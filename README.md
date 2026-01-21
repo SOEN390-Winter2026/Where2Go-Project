@@ -1,18 +1,20 @@
 # Where2Go
 
 ## Team
-- SOEN 390 Project Team
+**SOEN 390 Project Team**
 
-Adriana Ruscitti-Titto    |  (40239627)  |
-Steven Dy                 |  (40283742)  |
-Ange Akaliza              |  (40270048)  |
-Jammie Assenov            |  (40174965)  |
-Mugisha Samuel Rugomwa    |  (40265564)  |
-Océane Rakotomalala       |  (40226514)  |
-Jenna Sidi Abed           |  (40270128)  | xJennaS
-Khujista Faqiri           |  (40249541)  |
-Yayi Chen                 |  (40286042)  |
-Aidana Abdybaeva          |  (40281501)  |
+| Name | Student ID | Github Username | 
+|------|-------------|----------------|
+| Adriana Ruscitti-Titto    |  (40239627)  | |
+| Steven Dy                 |  (40283742)  | |
+| Ange Akaliza              |  (40270048)  | |
+| Jammie Assenov            |  (40174965)  | |
+| Mugisha Samuel Rugomwa    |  (40265564)  | |
+| Océane Rakotomalala       |  (40226514)  | oceven |
+| Jenna Sidi Abed           |  (40270128)  | xJennaS |
+| Khujista Faqiri           |  (40249541)  | |
+| Yayi Chen                 |  (40286042)  | |
+| Aidana Abdybaeva          |  (40281501)  | |
 
 
 ### Project overview ###
