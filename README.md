@@ -14,7 +14,7 @@
 | Jenna Sidi Abed           |  40270128  | xJennaS |
 | Khujista Faqiri           |  40249541  | |
 | Yayi Chen                 |  40286042  | |
-| Aidana Abdybaeva          |  40281501  | |
+| Aidana Abdybaeva          |  40281501  | xidxnx |
 
 
 ### Project overview ###
