@@ -15,6 +15,8 @@
 | Khujista Faqiri           |  40249541  | |
 | Yayi Chen                 |  40286042  | |
 | Aidana Abdybaeva          |  40281501  | xidxnx |
+| Ibtihal Mossa             |  40239097  | ibti-m |  
+
 
 
 ### Project overview ###
