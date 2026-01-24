@@ -5,7 +5,7 @@
 
 | Name | Student ID | Github Username | 
 |------|-------------|----------------|
-| Adriana Ruscitti-Titto    |  40239627  | |
+| Adriana Ruscitti-Titto    |  40239627  | Adriana643 |
 | Steven Dy                 |  40283742  | Steven01231|
 | Ange Akaliza              |  40270048  | Ellakaliza |
 | Jammie Assenov            |  40174965  | |
@@ -25,9 +25,14 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 
 ## Technology Stack
 - **Frontend:** React Native
+- **Backend:** Node.js & Express
+- **Integrations:** Google Maps API, Google Calendar API
+- **Libraries:** react-native-geolocation-service
+- **Database:** MongoDB
 - **CI/CD:** GitHub Actions
-- **Runtime & Tooling:** Node.js
+
+## Requirements
 
 
 
-
+## How to run
