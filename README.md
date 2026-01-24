@@ -6,7 +6,7 @@
 | Name | Student ID | Github Username | 
 |------|-------------|----------------|
 | Adriana Ruscitti-Titto    |  40239627  | |
-| Steven Dy                 |  40283742  | |
+| Steven Dy                 |  40283742  | Steven01231|
 | Ange Akaliza              |  40270048  | |
 | Jammie Assenov            |  40174965  | |
 | Mugisha Samuel Rugomwa    |  40265564  | MugishaSamy |
