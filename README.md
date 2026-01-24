@@ -13,7 +13,7 @@
 | Océane Rakotomalala       |  40226514  | oceven |
 | Jenna Sidi Abed           |  40270128  | xJennaS |
 | Khujista Faqiri           |  40249541  | |
-| Yayi Chen                 |  40286042  | |
+| Yayi Chen                 |  40286042  | afkCYa |
 | Aidana Abdybaeva          |  40281501  | xidxnx |
 | Ibtihal Mossa             |  40239097  | ibti-m |  
 
