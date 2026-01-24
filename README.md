@@ -7,7 +7,7 @@
 |------|-------------|----------------|
 | Adriana Ruscitti-Titto    |  40239627  | |
 | Steven Dy                 |  40283742  | Steven01231|
-| Ange Akaliza              |  40270048  | |
+| Ange Akaliza              |  40270048  | Ellakaliza |
 | Jammie Assenov            |  40174965  | |
 | Mugisha Samuel Rugomwa    |  40265564  | MugishaSamy |
 | Océane Rakotomalala       |  40226514  | oceven |
