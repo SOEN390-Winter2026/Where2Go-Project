@@ -30,15 +30,52 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 - **Libraries:** react-native-geolocation-service
 - **Database:** MongoDB
 - **CI/CD:** GitHub Actions
-- **Unit Testing:** JUnit
+- **Unit Testing:** Jest
 - **End-2-End Testing**: Maestro
 
 **Additional:**
 SonarQube: Used for code analysis and quality
 
 
-## Requirements
+## Installation
 
+Before running anything, you must have the requirements:
+- Nodejs installed
 
+### Backend
+
+Open path for backend folder
+
+Run ```npm install```
+
+### Frontend
+
+Open path for frontend folder
+
+Run ```npm install```
 
 ## How to run
+
+### Backend
+
+Run ```npm run dev```
+
+Run ```npm start```
+
+### Frontend
+
+To run your project, navigate to the directory and run one of the following npm commands.
+
+- cd where2go
+- npm run android
+- npm run ios # you need to use macOS to build the iOS project - use the Expo app if you need to do iOS development without a Mac     
+- npm run web
+
+## Packages & Dependencies
+
+- Express
+- Cors
+- dotenv
+- Mongoose
+- Nodemon
+- React native
