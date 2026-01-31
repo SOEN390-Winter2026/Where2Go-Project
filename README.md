@@ -34,7 +34,7 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 - **End-2-End Testing**: Maestro
 
 **Additional:**
-SonarQube: Used for code analysis and quality
+- SonarQube, used for code analysis and quality
 
 
 ## Installation
@@ -71,11 +71,29 @@ To run your project, navigate to the directory and run one of the following npm 
 - npm run ios # you need to use macOS to build the iOS project - use the Expo app if you need to do iOS development without a Mac     
 - npm run web
 
+## Testing
+
+### Backend
+
+Open path for backend folder
+
+```npm run test```
+
+For backend dev mode: ```npm run dev```
+
+For watch mode: ```npm run test:watch```
+
+### Frontend
+
+Open path for frontend folder
+
+```npm run test```
+
 ## Packages & Dependencies
 
-- Express
-- Cors
-- dotenv
-- Mongoose
-- Nodemon
-- React native
+- Express: Run the server
+- Cors: Allows server to permit web browsers to make requests from origins
+- dotenv: Keep important data secure within the code
+- Mongoose: Access mongodb
+- Nodemon: Automatically rerun code when its edited
+- React native: Main framework used to develop our mobile application
