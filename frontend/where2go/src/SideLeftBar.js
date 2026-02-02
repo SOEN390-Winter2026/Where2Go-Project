@@ -113,6 +113,8 @@ const styles = StyleSheet.create({
     top: "5%",
     alignItems: "center",
     backgroundColor: "white",
+    zIndex: 20,
+    elevation: 20,
   },
 
   barItem: {
