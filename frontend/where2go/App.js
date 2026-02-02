@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
+import SideLeftBar from './src/SideLeftBar';
 
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
       >
         <Marker coordinate={campusCoords} />
       </MapView>
+      <SideLeftBar />
       <View style={styles.buttons}>
         <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
         <Button title="Loyola" color="#ffffff" onPress={() => setCurrentCampus('Loyola')} />
