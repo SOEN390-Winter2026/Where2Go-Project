@@ -1,50 +1,54 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, View, Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
-import {APIProvider, Map, Marker} from '@vis.gl/react-google-maps';
-import { GOOGLE_MAPS_API_KEY } from '@env';
+import MapView, { Marker } from 'react-native-maps';
+
 
 export default function App() {
   const [currentCampus, setCurrentCampus] = useState('SGW');
-  const [campusCoords, setCampusCoords] = useState({ lat: 45.4974, lng: -73.5771 });
+  const [campusCoords, setCampusCoords] = useState({
+    latitude: 45.4974,
+    longitude: -73.5771,
+  });
   const mapRef = useRef(null);
   // whenever currentCampus changes, this will get the new coordinates from the backend
-    useEffect(() => {
-      fetch(`http://localhost:3000/campus/${currentCampus}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setCampusCoords(data);
-  // This will center the map on the new coords
-          mapRef.current?.setCenter(data);
-        })
-        .catch((err) => console.error('Error fetching campus coordinates:', err));
-    }, [currentCampus]);
+  useEffect(() => {
+    fetch(`http://localhost:3000/campus/${currentCampus}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const nextCoords = { latitude: data.lat, longitude: data.lng };
+        setCampusCoords(nextCoords);
+        // Center the native map on the new coords
+        mapRef.current?.animateToRegion(
+          {
+            ...nextCoords,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          500
+        );
+      })
+      .catch((err) => console.error('Error fetching campus coordinates:', err));
+  }, [currentCampus]);
   return (
-  <APIProvider apiKey={GOOGLE_MAPS_API_KEY} onLoad={() => console.log('Maps API has loaded.')}>
     <View style={styles.container}>
-      <Map
+      <MapView
         ref={mapRef}
-        defaultZoom={13}
-        defaultCenter={campusCoords} // Location that gets first loaded
-        style={{ width: '100%', height: '100%' }}
-        onCameraChanged={(ev) =>
-          console.log(
-            'camera changed:',
-            ev.detail.center,
-            'zoom:',
-            ev.detail.zoom
-          )
-        }
+        initialRegion={{
+          ...campusCoords,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
+        style={styles.map}
       >
-        <Marker position={campusCoords} />
-        </Map>
-         <View style={styles.buttons}>
-                  <Button title="SGW" onPress={() => setCurrentCampus('SGW')} />
-                  <Button title="Loyola" onPress={() => setCurrentCampus('Loyola')} />
-                </View>
+        <Marker coordinate={campusCoords} />
+      </MapView>
+      <View style={styles.buttons}>
+        <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
+        <Button title="Loyola" color="#ffffff" onPress={() => setCurrentCampus('Loyola')} />
+      </View>
       <StatusBar style="auto" />
     </View>
-       </APIProvider>
   );
 }
 
@@ -54,5 +58,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  buttons: {
+    position: 'absolute',
+    bottom: 40,
+    width: '90%',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#6b0f1a',
+    zIndex: 10,
+    elevation: 10,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
   },
 });

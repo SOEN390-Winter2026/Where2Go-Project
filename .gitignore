@@ -25,3 +25,7 @@ hs_err_pid*
 replay_pid*
 .idea/
 *.iml
+node_modules
+.expo/
+.vscode/
+/Where2Go/
