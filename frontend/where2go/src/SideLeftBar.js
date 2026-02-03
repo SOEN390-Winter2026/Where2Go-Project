@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Animated,
 } from "react-native";
 
-export default function SideLeftBar() {
+export default function SideLeftBar({ currentCampus, onToggleCampus }) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -20,20 +20,22 @@ export default function SideLeftBar() {
   const secondGPSIcon = require("../assets/ic--round-gps-fixed.png");
 
   /* ---------- State ---------- */
-  const [isSGW, setIsSGW] = useState(false);
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const isSGW = currentCampus === "SGW";
+  const slideAnim = useRef(new Animated.Value(isSGW ? 0 : -26)).current;
 
   const [active, setActive] = useState(null);
 
   /* ---------- Switch Animation ---------- */
-  const toggleCampus = () => {
+  useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: isSGW ? 0 : -26,
-      duration: 400,
+      duration: 250,
       useNativeDriver: true,
     }).start();
+  }, [isSGW, slideAnim]);
 
-    setIsSGW(prev => !prev);
+  const toggleCampus = () => {
+    onToggleCampus?.();
   };
 
   /* ---------- Icons ---------- */
@@ -61,8 +63,11 @@ export default function SideLeftBar() {
               { backgroundColor: isSGW ? "#912338" : "#ccc" },
             ]}
           />
-          <Text style={styles.sgwName}>SGW</Text>
-        <Text style={styles.loyolaName}>Loyola</Text>
+    {isSGW ? (
+      <Text style={[styles.sgwName, { color: "#ffffff" }]}>SGW</Text>
+    ) : (
+      <Text style={[styles.loyolaName, { color: "#912338" }]}>Loyola</Text>
+    )}
           <Animated.View
             style={[
               styles.sliderKnob,

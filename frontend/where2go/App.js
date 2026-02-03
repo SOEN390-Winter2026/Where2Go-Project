@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Button } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
@@ -47,12 +47,13 @@ export default function App() {
       >
         <Marker coordinate={campusCoords} />
       </MapView>
-      <SideLeftBar />
+      <SideLeftBar
+        currentCampus={currentCampus}
+        onToggleCampus={() =>
+          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
+        }
+      />
       <TopRightMenu />
-      <View style={styles.buttons}>
-        <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
-        <Button title="Loyola" color="#ffffff" onPress={() => setCurrentCampus('Loyola')} />
-      </View>
       <StatusBar style="auto" />
     </View>
   );
@@ -72,19 +73,5 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     zIndex: 1,
-  },
-  buttons: {
-    position: 'absolute',
-    bottom: 40,
-    width: '90%',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#6b0f1a',
-    zIndex: 10,
-    elevation: 10,
-    alignSelf: 'center',
   },
 });
