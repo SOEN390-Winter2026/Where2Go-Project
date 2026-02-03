@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const { getCampusCoordinates } = require("./services/map");
 
 const app = express();
 
@@ -8,6 +9,14 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
     res.json({ message: "Backend is running" });
+});
+
+// Endpoint to get campus coordinates (SGW or Loyola)
+app.get("/campus/:name", (req, res) => {
+    console.log("Backend received request for campus:", req.params.name);
+    const campus = getCampusCoordinates(req.params.name);
+    if (!campus) return res.status(404).json({ error: "Campus not found" });
+    res.json(campus);
 });
 
 const PORT = process.env.PORT || 3000;
