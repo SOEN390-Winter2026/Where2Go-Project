@@ -1,0 +1,111 @@
+@media (min-width: 600px) {
+  .header {grid-area: 1 / span 6;}
+  .menu {grid-area: 2 / span 1;}
+  .content {grid-area: 2 / span 4;}
+  .facts {grid-area: 2 / span 1;}
+  .footer {grid-area: 3 / span 6;}
+}
+.floatLeftBar{
+    position: absolute;
+    padding: 5px;
+    border: 2px solid #912338;
+    border-radius: 50px;
+    max-height: fit-content;
+    left: 1%;
+    top: 5%;
+    display: grid;
+    justify-items: center;
+}
+
+.sgwName {
+  position: absolute;
+  color: #912338;
+  font-size: 10px;
+  left: 22px;
+  display: grid;
+  justify-items: center;
+  top: 15px;
+  z-index: 1;
+}
+.loyolaName {
+  position: absolute;
+  color: #ccc;
+  font-size: 10px;
+  left: 20px;
+  display: grid;
+  justify-items: center;
+  top: 45px;
+  z-index: 1;
+}
+
+.floatLeftBar > div {
+    border: 2px solid #912338;
+    border-radius: 50px;
+    padding: 5px;
+    margin: 5px;
+    transition: all 0.4s ease;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 60px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #912338;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #912338;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateY(-26px);
+  -ms-transform: translateY(-26px);
+  transform: translateY(-26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+  z-index: 2;
+}
