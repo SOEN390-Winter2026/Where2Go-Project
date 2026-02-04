@@ -1,11 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import LoginScreen from "./src/Login";
 
 export default function App() {
+  
+  const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
@@ -31,7 +34,12 @@ export default function App() {
         );
       })
       .catch((err) => console.error('Error fetching campus coordinates:', err));
-  }, [currentCampus]);
+  }, [currentCampus, showLogin]);
+
+  //Login page first
+  if (showLogin){
+    return <LoginScreen onSkip={() => setShowLogin(false)}/>;
+  }
 
   return (
     <View style={styles.container}>
