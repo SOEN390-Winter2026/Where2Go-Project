@@ -23,7 +23,9 @@ export default function SideLeftBar({ currentCampus, onToggleCampus }) {
   const isSGW = currentCampus === "SGW";
   const slideAnim = useRef(new Animated.Value(isSGW ? 0 : -26)).current;
 
-  const [active, setActive] = useState(null);
+  const [activeDis, setActiveDis] = useState(null);
+  const [activePOI, setActivePOI] = useState(null);
+  const [activeGPS, setActiveGPS] = useState(null);
 
   /* ---------- Switch Animation ---------- */
   useEffect(() => {
@@ -39,17 +41,23 @@ export default function SideLeftBar({ currentCampus, onToggleCampus }) {
   };
 
   /* ---------- Icons ---------- */
-  const iconState = (name) => ({
-    backgroundColor: active === name ? "#912338" : "white",
-  });
+  const iconState = (name) => {
+  if (name === "disability")
+    return { backgroundColor: activeDis === name ? "#912338" : "#ccc" };
+  if (name === "poi")
+    return { backgroundColor: activePOI === name ? "#912338" : "#ccc" };
+  if (name === "gps")
+    return { backgroundColor: activeGPS === name ? "#912338" : "#ccc" };
+};
+
 
   const iconSource = (name) => {
     if (name === "disability")
-      return active === name ? secondDisabilityIcon : firstDisabilityIcon;
+      return activeDis === name ? secondDisabilityIcon : firstDisabilityIcon;
     if (name === "poi")
-      return active === name ? secondPOIIcon : firstPOIIcon;
+      return activePOI === name ? secondPOIIcon : firstPOIIcon;
     if (name === "gps")
-      return active === name ? secondGPSIcon : firstGPSIcon;
+      return activeGPS === name ? secondGPSIcon : firstGPSIcon;
   };
 
   return (
@@ -79,29 +87,36 @@ export default function SideLeftBar({ currentCampus, onToggleCampus }) {
         
       </Pressable>
 
-      {/* -------- Disability -------- */}
-      <Pressable
-        style={[styles.barItem, iconState("disability")]}
-        onPress={() => setActive("disability")}
-      >
-        <Image source={iconSource("disability")} style={styles.icon} />
-      </Pressable>
+     {/* -------- Disability -------- */}
+<Pressable
+  style={[styles.barItem, iconState("disability")]}
+  onPress={() =>
+    setActiveDis((prev) => (prev === "disability" ? null : "disability"))
+  }
+>
+  <Image source={iconSource("disability")} style={styles.icon} />
+</Pressable>
 
-      {/* -------- POI -------- */}
-      <Pressable
-        style={[styles.barItem, iconState("poi")]}
-        onPress={() => setActive("poi")}
-      >
-        <Image source={iconSource("poi")} style={styles.icon} />
-      </Pressable>
+{/* -------- POI -------- */}
+<Pressable
+  style={[styles.barItem, iconState("poi")]}
+  onPress={() =>
+    setActivePOI((prev) => (prev === "poi" ? null : "poi"))
+  }
+>
+  <Image source={iconSource("poi")} style={styles.icon} />
+</Pressable>
 
-      {/* -------- GPS -------- */}
-      <Pressable
-        style={[styles.barItem, iconState("gps")]}
-        onPress={() => setActive("gps")}
-      >
-        <Image source={iconSource("gps")} style={styles.icon} />
-      </Pressable>
+{/* -------- GPS -------- */}
+<Pressable
+  style={[styles.barItem, iconState("gps")]}
+  onPress={() =>
+    setActiveGPS((prev) => (prev === "gps" ? null : "gps"))
+  }
+>
+  <Image source={iconSource("gps")} style={styles.icon} />
+</Pressable>
+
     </View>
   );
 }
