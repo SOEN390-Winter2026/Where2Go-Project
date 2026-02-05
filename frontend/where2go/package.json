@@ -11,9 +11,9 @@
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
     "@googlemaps/markerclusterer": "^2.5.1",
-    "@react-native-community/geolocation": "^3.4.0",
     "@vis.gl/react-google-maps": "latest",
     "expo": "~54.0.33",
+    "expo-location": "~19.0.8",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",

@@ -2,7 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, PermissionsAndroid, Platform } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import Geolocation from '@react-native-community/geolocation';
+import * as Location from 'expo-location';
+
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 
@@ -16,9 +17,8 @@ export default function App() {
 
   const mapRef = useRef(null);
 
-  // 🔁 Fetch campus coords from backend
   useEffect(() => {
-    fetch(`http://10.0.2.2:3000/campus/${currentCampus}`) // NOT localhost
+    fetch(`http://10.0.2.2:3000/campus/${currentCampus}`) 
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
@@ -35,29 +35,33 @@ export default function App() {
       .catch((err) => console.error('Error fetching campus coordinates:', err));
   }, [currentCampus]);
 
-  // 📍 Live user location
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-      );
+
+ useEffect(() => {
+  (async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission denied');
+      return;
     }
 
-    const watchId = Geolocation.watchPosition(
-      (pos) => {
+    await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 1000,
+        distanceInterval: 5,
+      },
+      (loc) => {
         const coords = {
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
         };
         console.log('USER LOCATION:', coords);
         setUserLocation(coords);
-      },
-      (err) => console.log('Location error:', err),
-      { enableHighAccuracy: true, distanceFilter: 5 }
+      }
     );
+  })();
+}, []);
 
-    return () => Geolocation.clearWatch(watchId);
-  }, []);
 
   return (
     <View style={styles.container}>
