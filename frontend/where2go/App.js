@@ -37,6 +37,7 @@ export default function App() {
     fetch(`http://localhost:3000/campus/${currentCampus}/buildings`)
       .then((res) => res.json())
       .then((data) => {
+        console.log(`Fetched ${data.length} buildings for ${currentCampus}:`, data);
         setBuildings(data);
       })
       .catch((err) => console.error('Error fetching buildings:', err));
@@ -57,18 +58,27 @@ export default function App() {
         <Marker coordinate={campusCoords} />
         
         {/* Render building polygons to highlight them */}
-        {buildings.map((building) => (
-          <Polygon
-            key={building.id}
-            coordinates={building.coordinates.map((coord) => ({
-              latitude: coord.lat,
-              longitude: coord.lng,
-            }))}
-            fillColor="rgba(135, 206, 250, 0.3)"
-            strokeColor="rgba(30, 144, 255, 0.8)"
-            strokeWidth={2}
-          />
-        ))}
+        {buildings.length > 0 && console.log('Rendering polygons for', buildings.length, 'buildings')}
+        {buildings.map((building) => {
+          if (!building.coordinates || building.coordinates.length === 0) {
+            console.warn(`Building ${building.id} has no coordinates`);
+            return null;
+          }
+          const polygonCoords = building.coordinates.map((coord) => ({
+            latitude: coord.lat,
+            longitude: coord.lng,
+          }));
+          console.log(`Rendering polygon for ${building.id} with ${polygonCoords.length} points`);
+          return (
+            <Polygon
+              key={building.id}
+              coordinates={polygonCoords}
+              fillColor="rgba(135, 206, 250, 0.3)"
+              strokeColor="rgba(30, 144, 255, 0.8)"
+              strokeWidth={2}
+            />
+          );
+        })}
         
         {/* Render building markers at the center of each building */}
         {buildings.map((building) => {
