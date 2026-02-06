@@ -6,8 +6,8 @@ import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 
 // Backend URL configuration
-// For mobile testing, replace 'localhost' with your computer's IP address
-// Example: const BACKEND_URL = 'http://192.168.1.100:3000';
+// Set EXPO_PUBLIC_BACKEND_URL in .env file (see .env.example)
+// Defaults to localhost for web testing
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
 export default function App() {
