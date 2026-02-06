@@ -15,7 +15,7 @@ export default function App() {
 
   // whenever currentCampus changes, this will get the new coordinates from the backend
   useEffect(() => {
-    fetch(`http://localhost:3000/campus/${currentCampus}`)
+    fetch(`http://192.168.1.8:3000/campus/${currentCampus}`)
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
