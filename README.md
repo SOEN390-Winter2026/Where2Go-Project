@@ -79,3 +79,34 @@ To run your project, navigate to the directory and run one of the following npm 
 - Mongoose
 - Nodemon
 - React native
+
+## Features
+
+### Building Highlighting
+
+The application highlights key university buildings on the map using Google Maps API polygon overlays. This feature helps users quickly identify important campus buildings.
+
+**How it works:**
+- Buildings are displayed with semi-transparent blue polygons over their footprints
+- Each building has a marker at its center showing the building name and ID
+- Buildings are automatically loaded based on the selected campus (SGW or Loyola)
+- The styling includes:
+  - Fill color: Light blue with 30% opacity (`rgba(135, 206, 250, 0.3)`)
+  - Stroke color: Dodger blue with 80% opacity (`rgba(30, 144, 255, 0.8)`)
+  - Stroke width: 2 pixels
+
+**Available buildings:**
+
+*SGW Campus:*
+- Henry F. Hall Building (H)
+- Guy-De Maisonneuve Building (GM)
+- John Molson Building (MB)
+- J.W. McConnell Building - Library (LB)
+
+*Loyola Campus:*
+- Central Building (CC)
+- Administration Building (AD)
+- Student Centre (SP)
+
+**API Endpoints:**
+- `GET /campus/:name/buildings` - Returns building data (coordinates and names) for the specified campus

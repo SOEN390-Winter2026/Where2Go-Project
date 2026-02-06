@@ -74,11 +74,14 @@ export default function App() {
         {buildings.map((building) => {
           const center = building.coordinates.reduce(
             (acc, coord) => ({
-              latitude: acc.latitude + coord.lat / building.coordinates.length,
-              longitude: acc.longitude + coord.lng / building.coordinates.length,
+              latitude: acc.latitude + coord.lat,
+              longitude: acc.longitude + coord.lng,
             }),
             { latitude: 0, longitude: 0 }
           );
+          center.latitude /= building.coordinates.length;
+          center.longitude /= building.coordinates.length;
+          
           return (
             <Marker
               key={`marker-${building.id}`}
