@@ -1,9 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+
+// Backend URL configuration
+// For mobile testing, replace 'localhost' with your computer's IP address
+// Example: const BACKEND_URL = 'http://192.168.1.100:3000';
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
 export default function App() {
   const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -16,7 +21,7 @@ export default function App() {
 
   // whenever currentCampus changes, this will get the new coordinates from the backend
   useEffect(() => {
-    fetch(`http://localhost:3000/campus/${currentCampus}`)
+    fetch(`${BACKEND_URL}/campus/${currentCampus}`)
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
@@ -34,7 +39,7 @@ export default function App() {
       .catch((err) => console.error('Error fetching campus coordinates:', err));
 
     // Fetch buildings for the current campus
-    fetch(`http://localhost:3000/campus/${currentCampus}/buildings`)
+    fetch(`${BACKEND_URL}/campus/${currentCampus}/buildings`)
       .then((res) => res.json())
       .then((data) => {
         console.log(`Fetched ${data.length} buildings for ${currentCampus}:`, data);

@@ -110,3 +110,39 @@ The application highlights key university buildings on the map using Google Maps
 
 **API Endpoints:**
 - `GET /campus/:name/buildings` - Returns building data (coordinates and names) for the specified campus
+
+**Testing on Mobile Devices:**
+
+When testing on a physical device or emulator, you need to configure the backend URL:
+
+1. Copy the example environment file:
+   ```bash
+   cd frontend/where2go
+   cp .env.example .env
+   ```
+
+2. Find your computer's IP address:
+   - **Windows:** Open Command Prompt and run `ipconfig`
+   - **Mac/Linux:** Open Terminal and run `ifconfig` or `ip addr`
+   - Look for your local network IP (usually starts with 192.168.x.x or 10.0.x.x)
+
+3. Edit the `.env` file and replace `localhost` with your IP:
+   ```
+   EXPO_PUBLIC_BACKEND_URL=http://192.168.1.100:3000
+   ```
+   (Replace `192.168.1.100` with your actual IP address)
+
+4. Make sure your mobile device is on the same network as your computer
+
+5. Start the backend server and run the mobile app:
+   ```bash
+   # Terminal 1 - Backend
+   cd backend
+   npm start
+   
+   # Terminal 2 - Frontend
+   cd frontend/where2go
+   npm run android  # or npm run ios
+   ```
+
+The buildings should now appear as highlighted polygons on the map.
