@@ -18,11 +18,13 @@ export default function App() {
   const mapRef = useRef(null);
 
   useEffect(() => {
+    // Change call so that it works on real device after
     fetch(`http://10.0.2.2:3000/campus/${currentCampus}`) 
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
         setCampusCoords(nextCoords);
+        // Center the native map on the new coords
         mapRef.current?.animateToRegion(
           {
             ...nextCoords,
@@ -90,12 +92,13 @@ export default function App() {
           />
         )}
       </MapView>
-      <SideLeftBar />
+      <SideLeftBar 
+        currentCampus={currentCampus}
+        onToggleCampus={() =>
+          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
+        }
+        />
       <TopRightMenu />
-      <View style={styles.buttons}>
-        <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
-        <Button title="Loyola" color="#ffffff" onPress={() => setCurrentCampus('Loyola')} />
-      </View>
       <StatusBar style="auto" />
     </View>
   );

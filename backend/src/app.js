@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const dotenv = require("dotenv");
 const { getCampusCoordinates } = require("./services/map");
 
+dotenv.config();
 const app = express();
 
 app.use(cors());
