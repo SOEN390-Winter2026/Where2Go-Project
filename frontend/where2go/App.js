@@ -17,10 +17,32 @@ export default function App() {
 
   const [buildings, setBuildings] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
+  //Snapping back to user
+  const snapBackToUser = () => {
+    if (!mapRef.current || !userLocation) return;
+    mapRef.current.animateToRegion(
+      {
+        ...userLocation,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      400
+    );
+    setUserDraggedMap(false);
+  };
+
+  useEffect(() => {
+    if (liveLocationEnabled && userLocation) {
+      snapBackToUser();
+    }
+  }, [liveLocationEnabled, userLocation]);
+
+  
   // whenever currentCampus changes, get coordinates and building polygons from the backend
   useEffect(() => {
     fetch(`${API_BASE_URL}/campus/${currentCampus}`)
@@ -77,7 +99,6 @@ export default function App() {
         setUserLocation(coords);
       }
     );
-
     watchRef.current = sub;
   };
 
@@ -90,17 +111,28 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
-      <MapView
-      ref={mapRef}
+        <MapView
+          ref={mapRef}
           initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
           style={styles.map}
-          >
+          // When user drags map, snap back to them after they are done
+          onRegionChange={() => {
+            if (liveLocationEnabled) {
+              setUserDraggedMap(true);
+            }
+          }}
+          onRegionChangeComplete={() => {
+            if (liveLocationEnabled && userLocation && userDraggedMap) {
+              snapBackToUser();
+            }
+          }}
+        >
 
         {/* Campus marker */}
         <Marker coordinate={campusCoords} title={currentCampus} />
 
         {/* User marker */}
-        {userLocation && (
+        {userLocation && liveLocationEnabled && (
           <Marker
             coordinate={userLocation}
             title="You"
@@ -119,14 +151,20 @@ export default function App() {
         ))}
       </MapView>
       <SideLeftBar
-      currentCampus={currentCampus}
-      onToggleCampus={() =>
-        setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
-      }
-      onToggleLiveLocation={() =>
-        setLiveLocationEnabled((prev) => !prev)
-         }
-         />
+        currentCampus={currentCampus}
+        onToggleCampus={() =>
+          setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
+        }
+        onToggleLiveLocation={() =>
+          setLiveLocationEnabled((prev) => 
+            {
+              if(prev){
+                setUserLocation(null);
+              }
+              return !prev;
+            })
+        }
+        />
 
       <TopRightMenu />
       <StatusBar style="auto" />
