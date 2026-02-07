@@ -13,8 +13,11 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@react-native-community/geolocation": "^3.4.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
+    "expo": "^54.0.33",
+    "expo-dev-client": "^6.0.20",
     "express": "^5.2.1",
     "mongoose": "^9.1.5"
   },
