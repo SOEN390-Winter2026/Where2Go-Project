@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const { getCampusCoordinates } = require("./src/services/map");
+const { getCampusCoordinates, getBuildings } = require("./src/services/map");
 
 dotenv.config();
 const app = express();
@@ -15,6 +15,12 @@ app.get("/campus/:name", (req, res) => {
   const campus = getCampusCoordinates(req.params.name);
   if (!campus) return res.status(404).json({ error: "Campus not found" });
   res.json(campus);
+});
+
+// Endpoint to get building polygons for a campus (for map highlighting)
+app.get("/campus/:name/buildings", (req, res) => {
+  const buildings = getBuildings(req.params.name);
+  res.json(buildings);
 });
 
 

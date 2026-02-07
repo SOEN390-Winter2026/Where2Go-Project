@@ -24,6 +24,7 @@
   "private": true,
   "devDependencies": {
     "@react-native-community/cli": "latest",
+    "babel-preset-expo": "^54.0.10",
     "metro-react-native-babel-preset": "^0.77.0"
   }
 }
