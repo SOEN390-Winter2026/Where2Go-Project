@@ -8,7 +8,7 @@ import {
   Animated,
 } from "react-native";
 
-export default function SideLeftBar({ currentCampus, onToggleCampus }) {
+export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation }) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -110,9 +110,10 @@ export default function SideLeftBar({ currentCampus, onToggleCampus }) {
 {/* -------- GPS -------- */}
 <Pressable
   style={[styles.barItem, iconState("gps")]}
-  onPress={() =>
-    setActiveGPS((prev) => (prev === "gps" ? null : "gps"))
-  }
+  onPress={() => {
+    setActiveGPS((prev) => (prev === "gps" ? null : "gps"));
+    onToggleLiveLocation();
+  }}
 >
   <Image source={iconSource("gps")} style={styles.icon} />
 </Pressable>

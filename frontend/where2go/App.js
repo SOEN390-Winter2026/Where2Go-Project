@@ -13,6 +13,12 @@ export default function App() {
     latitude: 45.4974,
     longitude: -73.5771,
   });
+
+  const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+  const watchRef = useRef(null);
+
+
+
   const [userLocation, setUserLocation] = useState(null);
 
   const mapRef = useRef(null);
@@ -37,14 +43,22 @@ export default function App() {
 
 
  useEffect(() => {
-  (async () => {
+  if (!liveLocationEnabled) {
+    if (watchRef.current) {
+      watchRef.current.remove();
+      watchRef.current = null;
+    }
+    return;
+  }
+
+  const startTracking = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission denied');
+    if (status !== "granted") {
+      console.log("Permission denied");
       return;
     }
 
-    await Location.watchPositionAsync(
+    const sub = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 1000,
@@ -55,12 +69,17 @@ export default function App() {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
         };
-        console.log('USER LOCATION:', coords);
+        console.log("USER LOCATION:", coords);
         setUserLocation(coords);
       }
     );
-  })();
-}, []);
+
+    watchRef.current = sub;
+  };
+
+  startTracking();
+}, [liveLocationEnabled]);
+
 
 
   return (
@@ -68,16 +87,11 @@ export default function App() {
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
       <MapView
-        ref={mapRef}
-        initialRegion={{
-          ...campusCoords,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        style={styles.map}
-        showsUserLocation={true}
-        followsUserLocation={true}
-      >
+      ref={mapRef}
+          initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
+          style={styles.map}
+          >
+
         {/* Campus marker */}
         <Marker coordinate={campusCoords} title={currentCampus} />
 
@@ -90,7 +104,16 @@ export default function App() {
           />
         )}
       </MapView>
-      <SideLeftBar />
+      <SideLeftBar
+      currentCampus={currentCampus}
+      onToggleCampus={() =>
+        setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
+      }
+      onToggleLiveLocation={() =>
+        setLiveLocationEnabled((prev) => !prev)
+         }
+         />
+
       <TopRightMenu />
       <View style={styles.buttons}>
         <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
