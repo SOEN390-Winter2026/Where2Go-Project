@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, PermissionsAndroid, Platform,Button } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, Platform, Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import LoadingPage from './src/LoadingPage';
 
 export default function App() {
   const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -14,6 +15,9 @@ export default function App() {
     longitude: -73.5771,
   });
   const [userLocation, setUserLocation] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [locationError, setLocationError] = useState(false);  // Track if there's a location permission issue
 
   const mapRef = useRef(null);
 
@@ -32,7 +36,9 @@ export default function App() {
           500
         );
       })
-      .catch((err) => console.error('Error fetching campus coordinates:', err));
+      .catch((err) => console.error('Error fetching campus coordinates:', err)).finally(() => {
+        setIsLoading(false); // Stop loading once campus data is fetched
+      });
   }, [currentCampus]);
 
 
@@ -41,6 +47,7 @@ export default function App() {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       console.log('Permission denied');
+      setIsLoading(false); // stop loading if no permission to get location (since usually waits for it to be fetched)
       return;
     }
 
@@ -62,6 +69,9 @@ export default function App() {
   })();
 }, []);
 
+  if (isLoading) {
+    return <LoadingPage />;
+  }
 
   return (
     <View style={styles.container}>

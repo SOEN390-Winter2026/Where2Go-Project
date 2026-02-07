@@ -1,0 +1,54 @@
+Compilation of things you should try to run if something broke
+Shouldn't this be a bash file or something... or something to run them for me... pretty please
+
+Whenever you switch branches
+>> cd frontend
+>> cd where2go
+>> npm install
+apparently backend is dead
+
+Map
+>> npx expo install react-native-maps
+
+- if some api thing breaks
+> get a   .env   file
+> search   GOOGLE_MAPS_API_KEY   in the discord server
+> put that entire string into the .env file
+
+Babel (which one? idk either)
+>> npx expo install babel-preset-expo
+>> npm install --save-dev babel-preset-expo
+
+Loading page
+>> npm install react-native-reanimated react-native-progress
+
+
+Other commands
+>> npx expo run:android
+- starts the android app on expo. With downloading expo if first time or cleared the app data before. i think?
+> might have to click   a   at some point too
+> btw clicking   r   reloads the screen for you (because i was rebooting the entire thing all the time)
+
+>> npx expo prebuild --clean
+>> npx expo start -c
+- probably has something to do with cleaning. or clearing cache. i dont know
+
+
+More troubleshooting
+- In android emulator
+> select   more actions/...
+> choose   virtual device emulator
+> delete   the default one
+> click   the + button on top left corner
+> use   pixel 6 phone
+> use   API 35 android 15.0 vanillaIscream (ice cream)
+> start   with the play button, don't let it auto start in command lines, always start it before you run the expo commands
+
+
+Complaints
+- If your branch stops working, consider trying someone else's branch as base setup
+- build breaking look at versions, mainly java
+- Using a more advanced version of java (jdk 25) can run you into a bunch of trouble. i got jdk 21 or 17 i dont remember anymore
+- If you reach the point where the error asks you to change a gradle file or extremely specific lines of files, cancel/revert/go back you are lost. change java version instead
+- Deleting and recloning the entire repo is perfectly valid. Just annoying that some folders require you to delete the subfolders first because the admin perm blocks you. Even though you are the admin
+- adb.exe breaking might be linked to the emulator. Go read More troubleshooting/In android emulator 

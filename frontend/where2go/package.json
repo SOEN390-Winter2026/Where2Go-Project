@@ -20,7 +20,9 @@
     "react-native": "0.81.5",
     "react-native-dotenv": "^3.4.11",
     "react-native-maps": "^1.20.1",
-    "react-native-web": "^0.21.0"
+    "react-native-progress": "^5.0.1",
+    "react-native-web": "^0.21.0",
+    "rive-react-native": "^9.8.0"
   },
   "private": true,
   "devDependencies": {
