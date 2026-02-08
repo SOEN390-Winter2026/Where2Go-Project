@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { render, act } from "@testing-library/react-native";
+import { render, waitFor} from "@testing-library/react-native";
 import * as Location from "expo-location";
 
 jest.mock("expo-location", () => ({
   requestForegroundPermissionsAsync: jest.fn(),
-  watchPositionAsync: jest.fn(),
-  Accuracy: { High: "High" },
+  watchPositionAsync: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+  Accuracy: { High: 3 },
 }));
 
 function LiveLocationEffect() {
@@ -37,12 +37,11 @@ describe("Live location permission handling", () => {
     Location.requestForegroundPermissionsAsync.mockResolvedValue({
       status: "denied",
     });
+    render(<LiveLocationEffect/>)
 
-    await act(async () => {
-      render(<LiveLocationEffect />);
+    await waitFor(() => {
+      expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
     });
-
-    expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
     expect(Location.watchPositionAsync).not.toHaveBeenCalled();
   });
 
@@ -50,24 +49,18 @@ describe("Live location permission handling", () => {
     Location.requestForegroundPermissionsAsync.mockResolvedValue({
       status: "granted",
     });
+    render(<LiveLocationEffect />);
 
-    Location.watchPositionAsync.mockResolvedValue({ remove: jest.fn() });
-
-    await act(async () => {
-      render(<LiveLocationEffect />);
+    await waitFor(() => {
+      expect(Location.watchPositionAsync).toHaveBeenCalledTimes(1);
     });
-
-    expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
-    expect(Location.watchPositionAsync).toHaveBeenCalledTimes(1);
-
-    const [options, callback] = Location.watchPositionAsync.mock.calls[0];
-
-    expect(options).toMatchObject({
-      accuracy: Location.Accuracy.High,
-      timeInterval: 1000,
-      distanceInterval: 5,
-    });
-
-    expect(typeof callback).toBe("function");
+    expect(Location.watchPositionAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accuracy: Location.Accuracy.High,
+        timeInterval: 1000,
+        distanceInterval: 5,
+      }),
+      expect.any(Function)
+    );
   });
 });
