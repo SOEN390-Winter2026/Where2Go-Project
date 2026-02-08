@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import BuildingCallout from './src/BuildingCallout';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
