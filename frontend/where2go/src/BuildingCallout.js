@@ -78,6 +78,7 @@ const BuildingCallout = ({ currentCampus }) => {
             latitude: building.latitude,
             longitude: building.longitude,
           }}
+          tracksViewChanges={false}
         >
           <Callout
             tooltip
