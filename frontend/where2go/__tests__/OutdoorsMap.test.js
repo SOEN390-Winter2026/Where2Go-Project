@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 // Jest:
 // Used for testing (1) UI Components, (2) User interactions, (3) Visual Logic
 
+//VARIABLES FOR API CALLS
 const request = require('supertest');
 // Assuming your Express app is exported from a file named 'app.js'
 const app = require('../../../backend/src/app'); 
@@ -35,7 +36,7 @@ describe("Rendering Features Properly", () => {
 })
 
 
-describe("Toggle Button Test", () => {
+describe(" Buttons Test", () => {
 
     function TestWrapper() {
         const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -54,7 +55,38 @@ describe("Toggle Button Test", () => {
         );
     }
 
-    it("Check currentCampus", () => {
+    function TestButtoneWrapper(){
+        return (
+            <>
+            <Pressable
+              testID="disPress"
+              
+              
+            >
+              
+            </Pressable>
+            
+            {/* -------- POI -------- */}
+            <Pressable
+              testID="pOIPress"
+              
+              
+            >
+              
+            </Pressable>
+            
+            {/* -------- GPS -------- */}
+            <Pressable
+              testID="gPSPress"
+              
+            >
+             
+            </Pressable>
+            </>
+        )
+    }
+
+    it("Toggle Button", () => {
         //const mockOnPress = jest.fn();
 
         const { getByTestId } = render(<TestWrapper />)
@@ -67,7 +99,20 @@ describe("Toggle Button Test", () => {
         //expect(pressToggleButton).toHaveBeenCalled();
 
         expect(currentCampus.props.children).toBe('Loyola')
-    })
+    });
+
+    it("Disability Button", () => {
+        const mockOnPress = jest.fn();
+
+        const { getByTestId } = render(<TestButtoneWrapper onPress={mockOnPress} />)
+        const pressDisButton = getByTestId("disPress");
+        
+
+        fireEvent.press(pressDisButton);
+        //expect(pressToggleButton).toHaveBeenCalled();
+
+        
+    });
 })
 
 describe("Backend Functions", () => {
@@ -119,7 +164,6 @@ describe("API Testing", () => {
 
     it("/campus/SGW/buildings", async () => {
         const response = await request(app).get('/campus/SGW/buildings');
-        console.log(response.body[1]);
         expect(response.status).toBe(200);
         expect(response.body[1]).toEqual({
       id: 'jw',
@@ -139,7 +183,6 @@ describe("API Testing", () => {
 
     it("/campus/Loyola/buildings", async () => {
         const response = await request(app).get('/campus/Loyola/buildings');
-        console.log(response.body[1]);
         expect(response.status).toBe(200);
         expect(response.body[1]).toEqual({
       id: 'pc',
