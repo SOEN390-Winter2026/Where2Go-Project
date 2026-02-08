@@ -17,10 +17,35 @@ export default function App() {
     latitude: 45.4974,
     longitude: -73.5771,
   });
+
   const [buildings, setBuildings] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
+  const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+  const watchRef = useRef(null);
   const mapRef = useRef(null);
 
+  //Snapping back to user
+  const snapBackToUser = () => {
+    if (!mapRef.current || !userLocation) return;
+    mapRef.current.animateToRegion(
+      {
+        ...userLocation,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      400
+    );
+    setUserDraggedMap(false);
+  };
+
+  useEffect(() => {
+    if (liveLocationEnabled && userLocation) {
+      snapBackToUser();
+    }
+  }, [liveLocationEnabled, userLocation]);
+
+  
   // whenever currentCampus changes, get coordinates and building polygons from the backend
   useEffect(() => {
     fetch(`${API_BASE_URL}/campus/${currentCampus}`)
@@ -47,14 +72,22 @@ export default function App() {
 
 
  useEffect(() => {
-  (async () => {
+  if (!liveLocationEnabled) {
+    if (watchRef.current) {
+      watchRef.current.remove();
+      watchRef.current = null;
+    }
+    return;
+  }
+
+  const startTracking = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission denied');
+    if (status !== "granted") {
+      console.log("Permission denied");
       return;
     }
 
-    await Location.watchPositionAsync(
+    const sub = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 1000,
@@ -65,12 +98,16 @@ export default function App() {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
         };
-        console.log('USER LOCATION:', coords);
+        console.log("USER LOCATION:", coords);
         setUserLocation(coords);
       }
     );
-  })();
-}, []);
+    watchRef.current = sub;
+  };
+
+  startTracking();
+}, [liveLocationEnabled]);
+
 
 
   //Login page first
@@ -82,22 +119,28 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
-      <MapView
-        ref={mapRef}
-        initialRegion={{
-          ...campusCoords,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        style={styles.map}
-        showsUserLocation={true}
-        followsUserLocation={true}
-      >
+        <MapView
+          ref={mapRef}
+          initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
+          style={styles.map}
+          // When user drags map, snap back to them after they are done
+          onRegionChange={() => {
+            if (liveLocationEnabled) {
+              setUserDraggedMap(true);
+            }
+          }}
+          onRegionChangeComplete={() => {
+            if (liveLocationEnabled && userLocation && userDraggedMap) {
+              snapBackToUser();
+            }
+          }}
+        >
+
         {/* Campus marker */}
         <Marker coordinate={campusCoords} title={currentCampus} />
 
         {/* User marker */}
-        {userLocation && (
+        {userLocation && liveLocationEnabled && (
           <Marker
             coordinate={userLocation}
             title="You"
@@ -115,12 +158,22 @@ export default function App() {
           />
         ))}
       </MapView>
-      <SideLeftBar 
+      <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
-          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
+          setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
+        }
+        onToggleLiveLocation={() =>
+          setLiveLocationEnabled((prev) => 
+            {
+              if(prev){
+                setUserLocation(null);
+              }
+              return !prev;
+            })
         }
         />
+
       <TopRightMenu />
       <StatusBar style="auto" />
     </View>
