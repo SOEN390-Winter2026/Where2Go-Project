@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
-import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-
+import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
+import { colors } from './src/theme/colors';
+import { API_BASE_URL } from './src/config';
 
 export default function App() {
   
@@ -16,12 +17,13 @@ export default function App() {
     latitude: 45.4974,
     longitude: -73.5771,
   });
+  const [buildings, setBuildings] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
-
   const mapRef = useRef(null);
 
+  // whenever currentCampus changes, get coordinates and building polygons from the backend
   useEffect(() => {
-    fetch(`http://10.0.2.2:3000/campus/${currentCampus}`) 
+    fetch(`${API_BASE_URL}/campus/${currentCampus}`)
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
@@ -36,7 +38,12 @@ export default function App() {
         );
       })
       .catch((err) => console.error('Error fetching campus coordinates:', err));
-  }, [currentCampus, showLogin]);
+
+    fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
+      .then((res) => res.json())
+      .then(setBuildings)
+      .catch((err) => console.error('Error fetching buildings:', err));
+  }, [currentCampus,showLogin]);
 
 
  useEffect(() => {
@@ -97,13 +104,24 @@ export default function App() {
             pinColor="blue"
           />
         )}
+        {/* this section renders the campus highlighted shapes */}
+        {buildings.map((building) => (
+          <Polygon
+            key={building.id}
+            coordinates={building.coordinates}
+            fillColor={colors.buildingHighlightFill}
+            strokeColor={colors.buildingHighlightStroke}
+            strokeWidth={2}
+          />
+        ))}
       </MapView>
-      <SideLeftBar />
+      <SideLeftBar 
+        currentCampus={currentCampus}
+        onToggleCampus={() =>
+          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
+        }
+        />
       <TopRightMenu />
-      <View style={styles.buttons}>
-        <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
-        <Button title="Loyola" color="#ffffff" onPress={() => setCurrentCampus('Loyola')} />
-      </View>
       <StatusBar style="auto" />
     </View>
   );
