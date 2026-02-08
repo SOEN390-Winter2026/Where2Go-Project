@@ -1,13 +1,49 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext, createContext } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
-import LoginScreen from "./src/Login";
+import { AppStateProvider, AppStateContext } from './src/context/AppStateContext';
+import LandingPage from "./src/Login";
+import LoadingPage from './src/LoadingPage'; 
+import QuestionnairePage from './src/UserType'; 
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
+
+const AppStateContext = createContext();
+
+function AppStateProvider({ children }) {
+  const [loadingOverlay, setLoadingOverlay] = useState(true); 
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false); 
+  const [showLanding, setShowLanding] = useState(false); 
+
+  useEffect(() => {
+    
+    const init = async () => {
+  
+      setShowQuestionnaire(true); 
+      setLoadingOverlay(false); 
+    };
+    init();
+  }, []);
+
+  return (
+    <AppStateContext.Provider
+      value={{
+        loadingOverlay,
+        showQuestionnaire,
+        setShowQuestionnaire,
+        showLanding,
+        setShowLanding,
+      }}
+    >
+      {children}
+    </AppStateContext.Provider>
+  );
+}
+
 
 export default function App() {
   
@@ -116,6 +152,7 @@ export default function App() {
   }
 
   return (
+    <AppStateProvider>
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
@@ -176,7 +213,17 @@ export default function App() {
 
       <TopRightMenu />
       <StatusBar style="auto" />
+      <AppStateContext.Consumer>
+          {({ loadingOverlay, showQuestionnaire, showLanding }) => (
+            <>
+              {loadingOverlay && <LoadingPage />}           
+              {showQuestionnaire && <QuestionnairePage />} 
+              {showLanding && <LandingPage />}             
+            </>
+          )}
+        </AppStateContext.Consumer>
     </View>
+    </AppStateProvider>
   );
 }
 
