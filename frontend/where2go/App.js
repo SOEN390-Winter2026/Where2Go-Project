@@ -9,6 +9,7 @@ import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
 export default function App() {
+  console.log(API_BASE_URL);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,

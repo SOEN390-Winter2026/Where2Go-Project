@@ -63,7 +63,9 @@ export default function SideLeftBar({ currentCampus, onToggleCampus }) {
   return (
     <View style={styles.floatLeftBar}>
       {/* -------- Custom Switch -------- */}
-      <Pressable style={styles.barItem} onPress={toggleCampus}>
+      <Pressable 
+      testID="togglePress"
+      style={styles.barItem} onPress={toggleCampus}>
         <View style={styles.switch}>
           <View
             style={[
