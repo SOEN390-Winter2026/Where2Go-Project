@@ -1,52 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, Platform, Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import BuildingCallout from './src/BuildingCallout';
-import LoginScreen from "./src/Login";
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
 export default function App() {
-  
-  const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
     longitude: -73.5771,
   });
-
   const [buildings, setBuildings] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
-  const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
-  const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
-  const watchRef = useRef(null);
   const mapRef = useRef(null);
 
-  //Snapping back to user
-  const snapBackToUser = () => {
-    if (!mapRef.current || !userLocation) return;
-    mapRef.current.animateToRegion(
-      {
-        ...userLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      },
-      400
-    );
-    setUserDraggedMap(false);
-  };
-
-  useEffect(() => {
-    if (liveLocationEnabled && userLocation) {
-      snapBackToUser();
-    }
-  }, [liveLocationEnabled, userLocation]);
-
-  
   // whenever currentCampus changes, get coordinates and building polygons from the backend
   useEffect(() => {
     fetch(`${API_BASE_URL}/campus/${currentCampus}`)
@@ -69,79 +41,55 @@ export default function App() {
       .then((res) => res.json())
       .then(setBuildings)
       .catch((err) => console.error('Error fetching buildings:', err));
-  }, [currentCampus,showLogin]);
+  }, [currentCampus]);
 
 
- useEffect(() => {
-  if (!liveLocationEnabled) {
-    if (watchRef.current) {
-      watchRef.current.remove();
-      watchRef.current = null;
-    }
-    return;
-  }
-
-  const startTracking = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Permission denied");
-      return;
-    }
-
-    const sub = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 1000,
-        distanceInterval: 5,
-      },
-      (loc) => {
-        const coords = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        };
-        console.log("USER LOCATION:", coords);
-        setUserLocation(coords);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission denied');
+        return;
       }
-    );
-    watchRef.current = sub;
-  };
 
-  startTracking();
-}, [liveLocationEnabled]);
+      await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 5,
+        },
+        (loc) => {
+          const coords = {
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          };
+          console.log('USER LOCATION:', coords);
+          setUserLocation(coords);
+        }
+      );
+    })();
+  }, []);
 
-
-
-  //Login page first
-  if (showLogin){
-    return <LoginScreen onSkip={() => setShowLogin(false)}/>;
-  }
 
   return (
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
-        <MapView
-          ref={mapRef}
-          initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
-          style={styles.map}
-          // When user drags map, snap back to them after they are done
-          onRegionChange={() => {
-            if (liveLocationEnabled) {
-              setUserDraggedMap(true);
-            }
-          }}
-          onRegionChangeComplete={() => {
-            if (liveLocationEnabled && userLocation && userDraggedMap) {
-              snapBackToUser();
-            }
-          }}
-        >
-
-        {/* Campus marker */}
-        <Marker coordinate={campusCoords} title={currentCampus} />
+      <MapView
+        ref={mapRef}
+        initialRegion={{
+          ...campusCoords,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
+        style={styles.map}
+        showsUserLocation={true}
+      >
+        {/* Building markers with callouts */}
+        <BuildingCallout currentCampus={currentCampus} />
 
         {/* User marker */}
-        {userLocation && liveLocationEnabled && (
+        {userLocation && (
           <Marker
             coordinate={userLocation}
             title="You"
@@ -162,19 +110,9 @@ export default function App() {
       <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
-          setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
+          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
         }
-        onToggleLiveLocation={() =>
-          setLiveLocationEnabled((prev) => 
-            {
-              if(prev){
-                setUserLocation(null);
-              }
-              return !prev;
-            })
-        }
-        />
-
+      />
       <TopRightMenu />
     </View>
   );
