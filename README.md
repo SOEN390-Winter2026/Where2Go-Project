@@ -28,7 +28,7 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 - **Backend:** Node.js & Express
 - **Integrations:** Google Maps API, Google Calendar API
 - **Libraries:** react-native-geolocation-service
-- **Database:** MongoDB
+- **Database:** None
 - **CI/CD:** GitHub Actions
 - **Unit Testing:** Jest
 - **End-2-End Testing**: Maestro
@@ -42,15 +42,7 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 Before running anything, you must have the requirements:
 - Nodejs installed
 
-### Backend
-
-Open path for backend folder
-
-Run ```npm install```
-
-### Frontend
-
-Open path for frontend folder
+For both backend and frontend, open path for folders where ``\backend\src`` and ``\frontend\where2go``
 
 Run ```npm install```
 
@@ -58,9 +50,9 @@ Run ```npm install```
 
 ### Backend
 
-Run ```npm run dev```
+``npm run dev``
 
-Run ```npm start```
+``npm start``
 
 ### Frontend
 
@@ -89,6 +81,31 @@ Open path for frontend folder
 
 ```npm run test```
 
+Alternative:
+
+```
+npx expo prebuild --clean
+npx expo run:android
+```
+
+## Testing
+
+### Backend
+
+Open path for backend folder
+
+```npm run test```
+
+For backend dev mode: ```npm run dev```
+
+For watch mode: ```npm run test:watch```
+
+### Frontend
+
+Open path for frontend folder
+
+```npm run test```
+
 ## Packages & Dependencies
 
 - Express: Run the server
@@ -97,3 +114,9 @@ Open path for frontend folder
 - Mongoose: Access mongodb
 - Nodemon: Automatically rerun code when its edited
 - React native: Main framework used to develop our mobile application
+- Express: Run the server
+- Cors: Allows server to permit web browsers to make requests from origins
+- dotenv: Keep important data secure within the code
+- Nodemon: Automatically rerun code when its edited
+- React native: Main framework used to develop our mobile application
+- Expo: Facilitate development of the native app

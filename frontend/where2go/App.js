@@ -1,9 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, PermissionsAndroid, Platform,Button } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
-
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 
@@ -13,16 +11,16 @@ export default function App() {
     latitude: 45.4974,
     longitude: -73.5771,
   });
-  const [userLocation, setUserLocation] = useState(null);
-
   const mapRef = useRef(null);
 
+  // whenever currentCampus changes, this will get the new coordinates from the backend
   useEffect(() => {
-    fetch(`http://192.168.1.8:3000/campus/${currentCampus}`)
+    fetch(`http://localhost:3000/campus/${currentCampus}`)
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
         setCampusCoords(nextCoords);
+        // Center the native map on the new coords
         mapRef.current?.animateToRegion(
           {
             ...nextCoords,
@@ -35,38 +33,9 @@ export default function App() {
       .catch((err) => console.error('Error fetching campus coordinates:', err));
   }, [currentCampus]);
 
-
- useEffect(() => {
-  (async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission denied');
-      return;
-    }
-
-    await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 1000,
-        distanceInterval: 5,
-      },
-      (loc) => {
-        const coords = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        };
-        console.log('USER LOCATION:', coords);
-        setUserLocation(coords);
-      }
-    );
-  })();
-}, []);
-
-
   return (
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
-
       <MapView
         ref={mapRef}
         initialRegion={{
@@ -75,27 +44,16 @@ export default function App() {
           longitudeDelta: 0.01,
         }}
         style={styles.map}
-        showsUserLocation={true}
-        followsUserLocation={true}
       >
-        {/* Campus marker */}
-        <Marker coordinate={campusCoords} title={currentCampus} />
-
-        {/* User marker */}
-        {userLocation && (
-          <Marker
-            coordinate={userLocation}
-            title="You"
-            pinColor="blue"
-          />
-        )}
+        <Marker coordinate={campusCoords} />
       </MapView>
-      <SideLeftBar />
+      <SideLeftBar
+        currentCampus={currentCampus}
+        onToggleCampus={() =>
+          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
+        }
+      />
       <TopRightMenu />
-      <View style={styles.buttons}>
-        <Button title="SGW" color="#ffffff" onPress={() => setCurrentCampus('SGW')} />
-        <Button title="Loyola" color="#ffffff" onPress={() => setCurrentCampus('Loyola')} />
-      </View>
       <StatusBar style="auto" />
     </View>
   );
@@ -115,19 +73,5 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     zIndex: 1,
-  },
-  buttons: {
-    position: 'absolute',
-    bottom: 40,
-    width: '90%',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#6b0f1a',
-    zIndex: 10,
-    elevation: 10,
-    alignSelf: 'center',
   },
 });
