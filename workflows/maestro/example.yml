@@ -1,0 +1,6 @@
+appId: com.where2go.app
+
+-launchApp:
+clearState: true
+-tapOn: "gps"
+-assertVisible: "mapRef"
