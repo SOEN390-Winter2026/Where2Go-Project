@@ -1,14 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, PermissionsAndroid, Platform,Button } from 'react-native';
+import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import LoginScreen from "./src/Login";
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
 export default function App() {
+  
+  const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
@@ -65,7 +68,7 @@ export default function App() {
       .then((res) => res.json())
       .then(setBuildings)
       .catch((err) => console.error('Error fetching buildings:', err));
-  }, [currentCampus]);
+  }, [currentCampus,showLogin]);
 
 
  useEffect(() => {
@@ -106,6 +109,11 @@ export default function App() {
 }, [liveLocationEnabled]);
 
 
+
+  //Login page first
+  if (showLogin){
+    return <LoginScreen onSkip={() => setShowLogin(false)}/>;
+  }
 
   return (
     <View style={styles.container}>
