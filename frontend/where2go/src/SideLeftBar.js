@@ -63,7 +63,13 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   return (
     <View style={styles.floatLeftBar}>
       {/* -------- Custom Switch -------- */}
-      <Pressable style={styles.barItem} onPress={toggleCampus}>
+      <Pressable 
+        testID="campusToggle"
+        accessible={true}
+        accessibilityLabel="campus-switch"
+        style={styles.barItem} 
+        onPress={toggleCampus}
+      >
         <View style={styles.switch}>
           <View
             style={[
@@ -109,6 +115,9 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 
 {/* -------- GPS -------- */}
 <Pressable
+  testID="gps123"
+  accessible={true}
+  accessibilityLabel="gps"
   style={[styles.barItem, iconState("gps")]}
   onPress={() => {
     setActiveGPS((prev) => (prev === "gps" ? null : "gps"));
