@@ -6,8 +6,10 @@ import * as Location from 'expo-location';
 
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import UserType from './src/UserType';
 
 export default function App() {
+  const [userType, setUserType] = useState(null); // <-- null means not chosen yet
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
@@ -17,6 +19,7 @@ export default function App() {
 
   const mapRef = useRef(null);
 
+  
   useEffect(() => {
     fetch(`http://10.0.2.2:3000/campus/${currentCampus}`) 
       .then((res) => res.json())
@@ -37,6 +40,9 @@ export default function App() {
 
 
  useEffect(() => {
+
+  let subscription;
+
   (async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -44,7 +50,7 @@ export default function App() {
       return;
     }
 
-    await Location.watchPositionAsync(
+    subscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 1000,
@@ -55,15 +61,27 @@ export default function App() {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
         };
-        console.log('USER LOCATION:', coords);
+       // console.log('USER LOCATION:', coords);
         setUserLocation(coords);
       }
     );
   })();
-}, []);
+  return () => { 
+    subscription?.remove?.();
+  };
+  //}, [];r
+    
+}, [userType]);
 
-
+if (!userType) {
   return (
+    <UserType
+      onSelectType={(type) => setUserType(type)} // student/faculty/visitor
+    />
+  );
+}
+
+return (
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
