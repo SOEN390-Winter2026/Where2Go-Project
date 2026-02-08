@@ -30,3 +30,4 @@ node_modules
 frontend/where2go/.expo/
 .vscode/
 /Where2Go/
+frontend/package.json
