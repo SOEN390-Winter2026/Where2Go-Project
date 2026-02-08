@@ -109,6 +109,9 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 
 {/* -------- GPS -------- */}
 <Pressable
+  testID="gps123"
+  accessible={true}
+  accessibilityLabel="gps"
   style={[styles.barItem, iconState("gps")]}
   onPress={() => {
     setActiveGPS((prev) => (prev === "gps" ? null : "gps"));
