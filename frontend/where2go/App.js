@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, PermissionsAndroid, Platform,Button } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, Platform, Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
@@ -43,31 +43,31 @@ export default function App() {
   }, [currentCampus]);
 
 
- useEffect(() => {
-  (async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission denied');
-      return;
-    }
-
-    await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 1000,
-        distanceInterval: 5,
-      },
-      (loc) => {
-        const coords = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        };
-        console.log('USER LOCATION:', coords);
-        setUserLocation(coords);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission denied');
+        return;
       }
-    );
-  })();
-}, []);
+
+      await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 5,
+        },
+        (loc) => {
+          const coords = {
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          };
+          console.log('USER LOCATION:', coords);
+          setUserLocation(coords);
+        }
+      );
+    })();
+  }, []);
 
 
   return (
@@ -83,10 +83,9 @@ export default function App() {
         }}
         style={styles.map}
         showsUserLocation={true}
-        followsUserLocation={true}
       >
-        {/* Campus marker */}
-        <Marker coordinate={campusCoords} title={currentCampus} />
+        {/* Building markers with callouts */}
+        <BuildingCallout currentCampus={currentCampus} />
 
         {/* User marker */}
         {userLocation && (
@@ -107,14 +106,13 @@ export default function App() {
           />
         ))}
       </MapView>
-      <SideLeftBar 
+      <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
           setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
         }
-        />
+      />
       <TopRightMenu />
-      <StatusBar style="auto" />
     </View>
   );
 }
