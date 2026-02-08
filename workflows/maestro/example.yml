@@ -1,0 +1,8 @@
+appId: host.exp.exponent
+---
+- waitForAnimationToEnd
+- tapOn:
+    id: gps123
+- assertVisible:
+    id: mapRef
+
