@@ -27,5 +27,7 @@ replay_pid*
 *.iml
 node_modules
 .expo/
+frontend/where2go/.expo/
 .vscode/
 /Where2Go/
+frontend/package.json
