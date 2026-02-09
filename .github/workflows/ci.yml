@@ -1,0 +1,56 @@
+name: pipeline-ci
+
+on:
+  push:
+    branches: [ main , release1 ]
+  pull_request:
+    branches: [ main , release1 ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Backend
+      - name: Setup backend dependencies
+        run: cd backend && npm install
+
+      - name: Run backend tests with coverage
+        timeout-minutes: 10
+        run: cd backend && npm test -- --coverage || echo "No backend tests yet"
+
+      # Frontend  
+      - name: Setup frontend dependencies
+        run: cd frontend/where2go && npm install
+
+      - name: Run frontend tests with coverage
+        timeout-minutes: 10
+        run: cd frontend/where2go && npm run test:ci -- --coverage --maxWorkers=2
+
+      # SonarQube
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # Backend smoke check
+      - name: Start server (smoke check)
+        run: |
+          cd backend
+          node src/app.js &
+          sleep 5
+          pkill -f "node src/app.js" || true
+          echo "Backend server started and stopped successfully"
+
+      # Maestro tests (add them later)

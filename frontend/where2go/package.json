@@ -7,7 +7,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "test:ci": "jest --forceExit --ci"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
@@ -25,7 +26,16 @@
     "react-native-web": "^0.21.0"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.test.{js,jsx,ts,tsx}",
+      "!src/**/*.spec.{js,jsx,ts,tsx}",
+      "!src/**/__tests__/**",
+      "!src/**/__mocks__/**",
+      "!src/**/config.js",
+      "!src/**/app.config.js"
+    ]
   },
   "private": true,
   "devDependencies": {
