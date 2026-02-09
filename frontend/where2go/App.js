@@ -6,6 +6,7 @@ import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
+import BuildingCallout from './src/BuildingCallout';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
@@ -137,6 +138,9 @@ export default function App() {
             }
           }}
         >
+
+        {/* Building markers with callouts */}
+        <BuildingCallout currentCampus={currentCampus} />
 
         {/* Campus marker */}
         <Marker coordinate={campusCoords} title={currentCampus} />
