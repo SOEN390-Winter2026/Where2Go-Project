@@ -121,6 +121,8 @@ export default function App() {
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
         <MapView
+          testID="mapRef"
+          accessible={true}
           ref={mapRef}
           initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
           style={styles.map}
