@@ -10,14 +10,16 @@ import BuildingCallout from './src/BuildingCallout';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
+const CAMPUS_COORDS = {
+  SGW: { latitude: 45.4974, longitude: -73.5771 },
+  Loyola: { latitude: 45.4587, longitude: -73.6409 },
+};
+
 export default function App() {
-  
+
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
-  const [campusCoords, setCampusCoords] = useState({
-    latitude: 45.4974,
-    longitude: -73.5771,
-  });
+  const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
 
   const [buildings, setBuildings] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
@@ -47,27 +49,26 @@ export default function App() {
   }, [liveLocationEnabled, userLocation]);
 
   
-  // whenever currentCampus changes, get coordinates and building polygons from the backend
+  // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
   useEffect(() => {
-    fetch(`${API_BASE_URL}/campus/${currentCampus}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const nextCoords = { latitude: data.lat, longitude: data.lng };
-        setCampusCoords(nextCoords);
-        mapRef.current?.animateToRegion(
-          {
-            ...nextCoords,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          500
-        );
-      })
-      .catch((err) => console.error('Error fetching campus coordinates:', err));
+    const nextCoords = CAMPUS_COORDS[currentCampus];
+    setCampusCoords(nextCoords);
+    mapRef.current?.animateToRegion(
+      {
+        ...nextCoords,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      500
+    );
 
+    console.log('Fetching buildings from:', `${API_BASE_URL}/campus/${currentCampus}/buildings`);
     fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
       .then((res) => res.json())
-      .then(setBuildings)
+      .then((data) => {
+        console.log('Buildings received:', data.length);
+        setBuildings(data);
+      })
       .catch((err) => console.error('Error fetching buildings:', err));
   }, [currentCampus,showLogin]);
 
@@ -140,7 +141,7 @@ export default function App() {
         >
 
         {/* Building markers with callouts */}
-        <BuildingCallout currentCampus={currentCampus} />
+        <BuildingCallout buildings={buildings} />
 
         {/* Campus marker */}
         <Marker coordinate={campusCoords} title={currentCampus} />

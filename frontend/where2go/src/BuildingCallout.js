@@ -1,10 +1,10 @@
 import { StyleSheet, View, Text, Image, Linking } from 'react-native';
 import { Marker, Callout } from 'react-native-maps';
-import buildings from './data/buildings.json';
 
 export const buildingImages = {
   // SGW campus
   H: require('../assets/buildings/SGWImages/hBuilding.png'),
+  JW: require('../assets/buildings/SGWImages/gnBuilding.png'),
   VA: require('../assets/buildings/SGWImages/vaBuilding.png'),
   EV: require('../assets/buildings/SGWImages/evBuilding.png'),
   GN: require('../assets/buildings/SGWImages/gnBuilding.png'),
@@ -66,42 +66,57 @@ export const buildingImages = {
   VL: require('../assets/buildings/LoyolaImages/vlBuilding.png'),
 };
 
-const BuildingCallout = ({ currentCampus }) => {
-  const campusBuildings = buildings[currentCampus] || [];
+const getCentroid = (coordinates) => {
+  const len = coordinates.length;
+  const sum = coordinates.reduce(
+    (acc, coord) => ({
+      latitude: acc.latitude + coord.latitude,
+      longitude: acc.longitude + coord.longitude,
+    }),
+    { latitude: 0, longitude: 0 }
+  );
+  return {
+    latitude: sum.latitude / len,
+    longitude: sum.longitude / len,
+  };
+};
+
+const BuildingCallout = ({ buildings }) => {
+  if (!buildings || buildings.length === 0) return null;
 
   return (
     <>
-      {campusBuildings.map((building) => (
-        <Marker
-          key={building.code}
-          coordinate={{
-            latitude: building.latitude,
-            longitude: building.longitude,
-          }}
-          tracksViewChanges={false}
-        >
-          <Callout
-            tooltip
-            onPress={() => {
-              if (building?.link) Linking.openURL(building.link);
-            }}
+      {buildings.map((building) => {
+        const center = getCentroid(building.coordinates);
+        return (
+          <Marker
+            key={building.id}
+            coordinate={center}
+            tracksViewChanges={false}
           >
-            <View style={styles.callout}>
-              {buildingImages[building.code] && (
-                <Image
-                  source={buildingImages[building.code]}
-                  style={styles.calloutImage}
-                />
-              )}
-              <Text style={styles.calloutName}>{building.name}</Text>
-              <Text style={styles.calloutBuildingDescription}>
-                {building.address}
-              </Text>
-              <Text style={styles.calloutLink}>View on Concordia.ca</Text>
-            </View>
-          </Callout>
-        </Marker>
-      ))}
+            <Callout
+              tooltip
+              onPress={() => {
+                if (building?.link) Linking.openURL(building.link);
+              }}
+            >
+              <View style={styles.callout}>
+                {buildingImages[building.code] && (
+                  <Image
+                    source={buildingImages[building.code]}
+                    style={styles.calloutImage}
+                  />
+                )}
+                <Text style={styles.calloutName}>{building.name}</Text>
+                <Text style={styles.calloutBuildingDescription}>
+                  {building.address}
+                </Text>
+                <Text style={styles.calloutLink}>View on Concordia.ca</Text>
+              </View>
+            </Callout>
+          </Marker>
+        );
+      })}
     </>
   );
 };
