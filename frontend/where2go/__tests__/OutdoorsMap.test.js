@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 //VARIABLES FOR API CALLS
 const request = require('supertest');
 // Assuming your Express app is exported from a file named 'app.js'
-const app = require('../../../backend/src/app'); 
+const app = require('../../../backend/src/app');
 
 /**
  * - Campus toggle state logic
@@ -55,33 +55,31 @@ describe(" Buttons Test", () => {
         );
     }
 
-    function TestButtoneWrapper(){
+    function TestButtoneWrapper() {
         return (
             <>
-            <Pressable
-              testID="disPress"
-              
-              
-            >
-              
-            </Pressable>
-            
-            {/* -------- POI -------- */}
-            <Pressable
-              testID="pOIPress"
-              
-              
-            >
-              
-            </Pressable>
-            
-            {/* -------- GPS -------- */}
-            <Pressable
-              testID="gPSPress"
-              
-            >
-             
-            </Pressable>
+                <Pressable
+                    testID="disPress"
+                >
+
+                </Pressable>
+
+                {/* -------- POI -------- */}
+                <Pressable
+                    testID="pOIPress"
+
+
+                >
+
+                </Pressable>
+
+                {/* -------- GPS -------- */}
+                <Pressable
+                    testID="gPSPress"
+
+                >
+
+                </Pressable>
             </>
         )
     }
@@ -106,12 +104,12 @@ describe(" Buttons Test", () => {
 
         const { getByTestId } = render(<TestButtoneWrapper onPress={mockOnPress} />)
         const pressDisButton = getByTestId("disPress");
-        
+
 
         fireEvent.press(pressDisButton);
         //expect(pressToggleButton).toHaveBeenCalled();
 
-        
+
     });
 })
 
@@ -156,9 +154,9 @@ describe("API Testing", () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
-                lat: 45.4587,
-                lng: -73.6409,
-            });
+            lat: 45.4587,
+            lng: -73.6409,
+        });
 
     });
 
@@ -166,18 +164,18 @@ describe("API Testing", () => {
         const response = await request(app).get('/campus/SGW/buildings');
         expect(response.status).toBe(200);
         expect(response.body[1]).toEqual({
-      id: 'jw',
-      name: 'McConnell Building',
-      coordinates: [
-        { latitude: 45.49734, longitude: -73.578063 },
-        { latitude: 45.4968756, longitude: -73.5770947 },
-        { latitude: 45.4962439, longitude: -73.5777203 },
-        { latitude: 45.496684, longitude: -73.5786444 }
-      ]
-    });
+            id: 'jw',
+            name: 'McConnell Building',
+            coordinates: [
+                { latitude: 45.49734, longitude: -73.578063 },
+                { latitude: 45.4968756, longitude: -73.5770947 },
+                { latitude: 45.4962439, longitude: -73.5777203 },
+                { latitude: 45.496684, longitude: -73.5786444 }
+            ]
+        });
 
-    
-        
+
+
 
     });
 
@@ -185,15 +183,15 @@ describe("API Testing", () => {
         const response = await request(app).get('/campus/Loyola/buildings');
         expect(response.status).toBe(200);
         expect(response.body[1]).toEqual({
-      id: 'pc',
-      name: 'PERFORM Center',
-      coordinates: [
-        { latitude: 45.45728, longitude: -73.63763 },
-        { latitude: 45.45695, longitude: -73.63677 },
-        { latitude: 45.45668, longitude: -73.63699 },
-        { latitude: 45.45702, longitude: -73.63784 },
-      ],
-    });       
+            id: 'pc',
+            name: 'PERFORM Center',
+            coordinates: [
+                { latitude: 45.45728, longitude: -73.63763 },
+                { latitude: 45.45695, longitude: -73.63677 },
+                { latitude: 45.45668, longitude: -73.63699 },
+                { latitude: 45.45702, longitude: -73.63784 },
+            ],
+        });
     });
 
 
