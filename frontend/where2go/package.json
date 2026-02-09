@@ -31,8 +31,10 @@
   "devDependencies": {
     "@react-native-community/cli": "latest",
     "@testing-library/react-native": "^13.3.3",
+    "@types/react": "~19.1.10",
     "babel-preset-expo": "^54.0.10",
     "jest": "^29.7.0",
-    "metro-react-native-babel-preset": "^0.77.0"
+    "metro-react-native-babel-preset": "^0.77.0",
+    "typescript": "~5.9.2"
   }
 }

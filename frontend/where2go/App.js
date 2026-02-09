@@ -131,14 +131,20 @@ export default function App() {
         >
 
         {/* Campus marker */}
-        <Marker coordinate={campusCoords} title={currentCampus} />
+        <Marker testID="campusMarker"  // Add this
+        coordinate={campusCoords} 
+        title={currentCampus}
+        accessibilityLabel="Campus Location Marker" />
 
         {/* User marker */}
         {userLocation && liveLocationEnabled && (
           <Marker
+          testID="userMarker"
             coordinate={userLocation}
             title="You"
             pinColor="blue"
+            accessible={true}
+            accessibilityLabel="User Location Marker"
           />
         )}
         {/* this section renders the campus highlighted shapes */}

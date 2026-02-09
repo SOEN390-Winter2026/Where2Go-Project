@@ -1,0 +1,12 @@
+appId: host.exp.exponent
+---
+- waitForAnimationToEnd
+
+- tapOn: "gps"
+- tapOn: "User Location Marker"
+- tapOn:
+    text: "While using the app"
+    optional: true
+- assertNotVisible:
+    id: mapRef
+    
