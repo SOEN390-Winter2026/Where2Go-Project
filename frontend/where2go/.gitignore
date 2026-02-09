@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+# Test coverage
+coverage/
+
 # Expo
 .expo/
 dist/
