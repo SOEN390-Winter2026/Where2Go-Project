@@ -88,7 +88,7 @@ describe(" Buttons Test", () => {
         //const mockOnPress = jest.fn();
 
         const { getByTestId } = render(<TestWrapper />)
-        const pressToggleButton = getByTestId("togglePress");
+        const pressToggleButton = getByTestId("campusToggle");
         const currentCampus = getByTestId("campusText");
 
         expect(currentCampus.props.children).toBe('SGW');
