@@ -16,7 +16,8 @@ const CAMPUS_COORDS = {
 };
 
 export default function App() {
-
+  console.log(API_BASE_URL);
+  
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);

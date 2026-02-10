@@ -11,6 +11,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@googlemaps/markerclusterer": "^2.5.1",
     "@vis.gl/react-google-maps": "latest",
@@ -26,14 +27,25 @@
     "react-native-web": "^0.21.0"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.test.{js,jsx,ts,tsx}",
+      "!src/**/*.spec.{js,jsx,ts,tsx}",
+      "!src/**/__tests__/**",
+      "!src/**/__mocks__/**",
+      "!src/**/config.js",
+      "!src/**/app.config.js"
+    ]
   },
   "private": true,
   "devDependencies": {
     "@react-native-community/cli": "latest",
     "@testing-library/react-native": "^13.3.3",
     "babel-preset-expo": "^54.0.10",
-    "jest": "^29.7.0",
-    "metro-react-native-babel-preset": "^0.77.0"
+    "metro-react-native-babel-preset": "^0.77.0",
+    "react-test-renderer": "19.1.0",
+    "supertest": "^7.2.2",
+    "jest": "^29.7.0"
   }
 }
