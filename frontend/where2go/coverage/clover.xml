@@ -1,36 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1770607787787" clover="3.2.0">
-  <project timestamp="1770607787787" name="All files">
-    <metrics statements="48" coveredstatements="38" conditionals="40" coveredconditionals="24" methods="16" coveredmethods="5" elements="104" coveredelements="67" complexity="0" loc="48" ncloc="48" packages="2" files="8" classes="8"/>
-    <package name="assets">
-      <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="gis--poi-alt-2.png" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/assets/gis--poi-alt-2.png">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-      </file>
-      <file name="gis--poi-alt.png" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/assets/gis--poi-alt.png">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-      </file>
-      <file name="hugeicons--disability-02-2.png" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/assets/hugeicons--disability-02-2.png">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-      </file>
-      <file name="hugeicons--disability-02.png" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/assets/hugeicons--disability-02.png">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-      </file>
-      <file name="ic--round-gps-fixed.png" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/assets/ic--round-gps-fixed.png">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-      </file>
-      <file name="lets-icons--gps-fixed.png" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/assets/lets-icons--gps-fixed.png">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-      </file>
-    </package>
+<coverage generated="1770705242991" clover="3.2.0">
+  <project timestamp="1770705242991" name="All files">
+    <metrics statements="49" coveredstatements="32" conditionals="40" coveredconditionals="24" methods="18" coveredmethods="5" elements="107" coveredelements="61" complexity="0" loc="49" ncloc="49" packages="2" files="5" classes="5"/>
     <package name="src">
-      <metrics statements="42" coveredstatements="32" conditionals="40" coveredconditionals="24" methods="16" coveredmethods="5"/>
+      <metrics statements="48" coveredstatements="32" conditionals="40" coveredconditionals="24" methods="18" coveredmethods="5"/>
+      <file name="Login.js" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/src/Login.js">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+      </file>
+      <file name="OutdoorDirection.js" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/src/OutdoorDirection.js">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+      </file>
       <file name="SideLeftBar.js" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/src/SideLeftBar.js">
         <metrics statements="35" coveredstatements="31" conditionals="38" coveredconditionals="24" methods="11" coveredmethods="5"/>
         <line num="13" count="2" type="stmt"/>
@@ -75,9 +60,16 @@
         <line num="8" count="0" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
-        <line num="36" count="1" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.theme">
+      <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="colors.js" path="/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/src/theme/colors.js">
+        <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
       </file>
     </package>
   </project>

@@ -53,4 +53,9 @@ jobs:
           pkill -f "node src/app.js" || true
           echo "Backend server started and stopped successfully"
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
       # Maestro tests (add them later)
