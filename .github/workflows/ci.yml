@@ -2,7 +2,7 @@ name: pipeline-ci
 
 on:
   push:
-    branches: [ main , release1, outdoorDirectionPage ]
+    branches: [ main , release1 ]
   pull_request:
     branches: [ main , release1 ]
 
