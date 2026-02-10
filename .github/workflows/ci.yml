@@ -53,10 +53,10 @@ jobs:
           pkill -f "node src/app.js" || true
           echo "Backend server started and stopped successfully"
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: |
-            frontend/where2go/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: SOEN390-Winter2026/Where2Go-Project
 
       # Maestro tests (add them later)
