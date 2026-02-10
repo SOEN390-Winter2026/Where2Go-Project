@@ -3,15 +3,23 @@ import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'rea
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
+
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
+import LoadingPage from './src/LoadingPage';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
+
+/*
+  I'm assuming the flow will be
+  Login -> questionaire -> loading
+*/
 
 export default function App() {
   
   const [showLogin, setShowLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
@@ -113,6 +121,11 @@ export default function App() {
   //Login page first
   if (showLogin){
     return <LoginScreen onSkip={() => setShowLogin(false)}/>;
+  }
+
+  // loading page last
+  if (isLoading) {
+    return <LoadingPage />;
   }
 
   return (
