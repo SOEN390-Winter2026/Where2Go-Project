@@ -10,6 +10,7 @@ import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
 export default function App() {
+  console.log(API_BASE_URL);
   
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
