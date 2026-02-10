@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet,Pressable } from 'react-native';
 
-export default function OutdoorDirection() {
+export default function OutdoorDirection({onPressBack}) {
   console.log("wow");
 
   return (
     <View style={styles.container}>
+        <Pressable style={styles.press}onPress={onPressBack}><Text style={styles.pressText}>Back</Text></Pressable>
       <Text style={styles.text}>Hello</Text>
     </View>
   );
@@ -19,5 +20,23 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
+    color: 'red',
+  },
+  press: {
+    position: 'absolute',
+    backgroundColor: "#912338", 
+    padding: 8,
+    borderRadius: 8,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    top: '5%',
+    left:'5%',
+    
+  },
+  pressText:{
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
