@@ -5,7 +5,7 @@ export default function OutdoorDirection({onPressBack}) {
 
   return (
     <View style={styles.container}>
-        <Pressable style={styles.press}onPress={onPressBack}><Text style={styles.pressText}>Back</Text></Pressable>
+        <Pressable testID='pressBack' style={styles.press}onPress={onPressBack}><Text style={styles.pressText}>Back</Text></Pressable>
       <Text style={styles.text}>Hello</Text>
     </View>
   );
