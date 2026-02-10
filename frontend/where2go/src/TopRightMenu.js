@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function TopRightMenu() {
+export default function TopRightMenu({onPressDirection}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -20,6 +20,9 @@ export default function TopRightMenu() {
         <View style={styles.dropdown}>
           <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>
             <Text style={styles.menuText}>Map</Text>
+          </Pressable>
+          <Pressable style={styles.menuItem} onPress={onPressDirection}>
+            <Text style={styles.menuText}>Direction</Text>
           </Pressable>
           <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>
             <Text style={styles.menuText}>Calendar</Text>
