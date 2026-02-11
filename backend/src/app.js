@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const { getCampusCoordinates } = require("./services/map");
+const dotenv = require("dotenv");
+const { getCampusCoordinates, getBuildings } = require("./services/map");
 
+dotenv.config();
 const app = express();
 
 app.use(cors());
@@ -19,7 +21,15 @@ app.get("/campus/:name", (req, res) => {
     res.json(campus);
 });
 
+// Endpoint to get building polygons for a campus (for map highlighting)
+app.get("/campus/:name/buildings", (req, res) => {
+    const buildings = getBuildings(req.params.name);
+    res.json(buildings);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
 });
+
+module.exports = app;

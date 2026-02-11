@@ -1,27 +1,56 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, PermissionsAndroid, Platform } from 'react-native';
+import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
-import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-
+import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
-import UserType from './src/UserType';
+import UserType from './src/UserType'; 
+import LoginScreen from "./src/Login";
+import OutdoorDirection from "./src/OutdoorDirection";
+import { colors } from './src/theme/colors';
+import { API_BASE_URL } from './src/config';
+
 
 export default function App() {
-  const [userType, setUserType] = useState(null); // <-- null means not chosen yet
+  console.log(API_BASE_URL);
+   const [userType, setUserType] = useState(null); // <-- null means not chosen yet
+  const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
+  const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
     longitude: -73.5771,
   });
+  const [buildings, setBuildings] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
-
+  const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
+  const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+  const watchRef = useRef(null);
   const mapRef = useRef(null);
 
-  
+  //Snapping back to user
+  const snapBackToUser = () => {
+    if (!mapRef.current || !userLocation) return;
+    mapRef.current.animateToRegion(
+      {
+        ...userLocation,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      400
+    );
+    setUserDraggedMap(false);
+  };
   useEffect(() => {
-    fetch(`http://10.0.2.2:3000/campus/${currentCampus}`) 
+    if (liveLocationEnabled && userLocation) {
+      snapBackToUser();
+    }
+  }, [liveLocationEnabled, userLocation]);
+  
+  // whenever currentCampus changes, get coordinates and building polygons from the backend
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/campus/${currentCampus}`)
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
@@ -36,21 +65,34 @@ export default function App() {
         );
       })
       .catch((err) => console.error('Error fetching campus coordinates:', err));
-  }, [currentCampus]);
+
+    fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
+      .then((res) => res.json())
+      .then(setBuildings)
+      .catch((err) => console.error('Error fetching buildings:', err));
+  }, [currentCampus,showLogin]);
 
 
  useEffect(() => {
 
   let subscription;
-
   (async () => {
+  if (!liveLocationEnabled) {
+    if (watchRef.current) {
+      watchRef.current.remove();
+      watchRef.current = null;
+    }
+    return;
+  }
+  const startTracking = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission denied');
+    if (status !== "granted") {
+      console.log("Permission denied");
       return;
     }
 
     subscription = await Location.watchPositionAsync(
+    const sub = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
         timeInterval: 1000,
@@ -61,7 +103,9 @@ export default function App() {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
         };
+
        // console.log('USER LOCATION:', coords);
+        ///Qustionnaire start
         setUserLocation(coords);
       }
     );
@@ -72,7 +116,30 @@ export default function App() {
   //}, [];r
     
 }, [userType]);
+  /////Questionnaire end
 
+  //Release start
+        console.log("USER LOCATION:", coords);
+        setUserLocation(coords);
+      }
+    );
+    watchRef.current = sub;
+  };
+
+  startTracking();
+}, [liveLocationEnabled]);
+
+
+
+  //Login page first
+  if (showLogin){
+    return <LoginScreen onSkip={() => setShowLogin(false)}/>;
+  }
+  if(showOutdoorDirection){
+    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
+  }
+
+/// Release end 
 if (!userType) {
   return (
     <UserType
@@ -85,38 +152,64 @@ return (
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
 
-      <MapView
-        ref={mapRef}
-        initialRegion={{
-          ...campusCoords,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        style={styles.map}
-        showsUserLocation={true}
-        followsUserLocation={true}
-      >
+        <MapView
+          testID="mapRef"
+          accessible={true}
+          ref={mapRef}
+          initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
+          style={styles.map}
+          // When user drags map, snap back to them after they are done
+          onRegionChange={() => {
+            if (liveLocationEnabled) {
+              setUserDraggedMap(true);
+            }
+          }}
+          onRegionChangeComplete={() => {
+            if (liveLocationEnabled && userLocation && userDraggedMap) {
+              snapBackToUser();
+            }
+          }}
+        >
+
         {/* Campus marker */}
         <Marker coordinate={campusCoords} title={currentCampus} />
 
         {/* User marker */}
-        {userLocation && (
+        {userLocation && liveLocationEnabled && (
           <Marker
             coordinate={userLocation}
             title="You"
             pinColor="blue"
           />
         )}
+        {/* this section renders the campus highlighted shapes */}
+        {buildings.map((building) => (
+          <Polygon
+            key={building.id}
+            coordinates={building.coordinates}
+            fillColor={colors.buildingHighlightFill}
+            strokeColor={colors.buildingHighlightStroke}
+            strokeWidth={2}
+          />
+        ))}
       </MapView>
-
       <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
-          setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
+          setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
         }
-      />
+        onToggleLiveLocation={() =>
+          setLiveLocationEnabled((prev) => 
+            {
+              if(prev){
+                setUserLocation(null);
+              }
+              return !prev;
+            })
+        }
+        />
 
-      <TopRightMenu />
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
       <StatusBar style="auto" />
     </View>
   );
@@ -136,5 +229,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     zIndex: 1,
+  },
+  buttons: {
+    position: 'absolute',
+    bottom: 40,
+    width: '90%',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#6b0f1a',
+    zIndex: 10,
+    elevation: 10,
+    alignSelf: 'center',
   },
 });
