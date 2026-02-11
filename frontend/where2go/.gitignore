@@ -41,4 +41,4 @@ yarn-error.*
 /android
 
 # coverage
-coverage/
+/coverage
