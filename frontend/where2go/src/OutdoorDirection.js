@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet,Pressable } from 'react-native';
 
 export default function OutdoorDirection({onPressBack}) {
-  console.log("wow");
 
   return (
     <View style={styles.container}>
