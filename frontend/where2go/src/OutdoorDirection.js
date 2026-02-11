@@ -1,42 +1,151 @@
-import { View, Text, StyleSheet,Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-export default function OutdoorDirection({onPressBack}) {
-  console.log("wow");
-
+export default function OutdoorDirection({ onPressBack }) {
+  
+  const routes =[
+    {id: "1" }, { id: "2" }, { id: "3"},
+  ]
+  
+  
   return (
-    <View style={styles.container}>
-        <Pressable testID='pressBack' style={styles.press}onPress={onPressBack}><Text style={styles.pressText}>Back</Text></Pressable>
-      <Text style={styles.text}>Hello</Text>
-    </View>
+    <ImageBackground
+      source={require("../assets/background.png")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.header}>
+        <Pressable style={styles.backBtn} onPress={onPressBack}>
+          <Ionicons name="arrow-back" size={26} color="white" />
+        </Pressable>
+
+        <Text style={styles.headerTitle}>Plan Your Trip</Text>
+        <Text style={styles.headerSubtitle}>
+          Find the best route between campuses
+        </Text>
+        <View style= {styles.input}>
+          <Text style = {styles.inputLabel}>From</Text>
+          <TextInput placeholder="Choose Start Location"
+          style ={styles.inputText}/>
+        </View>
+
+        <View style= {styles.input}>
+          <Text style = {styles.inputLabel}>To</Text>
+          <TextInput placeholder="Choose destination"
+          style ={styles.inputText}/>
+        </View>
+      </View>
+
+      <View style={styles.bottomPart}>
+        <View style={styles.routesHeader}>
+          <Text style={styles.routesTitle}>
+            {routes.length} routes{"\n"}available
+          </Text>
+
+          <Pressable>
+            <Text style={styles.filterText}>Filter</Text>
+          </Pressable>
+        </View>
+       <View style={styles.scrollBar} />
+      <ScrollView
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={styles.routesContent}>
+          {routes.map((r) => (
+            <View key={r.id} style={styles.routeContainer} />
+          ))}
+        </ScrollView>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
+    flex: 1, 
+  },
+
+  header: {
+    width: "100%",
+    paddingTop: 35,
+    paddingHorizontal: 20,
+    position: "relative", 
+  },
+  backBtn: {
+    position: "absolute",
+    top: 30,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  headerTitle: {
+    color: "white",
+    fontSize: 28,
+    fontWeight: "700",
+    marginTop: 30, 
+  },
+  headerSubtitle: {
+    color: "rgba(255,255,255,0.8)",
+    marginTop: 6,
+    marginBottom: 6,
+    fontSize: 13,
+  },
+  input:{
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: 14,
+    padding: 10,
+    marginTop: 14,
+    backgroundColor: "white",
+  },
+  bottomPart: {
+    flex: 1,   
+    marginTop: 40,
+    paddingHorizontal: 16,
+    backgroundColor: "white",
+    paddingTop: 10,
+    overflow: "hidden",
+  },
+  routesHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  routesTitle: { 
+    fontSize: 14, 
+    fontWeight: "700", 
+    color: "#111", 
+  },
+  filterText: { 
+    color: "#7C2B38",
+    fontWeight: "800" 
+  },
+  routesSection: {
     flex: 1,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#F5F6F8",
+    marginTop: 18,             
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
-  text: {
-    fontSize: 24,
-    color: 'red',
+   routeContainer: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#7C2B38",
+    flexDirection: "row",
+    marginBottom: 16,
+    marginHorizontal:16,
+    height: 170,              
   },
-  press: {
-    position: 'absolute',
-    backgroundColor: "#912338", 
-    padding: 8,
-    borderRadius: 8,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    top: '5%',
-    left:'5%',
-    
+  routeBody: {
+    flex: 1,                 
   },
-  pressText:{
-    color: "#fff",
-    fontWeight: "bold",
+  flex: 1,   
+  routesContent: {   
   },
 });
+
