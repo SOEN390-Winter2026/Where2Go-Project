@@ -15,8 +15,8 @@ export default function OutdoorDirection({ onPressBack }) {
       resizeMode="cover"
     >
       <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={onPressBack}>
-          <Ionicons name="arrow-back" size={26} color="white" />
+        <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
+        <Ionicons name="arrow-back" size={26} color="white" />
         </Pressable>
 
         <Text style={styles.headerTitle}>Plan Your Trip</Text>
