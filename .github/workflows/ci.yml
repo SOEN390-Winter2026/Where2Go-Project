@@ -53,4 +53,10 @@ jobs:
           pkill -f "node src/app.js" || true
           echo "Backend server started and stopped successfully"
 
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: SOEN390-Winter2026/Where2Go-Project
+
       # Maestro tests (add them later)
