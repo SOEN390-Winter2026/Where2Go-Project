@@ -12,7 +12,7 @@ export default function LoadingPage() {
 
       <ActivityIndicator
         size="large"
-        color="#3498db"
+        color="#04e6ff"
         style={styles.loader}
       />
     </View>
@@ -28,15 +28,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    // width: '80%', // to make it responsive
-    // height: undefined,
-    width: 200,
-    height: 200,
-    backgroundColor: "blue",
+    width: '80%', // to make it responsive
+    height: undefined,
+    // width: 200,
+    // height: 200, // for testing
+    // backgroundColor: "cyan", // testing 2
     aspectRatio: 1, // to keep the logo square
     marginBottom: 30, // spacing
   },
   loader: {
     marginTop: 30,
+    transform: [{ scale: 2.5 }], // bigger spinny 
   },
 });
