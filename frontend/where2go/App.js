@@ -7,6 +7,7 @@ import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
+import OutdoorDirection from "./src/OutdoorDirection";
 import LoadingPage from './src/LoadingPage';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
@@ -17,7 +18,9 @@ import { API_BASE_URL } from './src/config';
 */
 
 export default function App() {
+  console.log(API_BASE_URL);
   
+  const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -122,10 +125,8 @@ export default function App() {
   if (showLogin){
     return <LoginScreen onSkip={() => setShowLogin(false)}/>;
   }
-
-  // loading page last
-  if (isLoading) {
-    return <LoadingPage />;
+  if(showOutdoorDirection){
+    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
   }
 
   return (
@@ -189,7 +190,7 @@ export default function App() {
         }
         />
 
-      <TopRightMenu />
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
       <StatusBar style="auto" />
     </View>
   );
