@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollVi
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from 'react';
 
-export default function OutdoorDirection({ onPressBack }) {
+export default function OutdoorDirection({ destination, onPressBack }) {
   
   const routes =[
     {id: "1" }, { id: "2" }, { id: "3"},
@@ -12,6 +12,7 @@ export default function OutdoorDirection({ onPressBack }) {
   const [fromDestination, setFromDestination] = useState("");
   const [toDestination, setToDestination] = useState("");
 
+  console.log("Current destination: ", destination);
   
   return (
     <ImageBackground

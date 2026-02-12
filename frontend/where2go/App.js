@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, PermissionsAndroid, Platform,Button } from 'react-native';
+import { StyleSheet, View, } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
@@ -28,6 +28,8 @@ export default function App() {
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
+  const [selectDestination, setSelectDestination] = useState(null);
+
   //Snapping back to user
   const snapBackToUser = () => {
     if (!mapRef.current || !userLocation) return;
@@ -48,7 +50,16 @@ export default function App() {
     }
   }, [liveLocationEnabled, userLocation]);
 
-  
+  // Select building as destination
+  const handleSelectDestination = (building) => {
+    if (selectDestination?.id === building.id) {
+      setSelectDestination(null);
+    } else {
+      setSelectDestination(building);
+    }
+  };
+
+
   // whenever currentCampus changes, get coordinates and building polygons from the backend
   useEffect(() => {
     fetch(`${API_BASE_URL}/campus/${currentCampus}`)
@@ -118,7 +129,7 @@ export default function App() {
     return <LoginScreen onSkip={() => setShowLogin(false)}/>;
   }
   if(showOutdoorDirection){
-    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
+    return <OutdoorDirection destination = {selectDestination} onPressBack={() => setShowOutdoorDirection((prev) => (prev === false))}/>
   }
 
   return (
@@ -156,15 +167,29 @@ export default function App() {
           />
         )}
         {/* this section renders the campus highlighted shapes */}
-        {buildings.map((building) => (
-          <Polygon
-            key={building.id}
-            coordinates={building.coordinates}
-            fillColor={colors.buildingHighlightFill}
-            strokeColor={colors.buildingHighlightStroke}
-            strokeWidth={2}
-          />
-        ))}
+        {buildings.map((building) => {
+
+          const destination = selectDestination?.id === building.id;
+          
+          return (
+            <Polygon
+              key={building.id}
+              coordinates={building.coordinates}
+              fillColor={
+                destination ? colors.destinationHighlightFill : 
+                colors.buildingHighlightFill
+              }
+              strokeColor={
+                colors.buildingHighlightStroke
+              }
+              strokeWidth={2}
+              tappable
+              onPress={() => 
+                handleSelectDestination(building)
+              }
+            />
+          )
+      })}
       </MapView>
       <SideLeftBar
         currentCampus={currentCampus}
