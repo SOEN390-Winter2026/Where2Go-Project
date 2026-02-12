@@ -128,7 +128,7 @@ export default function App() {
     if (!hasInitialized && dataLoaded) {
       setHasInitialized(true);
     }
-  }, [mapReady, dataLoaded, hasInitialized]);
+  }, [dataLoaded, hasInitialized]);
 
 
   //Login page first
