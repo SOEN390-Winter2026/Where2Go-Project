@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function OutdoorDirection({ onPressBack }) {
   
@@ -7,6 +8,10 @@ export default function OutdoorDirection({ onPressBack }) {
     {id: "1" }, { id: "2" }, { id: "3"},
   ]
   
+  //Input Destinations Variables
+  const [fromDestination, setFromDestination] = useState("");
+  const [toDestination, setToDestination] = useState("");
+
   
   return (
     <ImageBackground
@@ -25,13 +30,17 @@ export default function OutdoorDirection({ onPressBack }) {
         </Text>
         <View style= {styles.input}>
           <Text style = {styles.inputLabel}>From</Text>
-          <TextInput placeholder="Choose Start Location"
+          <TextInput testID="inputStartLoc" placeholder="Choose Start Location"
+          value={fromDestination}
+          onChangeText={setFromDestination}
           style ={styles.inputText}/>
         </View>
 
         <View style= {styles.input}>
           <Text style = {styles.inputLabel}>To</Text>
-          <TextInput placeholder="Choose destination"
+          <TextInput testID="inputDestLoc" placeholder="Choose destination"
+          value={toDestination}
+          onChangeText={setToDestination}
           style ={styles.inputText}/>
         </View>
       </View>
@@ -42,7 +51,7 @@ export default function OutdoorDirection({ onPressBack }) {
             {routes.length} routes{"\n"}available
           </Text>
 
-          <Pressable>
+          <Pressable testID="pressFilter">
             <Text style={styles.filterText}>Filter</Text>
           </Pressable>
         </View>
