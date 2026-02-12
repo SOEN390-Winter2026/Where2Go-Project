@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 export default function OutdoorDirection({ onPressBack }) {
   
