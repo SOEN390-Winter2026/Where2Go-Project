@@ -5,12 +5,14 @@ export default function LoadingPage() {
   return (
     <View style={styles.container}>
       <Image
+        testID="loadingLogo"
         source={require("../assets/Where2GoLogo.png")} // change to your image path
         style={styles.image}
         resizeMode="contain"
       />
 
       <ActivityIndicator
+        testID="loadingSpin"
         size="large"
         color="#04e6ff"
         style={styles.loader}
