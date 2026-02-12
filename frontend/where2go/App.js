@@ -126,14 +126,14 @@ export default function App() {
   // to change the loading to done/wont long load again
   useEffect(() => {
     if (!hasInitialized && dataLoaded) {
-      // setHasInitialized(true);
+      setHasInitialized(true);
 
-      // >> comment below area if not test
-      const timer = setTimeout(() => {
-        setHasInitialized(true);
-      }, 3000); // 3 sec delay for testing
+      // >> un/comment below area if test
+      // const timer = setTimeout(() => {
+      //   setHasInitialized(true);
+      // }, 3000); // 3 sec delay for testing
     
-      return () => clearTimeout(timer);
+      // return () => clearTimeout(timer);
       // >> comment end
     }
   }, [dataLoaded, hasInitialized]);
