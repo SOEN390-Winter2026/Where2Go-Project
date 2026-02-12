@@ -22,7 +22,7 @@ export default function App() {
   
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // loading depends on if map loaded
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
@@ -33,6 +33,8 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -50,20 +52,22 @@ export default function App() {
     setUserDraggedMap(false);
   };
 
+  // live location button turned on
   useEffect(() => {
     if (liveLocationEnabled && userLocation) {
       snapBackToUser();
     }
   }, [liveLocationEnabled, userLocation]);
 
-  
-  // whenever currentCampus changes, get coordinates and building polygons from the backend
+  // whenever currentCampus changes, get coordinates and building polygons from the backend. 
+  // Also set that map loaded
   useEffect(() => {
     fetch(`${API_BASE_URL}/campus/${currentCampus}`)
       .then((res) => res.json())
       .then((data) => {
         const nextCoords = { latitude: data.lat, longitude: data.lng };
         setCampusCoords(nextCoords);
+        setDataLoaded(true);
         mapRef.current?.animateToRegion(
           {
             ...nextCoords,
@@ -119,12 +123,30 @@ export default function App() {
   startTracking();
 }, [liveLocationEnabled]);
 
+  // to change the loading to done/wont long load again
+  useEffect(() => {
+    if (!hasInitialized && dataLoaded) {
+      setHasInitialized(true);
+    }
+  }, [mapReady, dataLoaded, hasInitialized]);
 
 
   //Login page first
   if (showLogin){
-    return <LoginScreen onSkip={() => setShowLogin(false)}/>;
+    return (
+      <LoginScreen
+        onSkip={() => {
+          setShowLogin(false);
+          setHasInitialized(false); // for loading
+        }}
+      />
+    );
   }
+  // start loading if the map still isn't done
+  if (!hasInitialized) {
+    return <LoadingPage />;
+  }
+
   if(showOutdoorDirection){
     return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
   }

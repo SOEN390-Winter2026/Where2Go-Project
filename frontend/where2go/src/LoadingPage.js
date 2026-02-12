@@ -1,8 +1,5 @@
 import React from "react";
-import { View, Image, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
-
-// Define the window height and width to use them for positioning
-const { width, height } = Dimensions.get('window');
+import { View, Image, ActivityIndicator, StyleSheet } from "react-native";
 
 export default function LoadingPage() {
   return (
