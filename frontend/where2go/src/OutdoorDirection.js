@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollVi
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect, useRef } from 'react';
 import { colors } from './theme/colors';
+import * as Location from 'expo-location';
 
 export default function OutdoorDirection({ onPressBack }) {
 
@@ -17,9 +18,36 @@ export default function OutdoorDirection({ onPressBack }) {
   const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
   const [isPressedFromDest, setIsPressedFromDest] = useState(false);
 
-  useEffect(() =>{
-    console.log(isPressedFromDest); 
-  },[isPressedFromDest])
+  useEffect(() => {
+    console.log("fromDestionation: ", fromDestination);
+  }, [fromDestination]);
+
+  const getCurrentLocation = async () => {
+
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Permission denied");
+      return;
+    }
+
+    const sub = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 1000,
+        distanceInterval: 5,
+      },
+      (loc) => {
+        const coords = {
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        };
+        console.log("USER LOCATION:", coords);
+        setFromDestination(`${coords.latitude},${coords.longitude}`);
+      }
+    );
+
+  };
+
 
 
   return (
@@ -42,10 +70,10 @@ export default function OutdoorDirection({ onPressBack }) {
           <TextInput testID="inputStartLoc" placeholder="Choose Start Location"
             value={fromDestination}
             onChangeText={setFromDestination}
-            style={styles.inputText} 
+            style={styles.inputText}
             onFocus={() => setIsPressedFromDest(true)}
             onBlur={() => setIsPressedFromDest(false)} />
-            
+
         </View>
 
         <View style={styles.input}>
@@ -62,13 +90,16 @@ export default function OutdoorDirection({ onPressBack }) {
       <View style={styles.bottomPart}>
         {/*Live Location Button*/}
 
-        {isPressedFromDest && 
-        <View>
-          <Pressable style={styles.liveLoc}>
-            <Ionicons name="location" size={26} color="#912338" />
-            <Text>Set to Your Location</Text>
-          </Pressable>
-        </View>}
+        {isPressedFromDest &&
+          <View>
+            <Pressable
+              onPress={() => { getCurrentLocation() }}
+              style={styles.liveLoc}>
+              <Ionicons name="location" size={26} color="#912338" />
+              <Text>Set to Your Location</Text>
+            </Pressable>
+          </View>}
+
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
             {routes.length} routes{"\n"}available
@@ -186,7 +217,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 2,
     backgroundColor: "white",
-    flexDirection: "row",        
+    flexDirection: "row",
     alignItems: "center",        // vertical alignment
     gap: 8,
   },
