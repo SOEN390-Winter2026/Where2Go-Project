@@ -4,6 +4,9 @@ const dotenv = require("dotenv");
 const { getCampusCoordinates, getBuildings } = require("./services/map");
 
 dotenv.config();
+
+console.log("✅ LOADED BACKEND FILE: backend/src/app.js");
+
 const app = express();
 
 app.use(cors());
@@ -23,6 +26,7 @@ app.get("/campus/:name", (req, res) => {
 
 // Endpoint to get building polygons for a campus (for map highlighting)
 app.get("/campus/:name/buildings", (req, res) => {
+     console.log("✅ HIT /campus/:name/buildings with:", req.params.name);
     const buildings = getBuildings(req.params.name);
     res.json(buildings);
 });
