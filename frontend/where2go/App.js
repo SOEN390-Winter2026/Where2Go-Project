@@ -12,7 +12,15 @@ import OutdoorDirection from "./src/OutdoorDirection";
 import { colors } from "./src/theme/colors";
 import { API_BASE_URL } from "./src/config";
 
+
 export default function App() {
+///////////
+useEffect(() => {
+  console.log("API_BASE_URL =", API_BASE_URL);
+}, []);
+
+//////////////
+
   const [userType, setUserType] = useState(null);
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
