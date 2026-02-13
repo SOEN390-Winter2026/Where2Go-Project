@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect, useRef } from 'react';
 import { colors } from './theme/colors';
 import * as Location from 'expo-location';
+import ErrorModal from './ErrorModal';
 
 export default function OutdoorDirection({ onPressBack }) {
 
@@ -17,35 +18,71 @@ export default function OutdoorDirection({ onPressBack }) {
   //Live Location Variables
   const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
   const [isPressedFromDest, setIsPressedFromDest] = useState(false);
+  
+  //Error Modal Variables
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     console.log("fromDestionation: ", fromDestination);
   }, [fromDestination]);
 
   const getCurrentLocation = async () => {
-
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Permission denied");
-      return;
-    }
-
-    const sub = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 1000,
-        distanceInterval: 5,
-      },
-      (loc) => {
-        const coords = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        };
-        console.log("USER LOCATION:", coords);
-        setFromDestination(`${coords.latitude},${coords.longitude}`);
+    try {
+      // Check if location services are enabled
+      const isLocationEnabled = await Location.hasServicesEnabledAsync();
+      if (!isLocationEnabled) {
+        setErrorMessage("Location services are turned off. Please enable location services in your device settings to use your current location.");
+        setShowErrorModal(true);
+        return;
       }
-    );
 
+      // Request permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission denied");
+        setErrorMessage("Location permission denied. Please enable location permission in your app settings to use your current location.");
+        setShowErrorModal(true);
+        return;
+      }
+
+      // Original watchPositionAsync implementation
+      const sub = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 5,
+        },
+        (loc) => {
+          if (!loc || !loc.coords) {
+            setErrorMessage("Unable to get your location coordinates. Please try again or enter your starting location manually.");
+            setShowErrorModal(true);
+            return;
+          }
+
+          const coords = {
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          };
+          console.log("USER LOCATION:", coords);
+          setFromDestination(`${coords.latitude},${coords.longitude}`);
+          setLiveLocCoordinates(coords);
+        }
+      );
+
+    } catch (error) {
+      console.log("Location error:", error);
+      let errorMsg = "Unable to get your current location. Please try again or enter your starting location manually.";
+      
+      if (error.code === 'E_LOCATION_TIMEOUT') {
+        errorMsg = "Location request timed out. Please check your GPS signal and try again, or enter your starting location manually.";
+      } else if (error.code === 'E_LOCATION_UNAVAILABLE') {
+        errorMsg = "Location is currently unavailable. Please check your device settings and try again, or enter your starting location manually.";
+      }
+      
+      setErrorMessage(errorMsg);
+      setShowErrorModal(true);
+    }
   };
 
 
@@ -118,6 +155,17 @@ export default function OutdoorDirection({ onPressBack }) {
           ))}
         </ScrollView>
       </View>
+
+      {/* Error Modal */}
+      <ErrorModal
+        visible={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title="Location Unavailable"
+        message={errorMessage}
+        iconName="alert-circle"
+        iconColor="#912338"
+        buttonText="OK"
+      />
     </ImageBackground>
   );
 }
