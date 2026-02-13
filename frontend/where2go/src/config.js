@@ -2,7 +2,6 @@ import { Platform } from 'react-native';
 
 // Optional: set API_URL in .env to override (e.g. shared backend or your machine's IP for physical devices)
 import { API_URL } from '@env';
-
 /**
  * Backend API base URL.
  * - Set API_URL in .env to override (useful for physical devices or a shared backend for colleagues).
