@@ -195,6 +195,11 @@ export default function App() {
       />
 
       <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
+      <BuildingInfoModal
+        building={selectedBuilding}
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
       <StatusBar style="auto" />
     </View>
   );
