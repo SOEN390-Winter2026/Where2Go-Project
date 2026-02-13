@@ -22,7 +22,6 @@ export default function App() {
   
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(true); // loading depends on if map loaded
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState({
     latitude: 45.4974,
@@ -33,7 +32,7 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false); // for loading check
   const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
   const watchRef = useRef(null);
   const mapRef = useRef(null);
