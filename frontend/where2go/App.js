@@ -8,6 +8,7 @@ import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
 import BuildingCallout from './src/BuildingCallout';
 import BuildingInfoModal from './src/BuildingInfoModal';
+import OutdoorDirection from "./src/OutdoorDirection";
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
@@ -18,7 +19,8 @@ const CAMPUS_COORDS = {
 
 export default function App() {
   console.log(API_BASE_URL);
-
+  
+  const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
@@ -125,6 +127,9 @@ export default function App() {
   if (showLogin) {
     return <LoginScreen onSkip={() => setShowLogin(false)} />;
   }
+  if(showOutdoorDirection){
+    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
+  }
 
   return (
     <View style={styles.container}>
@@ -189,7 +194,7 @@ export default function App() {
         }
       />
 
-      <TopRightMenu />
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
       <StatusBar style="auto" />
     </View>
   );
