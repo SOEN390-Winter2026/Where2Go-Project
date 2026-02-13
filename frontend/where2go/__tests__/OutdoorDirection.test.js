@@ -301,4 +301,114 @@ describe("Location Error Handling", () => {
 
         expect(input.props.value).toBe("Manual Location");
     });
+
+    it("shows timeout error when location request times out", async () => {
+        Location.hasServicesEnabledAsync.mockResolvedValue(true);
+        Location.requestForegroundPermissionsAsync.mockResolvedValue({
+            status: 'granted'
+        });
+
+        // Mock timeout error
+        const timeoutError = new Error('Location request timed out');
+        timeoutError.code = 'E_LOCATION_TIMEOUT';
+        Location.watchPositionAsync.mockRejectedValue(timeoutError);
+
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+
+        const input = getByTestId("inputStartLoc");
+
+        act(() => {
+            fireEvent(input, 'focus');
+        });
+
+        await waitFor(() => {
+            expect(getByText("Set to Your Location")).toBeTruthy();
+        });
+
+        const locationButton = getByText("Set to Your Location");
+
+        await act(async () => {
+            fireEvent.press(locationButton);
+        });
+
+        // Verify timeout error message
+        const errorTitle = await findByText("Location Unavailable");
+        expect(errorTitle).toBeTruthy();
+
+        const errorMessage = await findByText(/Location request timed out/i);
+        expect(errorMessage).toBeTruthy();
+    });
+
+    it("shows unavailable error when location is unavailable", async () => {
+        Location.hasServicesEnabledAsync.mockResolvedValue(true);
+        Location.requestForegroundPermissionsAsync.mockResolvedValue({
+            status: 'granted'
+        });
+
+        // Mock unavailable error
+        const unavailableError = new Error('Location unavailable');
+        unavailableError.code = 'E_LOCATION_UNAVAILABLE';
+        Location.watchPositionAsync.mockRejectedValue(unavailableError);
+
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+
+        const input = getByTestId("inputStartLoc");
+
+        act(() => {
+            fireEvent(input, 'focus');
+        });
+
+        await waitFor(() => {
+            expect(getByText("Set to Your Location")).toBeTruthy();
+        });
+
+        const locationButton = getByText("Set to Your Location");
+
+        await act(async () => {
+            fireEvent.press(locationButton);
+        });
+
+        // Verify unavailable error message
+        const errorTitle = await findByText("Location Unavailable");
+        expect(errorTitle).toBeTruthy();
+
+        const errorMessage = await findByText(/Location is currently unavailable/i);
+        expect(errorMessage).toBeTruthy();
+    });
+
+    it("shows generic error for unknown location errors", async () => {
+        Location.hasServicesEnabledAsync.mockResolvedValue(true);
+        Location.requestForegroundPermissionsAsync.mockResolvedValue({
+            status: 'granted'
+        });
+
+        // Mock generic error without specific code
+        const genericError = new Error('Unknown error');
+        Location.watchPositionAsync.mockRejectedValue(genericError);
+
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+
+        const input = getByTestId("inputStartLoc");
+
+        act(() => {
+            fireEvent(input, 'focus');
+        });
+
+        await waitFor(() => {
+            expect(getByText("Set to Your Location")).toBeTruthy();
+        });
+
+        const locationButton = getByText("Set to Your Location");
+
+        await act(async () => {
+            fireEvent.press(locationButton);
+        });
+
+        // Verify generic error message
+        const errorTitle = await findByText("Location Unavailable");
+        expect(errorTitle).toBeTruthy();
+
+        const errorMessage = await findByText(/Unable to get your current location/i);
+        expect(errorMessage).toBeTruthy();
+    });
 });
