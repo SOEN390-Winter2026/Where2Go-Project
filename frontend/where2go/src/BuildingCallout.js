@@ -1,5 +1,7 @@
-import { StyleSheet, View, Text, Image, Linking } from 'react-native';
-import { Marker, Callout } from 'react-native-maps';
+import { StyleSheet, View, Text } from 'react-native';
+import { Marker } from 'react-native-maps';
+import PropTypes from 'prop-types';
+import { colors } from './theme/colors';
 
 export const buildingImages = {
   // SGW campus
@@ -81,7 +83,7 @@ const getCentroid = (coordinates) => {
   };
 };
 
-const BuildingCallout = ({ buildings }) => {
+const BuildingCallout = ({ buildings, onBuildingPress }) => {
   if (!buildings || buildings.length === 0) return null;
 
   return (
@@ -93,27 +95,11 @@ const BuildingCallout = ({ buildings }) => {
             key={building.id}
             coordinate={center}
             tracksViewChanges={false}
+            onPress={() => onBuildingPress(building)}
           >
-            <Callout
-              tooltip
-              onPress={() => {
-                if (building?.link) Linking.openURL(building.link);
-              }}
-            >
-              <View style={styles.callout}>
-                {buildingImages[building.code] && (
-                  <Image
-                    source={buildingImages[building.code]}
-                    style={styles.calloutImage}
-                  />
-                )}
-                <Text style={styles.calloutName}>{building.name}</Text>
-                <Text style={styles.calloutBuildingDescription}>
-                  {building.address}
-                </Text>
-                <Text style={styles.calloutLink}>View on Concordia.ca</Text>
-              </View>
-            </Callout>
+            <View style={styles.markerLabel}>
+              <Text style={styles.markerLabelText}>{building.code}</Text>
+            </View>
           </Marker>
         );
       })}
@@ -121,45 +107,44 @@ const BuildingCallout = ({ buildings }) => {
   );
 };
 
+BuildingCallout.propTypes = {
+  buildings: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      code: PropTypes.string,
+      address: PropTypes.string,
+      link: PropTypes.string,
+      coordinates: PropTypes.arrayOf(
+        PropTypes.shape({
+          latitude: PropTypes.number,
+          longitude: PropTypes.number,
+        })
+      ),
+    })
+  ).isRequired,
+  onBuildingPress: PropTypes.func.isRequired,
+};
+
 const styles = StyleSheet.create({
-  callout: {
-    width: 200,
-    backgroundColor: '#6b0f1a',
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 4,
+  markerLabel: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#fff',
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
   },
-  calloutImage: {
-    width: '100%',
-    height: 107,
-  },
-  calloutName: {
-    fontSize: 14,
+  markerLabelText: {
+    color: '#fff',
+    fontSize: 11,
     fontWeight: '700',
-    color: 'white',
-    paddingHorizontal: 10,
-    paddingTop: 8,
-    alignSelf: 'center',
-  },
-  calloutBuildingDescription: {
-    fontSize: 12,
-    color: 'black',
-    backgroundColor: 'white',
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    paddingTop: 4,
-  },
-  calloutLink: {
-    backgroundColor: 'white',
-    fontSize: 12,
-    color: '#1a73e8',
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    paddingTop: 4,
+    textAlign: 'center',
   },
 });
 
