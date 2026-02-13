@@ -16,6 +16,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'hall',
       name: 'Hall Building',
+      code: 'H',
+      address: '1455 De Maisonneuve Blvd W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/h.html',
       coordinates: [
         { latitude: 45.4977303, longitude: -73.5790279 },
         { latitude: 45.4973808, longitude: -73.5783087 },
@@ -26,6 +29,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'jw',
       name: 'McConnell Building',
+      code: 'JW',
+      address: '1400 De Maisonneuve Blvd W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/jw.html',
       coordinates: [
         { latitude: 45.4973400, longitude: -73.5780630 },
         { latitude: 45.4968756, longitude: -73.5770947 },
@@ -36,6 +42,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'va',
       name: 'Visual Arts Building',
+      code: 'VA',
+      address: '1395 Rene-Levesque Blvd W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/va.html',
       coordinates: [
         { latitude: 45.49618, longitude: -73.57377 },
         { latitude: 45.49593, longitude: -73.57324 },
@@ -46,6 +55,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ev',
       name: 'Engineering & Visual Arts',
+      code: 'EV',
+      address: '1515 Ste-Catherine St W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ev.html',
       coordinates: [
         { latitude: 45.4958829, longitude: -73.5784841 },
         { latitude: 45.4954551, longitude: -73.5775882 },
@@ -56,6 +68,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'gn',
       name: 'Grey Nuns Building',
+      code: 'GN',
+      address: '1190 Guy St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/gn.html',
       coordinates: [
         { latitude: 45.49457, longitude: -73.57699 },
         { latitude: 45.49383, longitude: -73.57528 },
@@ -66,6 +81,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'fg',
       name: 'Faubourg Building',
+      code: 'FG',
+      address: '1250 Guy St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/fg.html',
       coordinates: [
         { latitude: 45.49494, longitude: -73.57784 },
         { latitude: 45.49467, longitude: -73.57722 },
@@ -76,6 +94,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'cl',
       name: 'CL Annex Building',
+      code: 'CL',
+      address: '1665 Ste-Catherine St W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/cl.html',
       coordinates: [
         { latitude: 45.49448, longitude: -73.57933 },
         { latitude: 45.49423, longitude: -73.57889 },
@@ -86,6 +107,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'td',
       name: 'Toronto-Dominion Building',
+      code: 'TD',
+      address: '1616 Ste-Catherine St W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/td.html',
       coordinates: [
         { latitude: 45.49521, longitude: -73.57841 },
         { latitude: 45.49503, longitude: -73.57800 },
@@ -96,6 +120,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'mb',
       name: 'John Molson Building',
+      code: 'MB',
+      address: '1450 Guy St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/mb.html',
       coordinates: [
         { latitude: 45.49560, longitude: -73.57926},
         { latitude: 45.49525, longitude: -73.57850 },
@@ -106,6 +133,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'gm',
       name: 'Guy-De Maisonneuve Building',
+      code: 'GM',
+      address: '1550 De Maisonneuve Blvd W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/gm.html',
       coordinates: [
         { latitude: 45.49614, longitude: -73.57882 },
         { latitude: 45.49594, longitude: -73.57843 },
@@ -116,6 +146,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ls',
       name: 'Learning Square Building',
+      code: 'LS',
+      address: '1535 De Maisonneuve Blvd W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ls.html',
       coordinates: [
         { latitude: 45.49654, longitude: -73.57958 },
         { latitude: 45.49638, longitude: -73.57923 },
@@ -126,6 +159,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'er',
       name: 'ER Building',
+      code: 'ER',
+      address: '2155 Guy St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/er.html',
       coordinates: [
         { latitude: 45.49669, longitude: -73.58014 },
         { latitude: 45.49653, longitude: -73.57966 },
@@ -136,6 +172,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'gs',
       name: 'GS Building',
+      code: 'GS',
+      address: '1538 Sherbrooke St W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/gs.html',
       coordinates: [
         { latitude: 45.49675, longitude: -73.58137 },
         { latitude: 45.49655, longitude: -73.58078 },
@@ -146,6 +185,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'sb',
       name: 'Samuel Bronfman Building',
+      code: 'SB',
+      address: '1590 Docteur Penfield Ave, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/sb.html',
       coordinates: [
         { latitude: 45.49666, longitude: -73.58621 },
         { latitude: 45.49666, longitude: -73.58586 },
@@ -156,6 +198,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'q',
       name: 'Q Annex',
+      code: 'Q',
+      address: '2010 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/q.html',
       coordinates: [
         { latitude: 45.49668, longitude: -73.57908 },
         { latitude: 45.49664, longitude: -73.57902 },
@@ -166,6 +211,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'p',
       name: 'P Annex',
+      code: 'P',
+      address: '2020 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/p.html',
       coordinates: [
         { latitude: 45.49670, longitude: -73.57913 },
         { latitude: 45.49668, longitude: -73.57909 },
@@ -176,6 +224,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 't',
       name: 'T Annex',
+      code: 'T',
+      address: '2030 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/t.html',
       coordinates: [
         { latitude: 45.49674, longitude: -73.57925 },
         { latitude: 45.49673, longitude: -73.57922 },
@@ -186,6 +237,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'rr',
       name: 'RR Annex',
+      code: 'RR',
+      address: '2040 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/rr.html',
       coordinates: [
         { latitude: 45.49680, longitude: -73.57933 },
         { latitude: 45.49676, longitude: -73.57925 },
@@ -196,6 +250,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'r',
       name: 'R Annex',
+      code: 'R',
+      address: '2050 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/r.html',
       coordinates: [
         { latitude: 45.49683, longitude: -73.57940 },
         { latitude: 45.49680, longitude: -73.57934 },
@@ -206,6 +263,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'fa',
       name: 'FA Annex',
+      code: 'FA',
+      address: '2060 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/fa.html',
       coordinates: [
         { latitude: 45.49684, longitude: -73.57944 },
         { latitude: 45.49683, longitude: -73.57940 },
@@ -216,6 +276,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'en',
       name: 'EN Annex',
+      code: 'EN',
+      address: '2070 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/en.html',
       coordinates: [
         { latitude: 45.49693, longitude: -73.57955 },
         { latitude: 45.49689, longitude: -73.57947 },
@@ -226,6 +289,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'x',
       name: 'X Annex',
+      code: 'X',
+      address: '2080 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/x.html',
       coordinates: [
         { latitude: 45.49695, longitude: -73.57966 },
         { latitude: 45.49691, longitude: -73.57958 },
@@ -236,6 +302,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'z',
       name: 'Z Annex',
+      code: 'Z',
+      address: '2090 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/z.html',
       coordinates: [
         { latitude: 45.49699, longitude: -73.57974 },
         { latitude: 45.49695, longitude: -73.57966 },
@@ -246,6 +315,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'pr',
       name: 'PR Annex',
+      code: 'PR',
+      address: '2100 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/pr.html',
       coordinates: [
         { latitude: 45.49707, longitude: -73.57988 },
         { latitude: 45.49705, longitude: -73.57983 },
@@ -256,6 +328,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'v',
       name: 'V Annex',
+      code: 'V',
+      address: '2110 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/v.html',
       coordinates: [
         { latitude: 45.49709, longitude: -73.57992 },
         { latitude: 45.49707, longitude: -73.57988 },
@@ -266,6 +341,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'm',
       name: 'M Annex',
+      code: 'M',
+      address: '2135 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/m.html',
       coordinates: [
         { latitude: 45.49777, longitude: -73.57998 },
         { latitude: 45.49770, longitude: -73.57982 },
@@ -276,6 +354,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 's',
       name: 'S Annex',
+      code: 'S',
+      address: '2145 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/s.html',
       coordinates: [
         { latitude: 45.49782, longitude: -73.58009 },
         { latitude: 45.49777, longitude: -73.57998 },
@@ -286,6 +367,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ci',
       name: 'CI Annex',
+      code: 'CI',
+      address: '2149 Mackay St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ci.html',
       coordinates: [
         { latitude: 45.49788, longitude: -73.58021 },
         { latitude: 45.49782, longitude: -73.58009 },
@@ -296,6 +380,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'mi',
       name: 'MI Annex',
+      code: 'MI',
+      address: '2130 Bishop St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/mi.html',
       coordinates: [
         { latitude: 45.49781, longitude: -73.57923 },
         { latitude: 45.49778, longitude: -73.57917 },
@@ -306,6 +393,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'd',
       name: 'D Annex',
+      code: 'D',
+      address: '2140 Bishop St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/d.html',
       coordinates: [
         { latitude: 45.49785, longitude: -73.57931 },
         { latitude: 45.49781, longitude: -73.57923 },
@@ -316,6 +406,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'b',
       name: 'B Annex',
+      code: 'B',
+      address: '2160 Bishop St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/b.html',
       coordinates: [
         { latitude: 45.49790, longitude: -73.57943 },
         { latitude: 45.49788, longitude: -73.57939 },
@@ -326,6 +419,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'k',
       name: 'K Annex',
+      code: 'K',
+      address: '2150 Bishop St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/k.html',
       coordinates: [
         { latitude: 45.49792, longitude: -73.57946 },
         { latitude: 45.49790, longitude: -73.57943 },
@@ -336,6 +432,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'mu',
       name: 'MU Annex',
+      code: 'MU',
+      address: '2170 Bishop St, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/mu.html',
       coordinates: [
         { latitude: 45.49796, longitude: -73.57954 },
         { latitude: 45.49794, longitude: -73.57950 },
@@ -347,7 +446,10 @@ const CAMPUS_BUILDINGS = {
   Loyola: [
     {
       id: 'do',
-      name: 'Stinger Dome Building',
+      name: 'Stinger Dome (seasonal)',
+      code: 'DO',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/do.html',
       coordinates: [
         { latitude: 45.45834, longitude: -73.63596 },
         { latitude: 45.45793, longitude: -73.63524 },
@@ -357,7 +459,10 @@ const CAMPUS_BUILDINGS = {
     },
     {
       id: 'pc',
-      name: 'PERFORM Center',
+      name: 'PERFORM Centre',
+      code: 'PC',
+      address: '7200 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/pc.html',
       coordinates: [
         { latitude: 45.45728, longitude: -73.63763 },
         { latitude: 45.45695, longitude: -73.63677 },
@@ -368,6 +473,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ra',
       name: 'Recreation and Athletics Complex',
+      code: 'RA',
+      address: '7200 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ra.html',
       coordinates: [
         { latitude: 45.45701, longitude: -73.63806 },
         { latitude: 45.45667, longitude: -73.63715 },
@@ -378,6 +486,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ge',
       name: 'Centre for Structural and Functional Genomics',
+      code: 'GE',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ge.html',
       coordinates: [
         { latitude: 45.45717, longitude: -73.64057 },
         { latitude: 45.45704, longitude: -73.64016 },
@@ -387,7 +498,10 @@ const CAMPUS_BUILDINGS = {
     },
     {
       id: 'cj',
-      name: 'Comunications Studies and Journalism Building',
+      name: 'Communication Studies and Journalism Building',
+      code: 'CJ',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/cj.html',
       coordinates: [
         { latitude: 45.45783, longitude: -73.64048 },
         { latitude: 45.45747, longitude: -73.63951 },
@@ -398,6 +512,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'sp',
       name: 'Richard J. Renaud Science Complex',
+      code: 'SP',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/sp.html',
       coordinates: [
         { latitude: 45.45833, longitude: -73.64141 },
         { latitude: 45.45816, longitude: -73.64098 },
@@ -408,6 +525,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ad',
       name: 'Administration Building',
+      code: 'AD',
+      address: '7141 Sherbrooke St W, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ad.html',
       coordinates: [
         { latitude: 45.45838, longitude: -73.63976 },
         { latitude: 45.45826, longitude: -73.63944 },
@@ -418,6 +538,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'cc',
       name: 'Central Building',
+      code: 'CC',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/cc.html',
       coordinates: [
         { latitude: 45.45852, longitude: -73.64068 },
         { latitude: 45.45822, longitude: -73.63990 },
@@ -428,6 +551,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'rf',
       name: 'Loyola Jesuit Hall and Conference Centre',
+      code: 'RF',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/rf.html',
       coordinates: [
         { latitude: 45.45882, longitude: -73.64113 },
         { latitude: 45.45864, longitude: -73.64067 },
@@ -437,7 +563,10 @@ const CAMPUS_BUILDINGS = {
     },
     {
       id: 'fc',
-      name: 'F.C Smith Building',
+      name: 'F.C. Smith Building',
+      code: 'FC',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/fc.html',
       coordinates: [
         { latitude: 45.45881, longitude: -73.63960 },
         { latitude: 45.45857, longitude: -73.63889 },
@@ -448,6 +577,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'qa',
       name: 'Quadrangle',
+      code: 'QA',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/qa.html',
       coordinates: [
         { latitude: 45.45903, longitude: -73.64008 },
         { latitude: 45.45886, longitude: -73.63967 },
@@ -458,6 +590,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'py',
       name: 'Psychology Building',
+      code: 'PY',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/py.html',
       coordinates: [
         { latitude: 45.45920, longitude: -73.64052 },
         { latitude: 45.45905, longitude: -73.64014 },
@@ -468,6 +603,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 've',
       name: 'Vanier Extension',
+      code: 'VE',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ve.html',
       coordinates: [
         { latitude: 45.45905, longitude: -73.63886 },
         { latitude: 45.45883, longitude: -73.63827 },
@@ -478,6 +616,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'vl',
       name: 'Vanier Library Building',
+      code: 'VL',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/vl.html',
       coordinates: [
         { latitude: 45.45931, longitude: -73.63866 },
         { latitude: 45.45902, longitude: -73.63791 },
@@ -488,6 +629,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'pt',
       name: 'Oscar Peterson Concert Hall',
+      code: 'PT',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/pt.html',
       coordinates: [
         { latitude: 45.45948, longitude: -73.63913 },
         { latitude: 45.45930, longitude: -73.63867 },
@@ -498,6 +642,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'sc',
       name: 'Student Centre',
+      code: 'SC',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/sc.html',
       coordinates: [
         { latitude: 45.45930, longitude: -73.63932 },
         { latitude: 45.45917, longitude: -73.63897 },
@@ -508,6 +655,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'bh',
       name: 'BH Annex',
+      code: 'BH',
+      address: '3500 Av. Belmore, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/bh.html',
       coordinates: [
         { latitude: 45.45979, longitude: -73.63909 },
         { latitude: 45.45975, longitude: -73.63902 },
@@ -518,6 +668,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'bb',
       name: 'BB Annex',
+      code: 'BB',
+      address: '3502 Av. Belmore, Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/bb.html',
       coordinates: [
         { latitude: 45.45982, longitude: -73.63917 },
         { latitude: 45.45979, longitude: -73.63909 },
@@ -528,6 +681,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'ps',
       name: 'Physical Services Building',
+      code: 'PS',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ps.html',
       coordinates: [
         { latitude: 45.45996, longitude: -73.64007 },
         { latitude: 45.45968, longitude: -73.63933 },
@@ -538,6 +694,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'si',
       name: 'St. Ignatius of Loyola Church',
+      code: 'SI',
+      address: '4455 Broadway St., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/si.html',
       coordinates: [
         { latitude: 45.45817, longitude: -73.64252 },
         { latitude: 45.45794, longitude: -73.64193 },
@@ -548,6 +707,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'jr',
       name: 'Jesuit Residence',
+      code: 'JR',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/jr.html',
       coordinates: [
         { latitude: 45.45863, longitude: -73.64331 },
         { latitude: 45.45854, longitude: -73.64305 },
@@ -558,6 +720,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'hu',
       name: 'Applied Science Hub',
+      code: 'HU',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/hu.html',
       coordinates: [
         { latitude: 45.45872, longitude: -73.64190 },
         { latitude: 45.45858, longitude: -73.64150 },
@@ -566,8 +731,24 @@ const CAMPUS_BUILDINGS = {
       ],
     },
     {
+      id: 'ha',
+      name: 'Hingston Hall, wing HA',
+      code: 'HA',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ha.html',
+      coordinates: [
+        { latitude: 45.45937, longitude: -73.64149 },
+        { latitude: 45.45913, longitude: -73.64083 },
+        { latitude: 45.45882, longitude: -73.64107 },
+        { latitude: 45.45906, longitude: -73.64173 },
+      ],
+    },
+    {
       id: 'hb',
       name: 'Hingston Hall, wing HB',
+      code: 'HB',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/hb.html',
       coordinates: [
         { latitude: 45.45955, longitude: -73.64198 },
         { latitude: 45.45937, longitude: -73.64149 },
@@ -578,6 +759,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'hc',
       name: 'Hingston Hall, wing HC',
+      code: 'HC',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/hc.html',
       coordinates: [
         { latitude: 45.45991, longitude: -73.64204 },
         { latitude: 45.45981, longitude: -73.64181 },
@@ -588,6 +772,9 @@ const CAMPUS_BUILDINGS = {
     {
       id: 'sh',
       name: 'Future Buildings Laboratory',
+      code: 'SH',
+      address: '7141 Sherbrooke St. W., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/sh.html',
       coordinates: [
         { latitude: 45.45932, longitude: -73.64263 },
         { latitude: 45.45932, longitude: -73.64243 },
@@ -597,7 +784,10 @@ const CAMPUS_BUILDINGS = {
     },
     {
       id: 'ta',
-      name: 'Terrebone Building',
+      name: 'Terrebonne Building',
+      code: 'TA',
+      address: '7079 Terrebonne St., Montreal, QC',
+      link: 'https://www.concordia.ca/maps/buildings/ta.html',
       coordinates: [
         { latitude: 45.46008, longitude: -73.64090 },
         { latitude: 45.46001, longitude: -73.64072 },
