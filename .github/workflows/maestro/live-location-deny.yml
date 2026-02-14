@@ -1,0 +1,12 @@
+appId: host.exp.exponent
+---
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn: "gps"
+- tapOn:
+    text: "Don't allow"
+    optional: true
+
+- assertNotVisible:
+    id: "campusMarker"
