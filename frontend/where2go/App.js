@@ -6,6 +6,7 @@ import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
+import UserType from "./src/UserType";
 import OutdoorDirection from "./src/OutdoorDirection";
 import { colors } from "./src/theme/colors";
 import { API_BASE_URL } from "./src/config";
