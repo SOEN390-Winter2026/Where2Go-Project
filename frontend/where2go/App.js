@@ -78,10 +78,22 @@ useEffect(() => {
       })
       .catch((err) => console.error("Error fetching campus coordinates:", err));
 
+    // fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
+    //   .then((res) => res.json())
+    //   .then(setBuildings)
+    //   .catch((err) => console.error("Error fetching buildings:", err));
+
     fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
-      .then((res) => res.json())
-      .then(setBuildings)
-      .catch((err) => console.error("Error fetching buildings:", err));
+  .then(async (res) => {
+    const text = await res.text();
+    console.log("BUILDINGS URL:", `${API_BASE_URL}/campus/${currentCampus}/buildings`);
+    console.log("STATUS:", res.status);
+    console.log("BODY first 120:", text.slice(0, 120));
+    return JSON.parse(text);
+  })
+  .then(setBuildings)
+  .catch((err) => console.error("Error fetching buildings:", err));
+
   }, [currentCampus, showLogin]);
 
   // Live location tracking

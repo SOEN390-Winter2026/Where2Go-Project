@@ -13,3 +13,7 @@ import { API_URL } from '@env';
 export const API_BASE_URL = 
   (typeof API_URL === 'string' && API_URL.trim() && API_URL.trim().replace(/\/$/, '')) ||
   (Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+
+console.log("🔥 CONFIG LOADED");
+console.log("🔥 API_URL from .env:", API_URL);
+console.log("🔥 Final API_BASE_URL:", API_BASE_URL);
