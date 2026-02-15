@@ -94,7 +94,7 @@ const BuildingCallout = ({ buildings, onBuildingPress }) => {
           <Marker
             key={building.id}
             coordinate={center}
-            tracksViewChanges={false}
+            tracksViewChanges={true}
             onPress={() => onBuildingPress(building)}
           >
             <View style={styles.markerLabel}>
