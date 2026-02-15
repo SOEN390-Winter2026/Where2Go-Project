@@ -30,7 +30,7 @@ describe("Input and Button Features", () => {
         const pressBackButton = getByTestId("pressFilter");
 
 
-        act(fireEvent.press(pressBackButton));
+        fireEvent.press(pressBackButton);
         //expect(pressBackButton).toHaveBeenCalled();
 
 
