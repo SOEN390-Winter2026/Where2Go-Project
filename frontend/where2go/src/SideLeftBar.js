@@ -9,12 +9,6 @@ import {
 } from "react-native";
 import PropTypes from 'prop-types';
 
-SideLeftBar.propTypes = {
-  currentCampus: PropTypes.string.isRequired,
-  onToggleCampus: PropTypes.func.isRequired,
-  onToggleLiveLocation: PropTypes.func.isRequired
-};
-
 export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation }) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
@@ -139,6 +133,12 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
     </View>
   );
 }
+
+SideLeftBar.propTypes = {
+  currentCampus: PropTypes.string.isRequired,
+  onToggleCampus: PropTypes.func.isRequired,
+  onToggleLiveLocation: PropTypes.func.isRequired
+};
 
 /* ---------- Styles ---------- */
 const styles = StyleSheet.create({
