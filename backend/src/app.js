@@ -28,13 +28,15 @@ app.get("/campus/:name/buildings", (req, res) => {
     res.json(buildings);
 });
 
-// GET /directions?originLat=&originLng=&destLat=&destLng=
-// Returns walking and transit routes with mode, duration, distance (US-2.3.1)
+// GET /directions?originLat=&originLng=&destLat=&destLng=&clientTime=
+// clientTime: optional ISO string from user's device for shuttle schedule (uses device time)
+// Returns walking, transit, and Concordia shuttle routes
 app.get("/directions", async (req, res) => {
     const originLat = parseFloat(req.query.originLat);
     const originLng = parseFloat(req.query.originLng);
     const destLat = parseFloat(req.query.destLat);
     const destLng = parseFloat(req.query.destLng);
+    const clientTime = req.query.clientTime && String(req.query.clientTime).trim();
 
     if (isNaN(originLat) || isNaN(originLng) || isNaN(destLat) || isNaN(destLng)) {
         return res.status(400).json({ error: "Invalid origin/destination coordinates" });
@@ -42,9 +44,10 @@ app.get("/directions", async (req, res) => {
 
     const origin = { lat: originLat, lng: originLng };
     const destination = { lat: destLat, lng: destLng };
+    const opts = clientTime ? { clientTime } : {};
 
     try {
-        const routes = await getTransportOptions(origin, destination);
+        const routes = await getTransportOptions(origin, destination, opts);
         res.json({ routes });
     } catch (err) {
         console.error("Directions error:", err);

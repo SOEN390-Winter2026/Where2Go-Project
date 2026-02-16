@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
@@ -9,6 +9,7 @@ import LoginScreen from "./src/Login";
 import OutdoorDirection from "./src/OutdoorDirection";
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
+import { polygonCentroid } from './src/utils/geo';
 
 export default function App() {
   console.log(API_BASE_URL);
@@ -129,7 +130,21 @@ export default function App() {
     return <LoginScreen onSkip={() => setShowLogin(false)}/>;
   }
   if(showOutdoorDirection){
-    return <OutdoorDirection destination = {selectDestination} onPressBack={() => setShowOutdoorDirection((prev) => (prev === false))}/>
+    // Convert selected building polygon to a { label, lat, lng } location object.
+    let destLocation = null;
+    if (selectDestination?.coordinates?.length) {
+      const center = polygonCentroid(selectDestination.coordinates);
+      destLocation = {
+        label: selectDestination.name || selectDestination.id,
+        ...center,
+      };
+    }
+    return (
+      <OutdoorDirection
+        destination={destLocation}
+        onPressBack={() => setShowOutdoorDirection(false)}
+      />
+    );
   }
 
   return (
