@@ -2,10 +2,6 @@ import React from "react";
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image } from "react-native";
 import PropTypes from 'prop-types';
 
-LoginScreen.propTypes = {
-  onSkip: PropTypes.func.isRequired,
-};
-
 const LoginScreen = ({onSkip}) => {
   return (
     <ImageBackground
@@ -14,7 +10,7 @@ const LoginScreen = ({onSkip}) => {
     >
      
       <View style ={styles.content}>
-       <Image
+       <Image testID="user-icon"
        source={require('../assets/user_icon.png')} 
        style={styles.userIcon}
        />
@@ -37,6 +33,11 @@ const LoginScreen = ({onSkip}) => {
     </ImageBackground>
   );
 };
+
+LoginScreen.propTypes = {
+  onSkip: PropTypes.func.isRequired,
+};
+
 
 const styles = StyleSheet.create({
   background: {
