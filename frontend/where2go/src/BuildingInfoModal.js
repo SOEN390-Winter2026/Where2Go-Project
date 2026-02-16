@@ -24,7 +24,7 @@ const BuildingInfoModal = ({ building, visible, onClose }) => {
       transparent={true}
       onRequestClose={onClose}
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable style={styles.overlay} onPress={onClose} testID="overlay">
         <Pressable style={styles.modalContainer} onPress={() => { }}>
           {/* Close button */}
           <Pressable
@@ -38,13 +38,13 @@ const BuildingInfoModal = ({ building, visible, onClose }) => {
 
           {/* Building image header */}
           {buildingImages[building.code] ? (
-            <Image
+            <Image testID="buildingImage"
               source={buildingImages[building.code]}
               style={styles.headerImage}
               resizeMode="cover"
             />
           ) : (
-            <View style={styles.headerImagePlaceholder} />
+            <View style={styles.headerImagePlaceholder} testID="imagePlaceholder"/>
           )}
 
           <ScrollView contentContainerStyle={styles.bodyContent}>
@@ -57,7 +57,7 @@ const BuildingInfoModal = ({ building, visible, onClose }) => {
             <Text style={styles.address}>{building.address}</Text>
 
             {/* Concordia link */}
-            <Pressable
+            <Pressable testID="concordiaLink"
               onPress={() => {
                 if (building.link) Linking.openURL(building.link);
               }}
