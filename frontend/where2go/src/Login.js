@@ -1,6 +1,10 @@
 import React from "react";
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import PropTypes from 'prop-types';
+
+LoginScreen.propTypes = {
+  onSkip: PropTypes.func.isRequired,
+};
 
 const LoginScreen = ({onSkip}) => {
   return (
