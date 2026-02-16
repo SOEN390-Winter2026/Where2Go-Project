@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import PoiSlider from "./src/PoiSlider";
 import LoginScreen from "./src/Login";
 import OutdoorDirection from "./src/OutdoorDirection";
 import { colors } from './src/theme/colors';
@@ -25,6 +26,10 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+
+  //POI Variables
+  const [isPressedPOI, setIsPressedPOI] = useState(false);
+
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -186,9 +191,13 @@ export default function App() {
               return !prev;
             })
         }
+        onPressPOI={() =>{
+          setIsPressedPOI(prev => !prev);
+        }}
         />
 
       <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
+      {isPressedPOI && <PoiSlider/>}
       <StatusBar style="auto" />
     </View>
   );

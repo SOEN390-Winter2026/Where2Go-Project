@@ -8,7 +8,7 @@ import {
   Animated,
 } from "react-native";
 
-export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation }) {
+export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation, onPressPOI }) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -109,7 +109,9 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   testID="pOIPress"
   style={[styles.barItem, iconState("poi")]}
   onPress={() =>
-    setActivePOI((prev) => (prev === "poi" ? null : "poi"))
+    {setActivePOI((prev) => (prev === "poi" ? null : "poi"));
+      onPressPOI();
+    }
   }
 >
   <Image source={iconSource("poi")} style={styles.icon} />
