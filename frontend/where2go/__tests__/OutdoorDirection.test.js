@@ -49,7 +49,7 @@ describe("Input and Button Features", () => {
             fireEvent.changeText(input, "Central Park");
         });
 
-        expect(input.props.value).toBe("Central Park"); // ✅ checks that value updated
+        expect(input.props.value).toBe("Central Park");
     });
 
     it("updates text in inputDestLoc", () => {
@@ -61,7 +61,7 @@ describe("Input and Button Features", () => {
             fireEvent.changeText(input, "Central Park");
         });
 
-        expect(input.props.value).toBe("Central Park"); // ✅ checks that value updated
+        expect(input.props.value).toBe("Central Park");
     });
 });
 
