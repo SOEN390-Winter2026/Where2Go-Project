@@ -128,7 +128,7 @@ export default function App() {
     return <LoginScreen onSkip={() => setShowLogin(false)} />;
   }
   if(showOutdoorDirection){
-    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
+    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))} />
   }
 
   return (
