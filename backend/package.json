@@ -20,7 +20,8 @@
     "expo-dev-client": "^6.0.20",
     "express": "^5.2.1",
     "jest-expo": "~54.0.17",
-    "mongoose": "^9.1.5"
+    "mongoose": "^9.1.5",
+    "react-native-maps": "1.20.1"
   },
   "jest": {
     "preset": "jest-expo",
