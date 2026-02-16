@@ -1,6 +1,5 @@
 import OutdoorDirection from '../src/OutdoorDirection.js';
-import { render, waitFor, fireEvent } from "@testing-library/react-native";
-import { act } from "react-test-renderer";
+import { render, waitFor, fireEvent, act } from "@testing-library/react-native";
 import * as Location from 'expo-location';
 
 // Mock the Location module
@@ -12,52 +11,50 @@ describe("Rendering Features Properly", () => {
         expect(OutdoorDirection).toBeDefined();
     });
 
-    it("Back Button", () => {
+    it("Back Button", async () => {
         const mockOnPress = jest.fn();
 
-        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} />)
+        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} />);
         const pressBackButton = getByTestId("pressBack");
 
+        await act(async () => {
+            fireEvent.press(pressBackButton);
+        });
 
-        fireEvent.press(pressBackButton);
         expect(mockOnPress).toHaveBeenCalled();
-
-
     });
 });
 
 describe("Input and Button Features", () => {
-    it("Filter Button", () => {
+    it("Filter Button", async () => {
         const mockOnPress = jest.fn();
 
-        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} />)
+        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} />);
         const pressBackButton = getByTestId("pressFilter");
 
-
-        fireEvent.press(pressBackButton);
-        //expect(pressBackButton).toHaveBeenCalled();
-
-
+        await act(async () => {
+            fireEvent.press(pressBackButton);
+        });
     });
 
-    it("updates text in inputDestLoc", () => {
+    it("updates text in inputStartLoc", async () => {
         const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} />);
 
         const input = getByTestId("inputStartLoc");
 
-        act(() => {
+        await act(async () => {
             fireEvent.changeText(input, "Central Park");
         });
 
         expect(input.props.value).toBe("Central Park");
     });
 
-    it("updates text in inputDestLoc", () => {
+    it("updates text in inputDestLoc", async () => {
         const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} />);
 
         const input = getByTestId("inputDestLoc");
 
-        act(() => {
+        await act(async () => {
             fireEvent.changeText(input, "Central Park");
         });
 
