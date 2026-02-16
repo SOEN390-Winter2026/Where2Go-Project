@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,64 @@ import {
   Animated,
 } from "react-native";
 import Slider from '@react-native-community/slider';
-
+import { GOOGLE_MAPS_API_KEY } from '@env';
 
 export default function PoiSlider(){
+
+    const [pois, setPois] = useState([]);
+    const types = [
+  "restaurant",
+  "park",
+  "museum",
+  "tourist_attraction",
+  "cafe",
+  "store"
+];
+
+const fetchNearbyPOIs = async (lat, lng, radiusInMeters) => {
+  const url =
+  `https://maps.googleapis.com/maps/api/place/nearbysearch/json` +
+  `?location=${lat},${lng}` +
+  `&radius=${radiusInMeters}` +
+  `&type=${types}` +
+  `&key=${GOOGLE_MAPS_API_KEY}`;
+  try {
+    const response = await fetch(url);
+    
+    // Manual check for HTTP errors (e.g., 400, 500)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json(); // Manual JSON parsing
+    return data.results;
+  } catch (error) {
+    console.error("Fetch failed:", error);
+  }
+};
+
+useEffect(() => {
+  const loadPOIs = async () => {
+    const results = await fetchNearbyPOIs(
+      45.49401341829886,
+      -73.57851255083219,
+      3000
+    );
+
+    setPois(results || []);
+  };
+
+  loadPOIs();
+}, []);
+
+useEffect(() =>{
+
+    pois.forEach((poi) => {
+  console.log(poi.name);
+});
+
+},[pois])
+
 
     const [sliderValueRadius, setSliderValueRadius] = useState(0);
 

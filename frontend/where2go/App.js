@@ -157,6 +157,12 @@ export default function App() {
             snapBackToUser();
           }
         }}
+       onPoiClick={(event) => {
+    const { placeId, name, coordinate } = event.nativeEvent;
+    console.log(`Clicked on ${name} with ID: ${placeId}`);
+  }}
+  showsPointsOfInterest={false}
+  
       >
 
         {/* Building markers with callouts */}
@@ -189,6 +195,7 @@ export default function App() {
             strokeWidth={2}
           />
         ))}
+        
       </MapView>
       <SideLeftBar
         currentCampus={currentCampus}
@@ -214,6 +221,7 @@ export default function App() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
+      {isPressedPOI && <PoiSlider/>}
       <StatusBar style="auto" />
     </View>
   );
