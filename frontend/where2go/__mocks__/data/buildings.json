@@ -1,0 +1,13 @@
+{
+  "SGW": [
+    {
+      "code": "H",
+      "name": "Hall Building",
+      "address": "1455 De Maisonneuve Blvd W",
+      "latitude": 45.4973,
+      "longitude": -73.5789,
+      "link": "https://example.com/hall"
+    }
+  ],
+  "Loyola": []
+}
