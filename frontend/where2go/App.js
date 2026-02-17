@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
+
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import PoiSlider from "./src/PoiSlider";
@@ -10,6 +11,7 @@ import LoginScreen from "./src/Login";
 import BuildingCallout from './src/BuildingCallout';
 import BuildingInfoModal from './src/BuildingInfoModal';
 import OutdoorDirection from "./src/OutdoorDirection";
+import LoadingPage from './src/LoadingPage';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
@@ -36,6 +38,8 @@ export default function App() {
   //POI Variables
   const [isPressedPOI, setIsPressedPOI] = useState(false);
 
+  const [dataLoaded, setDataLoaded] = useState(false); // for loading check
+  const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -58,17 +62,20 @@ export default function App() {
     setUserDraggedMap(false);
   };
 
+  // live location button turned on
   useEffect(() => {
     if (liveLocationEnabled && userLocation) {
       snapBackToUser();
     }
   }, [liveLocationEnabled, userLocation]);
 
-
   // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
+  // Also set that map loaded
+
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
     setCampusCoords(nextCoords);
+    setDataLoaded(true);
     mapRef.current?.animateToRegion(
       {
         ...nextCoords,
@@ -126,14 +133,40 @@ export default function App() {
     startTracking();
   }, [liveLocationEnabled]);
 
+  // to change the loading to done/wont long load again
+  useEffect(() => {
+    if (!hasInitialized && dataLoaded) {
+      setHasInitialized(true);
+
+      // >> un/comment below area if test
+      // const timer = setTimeout(() => {
+      //   setHasInitialized(true);
+      // }, 3000); // 3 sec delay for testing
+    
+      // return () => clearTimeout(timer);
+      // >> comment end
+    }
+  }, [dataLoaded, hasInitialized]);
 
 
   //Login page first
-  if (showLogin) {
-    return <LoginScreen onSkip={() => setShowLogin(false)} />;
+  if (showLogin){
+    return (
+      <LoginScreen
+        onSkip={() => {
+          setShowLogin(false);
+          setHasInitialized(false); // for loading
+        }}
+      />
+    );
   }
+  // start loading if the map still isn't done
+  if (!hasInitialized) {
+    return <LoadingPage />;
+  }
+
   if(showOutdoorDirection){
-    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))}/>
+    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} />;
   }
 
   return (
