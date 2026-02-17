@@ -15,6 +15,7 @@ function buildDirectionsUrl(origin, destination, mode) {
     origin: `${origin.lat},${origin.lng}`,
     destination: `${destination.lat},${destination.lng}`,
     mode,
+    alternatives: 'true', 
     key: API_KEY || "",
   });
   return `${base}?${params.toString()}`;
@@ -82,16 +83,20 @@ async function getTransportOptions(origin, destination) {
 
   const routes = [];
 
-  if (walkingRes?.routes?.[0]) {
-    const normalized = normalizeRoute(walkingRes.routes[0], "walking");
+ if (walkingRes?.routes?.length > 0) {
+  walkingRes.routes.forEach(route => {
+    const normalized = normalizeRoute(route, "walking");
     if (normalized) routes.push(normalized);
-  }
+  });
+}
 
-  if (transitRes?.routes?.[0]) {
-    const normalized = normalizeRoute(transitRes.routes[0], "transit");
+if (transitRes?.routes?.length > 0) {
+  transitRes.routes.forEach(route => {
+    const normalized = normalizeRoute(route, "transit");
     if (normalized) routes.push(normalized);
-  }
-
+  });
+}
+ console.log(`Found ${routes.length} total routes`); 
   return routes;
 }
 
