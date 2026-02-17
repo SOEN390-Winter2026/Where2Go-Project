@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { View, Text, StyleSheet, Pressable, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -36,6 +37,17 @@ export default function ErrorModal({
     </Modal>
   );
 }
+
+ErrorModal.propTypes = {
+  visible: PropTypes.bool, 
+  onClose: PropTypes.func.isRequired, 
+  title: PropTypes.String, 
+  message: PropTypes.String, 
+  iconName: PropTypes.String,
+  iconColor: PropTypes.String,
+  buttonText: PropTypes.String
+}
+
 
 const styles = StyleSheet.create({
   modalOverlay: {

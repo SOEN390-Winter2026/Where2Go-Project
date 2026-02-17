@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { colors } from './theme/colors';
 import * as Location from 'expo-location';
 import ErrorModal from './ErrorModal';
 import PropTypes from 'prop-types';
 
-export default function OutdoorDirection({ onPressBack }) {
+export default function OutdoorDirection({ onPressBack, initialFrom, initialTo }) {
 
   const routes = [
     { id: "1" }, { id: "2" }, { id: "3" },
@@ -23,6 +23,15 @@ export default function OutdoorDirection({ onPressBack }) {
   //Error Modal Variables
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // For when you tap on a building and select it as destination/departure
+  useEffect(() => {
+    if (initialFrom !== "") setFromDestination(initialFrom);
+  },[initialFrom]);
+
+  useEffect(() => {
+    if (initialTo !== "") setToDestination(initialTo);
+  }, [initialTo])
 
   useEffect(() => {
     console.log("fromDestionation: ", fromDestination);
@@ -173,6 +182,8 @@ export default function OutdoorDirection({ onPressBack }) {
 
 OutdoorDirection.propTypes = {
   onPressBack: PropTypes.func.isRequired,
+  initialFrom: PropTypes.string,
+  initialTo: PropTypes.string,
 };
 
 const styles = StyleSheet.create({
