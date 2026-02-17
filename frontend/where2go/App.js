@@ -161,7 +161,7 @@ export default function App() {
   }
 
   if(showOutdoorDirection){
-    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev === true ? false : true))} />
+    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} />;
   }
 
   return (

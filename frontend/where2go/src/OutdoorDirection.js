@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { colors } from './theme/colors';
 import * as Location from 'expo-location';
 import ErrorModal from './ErrorModal';
+import PropTypes from 'prop-types';
 
 export default function OutdoorDirection({ onPressBack }) {
 
@@ -169,6 +170,10 @@ export default function OutdoorDirection({ onPressBack }) {
     </ImageBackground>
   );
 }
+
+OutdoorDirection.propTypes = {
+  onPressBack: PropTypes.func.isRequired,
+};
 
 const styles = StyleSheet.create({
   background: {

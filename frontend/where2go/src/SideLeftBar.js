@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Animated,
 } from "react-native";
+import PropTypes from 'prop-types';
 
 export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation }) {
   /* ---------- Assets ---------- */
@@ -132,6 +133,12 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
     </View>
   );
 }
+
+SideLeftBar.propTypes = {
+  currentCampus: PropTypes.string.isRequired,
+  onToggleCampus: PropTypes.func.isRequired,
+  onToggleLiveLocation: PropTypes.func.isRequired
+};
 
 /* ---------- Styles ---------- */
 const styles = StyleSheet.create({
