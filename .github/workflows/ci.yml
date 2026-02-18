@@ -2,7 +2,7 @@ name: pipeline-ci
 
 on:
   push:
-    branches: [ main , release1, POI-steven ]
+    branches: [ main , release1, coverage-test ]
   pull_request:
     branches: [ main , release1 ]
 
