@@ -1,13 +1,12 @@
-const React = require('react');
+  const React = require("react");
+  const { View, Pressable } = require("react-native");
 
-const MapView = ({ children }) => {
-    return <>{children}</>;
-};
+  const Marker = ({ children }) => <View testID="marker">{children}</View>;
 
-const Marker = () => null;
+  const Callout = ({ children, onPress }) => (
+    <Pressable testID="callout" onPress={onPress}>
+      {children}
+    </Pressable>
+  );
 
-module.exports = {
-    __esModule: true,
-    default: MapView,
-    Marker,
-};
+module.exports = { __esModule: true, Marker, Callout };
