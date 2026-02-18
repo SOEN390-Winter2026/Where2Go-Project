@@ -1,0 +1,12 @@
+appId: host.exp.exponent
+---
+- tapOn: Skip
+- waitForAnimationToEnd
+- assertVisible:
+    id: mapRef
+- tapOn:
+    id: campusToggle
+- assertVisible: Loyola
+- tapOn:
+    id: campusToggle
+- assertVisible: SGW

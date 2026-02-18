@@ -1,24 +1,25 @@
 {
   "expo": {
-    "name": "where2go",
-    "slug": "where2go",
+    "name": "Where2Go",
+    "slug": "Where2Go",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/appListIconW2G.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/WGicon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#912338"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.where2go.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/appListIconW2G.png",
+        "backgroundColor": "#912338"
       },
       "edgeToEdgeEnabled": true
     },
