@@ -142,7 +142,6 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
       <View style={styles.header}>
         <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
           <Ionicons name="arrow-back" size={26} color="white" />
-          <Ionicons name="arrow-back" size={26} color="white" />
         </Pressable>
 
         <Text style={styles.headerTitle}>Plan Your Trip</Text>
@@ -247,8 +246,6 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
         </View>
         <View style={styles.scrollBar} />
         <ScrollView
-        <View style={styles.scrollBar} />
-        <ScrollView
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.routesContent}
           keyboardShouldPersistTaps="handled"
@@ -306,7 +303,6 @@ OutdoorDirection.propTypes = {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    flex: 1,
   },
   header: {
     width: "100%",
@@ -328,7 +324,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 28,
     fontWeight: "700",
-    marginTop: 30,
     marginTop: 30,
   },
   headerSubtitle: {
@@ -413,17 +408,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#111",
-  routesTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
   },
-  filterText: {
+
   filterText: {
     color: "#7C2B38",
     fontWeight: "800",
   },
-  routeContainer: {
+
   routeContainer: {
     backgroundColor: "white",
     borderRadius: 16,
@@ -432,8 +423,6 @@ const styles = StyleSheet.create({
     borderColor: "#7C2B38",
     flexDirection: "row",
     marginBottom: 16,
-    marginHorizontal: 16,
-    height: 170,
     marginHorizontal: 16,
     height: 170,
   },
