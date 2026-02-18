@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
-import MapView, { Marker, Polygon } from 'react-native-maps';
+import MapView, { Marker, Polygon, Callout } from 'react-native-maps';
 
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
@@ -22,7 +22,7 @@ const CAMPUS_COORDS = {
 
 export default function App() {
   console.log(API_BASE_URL);
-  
+
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -142,15 +142,29 @@ export default function App() {
       // const timer = setTimeout(() => {
       //   setHasInitialized(true);
       // }, 3000); // 3 sec delay for testing
-    
+
       // return () => clearTimeout(timer);
       // >> comment end
     }
   }, [dataLoaded, hasInitialized]);
 
+  //handle POI Change
+  const [selectedPois, setSelectedPois] = useState([]);
+  const handlePoisChange = (poisFromSlider) => {
+    setSelectedPois(poisFromSlider);
+  };
+
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    if (markerRef.current) {
+      markerRef.current.showCallout();
+    }
+  }, []);
+
 
   //Login page first
-  if (showLogin){
+  if (showLogin) {
     return (
       <LoginScreen
         onSkip={() => {
@@ -165,7 +179,7 @@ export default function App() {
     return <LoadingPage />;
   }
 
-  if(showOutdoorDirection){
+  if (showOutdoorDirection) {
     return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} />;
   }
 
@@ -190,27 +204,27 @@ export default function App() {
             snapBackToUser();
           }
         }}
-       onPoiClick={(event) => {
-    const { placeId, name, coordinate } = event.nativeEvent;
-    console.log(`Clicked on ${name} with ID: ${placeId}`);
-  }}
-  showsPointsOfInterest={false}
-  
+        onPoiClick={(event) => {
+          const { placeId, name, coordinate } = event.nativeEvent;
+          console.log(`Clicked on ${name} with ID: ${placeId}`);
+        }}
+        showsPointsOfInterest={false}
+
       >
 
         {/* Building markers with callouts */}
         <BuildingCallout buildings={buildings} onBuildingPress={handleBuildingPress} />
 
         {/* Campus marker */}
-        <Marker   
-        coordinate={campusCoords} 
-        title={currentCampus}
-        accessibilityLabel="campusMarker" />
+        <Marker
+          coordinate={campusCoords}
+          title={currentCampus}
+          accessibilityLabel="campusMarker" />
 
         {/* User marker */}
-        { liveLocationEnabled && userLocation && (
+        {liveLocationEnabled && userLocation && (
           <Marker
-          
+
             coordinate={userLocation}
             title="You"
             pinColor="blue"
@@ -218,6 +232,22 @@ export default function App() {
             accessibilityLabel="userMarker"
           />
         )}
+
+        {/*POIs Markers */}
+        {selectedPois?.map((poi) => (
+          <Marker
+            key={poi.place_id}
+            coordinate={{
+              latitude: poi.geometry.location.lat,
+              longitude: poi.geometry.location.lng,
+            }}
+            title={poi.name}
+            description={poi.vicinity}
+            pinColor="orange"
+          />
+
+        ))}
+
         {/* this section renders the campus highlighted shapes */}
         {buildings.map((building) => (
           <Polygon
@@ -228,7 +258,7 @@ export default function App() {
             strokeWidth={2}
           />
         ))}
-        
+
       </MapView>
       <SideLeftBar
         currentCampus={currentCampus}
@@ -243,18 +273,18 @@ export default function App() {
             return !prev;
           })
         }
-        onPressPOI={() =>{
+        onPressPOI={() => {
           setIsPressedPOI(prev => !prev);
         }}
       />
 
-      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)} />
       <BuildingInfoModal
         building={selectedBuilding}
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
-      {isPressedPOI && <PoiSlider/>}
+      {isPressedPOI && <PoiSlider onPoisChange={handlePoisChange} />}
       <StatusBar style="auto" />
     </View>
   );
