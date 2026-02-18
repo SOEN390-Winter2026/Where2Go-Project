@@ -63,5 +63,10 @@ jobs:
           flags: unittests
           name: codecov-coverage
           fail_ci_if_error: true
+      - name: Publish Frontend Unit Test Results
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: frontend/where2go/reports/junit.xml
 
       # Maestro tests (add them later)

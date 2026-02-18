@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="73" failures="0" errors="0" time="12.215">
+  <testsuite name="Rendering Features Properly" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:08" time="5.087" tests="11">
+    <testcase classname="Rendering Features Properly Render SideLeftBar" name="Rendering Features Properly Render SideLeftBar" time="0.016">
+    </testcase>
+    <testcase classname="Rendering Features Properly Render TopRightMenu" name="Rendering Features Properly Render TopRightMenu" time="0.026">
+    </testcase>
+    <testcase classname="Rendering Features Properly Render map" name="Rendering Features Properly Render map" time="0.001">
+    </testcase>
+    <testcase classname=" Buttons Test Toggle Button" name=" Buttons Test Toggle Button" time="0.7">
+    </testcase>
+    <testcase classname=" Buttons Test Disability Button" name=" Buttons Test Disability Button" time="0.009">
+    </testcase>
+    <testcase classname="Backend Functions Check getCampusCoordinates SGW" name="Backend Functions Check getCampusCoordinates SGW" time="0.005">
+    </testcase>
+    <testcase classname="Backend Functions Check getCampusCoordinates Loyola" name="Backend Functions Check getCampusCoordinates Loyola" time="0.005">
+    </testcase>
+    <testcase classname="API Testing /campus/SGW" name="API Testing /campus/SGW" time="0.069">
+    </testcase>
+    <testcase classname="API Testing /campus/Loyola" name="API Testing /campus/Loyola" time="0.057">
+    </testcase>
+    <testcase classname="API Testing /campus/SGW/buildings" name="API Testing /campus/SGW/buildings" time="0.006">
+    </testcase>
+    <testcase classname="API Testing /campus/Loyola/buildings" name="API Testing /campus/Loyola/buildings" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="BuildingCallout" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:08" time="7.105" tests="4">
+    <testcase classname="BuildingCallout renders markers for all buildings" name="BuildingCallout renders markers for all buildings" time="0.156">
+    </testcase>
+    <testcase classname="BuildingCallout pressing a marker calls onBuildingPress with correct building" name="BuildingCallout pressing a marker calls onBuildingPress with correct building" time="0.011">
+    </testcase>
+    <testcase classname="BuildingCallout renders nothing when buildings array is empty" name="BuildingCallout renders nothing when buildings array is empty" time="0.003">
+    </testcase>
+    <testcase classname="BuildingCallout renders nothing when buildings is null" name="BuildingCallout renders nothing when buildings is null" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="Rendering Features Properly" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:14" time="3.085" tests="14">
+    <testcase classname="Rendering Features Properly Render SideLeftBar" name="Rendering Features Properly Render SideLeftBar" time="0.001">
+    </testcase>
+    <testcase classname="Rendering Features Properly Back Button" name="Rendering Features Properly Back Button" time="0.704">
+    </testcase>
+    <testcase classname="Input and Button Features Filter Button" name="Input and Button Features Filter Button" time="0.011">
+    </testcase>
+    <testcase classname="Input and Button Features updates text in inputStartLoc" name="Input and Button Features updates text in inputStartLoc" time="0.02">
+    </testcase>
+    <testcase classname="Input and Button Features updates text in inputDestLoc" name="Input and Button Features updates text in inputDestLoc" time="0.033">
+    </testcase>
+    <testcase classname="Location Error Handling shows error modal when location services are disabled" name="Location Error Handling shows error modal when location services are disabled" time="0.045">
+    </testcase>
+    <testcase classname="Location Error Handling shows error modal when location permission is denied" name="Location Error Handling shows error modal when location permission is denied" time="0.047">
+    </testcase>
+    <testcase classname="Location Error Handling shows error modal when coordinates are missing" name="Location Error Handling shows error modal when coordinates are missing" time="0.03">
+    </testcase>
+    <testcase classname="Location Error Handling successfully sets location when all permissions are granted" name="Location Error Handling successfully sets location when all permissions are granted" time="0.176">
+    </testcase>
+    <testcase classname="Location Error Handling closes error modal when OK button is pressed" name="Location Error Handling closes error modal when OK button is pressed" time="0.027">
+    </testcase>
+    <testcase classname="Location Error Handling allows manual input when location fails" name="Location Error Handling allows manual input when location fails" time="0.025">
+    </testcase>
+    <testcase classname="Location Error Handling shows timeout error when location request times out" name="Location Error Handling shows timeout error when location request times out" time="0.093">
+    </testcase>
+    <testcase classname="Location Error Handling shows unavailable error when location is unavailable" name="Location Error Handling shows unavailable error when location is unavailable" time="0.034">
+    </testcase>
+    <testcase classname="Location Error Handling shows generic error for unknown location errors" name="Location Error Handling shows generic error for unknown location errors" time="0.049">
+    </testcase>
+  </testsuite>
+  <testsuite name="BuildingInfoModal" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:08" time="9.172" tests="14">
+    <testcase classname="BuildingInfoModal renders modal when visible is true" name="BuildingInfoModal renders modal when visible is true" time="1.657">
+    </testcase>
+    <testcase classname="BuildingInfoModal returns null when building is null" name="BuildingInfoModal returns null when building is null" time="0.015">
+    </testcase>
+    <testcase classname="BuildingInfoModal returns null when building is undefined" name="BuildingInfoModal returns null when building is undefined" time="0.009">
+    </testcase>
+    <testcase classname="BuildingInfoModal renders building image when image exists for building code" name="BuildingInfoModal renders building image when image exists for building code" time="0.026">
+    </testcase>
+    <testcase classname="BuildingInfoModal renders placeholder when building image does not exist" name="BuildingInfoModal renders placeholder when building image does not exist" time="0.011">
+    </testcase>
+    <testcase classname="BuildingInfoModal displays building code" name="BuildingInfoModal displays building code" time="0.012">
+    </testcase>
+    <testcase classname="BuildingInfoModal displays address section" name="BuildingInfoModal displays address section" time="0.139">
+    </testcase>
+    <testcase classname="BuildingInfoModal displays services section with default text" name="BuildingInfoModal displays services section with default text" time="0.027">
+    </testcase>
+    <testcase classname="BuildingInfoModal displays &quot;View on Concordia.ca&quot; link" name="BuildingInfoModal displays &quot;View on Concordia.ca&quot; link" time="0.058">
+    </testcase>
+    <testcase classname="BuildingInfoModal calls onClose when close button is pressed" name="BuildingInfoModal calls onClose when close button is pressed" time="0.013">
+    </testcase>
+    <testcase classname="BuildingInfoModal opens Concordia link when pressed" name="BuildingInfoModal opens Concordia link when pressed" time="0.019">
+    </testcase>
+    <testcase classname="BuildingInfoModal handles building with missing address properly" name="BuildingInfoModal handles building with missing address properly" time="0.274">
+    </testcase>
+    <testcase classname="BuildingInfoModal handles building with long name" name="BuildingInfoModal handles building with long name" time="0.027">
+    </testcase>
+    <testcase classname="BuildingInfoModal modal does not close when modal container is pressed" name="BuildingInfoModal modal does not close when modal container is pressed" time="0.02">
+    </testcase>
+  </testsuite>
+  <testsuite name="ErrorModal Component" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:17" time="1.57" tests="10">
+    <testcase classname="ErrorModal Component renders correctly when visible" name="ErrorModal Component renders correctly when visible" time="0.237">
+    </testcase>
+    <testcase classname="ErrorModal Component does not render when visible is false" name="ErrorModal Component does not render when visible is false" time="0.009">
+    </testcase>
+    <testcase classname="ErrorModal Component renders custom title" name="ErrorModal Component renders custom title" time="0.01">
+    </testcase>
+    <testcase classname="ErrorModal Component renders custom button text" name="ErrorModal Component renders custom button text" time="0.005">
+    </testcase>
+    <testcase classname="ErrorModal Component calls onClose when button is pressed" name="ErrorModal Component calls onClose when button is pressed" time="0.014">
+    </testcase>
+    <testcase classname="ErrorModal Component renders with custom icon name" name="ErrorModal Component renders with custom icon name" time="0.008">
+    </testcase>
+    <testcase classname="ErrorModal Component renders with custom icon color" name="ErrorModal Component renders with custom icon color" time="0.005">
+    </testcase>
+    <testcase classname="ErrorModal Component displays long messages correctly" name="ErrorModal Component displays long messages correctly" time="0.006">
+    </testcase>
+    <testcase classname="ErrorModal Component handles multiple consecutive calls" name="ErrorModal Component handles multiple consecutive calls" time="0.009">
+    </testcase>
+    <testcase classname="ErrorModal Component applies all custom props together" name="ErrorModal Component applies all custom props together" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="TopRightMenu" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:16" time="2.762" tests="8">
+    <testcase classname="TopRightMenu renders the menu btn" name="TopRightMenu renders the menu btn" time="0.076">
+    </testcase>
+    <testcase classname="TopRightMenu dropdown menu starts off closed" name="TopRightMenu dropdown menu starts off closed" time="0.017">
+    </testcase>
+    <testcase classname="TopRightMenu opens dropdown menu when hamburger button is pressed" name="TopRightMenu opens dropdown menu when hamburger button is pressed" time="0.032">
+    </testcase>
+    <testcase classname="TopRightMenu closes dropdown menu when hamburger button is pressed again" name="TopRightMenu closes dropdown menu when hamburger button is pressed again" time="0.046">
+    </testcase>
+    <testcase classname="TopRightMenu calls onPressDirection when Direction menu item is pressed" name="TopRightMenu calls onPressDirection when Direction menu item is pressed" time="0.057">
+    </testcase>
+    <testcase classname="TopRightMenu closes menu when Map item is pressed" name="TopRightMenu closes menu when Map item is pressed" time="0.025">
+    </testcase>
+    <testcase classname="TopRightMenu closes menu when Calendar item is pressed" name="TopRightMenu closes menu when Calendar item is pressed" time="0.072">
+    </testcase>
+    <testcase classname="TopRightMenu closes menu when Feedback item is pressed" name="TopRightMenu closes menu when Feedback item is pressed" time="0.009">
+    </testcase>
+  </testsuite>
+  <testsuite name="LoginScreen" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:18" time="0.972" tests="5">
+    <testcase classname="LoginScreen renders the entire login page" name="LoginScreen renders the entire login page" time="0.411">
+    </testcase>
+    <testcase classname="LoginScreen renders the user icon" name="LoginScreen renders the user icon" time="0.01">
+    </testcase>
+    <testcase classname="LoginScreen renders Sign in with Google btn" name="LoginScreen renders Sign in with Google btn" time="0.009">
+    </testcase>
+    <testcase classname="LoginScreen renders Skip btn" name="LoginScreen renders Skip btn" time="0.01">
+    </testcase>
+    <testcase classname="LoginScreen has to call onSkip when Skip btn is pressed" name="LoginScreen has to call onSkip when Skip btn is pressed" time="0.008">
+    </testcase>
+  </testsuite>
+  <testsuite name="LoadingPage" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:18" time="0.596" tests="3">
+    <testcase classname="LoadingPage renders the loading page without crashing" name="LoadingPage renders the loading page without crashing" time="0.079">
+    </testcase>
+    <testcase classname="LoadingPage renders the loading page logo image" name="LoadingPage renders the loading page logo image" time="0.01">
+    </testcase>
+    <testcase classname="LoadingPage renders the loading page activity indicator" name="LoadingPage renders the loading page activity indicator" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="buildings.json data sanity" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:19" time="0.341" tests="2">
+    <testcase classname="buildings.json data sanity every building has required fields" name="buildings.json data sanity every building has required fields" time="0.017">
+    </testcase>
+    <testcase classname="buildings.json data sanity building codes are unique within each campus" name="buildings.json data sanity building codes are unique within each campus" time="0.013">
+    </testcase>
+  </testsuite>
+  <testsuite name="Live location permission handling" errors="0" failures="0" skipped="0" timestamp="2026-02-18T23:24:18" time="0.581" tests="2">
+    <testcase classname="Live location permission handling denied permission: does not start watchPositionAsync" name="Live location permission handling denied permission: does not start watchPositionAsync" time="0.104">
+    </testcase>
+    <testcase classname="Live location permission handling granted permission: starts watchPositionAsync with correct options" name="Live location permission handling granted permission: starts watchPositionAsync with correct options" time="0.055">
+    </testcase>
+  </testsuite>
+</testsuites>
