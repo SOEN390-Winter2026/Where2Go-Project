@@ -127,7 +127,8 @@ BuildingInfoModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSetDeparture: PropTypes.func.isRequired,
-onSetDestination: PropTypes.func.isRequired
+  onSetDestination: PropTypes.func.isRequired,
+  selectedRole: PropTypes.string
 };
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
