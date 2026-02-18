@@ -2,7 +2,7 @@ name: pipeline-ci
 
 on:
   push:
-    branches: [ main , release1 ]
+    branches: [ main , release1, POI-steven ]
   pull_request:
     branches: [ main , release1 ]
 
@@ -58,5 +58,10 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: SOEN390-Winter2026/Where2Go-Project
+          files: |
+            ./frontend/where2go/coverage/lcov.info
+          flags: unittests
+          name: codecov-coverage
+          fail_ci_if_error: true
 
       # Maestro tests (add them later)
