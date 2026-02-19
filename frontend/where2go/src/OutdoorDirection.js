@@ -1,139 +1,93 @@
-import { View, Text, TextInput, StyleSheet, Pressable, ImageBackground, ScrollView, ActivityIndicator, Keyboard } from "react-native";
+import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useCallback } from "react";
-import PropTypes from "prop-types";
-import { API_BASE_URL } from "./config";
-import { SEARCHABLE_LOCATIONS } from "./data/locations";
+import React, { useState, useEffect, useRef } from 'react';
+import { colors } from './theme/colors';
+import * as Location from 'expo-location';
+import ErrorModal from './ErrorModal';
+import PropTypes from 'prop-types';
 
-// Re-export so existing callers (e.g. tests) still work with
-//   import { KNOWN_LOCATIONS } from './OutdoorDirection';
-export { KNOWN_LOCATIONS } from "./data/locations";
+export default function OutdoorDirection({ onPressBack }) {
 
-/* ── Helper constants & functions ─────────────────────────────────────────── */
+  const routes = [
+    { id: "1" }, { id: "2" }, { id: "3" },
+  ]
 
-/** Max autocomplete results shown in the dropdown */
-const MAX_RESULTS = 8;
+  //Input Destinations Variables
+  const [fromDestination, setFromDestination] = useState("");
+  const [toDestination, setToDestination] = useState("");
 
-/** Case-insensitive location filter for the autocomplete dropdown */
-function filterLocations(query) {
-  if (!query || query.trim().length === 0) return [];
-  const q = query.toLowerCase().trim();
-  return SEARCHABLE_LOCATIONS.filter((loc) => loc.searchText.includes(q)).slice(0, MAX_RESULTS);
-}
-
-/** Map an API transport mode to a human-readable label and Ionicons icon name */
-function getModeDisplay(mode) {
-  if (mode === "concordia_shuttle") return { label: "Concordia Shuttle", icon: "bus" };
-  if (mode === "walking") return { label: "Walking", icon: "walk" };
-  if (mode === "transit") return { label: "Transit", icon: "bus" };
-  return { label: mode, icon: "navigate" };
-}
-
-/**
- * OutdoorDirection — route planner screen with searchable From / To fields.
- *
- * Props:
- *   origin       – optional { label, lat, lng } for the starting point
- *   destination   – optional { label, lat, lng } for the destination
- *   onPressBack   – callback to close this screen
- *
- * The From / To fields are TextInputs with case-insensitive autocomplete.
- * Users can search by building name, building abbreviation (e.g. "MB", "EV"),
- * or campus name ("SGW", "Loyola").
- *
- * Routes are fetched only when BOTH origin and destination have valid lat/lng.
- */
-export default function OutdoorDirection({ origin: originProp, destination: destProp, onPressBack }) {
-  // ---- State ----
-  const [origin, setOrigin] = useState(originProp ?? null);
-  const [destination, setDestination] = useState(destProp ?? null);
-  const [originQuery, setOriginQuery] = useState(originProp?.label ?? "");
-  const [destQuery, setDestQuery] = useState(destProp?.label ?? "");
-  const [activeField, setActiveField] = useState(null); // "origin" | "dest" | null
-  const [routes, setRoutes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Sync from parent props when they change (e.g. user taps a building in App)
-  useEffect(() => {
-    if (originProp) {
-      setOrigin(originProp);
-      setOriginQuery(originProp.label ?? "");
-    }
-  }, [originProp]);
+  //Live Location Variables
+  const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
+  const [isPressedFromDest, setIsPressedFromDest] = useState(false);
+  
+  //Error Modal Variables
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (destProp) {
-      setDestination(destProp);
-      setDestQuery(destProp.label ?? "");
-    }
-  }, [destProp]);
+    console.log("fromDestionation: ", fromDestination);
+  }, [fromDestination]);
 
-  // ---- Route fetching (only when both endpoints are set) ----
-  const fetchRoutes = useCallback(async () => {
-    if (!origin?.lat || !destination?.lat) {
-      setRoutes([]);
-      return;
-    }
-    setLoading(true);
-    setError(null);
+  const getCurrentLocation = async () => {
     try {
-      const clientTime = encodeURIComponent(new Date().toISOString());
-      const res = await fetch(
-        `${API_BASE_URL}/directions?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}&clientTime=${clientTime}`
+      // Check if location services are enabled
+      const isLocationEnabled = await Location.hasServicesEnabledAsync();
+      if (!isLocationEnabled) {
+        setErrorMessage("Location services are turned off. Please enable location services in your device settings to use your current location.");
+        setShowErrorModal(true);
+        return;
+      }
+
+      // Request permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission denied");
+        setErrorMessage("Location permission denied. Please enable location permission in your app settings to use your current location.");
+        setShowErrorModal(true);
+        return;
+      }
+
+      // Original watchPositionAsync implementation
+      const sub = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 5,
+        },
+        (loc) => {
+          if (!loc || !loc.coords) {
+            setErrorMessage("Unable to get your location coordinates. Please try again or enter your starting location manually.");
+            setShowErrorModal(true);
+            return;
+          }
+
+          const coords = {
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          };
+          console.log("USER LOCATION:", coords);
+          setFromDestination(`${coords.latitude},${coords.longitude}`);
+          setLiveLocCoordinates(coords);
+        }
       );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch");
-      setRoutes(data.routes || []);
-    } catch (e) {
-      setError(e.message);
-      setRoutes([]);
-    } finally {
-      setLoading(false);
+
+    } catch (error) {
+      console.log("Location error:", error);
+      let errorMsg = "Unable to get your current location. Please try again or enter your starting location manually.";
+      
+      if (error.code === 'E_LOCATION_TIMEOUT') {
+        errorMsg = "Location request timed out. Please check your GPS signal and try again, or enter your starting location manually.";
+      } else if (error.code === 'E_LOCATION_UNAVAILABLE') {
+        errorMsg = "Location is currently unavailable. Please check your device settings and try again, or enter your starting location manually.";
+      }
+      
+      setErrorMessage(errorMsg);
+      setShowErrorModal(true);
     }
-  }, [origin, destination]);
-
-  useEffect(() => {
-    fetchRoutes();
-  }, [fetchRoutes]);
-
-  // ---- Autocomplete filtering (only when the field is focused) ----
-  const originResults = activeField === "origin" ? filterLocations(originQuery) : [];
-  const destResults = activeField === "dest" ? filterLocations(destQuery) : [];
-
-  // ---- Input handlers ----
-  const onOriginTextChange = (text) => {
-    setOriginQuery(text);
-    setOrigin(null); // clear until user picks from dropdown
-    setActiveField("origin"); // keep field active while typing (even if empty)
   };
 
-  const onDestTextChange = (text) => {
-    setDestQuery(text);
-    setDestination(null);
-    setActiveField("dest"); // keep field active while typing (even if empty)
-  };
 
-  const pickOrigin = (loc) => {
-    setOrigin({ label: loc.label, lat: loc.lat, lng: loc.lng });
-    setOriginQuery(loc.label);
-    setActiveField(null);
-    Keyboard.dismiss();
-  };
 
-  const pickDestination = (loc) => {
-    setDestination({ label: loc.label, lat: loc.lat, lng: loc.lng });
-    setDestQuery(loc.label);
-    setActiveField(null);
-    Keyboard.dismiss();
-  };
-
-  /** Delayed close so dropdown onPress fires before unmount */
-  const scheduleClose = (field) => {
-    setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
-  };
-
-  // ---- Render ----
   return (
     <ImageBackground
       source={require("../assets/background.png")}
@@ -147,77 +101,25 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
 
         <Text style={styles.headerTitle}>Plan Your Trip</Text>
         <Text style={styles.headerSubtitle}>
-          Find the best route between locations
+          Find the best route between campuses
         </Text>
-
-        {/* ---- From ---- */}
-        <View style={[styles.input, { zIndex: activeField === "origin" ? 20 : 1 }]}>
+        <View style={styles.input}>
           <Text style={styles.inputLabel}>From</Text>
-          <TextInput
-            testID="inputStartLoc"
-            style={styles.inputField}
-            value={originQuery}
-            onChangeText={onOriginTextChange}
-            onFocus={() => setActiveField("origin")}
-            onBlur={() => scheduleClose("origin")}
-            placeholder="Search campus or building..."
-            placeholderTextColor="#999"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {activeField === "origin" && originResults.length > 0 && (
-            <ScrollView
-              style={styles.dropdown}
-              keyboardShouldPersistTaps="handled"
-              nestedScrollEnabled
-            >
-              {originResults.map((loc, i) => (
-                <Pressable
-                  key={`origin-${loc.label}-${i}`}
-                  style={styles.dropdownItem}
-                  onPress={() => pickOrigin(loc)}
-                >
-                  <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>{loc.label}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          )}
+          <TextInput testID="inputStartLoc" placeholder="Choose Start Location"
+            value={fromDestination}
+            onChangeText={setFromDestination}
+            style={styles.inputText}
+            onFocus={() => setIsPressedFromDest(true)}
+            onBlur={() => setIsPressedFromDest(false)} />
+
         </View>
 
-        {/* ---- To ---- */}
-        <View style={[styles.input, { zIndex: activeField === "dest" ? 20 : 1 }]}>
+        <View style={styles.input}>
           <Text style={styles.inputLabel}>To</Text>
-          <TextInput
-            testID="inputDestLoc"
-            style={styles.inputField}
-            value={destQuery}
-            onChangeText={onDestTextChange}
-            onFocus={() => setActiveField("dest")}
-            onBlur={() => scheduleClose("dest")}
-            placeholder="Search campus or building..."
-            placeholderTextColor="#999"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {activeField === "dest" && destResults.length > 0 && (
-            <ScrollView
-              style={styles.dropdown}
-              keyboardShouldPersistTaps="handled"
-              nestedScrollEnabled
-            >
-              {destResults.map((loc, i) => (
-                <Pressable
-                  key={`dest-${loc.label}-${i}`}
-                  style={styles.dropdownItem}
-                  onPress={() => pickDestination(loc)}
-                >
-                  <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>{loc.label}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          )}
+          <TextInput testID="inputDestLoc" placeholder="Choose destination"
+            value={toDestination}
+            onChangeText={setToDestination}
+            style={styles.inputText} />
         </View>
       </View>
 
@@ -248,38 +150,10 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
         <View style={styles.scrollBar} />
         <ScrollView
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={styles.routesContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          {loading && (
-            <View style={styles.loadingRow}>
-              <ActivityIndicator size="small" color="#7C2B38" style={{ marginRight: 10 }} />
-              <Text style={styles.loadingText}>Loading routes...</Text>
-            </View>
-          )}
-          {error && (
-            <Text style={styles.errorText}>{error}</Text>
-          )}
-          {!loading && routes.map((r, i) => {
-            const { label, icon } = getModeDisplay(r.mode);
-            return (
-              <View key={`${r.mode}-${i}`} style={styles.routeContainer}>
-                <View style={styles.routeBody}>
-                  <Ionicons name={icon} size={28} color="#7C2B38" style={styles.routeIcon} />
-                  <View style={styles.routeDetails}>
-                    <Text style={styles.routeMode}>{label}</Text>
-                    <Text style={styles.routeTime}>{r.duration?.text || "—"}</Text>
-                    {r.distance?.text && (
-                      <Text style={styles.routeDistance}>{r.distance.text}</Text>
-                    )}
-                    {r.scheduleNote && (
-                      <Text style={styles.routeSchedule}>{r.scheduleNote}</Text>
-                    )}
-                  </View>
-                </View>
-              </View>
-            );
-          })}
+          contentContainerStyle={styles.routesContent}>
+          {routes.map((r) => (
+            <View key={r.id} style={styles.routeContainer} />
+          ))}
         </ScrollView>
       </View>
 
@@ -305,12 +179,12 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
+
   header: {
     width: "100%",
     paddingTop: 35,
     paddingHorizontal: 20,
     position: "relative",
-    zIndex: 10, // keep header (with dropdowns) above bottomPart
   },
   backBtn: {
     position: "absolute",
@@ -321,6 +195,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   headerTitle: {
     color: "white",
     fontSize: 28,
@@ -333,8 +208,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontSize: 13,
   },
-
-  /* ---- Input card ---- */
   input: {
     borderWidth: 1,
     borderColor: "white",
@@ -343,55 +216,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     backgroundColor: "white",
   },
-  inputLabel: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 4,
-  },
-  inputField: {
-    fontSize: 16,
-    color: "#111",
-    paddingVertical: 4,
-  },
-
-  /* ---- Autocomplete dropdown ---- */
-  dropdown: {
-    maxHeight: 200,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    marginTop: 6,
-  },
-  dropdownItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#eee",
-  },
-  dropdownText: {
-    fontSize: 14,
-    color: "#333",
-    flex: 1,
-  },
-
-  /* ---- Routes area ---- */
-  loadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  errorText: {
-    fontSize: 14,
-    color: "#c00",
-    padding: 16,
-  },
   bottomPart: {
-    flex: 1,
     flex: 1,
     marginTop: 40,
     paddingHorizontal: 16,
@@ -410,12 +235,17 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111",
   },
-
   filterText: {
     color: "#7C2B38",
-    fontWeight: "800",
+    fontWeight: "800"
   },
-
+  routesSection: {
+    flex: 1,
+    backgroundColor: "#F5F6F8",
+    marginTop: 18,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   routeContainer: {
     backgroundColor: "white",
     borderRadius: 16,
@@ -429,37 +259,20 @@ const styles = StyleSheet.create({
   },
   routeBody: {
     flex: 1,
+  },
+  flex: 1,
+  routesContent: {
+  },
+  liveLoc: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 14,
+    padding: 10,
+    marginTop: 2,
+    backgroundColor: "white",
     flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
+    alignItems: "center",        // vertical alignment
+    gap: 8,
   },
-  routeIcon: {
-    marginRight: 14,
-  },
-  routeDetails: {
-    flex: 1,
-  },
-  routeMode: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 4,
-  },
-  routeTime: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 2,
-  },
-  routeDistance: {
-    fontSize: 13,
-    color: "#666",
-  },
-  routeSchedule: {
-    fontSize: 12,
-    color: "#7C2B38",
-    marginTop: 4,
-    fontStyle: "italic",
-  },
-  routesContent: {},
-  scrollBar: {},
 });
+
