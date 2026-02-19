@@ -132,6 +132,14 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
 
+  const hasValidEndpoints = origin?.lat && destination?.lat;
+  const showEmptyState =
+    hasValidEndpoints &&
+    !loading &&
+    !error &&
+    routes.length === 0;
+
+
   // ---- Render ----
   return (
     <ImageBackground
@@ -244,6 +252,22 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
           )}
           {error && (
             <Text style={styles.errorText}>{error}</Text>
+          )}
+          {showEmptyState && (
+            <View style={styles.emptyStateContainer}>
+              <Ionicons
+                name="map-outline"
+                size={40}
+                color="#7C2B38"
+                style={{ marginBottom: 10 }}
+              />
+              <Text style={styles.emptyStateTitle}>
+                No routes found
+              </Text>
+              <Text style={styles.emptyStateText}>
+                Try selecting different locations or check your connection.
+              </Text>
+            </View>
           )}
           {!loading && routes.map((r, i) => {
             const { label, icon } = getModeDisplay(r.mode);
@@ -429,4 +453,26 @@ const styles = StyleSheet.create({
   },
   routesContent: {},
   scrollBar: {},
+
+  /* ---- No routes found ---- */
+  emptyStateContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+
+  emptyStateTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 6,
+  },
+
+  emptyStateText: {
+    fontSize: 14,
+    color: "#777",
+    textAlign: "center",
+  },
+
 });
