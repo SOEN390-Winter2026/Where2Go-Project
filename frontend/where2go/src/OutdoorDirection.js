@@ -1,6 +1,7 @@
 import { View, Text, TextInput, StyleSheet, Pressable, ImageBackground, ScrollView, ActivityIndicator, Keyboard } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect, useCallback } from "react";
+import PropTypes from "prop-types";
 import { API_BASE_URL } from "./config";
 import { SEARCHABLE_LOCATIONS } from "./data/locations";
 
