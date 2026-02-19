@@ -11,6 +11,9 @@ export default function ErrorModal({
   iconColor = "#912338",
   buttonText = "OK"
 }) {
+  if (!visible) return null; 
+  // don't render when not visible, test will break
+
   return (
     <Modal
       animationType="fade"

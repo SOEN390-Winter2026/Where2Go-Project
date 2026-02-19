@@ -60,6 +60,31 @@ describe("Input and Button Features", () => {
 
         expect(input.props.value).toBe("Central Park");
     });
+
+    it("hides live location button on blur", async () => {
+        const { getByTestId, queryByText } = render(
+            <OutdoorDirection onPressBack={() => {}} />
+        );
+
+        const input = getByTestId("inputStartLoc");
+
+        act(() => {
+            fireEvent(input, "focus");
+        });
+
+        await waitFor(() => {
+            expect(queryByText("Set to Your Location")).toBeTruthy();
+        });
+
+        act(() => {
+            fireEvent(input, "blur");
+        });
+
+        await waitFor(() => {
+            expect(queryByText("Set to Your Location")).toBeNull();
+        });
+    });
+
 });
 
 describe("Location Error Handling", () => {
@@ -408,5 +433,23 @@ describe("Location Error Handling", () => {
         const errorMessage = await findByText(/Unable to get your current location/i);
         expect(errorMessage).toBeTruthy();
     });
+
+    // it("covers sub.remove(), alternate path (stops watching for something that will not happen)", async () => {
+    //     Location.hasServicesEnabledAsync.mockResolvedValue(true);
+    //     Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
+
+    //     Location.watchPositionAsync.mockImplementation(async (options, callback) => {
+    //         callback(null); 
+    //         return null;
+    //     });
+
+    //     const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => {}} />);
+    //     const input = getByTestId("inputStartLoc");
+    //     act(() => fireEvent(input, "focus"));
+
+    //     const locationButton = getByText("Set to Your Location");
+    //     await act(async () => fireEvent.press(locationButton));
+    // });
+
 });
 
