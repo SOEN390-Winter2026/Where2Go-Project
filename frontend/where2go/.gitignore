@@ -46,3 +46,6 @@ yarn-error.*
 
 # coverage
 /coverage
+
+# reports
+/reports
