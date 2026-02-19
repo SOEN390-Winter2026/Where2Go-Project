@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { colors } from './theme/colors';
 import * as Location from 'expo-location';
 import ErrorModal from './ErrorModal';
@@ -12,7 +12,7 @@ function getCentroid(coordinates) {
   return { latitude: lat, longitude: lng };
 }
 
-export default function OutdoorDirection({ onPressBack, buildings }) {
+export default function OutdoorDirection({ onPressBack, buildings, initialFrom, initialTo }) {
 
   const routes = [
     { id: "1" }, { id: "2" }, { id: "3" },
@@ -29,6 +29,15 @@ export default function OutdoorDirection({ onPressBack, buildings }) {
   //Error Modal Variables
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // For when you tap on a building and select it as destination/departure
+  useEffect(() => {
+    if (initialFrom !== "") setFromDestination(initialFrom);
+  },[initialFrom]);
+
+  useEffect(() => {
+    if (initialTo !== "") setToDestination(initialTo);
+  }, [initialTo])
 
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
@@ -232,6 +241,8 @@ export default function OutdoorDirection({ onPressBack, buildings }) {
 OutdoorDirection.propTypes = {
   onPressBack: PropTypes.func.isRequired,
   buildings: PropTypes.array.isRequired,
+  initialFrom: PropTypes.string,
+  initialTo: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

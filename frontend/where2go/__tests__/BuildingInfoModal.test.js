@@ -28,148 +28,88 @@ describe('BuildingInfoModal', () => {
   };
 
   const mockOnClose = jest.fn();
+  const mockOnSetDeparture = jest.fn();
+  const mockOnSetDestination = jest.fn();
+
+  const buildingModal = (overrides = {}) => render(
+    <BuildingInfoModal
+      building={mockBuilding}
+      visible={true}
+      onClose={mockOnClose}
+      onSetDeparture={mockOnSetDeparture}
+      onSetDestination={mockOnSetDestination}
+      selectedRole={null}
+      {...overrides}
+    />
+  );
 
   test('renders modal when visible is true', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByText } = buildingModal();
     expect(getByText('Hall Building')).toBeTruthy();
     expect(getByText('H')).toBeTruthy();
     expect(getByText('1455 De Maisonneuve Blvd W, Montreal, QC')).toBeTruthy();
   });
 
-
   test('returns null when building is null', () => {
-    const { toJSON } = render(
-      <BuildingInfoModal 
-        building={null} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const { toJSON } = buildingModal({ building: null });
     expect(toJSON()).toBeNull();
   });
 
   test('returns null when building is undefined', () => {
-    const { toJSON } = render(
-      <BuildingInfoModal 
-        building={undefined} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const { toJSON } = buildingModal({ building: undefined });
     expect(toJSON()).toBeNull();
   });
 
   test('renders building image when image exists for building code', () => {
-    const { getByTestId, queryByTestId } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByTestId, queryByTestId } = buildingModal();
     expect(getByTestId('buildingImage')).toBeTruthy();
     expect(queryByTestId('imagePlaceholder')).toBeNull();
   });
 
   test('renders placeholder when building image does not exist', () => {
-    const buildingWithoutImage = { ...mockBuilding, code: 'NONEXISTENT' };
-
-    const { getByTestId, queryByTestId } = render(
-      <BuildingInfoModal 
-        building={buildingWithoutImage} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const { getByTestId, queryByTestId } = buildingModal({ building: { ...mockBuilding, code: 'NONEXISTENT' } });
     expect(getByTestId('imagePlaceholder')).toBeTruthy();
     expect(queryByTestId('buildingImage')).toBeNull();
   });
 
-
   test('displays building code', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const { getByText } = buildingModal();
     expect(getByText('H')).toBeTruthy();
   });
 
   test('displays address section', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const { getByText } = buildingModal();
     expect(getByText('Address')).toBeTruthy();
     expect(getByText(mockBuilding.address)).toBeTruthy();
   });
 
   test('displays services section with default text', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByText } = buildingModal();
     expect(getByText('Services')).toBeTruthy();
     expect(getByText('Services info coming soon.')).toBeTruthy();
-
   });
 
   test('displays "View on Concordia.ca" link', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByText } = buildingModal();
     expect(getByText('View on Concordia.ca')).toBeTruthy();
   });
 
+  test('displays both buttons for departure/destination', () => {
+    const { getByText } = buildingModal();
+    expect(getByText('Set as Departure')).toBeTruthy();
+    expect(getByText('Set as Destination')).toBeTruthy();
+  });
 
-  //interactions tests
+  // interactions tests
   test('calls onClose when close button is pressed', () => {
-    const { getByLabelText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByLabelText } = buildingModal();
     const closeButton = getByLabelText('Close');
     fireEvent.press(closeButton);
-
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-
   test('opens Concordia link when pressed', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const { getByText } = buildingModal();
     const link = getByText('View on Concordia.ca');
     fireEvent.press(link);
     expect(Linking.openURL).toHaveBeenCalledWith(
@@ -177,47 +117,60 @@ describe('BuildingInfoModal', () => {
     );
   });
 
+  test('calls onSetDestination when destination btn is pressed', () => {
+    const { getByText } = buildingModal();
+    fireEvent.press(getByText('Set as Destination'));
+    expect(mockOnSetDestination).toHaveBeenCalledWith(mockBuilding);
+  });
+
+  test('calls onSetDeparture when departure btn is pressed', () => {
+    const { getByText } = buildingModal();
+    fireEvent.press(getByText('Set as Departure'));
+    expect(mockOnSetDeparture).toHaveBeenCalledWith(mockBuilding);
+  });
+
   // edge cases
   test('handles building with missing address properly', () => {
-    const buildingWithoutAddress = { ...mockBuilding, address: '' };
-
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={buildingWithoutAddress} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByText } = buildingModal({ building: { ...mockBuilding, address: '' } });
     expect(getByText('Address')).toBeTruthy();
   });
 
   test('handles building with long name', () => {
-    const buildingWithLongName = {
-      ...mockBuilding,
-      name: 'St. Ignatius of Loyola Church',
-    };
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={buildingWithLongName} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
-
+    const buildingWithLongName = { ...mockBuilding, name: 'St. Ignatius of Loyola Church' };
+    const { getByText } = buildingModal({ building: buildingWithLongName });
     expect(getByText(buildingWithLongName.name)).toBeTruthy();
   });
 
   test('modal does not close when modal container is pressed', () => {
-    const { getByText } = render(
-      <BuildingInfoModal 
-        building={mockBuilding} 
-        visible={true} 
-        onClose={mockOnClose} 
-      />
-    );
+    const { getByText } = buildingModal();
     const modalContent = getByText('Hall Building');
     fireEvent.press(modalContent);
-
     expect(mockOnClose).not.toHaveBeenCalled();
+  });
+
+  test('shows cancel button with departure label when selectedRole is departure', () => {
+    const { getByText, queryByText } = buildingModal({ selectedRole: 'departure' });
+    expect(getByText('Selected as Departure. Press again to cancel.')).toBeTruthy();
+    expect(queryByText('Set as Departure')).toBeNull();
+    expect(queryByText('Set as Destination')).toBeNull();
+  });
+
+  test('shows cancel button with destination label when selectedRole is destination', () => {
+    const { getByText, queryByText } = buildingModal({ selectedRole: 'destination' });
+    expect(getByText('Selected as Destination. Press again to cancel.')).toBeTruthy();
+    expect(queryByText('Set as Departure')).toBeNull();
+    expect(queryByText('Set as Destination')).toBeNull();
+  });
+
+  test('calls onSetDeparture with null when cancel is pressed on departure role', () => {
+    const { getByText } = buildingModal({ selectedRole: 'departure' });
+    fireEvent.press(getByText('Selected as Departure. Press again to cancel.'));
+    expect(mockOnSetDeparture).toHaveBeenCalledWith(null);
+  });
+
+  test('calls onSetDestination with null when cancel is pressed on destination role', () => {
+    const { getByText } = buildingModal({ selectedRole: 'destination' });
+    fireEvent.press(getByText('Selected as Destination. Press again to cancel.'));
+    expect(mockOnSetDestination).toHaveBeenCalledWith(null);
   });
 });
