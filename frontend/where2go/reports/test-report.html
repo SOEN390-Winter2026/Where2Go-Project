@@ -1,0 +1,277 @@
+<html><head><meta charset="utf-8"/><title>Where2Go Test Report</title><style type="text/css">:root {
+  --text-primary: #111;
+  --text-secondary: #4f4f4f;
+  --success: #006633;
+  --success-bright: #80ffbf;
+  --danger: #cc071e;
+  --danger-bright: #fbdfe0;
+  --warning: #995c00;
+  --warning-bright: #ffeea8;
+  --panel: #eee;
+  --border: #949494;
+  --disabled: #6b6b6b;
+}
+
+html,
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+}
+body {
+  padding: 2rem 1rem;
+}
+.jesthtml-content {
+  margin: 0 auto;
+  max-width: 70rem;
+}
+header {
+  display: flex;
+  align-items: center;
+}
+#title {
+  margin: 0;
+  flex-grow: 1;
+}
+#logo {
+  height: 4rem;
+}
+#timestamp {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+#metadata-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.additional-information-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/** SUMMARY */
+#summary {
+  color: var(--text-primary);
+  display: flex;
+  font-family: monospace;
+  font-size: 1rem;
+}
+#summary > div {
+  margin-right: 0.5rem;
+  background: var(--panel);
+  padding: 1rem;
+  min-width: 15rem;
+}
+#summary > div:last-child {
+  margin-right: 0;
+}
+@media only screen and (max-width: 720px) {
+  #summary {
+    flex-direction: column;
+  }
+  #summary > div {
+    margin-right: 0;
+    margin-top: 1rem;
+  }
+  #summary > div:first-child {
+    margin-top: 0;
+  }
+}
+
+.summary-total {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.summary-passed {
+  color: var(--success);
+  border-left: 0.4rem solid var(--success);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-failed,
+.summary-obsolete-snapshots {
+  color: var(--danger);
+  border-left: 0.4rem solid var(--danger);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-pending {
+  color: var(--warning);
+  border-left: 0.4rem solid var(--warning);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-empty {
+  color: var(--disabled);
+  border-left: 0.4rem solid var(--disabled);
+  margin-bottom: 0.15rem;
+}
+
+.test-result {
+  padding: 1rem;
+  margin-bottom: 0.25rem;
+}
+.test-result:last-child {
+  border: 0;
+}
+.test-result.passed {
+  background-color: var(--success-bright);
+  color: var(--success);
+}
+.test-result.failed {
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.test-result.pending {
+  background-color: var(--warning-bright);
+  color: var(--warning);
+}
+
+.test-info {
+  display: flex;
+  justify-content: space-between;
+}
+.test-suitename {
+  width: 20%;
+  text-align: left;
+  font-weight: bold;
+  word-break: break-word;
+}
+.test-title {
+  width: 40%;
+  text-align: left;
+  font-style: italic;
+}
+.test-status {
+  width: 20%;
+  text-align: right;
+}
+.test-duration {
+  width: 10%;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.failureMessages {
+  padding: 0 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed var(--danger);
+}
+.failureMessages.suiteFailure {
+  border-top: none;
+}
+.failureMsg {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.suite-container {
+  margin-bottom: 1rem;
+}
+.suite-info {
+  padding: 1rem;
+  background-color: var(--panel);
+  color: var(--text-secondary);
+  border: 0.15rem solid;
+  border-color: var(--panel);
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.suite-info:hover {
+  border-color: var(--border);
+  cursor: pointer;
+}
+.suite-info .suite-path {
+  word-break: break-all;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 1rem;
+}
+.suite-info .suite-time {
+  margin-left: 1rem;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.85rem;
+}
+.suite-info .suite-time.warn {
+  background-color: var(--danger);
+  color: #fff;
+}
+.suite-info:before {
+  content: "\2303";
+  display: inline-block;
+  margin-right: 1rem;
+  transform: rotate(180deg) translateY(0.15rem);
+}
+.suite-container[open] .suite-info:before {
+  transform: rotate(0deg) translateY(0.15rem);
+}
+
+/* CONSOLE LOGS */
+.suite-consolelog {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--panel);
+}
+.suite-consolelog-header {
+  font-weight: bold;
+}
+.suite-consolelog-item {
+  padding: 0.5rem;
+}
+.suite-consolelog-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-consolelog-item-origin {
+  color: var(--text-secondary);
+  font-weight: bold;
+}
+.suite-consolelog-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* OBSOLETE SNAPSHOTS */
+.suite-obsolete-snapshots {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.suite-obsolete-snapshots-header {
+  font-weight: bold;
+}
+.suite-obsolete-snapshots-item {
+  padding: 0.5rem;
+}
+.suite-obsolete-snapshots-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-obsolete-snapshots-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+</style></head><body><main class="jesthtml-content"><header><h1 id="title">Where2Go Test Report</h1></header><section id="metadata-container"><div id="timestamp">Started: 2026-02-18 19:23:23</div><div id="summary"><div id="suite-summary"><div class="summary-total">Suites (10)</div><div class="summary-passed ">10 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div><div id="test-summary"><div class="summary-total">Tests (73)</div><div class="summary-passed ">73 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div></div></section><details id="suite-1" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/BuildingCallout.test.js</div><div class="suite-time">4.87s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingCallout</div><div class="test-title">renders markers for all buildings</div><div class="test-status">passed</div><div class="test-duration">0.102s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingCallout</div><div class="test-title">pressing a marker calls onBuildingPress with correct building</div><div class="test-status">passed</div><div class="test-duration">0.014s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingCallout</div><div class="test-title">renders nothing when buildings array is empty</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingCallout</div><div class="test-title">renders nothing when buildings is null</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div></div></details><details id="suite-2" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/BuildingInfoModal.test.js</div><div class="suite-time warn">6.068s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">renders modal when visible is true</div><div class="test-status">passed</div><div class="test-duration">1.068s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">returns null when building is null</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">returns null when building is undefined</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">renders building image when image exists for building code</div><div class="test-status">passed</div><div class="test-duration">0.02s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">renders placeholder when building image does not exist</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">displays building code</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">displays address section</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">displays services section with default text</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">displays "View on Concordia.ca" link</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">calls onClose when close button is pressed</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">opens Concordia link when pressed</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">handles building with missing address properly</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">handles building with long name</div><div class="test-status">passed</div><div class="test-duration">0.017s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">BuildingInfoModal</div><div class="test-title">modal does not close when modal container is pressed</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div></div></details><details id="suite-3" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/OutdoorDirection.test.js</div><div class="suite-time">2.351s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Rendering Features Properly</div><div class="test-title">Render SideLeftBar</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Rendering Features Properly</div><div class="test-title">Back Button</div><div class="test-status">passed</div><div class="test-duration">0.291s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Input and Button Features</div><div class="test-title">Filter Button</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Input and Button Features</div><div class="test-title">updates text in inputStartLoc</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Input and Button Features</div><div class="test-title">updates text in inputDestLoc</div><div class="test-status">passed</div><div class="test-duration">0.024s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">shows error modal when location services are disabled</div><div class="test-status">passed</div><div class="test-duration">0.044s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">shows error modal when location permission is denied</div><div class="test-status">passed</div><div class="test-duration">0.054s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">shows error modal when coordinates are missing</div><div class="test-status">passed</div><div class="test-duration">0.028s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">successfully sets location when all permissions are granted</div><div class="test-status">passed</div><div class="test-duration">0.022s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">closes error modal when OK button is pressed</div><div class="test-status">passed</div><div class="test-duration">0.028s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">allows manual input when location fails</div><div class="test-status">passed</div><div class="test-duration">0.023s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">shows timeout error when location request times out</div><div class="test-status">passed</div><div class="test-duration">0.028s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">shows unavailable error when location is unavailable</div><div class="test-status">passed</div><div class="test-duration">0.022s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Location Error Handling</div><div class="test-title">shows generic error for unknown location errors</div><div class="test-status">passed</div><div class="test-duration">0.022s</div></div></div></div></details><details id="suite-4" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/OutdoorsMap.test.js</div><div class="suite-time">3.711s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Rendering Features Properly</div><div class="test-title">Render SideLeftBar</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Rendering Features Properly</div><div class="test-title">Render TopRightMenu</div><div class="test-status">passed</div><div class="test-duration">0.043s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Rendering Features Properly</div><div class="test-title">Render map</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename"> Buttons Test</div><div class="test-title">Toggle Button</div><div class="test-status">passed</div><div class="test-duration">0.628s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename"> Buttons Test</div><div class="test-title">Disability Button</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Backend Functions</div><div class="test-title">Check getCampusCoordinates SGW</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Backend Functions</div><div class="test-title">Check getCampusCoordinates Loyola</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">API Testing</div><div class="test-title">/campus/SGW</div><div class="test-status">passed</div><div class="test-duration">0.094s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">API Testing</div><div class="test-title">/campus/Loyola</div><div class="test-status">passed</div><div class="test-duration">0.02s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">API Testing</div><div class="test-title">/campus/SGW/buildings</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">API Testing</div><div class="test-title">/campus/Loyola/buildings</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div></div></details><details id="suite-5" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/TopRightMenu.test.js</div><div class="suite-time">0.762s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">renders the menu btn</div><div class="test-status">passed</div><div class="test-duration">0.03s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">dropdown menu starts off closed</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">opens dropdown menu when hamburger button is pressed</div><div class="test-status">passed</div><div class="test-duration">0.011s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">closes dropdown menu when hamburger button is pressed again</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">calls onPressDirection when Direction menu item is pressed</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">closes menu when Map item is pressed</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">closes menu when Calendar item is pressed</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TopRightMenu</div><div class="test-title">closes menu when Feedback item is pressed</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div></div></details><details id="suite-6" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/ErrorModal.test.js</div><div class="suite-time">0.962s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">renders correctly when visible</div><div class="test-status">passed</div><div class="test-duration">0.429s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">does not render when visible is false</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">renders custom title</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">renders custom button text</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">calls onClose when button is pressed</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">renders with custom icon name</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">renders with custom icon color</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">displays long messages correctly</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">handles multiple consecutive calls</div><div class="test-status">passed</div><div class="test-duration">0.011s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ErrorModal Component</div><div class="test-title">applies all custom props together</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div></div></details><details id="suite-7" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/Login.test.js</div><div class="suite-time">0.418s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoginScreen</div><div class="test-title">renders the entire login page</div><div class="test-status">passed</div><div class="test-duration">0.106s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoginScreen</div><div class="test-title">renders the user icon</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoginScreen</div><div class="test-title">renders Sign in with Google btn</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoginScreen</div><div class="test-title">renders Skip btn</div><div class="test-status">passed</div><div class="test-duration">0.016s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoginScreen</div><div class="test-title">has to call onSkip when Skip btn is pressed</div><div class="test-status">passed</div><div class="test-duration">0.037s</div></div></div></div></details><details id="suite-8" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/LiveLocation.test.js</div><div class="suite-time">0.233s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Live location permission handling</div><div class="test-title">denied permission: does not start watchPositionAsync</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Live location permission handling</div><div class="test-title">granted permission: starts watchPositionAsync with correct options</div><div class="test-status">passed</div><div class="test-duration">0.053s</div></div></div></div></details><details id="suite-9" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/LoadingPage.test.js</div><div class="suite-time">0.302s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoadingPage</div><div class="test-title">renders the loading page without crashing</div><div class="test-status">passed</div><div class="test-duration">0.036s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoadingPage</div><div class="test-title">renders the loading page logo image</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">LoadingPage</div><div class="test-title">renders the loading page activity indicator</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div></div></details><details id="suite-10" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/Users/steveycute/Documents/GitHub/Where2Go-Project/frontend/where2go/__tests__/buildingsData.test.js</div><div class="suite-time">0.13s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">buildings.json data sanity</div><div class="test-title">every building has required fields</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">buildings.json data sanity</div><div class="test-title">building codes are unique within each campus</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div></div></details></main></body></html>
