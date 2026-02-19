@@ -60,6 +60,7 @@ jobs:
           slug: SOEN390-Winter2026/Where2Go-Project
           files: |
             ./frontend/where2go/coverage/lcov.info
+            ./frontend/where2go/reports/junit.xml
           flags: unittests
           name: codecov-coverage
           fail_ci_if_error: true
