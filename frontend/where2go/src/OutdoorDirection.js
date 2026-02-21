@@ -8,9 +8,14 @@ import PropTypes from 'prop-types';
 
 export default function OutdoorDirection({ onPressBack }) {
 
-  const routes = [
-    { id: "1" }, { id: "2" }, { id: "3" },
-  ]
+  // US-2.5.2: Routes panel UI states
+  const [routes, setRoutes] = useState([{ id: "demo1" }]);              // later: real routes from API
+  const [isLoadingRoutes, setIsLoadingRoutes] = useState(false);
+  const [routesError, setRoutesError] = useState(null);  // string | null
+
+  const [travelMode, setTravelMode] = useState("walking");
+
+  const noRoutes = !isLoadingRoutes && !routesError && routes.length === 0;
 
   //Input Destinations Variables
   const [fromDestination, setFromDestination] = useState("");
@@ -86,7 +91,20 @@ export default function OutdoorDirection({ onPressBack }) {
     }
   };
 
+    // US-2.5.2: Next-step actions when no routes
+  const handleSwap = () => {
+    setFromDestination(toDestination);
+    setToDestination(fromDestination);
+  };
 
+  const handleTryMode = (mode) => {
+    setTravelMode(mode);
+    // Later: trigger refetch routes once merged
+  };
+
+  const handleEditStartEnd = () => {
+    // Light-touch action for now (no new navigation logic)
+  };
 
   return (
     <ImageBackground
@@ -138,23 +156,83 @@ export default function OutdoorDirection({ onPressBack }) {
             </Pressable>
           </View>}
 
-        <View style={styles.routesHeader}>
+          <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
-            {routes.length} routes{"\n"}available
+            {isLoadingRoutes ? "Loading routes…" : `${routes.length} routes\navailable`}
           </Text>
 
           <Pressable testID="pressFilter">
             <Text style={styles.filterText}>Filter</Text>
           </Pressable>
         </View>
+
         <View style={styles.scrollBar} />
-        <ScrollView
-          showsVerticalScrollIndicator={true}
-          contentContainerStyle={styles.routesContent}>
-          {routes.map((r) => (
-            <View key={r.id} style={styles.routeContainer} />
-          ))}
-        </ScrollView>
+
+        {/* US-2.5.2: Route list area should never look broken */}
+        {isLoadingRoutes ? (
+          <View style={styles.stateCard}>
+            <Text style={styles.stateTitle}>Loading routes…</Text>
+            <Text style={styles.stateText}>Just a sec while we look for options.</Text>
+          </View>
+        ) : routesError ? (
+          <View style={styles.stateCard}>
+            <Text style={styles.stateTitle}>Couldn’t load routes</Text>
+            <Text style={styles.stateText}>{routesError}</Text>
+
+            <Pressable style={styles.primaryBtn} onPress={() => {/* later: retry */}}>
+              <Text style={styles.primaryBtnText}>Try again</Text>
+            </Pressable>
+          </View>
+        ) : noRoutes ? (
+          <View style={styles.stateCard}>
+            <Text style={styles.stateTitle}>No routes found</Text>
+            <Text style={styles.stateText}>
+              Try a different start/destination, or switch travel mode.
+            </Text>
+
+            <View style={styles.actionsRow}>
+              <Pressable style={styles.primaryBtn} onPress={handleEditStartEnd}>
+                <Text style={styles.primaryBtnText}>Edit start/destination</Text>
+              </Pressable>
+
+              <Pressable style={styles.secondaryBtn} onPress={handleSwap}>
+                <Text style={styles.secondaryBtnText}>Swap</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.modeRow}>
+              {["walking", "biking", "transit"].map((m) => (
+                <Pressable
+                  key={m}
+                  onPress={() => handleTryMode(m)}
+                  style={[
+                    styles.modePill,
+                    travelMode === m && styles.modePillActive,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.modePillText,
+                      travelMode === m && styles.modePillTextActive,
+                    ]}
+                  >
+                    {m}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <ScrollView
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={styles.routesContent}
+          >
+            {routes.map((r, idx) => (
+              <View key={r.id ?? String(idx)} style={styles.routeContainer} />
+            ))}
+          </ScrollView>
+        )}
+        
       </View>
 
       {/* Error Modal */}
@@ -262,6 +340,77 @@ const styles = StyleSheet.create({
   },
   flex: 1,
   routesContent: {
+  },
+  stateCard: {
+    borderWidth: 1,
+    borderColor: "#E6E6E6",
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 4,
+    backgroundColor: "white",
+  },
+  stateTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#111",
+    marginBottom: 6,
+  },
+  stateText: {
+    fontSize: 13,
+    color: "#444",
+    marginBottom: 12,
+  },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  primaryBtn: {
+    backgroundColor: "#7C2B38",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    flex: 1,
+  },
+  primaryBtnText: {
+    color: "white",
+    fontWeight: "800",
+    textAlign: "center",
+  },
+  secondaryBtn: {
+    borderWidth: 1,
+    borderColor: "#7C2B38",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  secondaryBtnText: {
+    color: "#7C2B38",
+    fontWeight: "800",
+  },
+  modeRow: {
+    flexDirection: "row",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  modePill: {
+    borderWidth: 1,
+    borderColor: "#7C2B38",
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  modePillActive: {
+    backgroundColor: "#7C2B38",
+  },
+  modePillText: {
+    color: "#7C2B38",
+    fontWeight: "700",
+    textTransform: "capitalize",
+  },
+  modePillTextActive: {
+    color: "white",
   },
   liveLoc: {
     borderWidth: 1,
