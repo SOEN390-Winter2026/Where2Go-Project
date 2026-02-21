@@ -25,7 +25,7 @@ export default function OutdoorDirection({ onPressBack }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    console.log("fromDestination: ", fromDestination);
+    console.log("fromDestionation: ", fromDestination);
   }, [fromDestination]);
 
   const getCurrentLocation = async () => {
@@ -58,7 +58,6 @@ export default function OutdoorDirection({ onPressBack }) {
           if (!loc || !loc.coords) {
             setErrorMessage("Unable to get your location coordinates. Please try again or enter your starting location manually.");
             setShowErrorModal(true);
-            // if (sub) sub.remove();
             return;
           }
 
