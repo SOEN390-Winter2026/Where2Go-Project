@@ -251,7 +251,12 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
             </View>
           )}
           {error && (
-            <Text style={styles.errorText}>{error}</Text>
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <Pressable style={styles.retryButton} onPress={fetchRoutes}>
+                <Text style={styles.retryButtonText}>Try Again</Text>
+              </Pressable>
+            </View>
           )}
           {showEmptyState && (
             <View style={styles.emptyStateContainer}>
@@ -267,6 +272,9 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
               <Text style={styles.emptyStateText}>
                 Try selecting different locations or check your connection.
               </Text>
+              <Pressable style={styles.retryButton} onPress={fetchRoutes}>
+                <Text style={styles.retryButtonText}>Try Again</Text>
+              </Pressable>
             </View>
           )}
           {!loading && routes.map((r, i) => {
@@ -384,6 +392,14 @@ const styles = StyleSheet.create({
     color: "#c00",
     padding: 16,
   },
+  errorContainer: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   bottomPart: {
     flex: 1,
     marginTop: 40,
@@ -473,6 +489,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#777",
     textAlign: "center",
+  },
+
+  // Try Again button on no routes found & error
+  retryButton: {
+    marginTop: 20,
+    backgroundColor: '#912338',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontWeight: '600',
   },
 
 });
