@@ -27,7 +27,7 @@ jobs:
 
       - name: Run backend tests with coverage
         timeout-minutes: 10
-        run: cd backend && npm test -- --coverage || echo "No backend tests yet"
+        run: cd backend && npm test -- --coverage
 
       # Frontend  
       - name: Setup frontend dependencies

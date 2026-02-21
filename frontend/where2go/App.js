@@ -18,6 +18,7 @@ const CAMPUS_COORDS = {
   SGW: { latitude: 45.4974, longitude: -73.5771 },
   Loyola: { latitude: 45.4587, longitude: -73.6409 },
 };
+import { polygonCentroid } from './src/utils/geo';
 
 export default function App() {
   console.log(API_BASE_URL);
@@ -37,6 +38,8 @@ export default function App() {
   const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
   const watchRef = useRef(null);
   const mapRef = useRef(null);
+
+  const [selectDestination, setSelectDestination] = useState(null);
 
   const handleBuildingPress = (building) => {
     setSelectedBuilding(building);
@@ -64,9 +67,17 @@ export default function App() {
     }
   }, [liveLocationEnabled, userLocation]);
 
-  // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
-  // Also set that map loaded
+  // Select building as destination
+  const handleSelectDestination = (building) => {
+    if (selectDestination?.id === building.id) {
+      setSelectDestination(null);
+    } else {
+      setSelectDestination(building);
+    }
+  };
 
+
+  // whenever currentCampus changes, get coordinates and building polygons from the backend
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
     setCampusCoords(nextCoords);
@@ -161,7 +172,21 @@ export default function App() {
   }
 
   if(showOutdoorDirection){
-    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} />;
+    // Convert selected building polygon to a { label, lat, lng } location object.
+    let destLocation = null;
+    if (selectDestination?.coordinates?.length) {
+      const center = polygonCentroid(selectDestination.coordinates);
+      destLocation = {
+        label: selectDestination.name || selectDestination.id,
+        ...center,
+      };
+    }
+    return (
+      <OutdoorDirection
+        destination={destLocation}
+        onPressBack={() => setShowOutdoorDirection(false)}
+      />
+    );
   }
 
   return (
@@ -208,15 +233,29 @@ export default function App() {
           />
         )}
         {/* this section renders the campus highlighted shapes */}
-        {buildings.map((building) => (
-          <Polygon
-            key={building.id}
-            coordinates={building.coordinates}
-            fillColor={colors.buildingHighlightFill}
-            strokeColor={colors.buildingHighlightStroke}
-            strokeWidth={2}
-          />
-        ))}
+        {buildings.map((building) => {
+
+          const destination = selectDestination?.id === building.id;
+          
+          return (
+            <Polygon
+              key={building.id}
+              coordinates={building.coordinates}
+              fillColor={
+                destination ? colors.destinationHighlightFill : 
+                colors.buildingHighlightFill
+              }
+              strokeColor={
+                colors.buildingHighlightStroke
+              }
+              strokeWidth={2}
+              tappable
+              onPress={() => 
+                handleSelectDestination(building)
+              }
+            />
+          )
+      })}
       </MapView>
       <SideLeftBar
         currentCampus={currentCampus}
