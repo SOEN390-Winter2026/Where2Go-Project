@@ -10,6 +10,7 @@ import PoiSlider from "./src/PoiSlider";
 import LoginScreen from "./src/Login";
 import BuildingCallout from './src/BuildingCallout';
 import BuildingInfoModal from './src/BuildingInfoModal';
+import PoiInfoModal from './src/PoiInfoModal';
 import OutdoorDirection from "./src/OutdoorDirection";
 import LoadingPage from './src/LoadingPage';
 import { colors } from './src/theme/colors';
@@ -35,9 +36,11 @@ export default function App() {
   const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
 
-  //POI Variables
+  // POI state
   const [isPressedPOI, setIsPressedPOI] = useState(false);
   const [poiOriginBuilding, setPoiOriginBuilding] = useState(null);
+  const [selectedPoi, setSelectedPoi] = useState(null);
+  const [poiModalVisible, setPoiModalVisible] = useState(false);
 
   const [dataLoaded, setDataLoaded] = useState(false); // for loading check
   const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
@@ -238,7 +241,7 @@ export default function App() {
           />
         )}
 
-        {/*POIs Markers */}
+        {/* POI Markers (yellow pins) */}
         {selectedPois?.map((poi) => (
           <Marker
             key={poi.place_id}
@@ -249,8 +252,11 @@ export default function App() {
             title={poi.name}
             description={poi.vicinity}
             pinColor="orange"
+            onPress={() => {
+              setSelectedPoi(poi);
+              setPoiModalVisible(true);
+            }}
           />
-
         ))}
 
         {/* this section renders the campus highlighted shapes */}
@@ -291,6 +297,11 @@ export default function App() {
         building={selectedBuilding}
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+      />
+      <PoiInfoModal
+        poi={selectedPoi}
+        visible={poiModalVisible}
+        onClose={() => setPoiModalVisible(false)}
       />
       {isPressedPOI && (
         <PoiSlider
