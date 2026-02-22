@@ -38,6 +38,7 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
   useEffect(() => {
     if (initialTo !== "") setToDestination(initialTo);
   }, [initialTo]);
+  
 
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
