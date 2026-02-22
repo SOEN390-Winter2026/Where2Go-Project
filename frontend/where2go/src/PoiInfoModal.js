@@ -35,16 +35,6 @@ const PoiInfoModal = ({ poi, visible, onClose, onSetAsDestination }) => {
     >
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
-          {/* Close button */}
-          <Pressable
-            style={styles.closeButton}
-            onPress={onClose}
-            accessibilityLabel="Close"
-            accessibilityRole="button"
-          >
-            <Ionicons name="close" size={22} color="#fff" />
-          </Pressable>
-
           {/* Photo header */}
           {photoUri ? (
             <Image
@@ -158,18 +148,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    zIndex: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 20,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   headerImage: {
     width: '100%',
