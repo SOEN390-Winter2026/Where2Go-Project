@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 // Optional: set API_URL in .env to override (e.g. shared backend or your machine's IP for physical devices)
-import { API_URL } from '@env';
+import { API_URL, GOOGLE_MAPS_API_KEY } from '@env';
 /**
  * Backend API base URL.
  * - Set API_URL in .env to override (useful for physical devices or a shared backend for colleagues).
@@ -13,3 +13,4 @@ import { API_URL } from '@env';
 export const API_BASE_URL = 
   (typeof API_URL === 'string' && API_URL.trim()?.replace(/\/$/, '')) ||
   (Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+export const GOOGLE_MAPS_API_KEY_ENV = (typeof GOOGLE_MAPS_API_KEY === 'string' && GOOGLE_MAPS_API_KEY.trim()) ? GOOGLE_MAPS_API_KEY.trim() : '';

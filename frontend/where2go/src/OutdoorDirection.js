@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
+import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { colors } from './theme/colors';
 import * as Location from 'expo-location';
 import ErrorModal from './ErrorModal';
 import PropTypes from 'prop-types';
+import { GOOGLE_MAPS_API_KEY_ENV } from './config';
 
 function getCentroid(coordinates) {
   const lat = coordinates.reduce((sum, c) => sum + c.latitude, 0) / coordinates.length;
@@ -12,11 +13,14 @@ function getCentroid(coordinates) {
   return { latitude: lat, longitude: lng };
 }
 
+const GOOGLE_DIRECTIONS_BASE = 'https://maps.googleapis.com/maps/api/directions/json';
+
 export default function OutdoorDirection({ onPressBack, buildings, initialFrom, initialTo }) {
 
-  const routes = [
-    { id: "1" }, { id: "2" }, { id: "3" },
-  ]
+  // Route results: { id, coordinates: [{latitude, longitude}, ...], distanceMeters, durationSeconds }
+  const [routes, setRoutes] = useState([]);
+  const [routesLoading, setRoutesLoading] = useState(false);
+  const [routesError, setRoutesError] = useState(null);
 
   //Input Destinations Variables
   const [fromDestination, setFromDestination] = useState("");
@@ -32,12 +36,18 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
 
   // For when you tap on a building and select it as destination/departure
   useEffect(() => {
-    if (initialFrom !== "") setFromDestination(initialFrom);
-  },[initialFrom]);
+    if (initialFrom === '') return;
+    setFromDestination(initialFrom);
+    const building = buildings.find((b) => b.name === initialFrom);
+    if (building) setFromCoordinates(getCentroid(building.coordinates));
+  }, [initialFrom, buildings]);
 
   useEffect(() => {
-    if (initialTo !== "") setToDestination(initialTo);
-  }, [initialTo])
+    if (initialTo === '') return;
+    setToDestination(initialTo);
+    const building = buildings.find((b) => b.name === initialTo);
+    if (building) setToCoordinates(getCentroid(building.coordinates));
+  }, [initialTo, buildings]);
 
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
@@ -50,6 +60,7 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
 
   const handleFromChange = (text) => {
     setFromDestination(text);
+    setFromCoordinates(null);
     if (text.length < 1) { setFromSuggestions([]); return; }
     const filtered = buildings.filter(b =>
       b.name.toLowerCase().includes(text.toLowerCase())
@@ -59,6 +70,7 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
   
   const handleToChange = (text) => {
     setToDestination(text);
+    setToCoordinates(null);
     if (text.length < 1) { setToSuggestions([]); return; }
     const filtered = buildings.filter(b =>
       b.name.toLowerCase().includes(text.toLowerCase())
@@ -77,6 +89,59 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
     setToCoordinates(getCentroid(building.coordinates));
     setToSuggestions([]);
   };
+  const calculateRoutes = useCallback(async (from, to) => {
+    if (from?.latitude == null || to?.latitude == null) return;
+    if (!GOOGLE_MAPS_API_KEY_ENV ) {
+      setRoutesError('Google Maps API key is missing. Add GOOGLE_MAPS_API_KEY to your .env file.');
+      setRoutes([]);
+      return;
+    }
+    setRoutesLoading(true);
+    setRoutesError(null);
+    try {
+      const origin = `${from.latitude},${from.longitude}`;
+      const destination = `${to.latitude},${to.longitude}`;
+      const url = `${GOOGLE_DIRECTIONS_BASE}?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&mode=walking&key=${GOOGLE_MAPS_API_KEY_ENV}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.status !== 'OK' || !data.routes?.length) {
+        setRoutes([]);
+        setRoutesError(data.error_message || 'No route found between these locations.');
+        return;
+      }
+      const routeList = data.routes.map((r, i) => {
+        const leg = r.legs?.[0];
+        const distanceMeters = leg?.distance?.value ?? 0;
+        const durationSeconds = leg?.duration?.value ?? 0;
+        const steps = (leg?.steps || []).map((s) => ({
+          durationSeconds: s.duration?.value ?? 0,
+          distanceMeters: s.distance?.value ?? 0,
+        }));
+        return {
+          id: String(i + 1),
+          distanceMeters,
+          durationSeconds,
+          steps,
+        };
+      });
+      setRoutes(routeList);
+    } catch (err) {
+      console.warn('Route calculation failed:', err);
+      setRoutes([]);
+      setRoutesError('Unable to calculate routes. Check your connection and try again.');
+    } finally {
+      setRoutesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (fromCoordinates && toCoordinates) {
+      calculateRoutes(fromCoordinates, toCoordinates);
+    } else {
+      setRoutes([]);
+      setRoutesError(null);
+    }
+  }, [fromCoordinates, toCoordinates, calculateRoutes]);
 
   const getCurrentLocation = async () => {
     try {
@@ -118,6 +183,7 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
           console.log("USER LOCATION:", coords);
           setFromDestination(`${coords.latitude},${coords.longitude}`);
           setLiveLocCoordinates(coords);
+          setFromCoordinates(coords);
         }
       );
 
@@ -153,14 +219,19 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
         <Text style={styles.headerSubtitle}>
           Find the best route between campuses
         </Text>
-        <View style={styles.input}>
-          <Text style={styles.inputLabel}>From</Text>
-          <TextInput testID="inputStartLoc" placeholder="Choose Start Location"
-            value={fromDestination}
-            onChangeText={handleFromChange}
-            style={styles.inputText}
-            onFocus={() => setIsPressedFromDest(true)}
-            onBlur={() => setIsPressedFromDest(false)} />
+        <View style={styles.fromWrapper}>
+          <View style={styles.input}>
+            <Text style={styles.inputLabel}>From</Text>
+            <TextInput testID="inputStartLoc" placeholder="Choose Start Location"
+              value={fromDestination}
+              onChangeText={handleFromChange}
+              style={styles.inputText}
+              onFocus={() => setIsPressedFromDest(true)}
+              onBlur={() => setIsPressedFromDest(false)} />
+          </View>
+          <Pressable onPress={() => getCurrentLocation()} style={styles.gpsIconBtn} hitSlop={12}>
+            <Image source={require('../assets/lets-icons--gps-fixed.png')} style={styles.gpsIcon} resizeMode="contain" />
+          </Pressable>
         </View>
         {fromSuggestions.length > 0 && (
           <View style={styles.suggestions}>
@@ -193,34 +264,75 @@ export default function OutdoorDirection({ onPressBack, buildings, initialFrom, 
         </View>
 
       <View style={styles.bottomPart}>
-        {/*Live Location Button*/}
-
-        {isPressedFromDest &&
-          <View>
-            <Pressable
-              onPress={() => { getCurrentLocation() }}
-              style={styles.liveLoc}>
-              <Ionicons name="location" size={26} color="#912338" />
-              <Text>Set to Your Location</Text>
-            </Pressable>
-          </View>}
-
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
-            {routes.length} routes{"\n"}available
+            {routesLoading
+              ? 'Finding routes…'
+              : fromCoordinates && toCoordinates
+                ? `${routes.length} route${routes.length !== 1 ? 's' : ''} available`
+                : 'Select both locations'}
           </Text>
 
           <Pressable testID="pressFilter">
             <Text style={styles.filterText}>Filter</Text>
           </Pressable>
         </View>
+        {routesError ? (
+          <Text style={styles.routesError}>{routesError}</Text>
+        ) : null}
         <View style={styles.scrollBar} />
         <ScrollView
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.routesContent}>
-          {routes.map((r) => (
-            <View key={r.id} style={styles.routeContainer} />
-          ))}
+          {(routes.length ? routes : fromCoordinates && toCoordinates ? [{ id: '1' }, { id: '2' }, { id: '3' }] : []).map((r) => {
+            const hasData = r.durationSeconds != null && r.distanceMeters != null;
+            const totalMins = hasData ? Math.round(r.durationSeconds / 60) : null;
+            const arriveAt = hasData ? new Date(Date.now() + r.durationSeconds * 1000) : null;
+            const arriveStr = arriveAt ? arriveAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            const steps = r.steps || [];
+            return (
+              <View key={r.id} style={styles.routeContainer}>
+                <View style={styles.routeLeftBar} />
+                <View style={styles.routeContent}>
+                  {hasData ? (
+                    <>
+                      <View style={styles.routeHeader}>
+                        <Ionicons name="walk" size={22} color={colors.primary} />
+                        <Text style={styles.routeDuration}>{totalMins} min</Text>
+                      </View>
+                      <Text style={styles.routeArrive}>Arrive {arriveStr}</Text>
+                      <View style={styles.routeTimeline}>
+                        <View style={styles.routeSegment}>
+                          <Ionicons name="location" size={16} color={colors.primary} style={styles.routeIcon} />
+                          <Text style={styles.routeSegmentTitle} numberOfLines={1}>{fromDestination}</Text>
+                        </View>
+                        {steps.map((step, idx) => (
+                          <View key={idx}>
+                            <View style={styles.routeStepLine} />
+                            <View style={styles.routeSegment}>
+                              <Ionicons name="walk-outline" size={16} color={colors.primary} style={styles.routeIcon} />
+                              <Text style={styles.routeStepText}>
+                                Walk {Math.round(step.durationSeconds / 60)} min ({step.distanceMeters} m)
+                              </Text>
+                            </View>
+                          </View>
+                        ))}
+                        <View style={styles.routeStepLine} />
+                        <View style={styles.routeSegment}>
+                          <Ionicons name="location" size={16} color={colors.primary} style={styles.routeIcon} />
+                          <Text style={styles.routeSegmentTitle} numberOfLines={1}>{toDestination}</Text>
+                        </View>
+                      </View>
+                    </>
+                  ) : (
+                    <Text style={styles.routeSummary}>
+                      {routesLoading ? '…' : 'Route ' + r.id}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            );
+          })}
         </ScrollView>
       </View>
 
@@ -286,6 +398,24 @@ const styles = StyleSheet.create({
     marginTop: 14,
     backgroundColor: "white",
   },
+  fromWrapper: {
+    position: 'relative',
+    marginTop: 14,
+  },
+  gpsIconBtn: {
+    position: 'absolute',
+    top: '30%',
+    right: 8,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  gpsIcon: {
+    width: 32,
+    height: 32,
+    tintColor: colors.primary,
+  },
   bottomPart: {
     flex: 1,
     marginTop: 40,
@@ -305,6 +435,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111",
   },
+  routesError: {
+    fontSize: 13,
+    color: "#912338",
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
   filterText: {
     color: "#7C2B38",
     fontWeight: "800"
@@ -317,32 +453,78 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   routeContainer: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#7C2B38",
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 16,
     marginHorizontal: 16,
-    height: 170,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#FCFCFC',
+  },
+  routeLeftBar: {
+    width: 5,
+    backgroundColor: colors.primary,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  routeContent: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingLeft: 16,
+  },
+  routeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+  },
+  routeDuration: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  routeArrive: {
+    fontSize: 13,
+    color: colors.primary,
+    marginBottom: 12,
+  },
+  routeTimeline: {
+    marginTop: 4,
+  },
+  routeSegment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  routeIcon: {
+    marginRight: 8,
+  },
+  routeSegmentTitle: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  routeStepText: {
+    fontSize: 13,
+    color: colors.primary,
+  },
+  routeStepLine: {
+    height: 1,
+    backgroundColor: colors.primary,
+    opacity: 0.4,
+    marginVertical: 6,
+    marginLeft: 12,
+  },
+  routeSummary: {
+    fontSize: 14,
+    color: '#111',
+    paddingVertical: 8,
   },
   routeBody: {
     flex: 1,
   },
-  flex: 1,
   routesContent: {
-  },
-  liveLoc: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 14,
-    padding: 10,
-    marginTop: 2,
-    backgroundColor: "white",
-    flexDirection: "row",
-    alignItems: "center",        // vertical alignment
-    gap: 8,
   },
   suggestions: {
     backgroundColor: 'white',
