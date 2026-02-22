@@ -14,7 +14,7 @@ describe("Rendering Features Properly", () => {
     it("Back Button", async () => {
         const mockOnPress = jest.fn();
 
-        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} />);
+        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} buildings={[]} />);
         const pressBackButton = getByTestId("pressBack");
 
         await act(async () => {
@@ -29,7 +29,7 @@ describe("Input and Button Features", () => {
     it("Filter Button", async () => {
         const mockOnPress = jest.fn();
 
-        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} />);
+        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} buildings={[]} />);
         const pressBackButton = getByTestId("pressFilter");
 
         await act(async () => {
@@ -38,7 +38,7 @@ describe("Input and Button Features", () => {
     });
 
     it("updates text in inputStartLoc", async () => {
-        const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -50,7 +50,7 @@ describe("Input and Button Features", () => {
     });
 
     it("updates text in inputDestLoc", async () => {
-        const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputDestLoc");
 
@@ -83,7 +83,7 @@ describe("Location Error Handling", () => {
         // Mock location services as disabled
         Location.hasServicesEnabledAsync.mockResolvedValue(false);
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -119,7 +119,7 @@ describe("Location Error Handling", () => {
             status: 'denied'
         });
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -161,7 +161,7 @@ describe("Location Error Handling", () => {
             return mockSubscription;
         });
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -207,7 +207,7 @@ describe("Location Error Handling", () => {
             return mockSubscription;
         });
 
-        const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -235,7 +235,7 @@ describe("Location Error Handling", () => {
         // Mock location services as disabled
         Location.hasServicesEnabledAsync.mockResolvedValue(false);
 
-        const { getByTestId, getByText, findByText, queryByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText, queryByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -273,7 +273,7 @@ describe("Location Error Handling", () => {
         // Mock location services as disabled
         Location.hasServicesEnabledAsync.mockResolvedValue(false);
 
-        const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -310,7 +310,7 @@ describe("Location Error Handling", () => {
         timeoutError.code = 'E_LOCATION_TIMEOUT';
         Location.watchPositionAsync.mockRejectedValue(timeoutError);
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -347,7 +347,7 @@ describe("Location Error Handling", () => {
         unavailableError.code = 'E_LOCATION_UNAVAILABLE';
         Location.watchPositionAsync.mockRejectedValue(unavailableError);
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
@@ -383,7 +383,7 @@ describe("Location Error Handling", () => {
         const genericError = new Error('Unknown error');
         Location.watchPositionAsync.mockRejectedValue(genericError);
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} />);
+        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
 
         const input = getByTestId("inputStartLoc");
 
