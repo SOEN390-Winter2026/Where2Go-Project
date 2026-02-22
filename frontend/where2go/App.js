@@ -38,6 +38,15 @@ export default function App() {
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
+  //for selecting buildings as departure or destination on map
+  const [departureBuilding, setDepartureBuilding] = useState(null);
+  const [destinationBuilding, setDestinationBuilding] = useState(null);
+  const getBuildingRole = (building) => {
+    if (building?.id === departureBuilding?.id) return 'departure';
+    if (building?.id === destinationBuilding?.id) return 'destination';
+    return null;
+  };
+
   const handleBuildingPress = (building) => {
     setSelectedBuilding(building);
     setModalVisible(true);
@@ -161,7 +170,13 @@ export default function App() {
   }
 
   if(showOutdoorDirection){
-    return <OutdoorDirection onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} />;
+    return <OutdoorDirection 
+    onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} 
+    buildings={buildings} 
+    initialFrom={departureBuilding ? departureBuilding.name : ""}
+    initialTo={destinationBuilding ? destinationBuilding.name : ""}
+    />;
+  
   }
 
   return (
@@ -238,12 +253,14 @@ export default function App() {
         building={selectedBuilding}
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+        onSetDeparture={(buildingCommute) => setDepartureBuilding(buildingCommute)}
+        onSetDestination={(buildingCommute) => setDestinationBuilding(buildingCommute)}
+        selectedRole={ getBuildingRole(selectedBuilding) }
       />
       <StatusBar style="auto" />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

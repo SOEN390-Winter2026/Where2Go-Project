@@ -1,12 +1,18 @@
 import { View, Text, StyleSheet, Pressable, ImageBackground, TextInput, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { colors } from './theme/colors';
 import * as Location from 'expo-location';
 import ErrorModal from './ErrorModal';
 import PropTypes from 'prop-types';
 
-export default function OutdoorDirection({ onPressBack }) {
+function getCentroid(coordinates) {
+  const lat = coordinates.reduce((sum, c) => sum + c.latitude, 0) / coordinates.length;
+  const lng = coordinates.reduce((sum, c) => sum + c.longitude, 0) / coordinates.length;
+  return { latitude: lat, longitude: lng };
+}
+
+export default function OutdoorDirection({ onPressBack, buildings, initialFrom, initialTo }) {
 
   const routes = [
     { id: "1" }, { id: "2" }, { id: "3" },
@@ -24,9 +30,54 @@ export default function OutdoorDirection({ onPressBack }) {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // For when you tap on a building and select it as destination/departure
+  useEffect(() => {
+    if (initialFrom !== "") setFromDestination(initialFrom);
+  },[initialFrom]);
+
+  useEffect(() => {
+    if (initialTo !== "") setToDestination(initialTo);
+  }, [initialTo]);
+  
+
+  const [fromSuggestions, setFromSuggestions] = useState([]);
+  const [toSuggestions, setToSuggestions] = useState([]);
+  const [fromCoordinates, setFromCoordinates] = useState(null);
+  const [toCoordinates, setToCoordinates] = useState(null);
+
   useEffect(() => {
     console.log("fromDestionation: ", fromDestination);
   }, [fromDestination]);
+
+  const handleFromChange = (text) => {
+    setFromDestination(text);
+    if (text.length < 1) { setFromSuggestions([]); return; }
+    const filtered = buildings.filter(b =>
+      b.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setFromSuggestions(filtered.slice(0, 5));
+  };
+  
+  const handleToChange = (text) => {
+    setToDestination(text);
+    if (text.length < 1) { setToSuggestions([]); return; }
+    const filtered = buildings.filter(b =>
+      b.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setToSuggestions(filtered.slice(0, 5));
+  };
+  
+  const handleFromSelect = (building) => {
+    setFromDestination(building.name);
+    setFromCoordinates(getCentroid(building.coordinates));
+    setFromSuggestions([]);
+  };
+  
+  const handleToSelect = (building) => {
+    setToDestination(building.name);
+    setToCoordinates(getCentroid(building.coordinates));
+    setToSuggestions([]);
+  };
 
   const getCurrentLocation = async () => {
     try {
@@ -107,23 +158,40 @@ export default function OutdoorDirection({ onPressBack }) {
           <Text style={styles.inputLabel}>From</Text>
           <TextInput testID="inputStartLoc" placeholder="Choose Start Location"
             value={fromDestination}
-            onChangeText={setFromDestination}
+            onChangeText={handleFromChange}
             style={styles.inputText}
             onFocus={() => setIsPressedFromDest(true)}
             onBlur={() => setIsPressedFromDest(false)} />
-
         </View>
+        {fromSuggestions.length > 0 && (
+          <View style={styles.suggestions}>
+            {fromSuggestions.map((b) => (
+              <Pressable key={b.id} style={styles.suggestionItem} onPress={() => handleFromSelect(b)}>
+                <Text style={styles.suggestionText}>{b.name}</Text>
+                <Text style={styles.suggestionCampus}>{b.campus}</Text>
+              </Pressable>
+            ))}
+            </View>
+        )}
 
         <View style={styles.input}>
           <Text style={styles.inputLabel}>To</Text>
           <TextInput testID="inputDestLoc" placeholder="Choose destination"
             value={toDestination}
-            onChangeText={setToDestination}
+            onChangeText={handleToChange}
             style={styles.inputText} />
         </View>
-      </View>
-
-
+        {toSuggestions.length > 0 && (
+          <View style={styles.suggestions}>
+            {toSuggestions.map((b) => ( 
+              <Pressable key={b.id} style={styles.suggestionItem} onPress={() => handleToSelect(b)}>
+                <Text style={styles.suggestionText}>{b.name}</Text>
+                <Text style={styles.suggestionCampus}>{b.campus}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+        </View>
 
       <View style={styles.bottomPart}>
         {/*Live Location Button*/}
@@ -173,6 +241,9 @@ export default function OutdoorDirection({ onPressBack }) {
 
 OutdoorDirection.propTypes = {
   onPressBack: PropTypes.func.isRequired,
+  buildings: PropTypes.array.isRequired,
+  initialFrom: PropTypes.string,
+  initialTo: PropTypes.string,
 };
 
 const styles = StyleSheet.create({
@@ -274,5 +345,22 @@ const styles = StyleSheet.create({
     alignItems: "center",        // vertical alignment
     gap: 8,
   },
+  suggestions: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    marginTop: -10,
+    zIndex: 99,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionText: { fontSize: 14, color: '#111' },
+  suggestionCampus: { fontSize: 12, color: '#888' },
 });
 
