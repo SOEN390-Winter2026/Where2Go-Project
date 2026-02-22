@@ -37,6 +37,7 @@ export default function App() {
 
   //POI Variables
   const [isPressedPOI, setIsPressedPOI] = useState(false);
+  const [poiOriginBuilding, setPoiOriginBuilding] = useState(null);
 
   const [dataLoaded, setDataLoaded] = useState(false); // for loading check
   const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
@@ -44,8 +45,12 @@ export default function App() {
   const mapRef = useRef(null);
 
   const handleBuildingPress = (building) => {
+    if(isPressedPOI){
+      setPoiOriginBuilding(building);
+    }else{
     setSelectedBuilding(building);
     setModalVisible(true);
+    }
   };
 
   //Snapping back to user
@@ -274,7 +279,10 @@ export default function App() {
           })
         }
         onPressPOI={() => {
-          setIsPressedPOI(prev => !prev);
+          setIsPressedPOI(prev => {
+            if(prev) setPoiOriginBuilding(null);
+            return !prev;
+          });
         }}
       />
 
@@ -284,7 +292,13 @@ export default function App() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
-      {isPressedPOI && <PoiSlider onPoisChange={handlePoisChange} />}
+      {isPressedPOI && (
+        <PoiSlider
+          onPoisChange={handlePoisChange}
+          userLocation={userLocation}
+          selectedBuilding={poiOriginBuilding}
+        />
+      )}
       <StatusBar style="auto" />
     </View>
   );

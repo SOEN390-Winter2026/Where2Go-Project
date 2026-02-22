@@ -1,122 +1,146 @@
-import { useState, useEffect } from "react";
-import * as Location from "expo-location";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  Image,
-  Pressable,
   StyleSheet,
-  Animated,
 } from "react-native";
-import Slider from '@react-native-community/slider';
-import { GOOGLE_MAPS_API_KEY } from '@env';
+import Slider from "@react-native-community/slider";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 
-export default function PoiSlider({ onPoisChange }) {
+const MIN_RADIUS = 10;
+const MAX_RADIUS = 1000;
 
-  const [userLocation, setUserLocation] = useState([])
-  const [pois, setPois] = useState([]);
-  const types = [
-    "restaurant",
-    "cafe",
-    "store"
-  ];
+const POI_TYPES = [
+  "restaurant", 
+  "cafe", 
+  "store", 
+  "bar", 
+  "pharmacy", 
+  "gym"
+];
 
-  const fetchCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Permission denied");
-      return;
-    }
+export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding }) {
+  const [sliderRadius, setSliderRadius] = useState(MIN_RADIUS);
+  const [displayRadius, setDisplayRadius] = useState(MIN_RADIUS);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const debounceTimer = useRef(null);
 
-    const sub = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 1000,
-        distanceInterval: 5,
-      },
-      (loc) => {
-        const coords = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        };
-        console.log("USER LOCATION:", coords);
-        setUserLocation(coords);
+  const resolveOrigin = () => {
+    if (selectedBuilding) {
+      const coords = selectedBuilding.coordinates;
+      if (coords?.length > 0) {
+        const lat = coords.reduce((sum, c) => sum + c.latitude,  0) / coords.length;
+        const lng = coords.reduce((sum, c) => sum + c.longitude, 0) / coords.length;
+        return { latitude: lat, longitude: lng };
       }
-    );
+      if (selectedBuilding.latitude && selectedBuilding.longitude) {
+        return { latitude: selectedBuilding.latitude, longitude: selectedBuilding.longitude };
+      }
+    }
+    if (userLocation?.latitude && userLocation?.longitude) return userLocation;
+    return null;
   };
 
   const fetchNearbyPOIs = async (lat, lng, radiusInMeters) => {
+    const typeParam = POI_TYPES.join("|");
     const url =
       `https://maps.googleapis.com/maps/api/place/nearbysearch/json` +
       `?location=${lat},${lng}` +
-      `&type=${types}` +
+      `&type=${typeParam}` +
       `&radius=${radiusInMeters}` +
       `&key=${GOOGLE_MAPS_API_KEY}`;
+
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(url);
-
-      // Manual check for HTTP errors (e.g., 400, 500)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      const data = await response.json(); // Manual JSON parsing
-      return data.results;
-    } catch (error) {
-      console.error("Fetch failed:", error);
+      const data = await response.json();
+      if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
+        throw new Error(`Places API: ${data.status}`);
+      }
+      return data.results || [];
+    } catch (errpr) {
+      console.error("POI fetch failed:", error);
+      setError("Could not load points of interest.");
+      return [];
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const loadPOIs = async () => {
-      const results = await fetchNearbyPOIs(userLocation.latitude, userLocation.longitude, sliderValueRadius);
-
-      setPois(results || []);
+    const origin = resolveOrigin();
+    if (!origin) {
+      onPoisChange([]);
+      return;
+    }
+    const load = async () => {
+      const results = await fetchNearbyPOIs(origin.latitude, origin.longitude, sliderRadius);
+      onPoisChange(results);
     };
+    load();
+  }, [sliderRadius, userLocation, selectedBuilding]);
 
-    loadPOIs();
-  }, [userLocation]);
+  const handleSliderChange = (value) => {
+    setDisplayRadius(value);
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => setSliderRadius(value), 400);
+  };
 
-  useEffect(() => {
-    onPoisChange(pois);
-  }, [pois])
+  const radiusM = Math.round(displayRadius);
 
-
-  const [sliderValueRadius, setSliderValueRadius] = useState(0);
+  const originLabel = selectedBuilding
+    ? `From: ${selectedBuilding.name ?? "Selected building"}`
+    : userLocation
+      ? "From: Your location"
+      : "No location — enable GPS or tap a building";
 
   return (
+    <View style={styles.poiSliderView}>
 
-    <>
+      <Text style={styles.radiusLabel}>
+        Radius Range: {radiusM} m
+      </Text>
 
-      <View style={styles.poiSliderView}>
-        <Text> Radius Range: {sliderValueRadius}</Text>
-        <Slider
-          style={{ width: 300, height: 40 }}
-          minimumValue={1}
-          maximumValue={10000}
-          minimumTrackTintColor="#ccc"
-          maximumTrackTintColor="#000000"
-          onValueChange={(value) => setSliderValueRadius(value)}
-          value={sliderValueRadius}
-          thumbTintColor="#912338"
-          step={1}
-        />
-        <Pressable
-          onPress={() => { fetchCurrentLocation(); console.log("beingpressed"); }}>
-          <Text style={styles.enterText}>
-            Enter
-          </Text>
-        </Pressable>
+      <Slider
+        style={{ width: 300, height: 40 }}
+        minimumValue={MIN_RADIUS}
+        maximumValue={MAX_RADIUS}
+        step={100}
+        value={displayRadius}
+        onValueChange={handleSliderChange}
+        minimumTrackTintColor="#ccc"
+        maximumTrackTintColor="#000000"
+        thumbTintColor="#912338"
+      />
 
+      <View style={[
+        styles.originPill,
+        selectedBuilding ? styles.originPillBuilding : styles.originPillLocation
+      ]}>
+        <Text style={[
+          styles.originText,
+          selectedBuilding && styles.originTextBuilding
+        ]}>
+          {loading ? "Loading…" : error ? error : originLabel}
+        </Text>
       </View>
 
-    </>
-  )
-
+      {!selectedBuilding && !userLocation && (
+        <Text style={styles.hint}>Enable GPS or tap a building on the map</Text>
+      )}
+      {!selectedBuilding && userLocation && (
+        <Text style={styles.hint}>Tap a building to search from its location</Text>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-
   poiSliderView: {
     position: "absolute",
     zIndex: 20,
@@ -128,16 +152,38 @@ const styles = StyleSheet.create({
     padding: 20,
     margin: 20,
     alignItems: "center",
-    alignSelf: "center", // Aligns slider in the middle of the screen
-
+    alignSelf: "center",
   },
-
-  enterText: {
-    backgroundColor: "#912338",
-    color: "white",
+  radiusLabel: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  originPill: {
     borderWidth: 1,
-    padding: 10,
-    margin: 2,
+    borderColor: "#912338",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginTop: 4,
     borderRadius: 20,
+  },
+  originPillLocation: {
+    backgroundColor: "white",
+  },
+  originPillBuilding: {
+    backgroundColor: "#912338",
+  },
+  originText: {
+    color: "#912338",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  originTextBuilding: {
+    color: "white",
+  },
+  hint: {
+    fontSize: 11,
+    color: "#aaa",
+    marginTop: 6,
+    fontStyle: "italic",
   },
 });
