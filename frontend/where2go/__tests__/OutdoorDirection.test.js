@@ -62,6 +62,107 @@ describe("Input and Button Features", () => {
     });
 });
 
+describe("Initial from/to and suggestion selection", () => {
+    const mockBuildings = [
+        { id: '1', name: 'Hall Building', campus: 'SGW', coordinates: [{ latitude: 45.497, longitude: -73.579 }, { latitude: 45.498, longitude: -73.578 }] },
+        { id: '2', name: 'Library', campus: 'SGW', coordinates: [{ latitude: 45.496, longitude: -73.577 }] },
+    ];
+
+    it("sets From input when initialFrom is provided", async () => {
+        const { getByTestId } = render(
+            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} initialFrom="Hall Building" />
+        );
+        await waitFor(() => {
+            expect(getByTestId("inputStartLoc").props.value).toBe("Hall Building");
+        });
+    });
+
+    it("sets To input when initialTo is provided", async () => {
+        const { getByTestId } = render(
+            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} initialTo="Library" />
+        );
+        await waitFor(() => {
+            expect(getByTestId("inputDestLoc").props.value).toBe("Library");
+        });
+    });
+
+    it("selecting a From suggestion updates input and uses building coordinates", async () => {
+        const { getByTestId, getByText } = render(
+            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
+        );
+        const fromInput = getByTestId("inputStartLoc");
+        await act(async () => {
+            fireEvent.changeText(fromInput, "Hall");
+        });
+        await waitFor(() => {
+            expect(getByText("Hall Building")).toBeTruthy();
+        });
+        const suggestion = getByText("Hall Building");
+        await act(async () => {
+            fireEvent.press(suggestion);
+        });
+        expect(fromInput.props.value).toBe("Hall Building");
+    });
+
+    it("selecting a To suggestion updates input and uses building coordinates", async () => {
+        const { getByTestId, getByText } = render(
+            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
+        );
+        const toInput = getByTestId("inputDestLoc");
+        await act(async () => {
+            fireEvent.changeText(toInput, "Lib");
+        });
+        await waitFor(() => {
+            expect(getByText("Library")).toBeTruthy();
+        });
+        const suggestion = getByText("Library");
+        await act(async () => {
+            fireEvent.press(suggestion);
+        });
+        expect(toInput.props.value).toBe("Library");
+    });
+
+    it("clearing From input clears suggestions", async () => {
+        const { getByTestId, getByText, queryByText } = render(
+            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
+        );
+        const fromInput = getByTestId("inputStartLoc");
+        await act(async () => {
+            fireEvent.changeText(fromInput, "Hall");
+        });
+        await waitFor(() => {
+            expect(getByText("Hall Building")).toBeTruthy();
+        });
+        await act(async () => {
+            fireEvent.changeText(fromInput, "");
+        });
+        await waitFor(() => {
+            expect(queryByText("Hall Building")).toBeNull();
+        });
+        expect(fromInput.props.value).toBe("");
+    });
+
+    it("clearing To input clears suggestions", async () => {
+        const { getByTestId, getByText, queryByText } = render(
+            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
+        );
+        const toInput = getByTestId("inputDestLoc");
+        await act(async () => {
+            fireEvent.changeText(toInput, "Lib");
+        });
+        await waitFor(() => {
+            expect(getByText("Library")).toBeTruthy();
+        });
+        await act(async () => {
+            fireEvent.changeText(toInput, "");
+        });
+        await waitFor(() => {
+            expect(queryByText("Library")).toBeNull();
+        });
+        expect(toInput.props.value).toBe("");
+    });
+});
+
 describe("Location Error Handling", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -154,10 +255,10 @@ describe("Location Error Handling", () => {
             status: 'granted'
         });
         
-        // Mock watchPositionAsync to call callback with null coords
+        // Mock watchPositionAsync: callback(null) covers !loc; callback({}) covers !loc.coords
         const mockSubscription = { remove: jest.fn() };
         Location.watchPositionAsync.mockImplementation(async (options, callback) => {
-            callback(null); // Simulate missing location
+            callback(null);
             return mockSubscription;
         });
 
