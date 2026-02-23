@@ -1,0 +1,21 @@
+appId: host.exp.exponent
+---
+- tapOn: Skip
+- waitForAnimationToEnd
+- tapOn: 
+    id: "menu-button"
+- tapOn: Direction
+- waitFor:
+    text: "Plan Your Trip"
+- tapOn: 
+    id: "inputStartLoc"
+    text: "ha"
+- waitFor:
+    text: "Hall Building"
+- tapOn: "Hall Building"
+- tapOn:
+    id: "inputDestLoc"
+    text: "ha"
+- waitFor:
+    text: "Hall Building"
+- tapOn: "Hall Building"
