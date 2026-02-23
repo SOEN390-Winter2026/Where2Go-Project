@@ -30,6 +30,7 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "silent": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.test.{js,jsx,ts,tsx}",

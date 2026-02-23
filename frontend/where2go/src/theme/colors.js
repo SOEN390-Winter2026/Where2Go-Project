@@ -9,6 +9,8 @@ export const colors = {
   buildingHighlightFill: 'rgba(145, 35, 56, 0.25)',
   // Stroke for building outlines
   buildingHighlightStroke: '#912338',
+  //Selected as destination
+  destinationHighlightFill: '#ffca89',
 };
 
 export default colors;

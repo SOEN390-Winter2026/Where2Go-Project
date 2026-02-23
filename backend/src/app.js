@@ -1,9 +1,10 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const { getCampusCoordinates, getBuildings } = require("./services/map");
-
-dotenv.config();
+const { getTransportOptions } = require("./services/directions");
 const app = express();
 
 app.use(cors());
@@ -25,6 +26,33 @@ app.get("/campus/:name", (req, res) => {
 app.get("/campus/:name/buildings", (req, res) => {
     const buildings = getBuildings(req.params.name);
     res.json(buildings);
+});
+
+// GET /directions?originLat=&originLng=&destLat=&destLng=&clientTime=
+// clientTime: optional ISO string from user's device for shuttle schedule (uses device time)
+// Returns walking, transit, and Concordia shuttle routes
+app.get("/directions", async (req, res) => {
+    const originLat = Number.parseFloat(req.query.originLat);
+    const originLng = Number.parseFloat(req.query.originLng);
+    const destLat = Number.parseFloat(req.query.destLat);
+    const destLng = Number.parseFloat(req.query.destLng);
+    const clientTime = req.query.clientTime && String(req.query.clientTime).trim();
+
+    if (Number.isNaN(originLat) || Number.isNaN(originLng) || Number.isNaN(destLat) || Number.isNaN(destLng)) {
+        return res.status(400).json({ error: "Invalid origin/destination coordinates" });
+    }
+
+    const origin = { lat: originLat, lng: originLng };
+    const destination = { lat: destLat, lng: destLng };
+    const opts = clientTime ? { clientTime } : {};
+
+    try {
+        const routes = await getTransportOptions(origin, destination, opts);
+        res.json({ routes });
+    } catch (err) {
+        console.error("Directions error:", err);
+        res.status(500).json({ error: "Failed to fetch directions" });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
