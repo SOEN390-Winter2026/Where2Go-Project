@@ -32,13 +32,13 @@ app.get("/campus/:name/buildings", (req, res) => {
 // clientTime: optional ISO string from user's device for shuttle schedule (uses device time)
 // Returns walking, transit, and Concordia shuttle routes
 app.get("/directions", async (req, res) => {
-    const originLat = parseFloat(req.query.originLat);
-    const originLng = parseFloat(req.query.originLng);
-    const destLat = parseFloat(req.query.destLat);
-    const destLng = parseFloat(req.query.destLng);
+    const originLat = Number.parseFloat(req.query.originLat);
+    const originLng = Number.parseFloat(req.query.originLng);
+    const destLat = Number.parseFloat(req.query.destLat);
+    const destLng = Number.parseFloat(req.query.destLng);
     const clientTime = req.query.clientTime && String(req.query.clientTime).trim();
 
-    if (isNaN(originLat) || isNaN(originLng) || isNaN(destLat) || isNaN(destLng)) {
+    if (Number.isNaN(originLat) || Number.isNaN(originLng) || Number.isNaN(destLat) || Number.isNaN(destLng)) {
         return res.status(400).json({ error: "Invalid origin/destination coordinates" });
     }
 

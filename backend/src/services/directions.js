@@ -46,8 +46,8 @@ function getMontrealMinutes(refDate = new Date()) {
     hour12: false,
   });
   const parts = fmt.formatToParts(refDate);
-  const h = parseInt(parts.find((p) => p.type === "hour").value, 10);
-  const m = parseInt(parts.find((p) => p.type === "minute").value, 10);
+  const h = Number.parseInt(parts.find((p) => p.type === "hour").value, 10);
+  const m = Number.parseInt(parts.find((p) => p.type === "minute").value, 10);
   return h * 60 + m;
 }
 
@@ -79,9 +79,9 @@ function isInSchedulePeriod(refDate = new Date()) {
     day: "2-digit",
   });
   const parts = fmt.formatToParts(refDate);
-  const y = parseInt(parts.find((p) => p.type === "year").value, 10);
-  const m = parseInt(parts.find((p) => p.type === "month").value, 10);
-  const d = parseInt(parts.find((p) => p.type === "day").value, 10);
+  const y = Number.parseInt(parts.find((p) => p.type === "year").value, 10);
+  const m = Number.parseInt(parts.find((p) => p.type === "month").value, 10);
+  const d = Number.parseInt(parts.find((p) => p.type === "day").value, 10);
   // Allow Winter 2026 (Jan 12 – Apr 15) and 2025 for dev/testing
   if (y === 2026) {
     if (m < 1 || m > 4) return false;
@@ -118,7 +118,7 @@ function getNextDeparture(fromCampus, refDate = new Date()) {
   const sched = day === 5 ? SHUTTLE_SCHEDULE.friday : SHUTTLE_SCHEDULE.weekdays;
   const times = fromCampus === "Loyola" ? sched.loyola : sched.sgw;
   const next = times.find((t) => t > mins);
-  return next != null ? minsToTimeStr(next) : null;
+  return next == null ? null : minsToTimeStr(next);
 }
 
 function buildDirectionsUrl(origin, destination, mode) {
