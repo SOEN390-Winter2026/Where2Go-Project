@@ -596,7 +596,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: "italic",
   },
-  routesContent: {},
   scrollBar: {},
 
   /* ---- No routes found ---- */
