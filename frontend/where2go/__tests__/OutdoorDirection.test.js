@@ -199,6 +199,32 @@ describe("Route fetching and mode display", () => {
         if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
         else delete global.fetch;
     }, 10000);
+
+    it("handles fetch failures and sets error state", async () => {
+        
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: false,
+            json: async () => ({ error: 'boom' }),
+        });
+
+        const { findByText, getByText } = render(
+            <OutdoorDirection
+                onPressBack={() => { }}
+                origin={{ label: 'A', lat: 1, lng: 1 }}
+                destination={{ label: 'B', lat: 2, lng: 2 }}
+                buildings={[]}
+            />
+        );
+
+        const err = await findByText('boom');
+        expect(err).toBeTruthy();
+
+        expect(global.fetch).toHaveBeenCalled();
+
+        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
+        else delete global.fetch;
+    });
+
 });
 ;
 
