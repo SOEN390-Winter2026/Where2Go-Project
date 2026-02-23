@@ -20,11 +20,44 @@ export { KNOWN_LOCATIONS } from "./data/locations";
 /** Max autocomplete results shown in the dropdown */
 const MAX_RESULTS = 8;
 
+
+function getBuildingDisplayName(label) {
+  if (!label) return label;
+  const match = label.match(/^(.+?)\s*\(/);
+  return match ? match[1] : label;
+}
+
 /** Case-insensitive location filter for the autocomplete dropdown */
-function filterLocations(query) {
+function filterLocations(query, buildings) {
   if (!query || query.trim().length === 0) return [];
   const q = query.toLowerCase().trim();
-  return SEARCHABLE_LOCATIONS.filter((loc) => loc.searchText.includes(q)).slice(0, MAX_RESULTS);
+  
+  // Search SEARCHABLE_LOCATIONS
+  const searchableResults = SEARCHABLE_LOCATIONS.filter((loc) => loc.searchText.includes(q));
+  
+  // Also search buildings prop (if provided) by name
+  let buildingResults = [];
+  if (buildings && buildings.length > 0) {
+    buildingResults = buildings.filter((building) => {
+      const name = building.name?.toLowerCase() || "";
+      return name.includes(q);
+    }).map((building) => ({
+      label: building.name,
+      lat: building.coordinates?.[0]?.latitude || null,
+      lng: building.coordinates?.[0]?.longitude || null,
+      searchText: building.name?.toLowerCase() || "",
+    }));
+  }
+  
+  // Merge results, preferring building matches, then deduplicate by display name
+  const combined = [...buildingResults, ...searchableResults];
+  const seen = new Set();
+  return combined.filter((loc) => {
+    const displayName = getBuildingDisplayName(loc.label);
+    if (seen.has(displayName)) return false;
+    seen.add(displayName);
+    return true;
+  }).slice(0, MAX_RESULTS);
 }
 
 /** Map an API transport mode to a human-readable label and Ionicons icon name */
@@ -41,9 +74,12 @@ function getModeDisplay(mode) {
  * Props:
  *   origin        – optional { label, lat, lng } for the starting point
  *   destination   – optional { label, lat, lng } for the destination
+ *   initialFrom   – optional building name string to pre-populate origin
+ *   initialTo     – optional building name string to pre-populate destination
+ *   buildings     – optional array of building objects for filtering suggestions
  *   onPressBack   – callback to close this screen
  */
-export default function OutdoorDirection({ origin: originProp, destination: destProp, onPressBack }) {
+export default function OutdoorDirection({ origin: originProp, destination: destProp, initialFrom, initialTo, buildings, onPressBack }) {
   // ---- Endpoint state ----
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
@@ -78,6 +114,22 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
     }
   }, [destProp]);
 
+  // Handle initialFrom prop
+  useEffect(() => {
+    if (initialFrom) {
+      setOriginQuery(initialFrom);
+      setOrigin({ label: initialFrom, lat: null, lng: null });
+    }
+  }, [initialFrom]);
+
+  // Handle initialTo prop
+  useEffect(() => {
+    if (initialTo) {
+      setDestQuery(initialTo);
+      setDestination({ label: initialTo, lat: null, lng: null });
+    }
+  }, [initialTo]);
+
   // ---- Route fetching (only when both endpoints are set) ----
   const fetchRoutes = useCallback(async () => {
     if (!origin?.lat || !destination?.lat) {
@@ -107,8 +159,8 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   }, [fetchRoutes]);
 
   // ---- Autocomplete filtering (only when the field is focused) ----
-  const originResults = activeField === "origin" ? filterLocations(originQuery) : [];
-  const destResults = activeField === "dest" ? filterLocations(destQuery) : [];
+  const originResults = activeField === "origin" ? filterLocations(originQuery, buildings) : [];
+  const destResults = activeField === "dest" ? filterLocations(destQuery, buildings) : [];
 
   // ---- Input handlers ----
   const onOriginTextChange = (text) => {
@@ -124,15 +176,17 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   };
 
   const pickOrigin = (loc) => {
-    setOrigin({ label: loc.label, lat: loc.lat, lng: loc.lng });
-    setOriginQuery(loc.label);
+    const cleanLabel = getBuildingDisplayName(loc.label);
+    setOrigin({ label: cleanLabel, lat: loc.lat, lng: loc.lng });
+    setOriginQuery(cleanLabel);
     setActiveField(null);
     Keyboard.dismiss();
   };
 
   const pickDestination = (loc) => {
-    setDestination({ label: loc.label, lat: loc.lat, lng: loc.lng });
-    setDestQuery(loc.label);
+    const cleanLabel = getBuildingDisplayName(loc.label);
+    setDestination({ label: cleanLabel, lat: loc.lat, lng: loc.lng });
+    setDestQuery(cleanLabel);
     setActiveField(null);
     Keyboard.dismiss();
   };
@@ -169,7 +223,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
           }
           const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
           setLiveLocCoordinates(coords);
-          const label = `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`;
+          const label = `${coords.latitude},${coords.longitude}`;
           setOriginQuery(label);
           setOrigin({ label, lat: coords.latitude, lng: coords.longitude });
         }
@@ -225,7 +279,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
                   onPress={() => pickOrigin(loc)}
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>{loc.label}</Text>
+                  <Text style={styles.dropdownText} numberOfLines={1}>{getBuildingDisplayName(loc.label)}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -256,7 +310,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
                   onPress={() => pickDestination(loc)}
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>{loc.label}</Text>
+                  <Text style={styles.dropdownText} numberOfLines={1}>{getBuildingDisplayName(loc.label)}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -330,6 +384,9 @@ OutdoorDirection.propTypes = {
   onPressBack: PropTypes.func.isRequired,
   origin: PropTypes.shape({ label: PropTypes.string, lat: PropTypes.number, lng: PropTypes.number }),
   destination: PropTypes.shape({ label: PropTypes.string, lat: PropTypes.number, lng: PropTypes.number }),
+  initialFrom: PropTypes.string,
+  initialTo: PropTypes.string,
+  buildings: PropTypes.array,
 };
 
 const styles = StyleSheet.create({

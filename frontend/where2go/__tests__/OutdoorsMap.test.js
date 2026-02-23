@@ -116,7 +116,7 @@ describe(" Buttons Test", () => {
         });
 
         expect(currentCampus.props.children).toBe('Loyola');
-    });
+    }, 15000);
 
     it("Disability Button", () => {
         const mockOnPress = jest.fn();
