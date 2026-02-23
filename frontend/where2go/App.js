@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable, Image } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon, Callout } from 'react-native-maps';
@@ -62,6 +62,21 @@ export default function App() {
     }else{
     setSelectedBuilding(building);
     setModalVisible(true);
+    }
+  };
+
+  //for points of interest (get images to display on map)
+  const POI_ICONS = {
+    restaurant: require("./assets/poi-icons/poi-marker-restaurant.png"),
+    cafe: require("./assets/poi-icons/poi-marker-cafe.png"),
+    bar: require("./assets/poi-icons/poi-marker-bar.png"),
+    pharmacy: require("./assets/poi-icons/poi-marker-pharmacy.png"),
+    gym: require("./assets/poi-icons/poi-marker-gym.png"),
+  };
+
+  const getPoiIcon = (types = []) => {
+    for (const t of types) {
+      if (POI_ICONS[t]) return POI_ICONS[t];
     }
   };
 
@@ -232,17 +247,21 @@ export default function App() {
           console.log(`Clicked on ${name} with ID: ${placeId}`);
         }}
         showsPointsOfInterest={false}
-
       >
 
         {/* Building markers with callouts */}
         <BuildingCallout buildings={buildings} onBuildingPress={handleBuildingPress} />
 
-        {/* Campus marker */}
-        <Marker
-          coordinate={campusCoords}
-          title={currentCampus}
-          accessibilityLabel="campusMarker" />
+        {/* this section renders the campus highlighted shapes */}
+        {buildings.map((building) => (
+          <Polygon
+            key={building.id}
+            coordinates={building.coordinates}
+            fillColor={colors.buildingHighlightFill}
+            strokeColor={colors.buildingHighlightStroke}
+            strokeWidth={2}
+          />
+        ))}
 
         {/* User marker */}
         {liveLocationEnabled && userLocation && (
@@ -256,7 +275,7 @@ export default function App() {
           />
         )}
 
-        {/* POI Markers (yellow pins) */}
+        {/* POI Markers (custom icons) */}
         {selectedPois?.map((poi) => (
           <Marker
             key={poi.place_id}
@@ -266,23 +285,19 @@ export default function App() {
             }}
             title={poi.name}
             description={poi.vicinity}
-            pinColor="orange"
             onPress={() => {
               setSelectedPoi(poi);
               setPoiModalVisible(true);
             }}
-          />
-        ))}
-
-        {/* this section renders the campus highlighted shapes */}
-        {buildings.map((building) => (
-          <Polygon
-            key={building.id}
-            coordinates={building.coordinates}
-            fillColor={colors.buildingHighlightFill}
-            strokeColor={colors.buildingHighlightStroke}
-            strokeWidth={2}
-          />
+            tracksViewChanges={false}>
+            <View style={styles.poiMarker}>
+              <Image
+                source={getPoiIcon(poi.types)}
+                style={styles.poiMarkerIcon}
+                resizeMode="contain"
+              />
+            </View>
+          </Marker>
         ))}
 
       </MapView>
@@ -301,7 +316,10 @@ export default function App() {
         }
         onPressPOI={() => {
           setIsPressedPOI(prev => {
-            if(prev) setPoiOriginBuilding(null);
+            if(prev) {
+              setPoiOriginBuilding(null);
+              setSelectedPois([]);
+            }
             return !prev;
           });
         }}
@@ -360,5 +378,20 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 10,
     alignSelf: 'center',
+  },
+  poiMarker: {
+    backgroundColor: "white",
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: "#912338",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  poiMarkerIcon: {
+    width: 24,
+    height: 24,
   },
 });
