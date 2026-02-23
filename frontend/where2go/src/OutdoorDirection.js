@@ -23,9 +23,10 @@ const MAX_RESULTS = 8;
 
 function getBuildingDisplayName(label) {
   if (!label) return label;
-  const match = label.match(/^(.+?)\s*\(/);
-  return match ? match[1] : label;
+  const parenIndex = label.indexOf("(");
+  return parenIndex > 0 ? label.slice(0, parenIndex).trimEnd() : label;
 }
+
 
 /** Case-insensitive location filter for the autocomplete dropdown */
 function filterLocations(query, buildings) {
