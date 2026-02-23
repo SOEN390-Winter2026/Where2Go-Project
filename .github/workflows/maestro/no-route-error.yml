@@ -5,17 +5,15 @@ appId: host.exp.exponent
 - tapOn: 
     id: "menu-button"
 - tapOn: Direction
-- waitFor:
-    text: "Plan Your Trip"
 - tapOn: 
     id: "inputStartLoc"
+- inputText: 
     text: "ha"
-- waitFor:
-    text: "Hall Building"
+    label: "Input start location no route error"
 - tapOn: "Hall Building"
 - tapOn:
     id: "inputDestLoc"
-    text: "ha"
-- waitFor:
-    text: "Hall Building"
-- tapOn: "Hall Building"
+- inputText: 
+    text: "gr"
+    label: "Input destination location no route error"
+- tapOn: "Grey Nuns Building"
