@@ -551,20 +551,6 @@ const styles = StyleSheet.create({
     color: "#7C2B38",
     fontWeight: "800",
   },
-  loadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  errorText: {
-    fontSize: 14,
-    color: "#c00",
-    padding: 16,
-  },
   routesContent: {},
   routeContainer: {
     backgroundColor: "white",
