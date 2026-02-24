@@ -1,10 +1,17 @@
 jest.mock('@env', () => ({ GOOGLE_MAPS_API_KEY: 'TEST_API_KEY' }), { virtual: true });
 
 jest.mock('@react-native-community/slider', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return ({ onValueChange, onSlidingComplete, ...props }) =>
-    React.createElement(View, { testID: 'slider', onValueChange, onSlidingComplete, ...props });
+    const React = require('react');
+    const { View } = require('react-native');
+    const PropTypes = require('prop-types');
+    const SliderMock = ({ onValueChange, onSlidingComplete, ...props }) => 
+        React.createElement(View, { testID: 'slider', onValueChange, onSlidingComplete, ...props });
+    
+    SliderMock.propTypes = {
+        onValueChange: PropTypes.func,
+        onSlidingComplete: PropTypes.func,
+    };
+  return SliderMock;
 });
 
 const makeFetchResponse = (results, status = 'OK') =>
@@ -90,5 +97,42 @@ describe('PoiSlider', () => {
         );
         await waitFor(() => expect(onPoisChange).toHaveBeenCalledWith([]));
         expect(queryByText('Could not load points of interest.')).toBeNull();
+    });
+
+    it("uses building coordinates as fetch origin", async () => {
+        const onPoisChange = jest.fn();
+        const building = {
+            name: "Hall Building",
+            coordinates: [
+            { latitude: 45.49, longitude: -73.57 },
+            { latitude: 45.5, longitude: -73.58 },
+            ],
+        };
+        render(
+            <PoiSlider onPoisChange={onPoisChange} userLocation={null} selectedBuilding={building} />
+        );
+        await waitFor(() => expect(onPoisChange).toHaveBeenCalled());
+
+        const calledUrl = globalThis.fetch.mock.calls[0][0];
+        //calculating the correct values that should be displayed: lat = (45.490 + 45.500)/ 2 = 45.495
+        //lng = (-73.570 + -73.580)/ 2 = -73.575
+        expect(calledUrl).toContain("location=45.49");
+        expect(calledUrl).toContain("-73.57");
+    });
+
+    it("uses lat/lng on building when coordinates are not there", async () => {
+        const onPoisChange = jest.fn();
+        const building = {
+            name: "EV Building",
+            latitude: 45.4955,
+            longitude: -73.578,
+        };
+        render(
+            <PoiSlider onPoisChange={onPoisChange} userLocation={null} selectedBuilding={building} />
+        );
+        await waitFor(() => expect(onPoisChange).toHaveBeenCalled());
+
+        const calledUrl = globalThis.fetch.mock.calls[0][0];
+        expect(calledUrl).toContain("location=45.4955,-73.578");
     });
 });

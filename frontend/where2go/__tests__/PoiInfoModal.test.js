@@ -54,4 +54,15 @@ describe('PoiInfoModal', () => {
         fireEvent.press(getByText('Set as destination'));
         expect(onSetAsDestination).toHaveBeenCalledTimes(1);
     });
+
+    it('renders an image when there is one available', () => {
+        const { getPlacePhotoUrl } = require('../src/utils/placePhotoUrl');
+        getPlacePhotoUrl.mockReturnValueOnce('https://example.com/photo.jpg');
+        const { UNSAFE_getByType } = render(
+            <PoiInfoModal poi={POI} visible={true} onClose={jest.fn()} />
+        );
+        const image = UNSAFE_getByType(require('react-native').Image);
+        expect(image.props.source).toEqual({ uri: 'https://example.com/photo.jpg' });
+    });
+
 });

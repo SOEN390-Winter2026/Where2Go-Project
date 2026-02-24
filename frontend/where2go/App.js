@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Pressable, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
-import MapView, { Marker, Polygon, Callout } from 'react-native-maps';
+import MapView, { Marker, Polygon } from 'react-native-maps';
 
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
