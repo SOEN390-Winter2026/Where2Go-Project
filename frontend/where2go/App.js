@@ -10,6 +10,7 @@ import LoginScreen from "./src/Login";
 import BuildingCallout from './src/BuildingCallout';
 import BuildingInfoModal from './src/BuildingInfoModal';
 import OutdoorDirection from "./src/OutdoorDirection";
+import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
@@ -23,6 +24,7 @@ export default function App() {
   console.log(API_BASE_URL);
   
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
@@ -179,6 +181,14 @@ export default function App() {
   
   }
 
+  if(showCalendar){
+    return <CalendarPage 
+    onPressBack={() => setShowCalendar((prev) => (prev !== true))} 
+    />;
+  
+  }
+
+
   return (
     <View style={styles.container}>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
@@ -248,7 +258,7 @@ export default function App() {
         }
       />
 
-      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)} onPressCalendar={() => setShowCalendar(true)}/>
       <BuildingInfoModal
         building={selectedBuilding}
         visible={modalVisible}
