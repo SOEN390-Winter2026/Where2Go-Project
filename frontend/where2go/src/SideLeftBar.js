@@ -107,7 +107,7 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 
 {/* -------- POI -------- */}
 <Pressable
-  testID="pOIPress"
+  testID="poiPress"
   style={[styles.barItem, iconState("poi")]}
   onPress={() =>
     {setActivePOI((prev) => (prev === "poi" ? null : "poi"));
@@ -139,7 +139,8 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 SideLeftBar.propTypes = {
   currentCampus: PropTypes.string.isRequired,
   onToggleCampus: PropTypes.func.isRequired,
-  onToggleLiveLocation: PropTypes.func.isRequired
+  onToggleLiveLocation: PropTypes.func.isRequired,
+  onPressPOI: PropTypes.func.isRequired
 };
 
 /* ---------- Styles ---------- */

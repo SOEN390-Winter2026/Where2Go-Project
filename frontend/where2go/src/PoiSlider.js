@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import { GOOGLE_MAPS_API_KEY } from "@env";
+import PropTypes from 'prop-types';
 
 const MIN_RADIUS = 100;
 const MAX_RADIUS = 1000;
@@ -17,6 +18,12 @@ const POI_TYPES = [
   "pharmacy", 
   "gym"
 ];
+
+function resolveOriginLabel(selectedBuilding, userLocation) {
+  if (selectedBuilding) return `From: ${selectedBuilding.name ?? "Selected building"}`;
+  if (userLocation) return "From: Your location";
+  return "No location — enable GPS or tap a building";
+}
 
 export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding }) {
 
@@ -103,11 +110,7 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
 
   const radiusM = Math.round(displayRadius);
 
-  const originLabel = selectedBuilding
-    ? `From: ${selectedBuilding.name ?? "Selected building"}`
-    : userLocation
-      ? "From: Your location"
-      : "No location — enable GPS or tap a building";
+  const originLabel = resolveOriginLabel(selectedBuilding, userLocation);
 
   return (
     <View style={styles.poiSliderView}>
@@ -143,6 +146,26 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
     </View>
   );
 }
+
+PoiSlider.propTypes = {
+  onPoisChange: PropTypes.func.isRequired,
+  userLocation: PropTypes.shape({
+    latitude: PropTypes.number.isRequired,
+    longitude: PropTypes.number.isRequired,
+  }),
+  selectedBuilding: PropTypes.shape({
+    name: PropTypes.string,
+    latitude: PropTypes.number,
+    longitude: PropTypes.number,
+    coordinates: PropTypes.arrayOf(
+      PropTypes.shape({
+        latitude: PropTypes.number.isRequired,
+        longitude: PropTypes.number.isRequired,
+      })
+    ),
+  }),
+};
+
 
 const styles = StyleSheet.create({
   poiSliderView: {
