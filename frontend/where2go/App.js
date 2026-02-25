@@ -1,14 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
+import PoiSlider from "./src/PoiSlider";
 import LoginScreen from "./src/Login";
 import BuildingCallout from './src/BuildingCallout';
 import BuildingInfoModal from './src/BuildingInfoModal';
+import PoiInfoModal from './src/PoiInfoModal';
 import OutdoorDirection from "./src/OutdoorDirection";
 import LoadingPage from './src/LoadingPage';
 import { colors } from './src/theme/colors';
@@ -21,7 +23,7 @@ const CAMPUS_COORDS = {
 
 export default function App() {
   console.log(API_BASE_URL);
-  
+
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -33,6 +35,13 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+
+  // POI state
+  const [isPressedPOI, setIsPressedPOI] = useState(false);
+  const [poiOriginBuilding, setPoiOriginBuilding] = useState(null);
+  const [selectedPoi, setSelectedPoi] = useState(null);
+  const [poiModalVisible, setPoiModalVisible] = useState(false);
+
   const [dataLoaded, setDataLoaded] = useState(false); // for loading check
   const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
   const watchRef = useRef(null);
@@ -48,8 +57,27 @@ export default function App() {
   };
 
   const handleBuildingPress = (building) => {
+    if(isPressedPOI){
+      setPoiOriginBuilding(building);
+    }else{
     setSelectedBuilding(building);
     setModalVisible(true);
+    }
+  };
+
+  //for points of interest (get images to display on map)
+  const POI_ICONS = {
+    restaurant: require("./assets/poi-icons/poi-marker-restaurant.png"),
+    cafe: require("./assets/poi-icons/poi-marker-cafe.png"),
+    bar: require("./assets/poi-icons/poi-marker-bar.png"),
+    pharmacy: require("./assets/poi-icons/poi-marker-pharmacy.png"),
+    gym: require("./assets/poi-icons/poi-marker-gym.png"),
+  };
+
+  const getPoiIcon = (types = []) => {
+    for (const t of types) {
+      if (POI_ICONS[t]) return POI_ICONS[t];
+    }
   };
 
   //Snapping back to user
@@ -146,15 +174,29 @@ export default function App() {
       // const timer = setTimeout(() => {
       //   setHasInitialized(true);
       // }, 3000); // 3 sec delay for testing
-    
+
       // return () => clearTimeout(timer);
       // >> comment end
     }
   }, [dataLoaded, hasInitialized]);
 
+  //handle POI Change
+  const [selectedPois, setSelectedPois] = useState([]);
+  const handlePoisChange = (poisFromSlider) => {
+    setSelectedPois(poisFromSlider);
+  };
+
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    if (markerRef.current) {
+      markerRef.current.showCallout();
+    }
+  }, []);
+
 
   //Login page first
-  if (showLogin){
+  if (showLogin) {
     return (
       <LoginScreen
         onSkip={() => {
@@ -200,28 +242,16 @@ export default function App() {
             snapBackToUser();
           }
         }}
+        onPoiClick={(event) => {
+          const { placeId, name } = event.nativeEvent;
+          console.log(`Clicked on ${name} with ID: ${placeId}`);
+        }}
+        showsPointsOfInterest={false}
       >
 
         {/* Building markers with callouts */}
         <BuildingCallout buildings={buildings} onBuildingPress={handleBuildingPress} />
 
-        {/* Campus marker */}
-        <Marker   
-        coordinate={campusCoords} 
-        title={currentCampus}
-        accessibilityLabel="campusMarker" />
-
-        {/* User marker */}
-        { liveLocationEnabled && userLocation && (
-          <Marker
-          
-            coordinate={userLocation}
-            title="You"
-            pinColor="blue"
-            accessible={true}
-            accessibilityLabel="userMarker"
-          />
-        )}
         {/* this section renders the campus highlighted shapes */}
         {buildings.map((building) => (
           <Polygon
@@ -232,6 +262,44 @@ export default function App() {
             strokeWidth={2}
           />
         ))}
+
+        {/* User marker */}
+        {liveLocationEnabled && userLocation && (
+          <Marker
+
+            coordinate={userLocation}
+            title="You"
+            pinColor="blue"
+            accessible={true}
+            accessibilityLabel="userMarker"
+          />
+        )}
+
+        {/* POI Markers (custom icons) */}
+        {selectedPois?.map((poi) => (
+          <Marker
+            key={poi.place_id}
+            coordinate={{
+              latitude: poi.geometry.location.lat,
+              longitude: poi.geometry.location.lng,
+            }}
+            title={poi.name}
+            description={poi.vicinity}
+            onPress={() => {
+              setSelectedPoi(poi);
+              setPoiModalVisible(true);
+            }}
+            tracksViewChanges={false}>
+            <View style={styles.poiMarker}>
+              <Image
+                source={getPoiIcon(poi.types)}
+                style={styles.poiMarkerIcon}
+                resizeMode="contain"
+              />
+            </View>
+          </Marker>
+        ))}
+
       </MapView>
       <SideLeftBar
         currentCampus={currentCampus}
@@ -246,9 +314,18 @@ export default function App() {
             return !prev;
           })
         }
+        onPressPOI={() => {
+          setIsPressedPOI(prev => {
+            if(prev) {
+              setPoiOriginBuilding(null);
+              setSelectedPois([]);
+            }
+            return !prev;
+          });
+        }}
       />
 
-      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)}/>
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)} />
       <BuildingInfoModal
         building={selectedBuilding}
         visible={modalVisible}
@@ -257,6 +334,18 @@ export default function App() {
         onSetDestination={(buildingCommute) => setDestinationBuilding(buildingCommute)}
         selectedRole={ getBuildingRole(selectedBuilding) }
       />
+      <PoiInfoModal
+        poi={selectedPoi}
+        visible={poiModalVisible}
+        onClose={() => setPoiModalVisible(false)}
+      />
+      {isPressedPOI && (
+        <PoiSlider
+          onPoisChange={handlePoisChange}
+          userLocation={userLocation}
+          selectedBuilding={poiOriginBuilding}
+        />
+      )}
       <StatusBar style="auto" />
     </View>
   );
@@ -289,5 +378,20 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 10,
     alignSelf: 'center',
+  },
+  poiMarker: {
+    backgroundColor: "white",
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: "#912338",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  poiMarkerIcon: {
+    width: 24,
+    height: 24,
   },
 });
