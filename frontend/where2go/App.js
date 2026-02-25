@@ -243,7 +243,7 @@ export default function App() {
           }
         }}
         onPoiClick={(event) => {
-          const { placeId, name, coordinate } = event.nativeEvent;
+          const { placeId, name } = event.nativeEvent;
           console.log(`Clicked on ${name} with ID: ${placeId}`);
         }}
         showsPointsOfInterest={false}

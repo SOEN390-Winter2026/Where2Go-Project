@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   View,
   Text,
+  Pressable,
   StyleSheet,
 } from "react-native";
 import Slider from "@react-native-community/slider";
@@ -22,12 +23,11 @@ const POI_TYPES = [
 function resolveOriginLabel(selectedBuilding, userLocation) {
   if (selectedBuilding) return `From: ${selectedBuilding.name ?? "Selected building"}`;
   if (userLocation) return "From: Your location";
-  return "No location — enable GPS or tap a building";
+  return "No location. Enable GPS or tap a building";
 }
 
 export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding }) {
 
-  const [sliderRadius, setSliderRadius] = useState(MIN_RADIUS);
   const [displayRadius, setDisplayRadius] = useState(MIN_RADIUS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -75,7 +75,7 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
         if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
           throw new Error(`Places API: ${data.status}`);
         }
-        for (const place of (data.results ?? []).slice(0, 5)) { //5 pois per type
+        for (const place of (data.results ?? []).slice(0, 5)) {
           if (!seenIds.has(place.place_id)) {
             seenIds.add(place.place_id);
             merged.push(place);
@@ -93,24 +93,21 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
     }
   };
 
-  useEffect(() => {
+  const handleLoad = async () => {
     const origin = resolveOrigin();
     if (!origin) {
       onPoisChange([]);
       return;
     }
-    const load = async () => {
-      const results = await fetchNearbyPOIs(origin.latitude, origin.longitude, sliderRadius);
-      if (results !== null) {
-        onPoisChange(results);
-      }
-    };
-    load();
-  }, [sliderRadius, userLocation, selectedBuilding]);
+    const results = await fetchNearbyPOIs(origin.latitude, origin.longitude, displayRadius);
+    if (results !== null) {
+      onPoisChange(results);
+    }
+  };
 
   const radiusM = Math.round(displayRadius);
-
   const originLabel = resolveOriginLabel(selectedBuilding, userLocation);
+  const hasOrigin = !!resolveOrigin();
 
   return (
     <View style={styles.poiSliderView}>
@@ -126,23 +123,33 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
         step={100}
         value={displayRadius}
         onValueChange={(value) => setDisplayRadius(value)}
-        onSlidingComplete={(value) => setSliderRadius(value)}
         minimumTrackTintColor="#ccc"
         maximumTrackTintColor="#000000"
         thumbTintColor="#912338"
       />
 
-      <View style={[
+      <View style={styles.bottomRow}>
+        <View style={[
           styles.originPill,
           selectedBuilding ? styles.originPillBuilding : styles.originPillLocation
         ]}>
-        <Text style={[
-            styles.originText,
-            selectedBuilding && styles.originTextBuilding
-          ]}>
-          {loading ? "Loading…" : error || originLabel}
-        </Text>
+          <Text style={styles.originText}>
+            {error || originLabel}
+          </Text>
+        </View>
+
+        <Pressable
+          testID="loadButton"
+          style={[styles.loadButton, !hasOrigin && styles.loadButtonDisabled]}
+          onPress={handleLoad}
+          disabled={!hasOrigin || loading}
+        >
+          <Text style={styles.loadButtonText}>
+            {loading ? "..." : "Load"}
+          </Text>
+        </Pressable>
       </View>
+
     </View>
   );
 }
@@ -166,6 +173,7 @@ PoiSlider.propTypes = {
   }),
 };
 
+const CONTAINER_WIDTH = 340;
 
 const styles = StyleSheet.create({
   poiSliderView: {
@@ -178,6 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     margin: 20,
+    width: CONTAINER_WIDTH, 
     alignItems: "center",
     alignSelf: "center",
   },
@@ -185,32 +194,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 4,
   },
+  bottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 4,
+    width: "100%",
+  },
   originPill: {
+    flex: 1,
     borderWidth: 1,
     borderColor: "#912338",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginTop: 4,
     borderRadius: 20,
   },
   originPillLocation: {
     backgroundColor: "white",
   },
   originPillBuilding: {
-    backgroundColor: "#912338",
+    backgroundColor: "white",
   },
   originText: {
-    color: "#912338",
+    color: '#912338',
+    textAlign: 'center',
     fontWeight: "600",
     fontSize: 13,
+    flexWrap: "wrap",
   },
-  originTextBuilding: {
+  loadButton: {
+    backgroundColor: "#912338",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    flexShrink: 0,
+  },
+  loadButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  loadButtonText: {
     color: "white",
-  },
-  hint: {
-    fontSize: 11,
-    color: "#aaa",
-    marginTop: 6,
-    fontStyle: "italic",
-  },
+    fontWeight: "600",
+    fontSize: 13,
+  }
 });
