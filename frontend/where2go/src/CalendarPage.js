@@ -71,9 +71,9 @@ export default function CalendarPage({ onPressBack }) {
                 <Ionicons name="arrow-up" size={26} color="white" />
             </Pressable>
 
-            <Text style={styles.txtNoCal}> No Calendar Yet </Text>
+            { !isCalendarConnected && <Text style={styles.txtNoCal}> No Calendar Yet </Text>}
 
-            <Modal transparent visible={visible} animationType="none">
+             <Modal transparent visible={visible} animationType="none">
                 <View style={styles.overlay}>
                     <Animated.View
                         style={[
@@ -83,6 +83,10 @@ export default function CalendarPage({ onPressBack }) {
                         {...panResponder.panHandlers}
                     >
                         <View style={styles.handle} />
+
+                    <Pressable style={styles.googleCalBtn}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
+                    <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
+
                     </Animated.View>
                 </View>
             </Modal>
@@ -104,11 +108,13 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 15,
         right: 15,
+        justifyContent: "center",
     },
     overlay: {
         flex: 1,
         justifyContent: "flex-end",
         backgroundColor: "rgba(0,0,0,0.4)",
+        
     },
     sheet: {
         height: SHEET_HEIGHT,
@@ -116,6 +122,9 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
+        justifyContent: "center",
+        flexDirection: "collumn",
+        gap: 20,
     },
     handle: {
         width: 50,
@@ -123,6 +132,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#ccc",
         borderRadius: 10,
         alignSelf: "center",
+        position: "absolute",
+        top: 10,
         marginBottom: 15,
     },
     backBtn: {
@@ -141,5 +152,23 @@ const styles = StyleSheet.create({
         position: "absolute",
         justifyContent: "center",
         alignItems: "center",
+    },
+
+    manualBtn: {
+        backgroundColor: "#912338",
+        padding: 12,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    googleCalBtn:{
+        backgroundColor: "#912338",
+        padding: 12,
+        borderRadius: 50,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    btnTxt:{
+        color: "white",
     }
 });
