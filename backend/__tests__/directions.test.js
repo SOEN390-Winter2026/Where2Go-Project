@@ -1,6 +1,7 @@
 const {
-    getTransportOptions,
-    normalizeRoute,
+  getTransportOptions,
+  getTransportOptionsResult,
+  normalizeRoute,
 } = require("../src/services/directions");
 
 jest.mock("../src/services/map", () => ({
@@ -15,7 +16,7 @@ jest.mock("https", () => ({
   get: jest.fn(),
 }));
 
-const https = require("node:https");
+const https = require("https");
 
 function mockHttpsGet(jsonData) {
   https.get.mockImplementation((url, callback) => {
@@ -133,20 +134,22 @@ describe("receiving transportation options", () => {
         expect(shuttleRoute).toBeUndefined();
     });
 
-    it("returns empty array when API returns no routes", async () => {
-        https.get.mockImplementation((url, callback) => {
-            const res = {
-                on: jest.fn((event, handler) => {
-                    if (event === "data") handler(JSON.stringify({ status: "ZERO_RESULTS", routes: [] }));
-                    if (event === "end") handler();
-                    return res;
-                }),
-            };
-            callback(res);
-            return { on: jest.fn() };
-        });
-        const routes = await getTransportOptions(sgwOrigin, offCampusDestination);
-        expect(routes).toEqual([]);
+    it("returns NO_ROUTES meta when API returns ZERO_RESULTS", async () => {
+    https.get.mockImplementation((url, callback) => {
+        const res = {
+        on: jest.fn((event, handler) => {
+            if (event === "data") handler(JSON.stringify({ status: "ZERO_RESULTS", routes: [] }));
+            if (event === "end") handler();
+            return res;
+        }),
+        };
+        callback(res);
+        return { on: jest.fn() };
+    });
+
+    const { routes, meta } = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+    expect(routes).toEqual([]);
+    expect(meta.reason).toBe("NO_ROUTES");
     });
 
     it("uses clientTime for shuttle schedule calculation", async () => {
@@ -204,19 +207,36 @@ describe("receiving transportation options", () => {
         expect(routes.find((r) => r.mode === "concordia_shuttle")).toBeUndefined();
     });
 
-    it("handles https network error", async () => {
-        https.get.mockImplementation(() => {
-            const emitter = {
-                on: jest.fn((event, handler) => {
-                    if (event === "error") handler(new Error("Network failure"));
-                    return emitter;
-                }),
-            };
+    it("handles https network error (returns empty routes)", async () => {
+    https.get.mockImplementation(() => {
+        const emitter = {
+        on: jest.fn((event, handler) => {
+            if (event === "error") handler(new Error("Network failure"));
             return emitter;
-        });
-        await expect(
-            getTransportOptions(sgwOrigin, offCampusDestination)
-        ).rejects.toThrow("Network failure");
+        }),
+        };
+        return emitter;
+    });
+
+    const routes = await getTransportOptions(sgwOrigin, offCampusDestination);
+    expect(routes).toEqual([]);
+    });
+
+    it("getTransportOptionsResult sets meta.reason=REQUEST_FAILED on network error", async () => {
+    https.get.mockImplementation(() => {
+        const emitter = {
+        on: jest.fn((event, handler) => {
+            if (event === "error") handler(new Error("Network failure"));
+            return emitter;
+        }),
+        };
+        return emitter;
+    });
+
+    const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+    expect(result.routes).toEqual([]);
+    expect(result.meta).toBeDefined();
+    expect(result.meta.reason).toBe("REQUEST_FAILED");
     });
 
     it("handle malformed JSON from API", async () => {
