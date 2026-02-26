@@ -133,8 +133,9 @@ function buildDirectionsUrl(origin, destination, mode) {
 }
 
 function fetchDirections(origin, destination, mode) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const url = buildDirectionsUrl(origin, destination, mode);
+
     https
       .get(url, (res) => {
         let data = "";
@@ -142,17 +143,27 @@ function fetchDirections(origin, destination, mode) {
         res.on("end", () => {
           try {
             const json = JSON.parse(data);
-            if (json.status === "OK" && json.routes?.length > 0) {
-              resolve(json);
-            } else {
-              resolve(null);
-            }
+            resolve({
+              ok: json.status === "OK",
+              status: json.status || "UNKNOWN",
+              routes: Array.isArray(json.routes) ? json.routes : [],
+            });
           } catch {
-            resolve(null);
+            resolve({
+              ok: false,
+              status: "INVALID_JSON",
+              routes: [],
+            });
           }
         });
       })
-      .on("error", reject);
+      .on("error", () => {
+        resolve({
+          ok: false,
+          status: "REQUEST_FAILED",
+          routes: [],
+        });
+      });
   });
 }
 
@@ -241,7 +252,7 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
  * @param {{ clientTime?: string }} [opts] - Optional. clientTime: ISO string from user's device (new Date().toISOString())
  * @returns {Promise<Array<{ mode: string, duration: { value: number, text: string }, distance: { value: number, text: string }, polyline?: string }>>}
  */
-async function getTransportOptions(origin, destination, opts = {}) {
+async function getTransportOptionsResult(origin, destination, opts = {}) {
   let refDate = new Date();
   if (opts.clientTime) {
     const parsed = new Date(opts.clientTime);
@@ -256,6 +267,12 @@ async function getTransportOptions(origin, destination, opts = {}) {
 
   const routes = [];
 
+  
+  const statuses = {
+    walking: walkingRes?.status,
+    transit: transitRes?.status,
+  };
+
   if (walkingRes?.routes?.[0]) {
     const normalized = normalizeRoute(walkingRes.routes[0], "walking");
     if (normalized) routes.push(normalized);
@@ -268,10 +285,39 @@ async function getTransportOptions(origin, destination, opts = {}) {
 
   if (shuttleRoute) routes.push(shuttleRoute);
 
+  
+  let meta = {};
+  if (routes.length === 0) {
+    const hadRequestFailure =
+      walkingRes?.status === "REQUEST_FAILED" ||
+      transitRes?.status === "REQUEST_FAILED";
+
+    const hadInvalid =
+      walkingRes?.status === "INVALID_JSON" ||
+      transitRes?.status === "INVALID_JSON";
+
+    
+    const allZeroResults =
+      (walkingRes?.status === "ZERO_RESULTS" || walkingRes?.routes?.length === 0) &&
+      (transitRes?.status === "ZERO_RESULTS" || transitRes?.routes?.length === 0) &&
+      !shuttleRoute;
+
+    if (hadRequestFailure) meta = { reason: "REQUEST_FAILED", statuses };
+    else if (hadInvalid) meta = { reason: "INVALID_RESPONSE", statuses };
+    else if (allZeroResults) meta = { reason: "NO_ROUTES", statuses };
+    else meta = { reason: "NO_ROUTES", statuses }; // safe default
+  }
+
+  return { routes, meta };
+}
+
+async function getTransportOptions(origin, destination, opts = {}) {
+  const { routes } = await getTransportOptionsResult(origin, destination, opts);
   return routes;
 }
 
 module.exports = {
   getTransportOptions,
+  getTransportOptionsResult,
   normalizeRoute,
 };
