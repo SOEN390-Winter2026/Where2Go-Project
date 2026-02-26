@@ -1,7 +1,6 @@
 import OutdoorDirection from '../src/OutdoorDirection.js';
-import { render, waitFor, fireEvent, act, renderHook } from "@testing-library/react-native";
+import { render, waitFor, fireEvent, act } from "@testing-library/react-native";
 import * as Location from 'expo-location';
-import React from 'react';
 
 // Mock the Location module
 jest.mock('expo-location');
@@ -578,118 +577,105 @@ describe("Location Error Handling", () => {
 });
 
 describe("Retry button", () => {
-  let fetchRoutesMock;
+  const origin = { label: 'A', lat: 1, lng: 1 };
+  const destination = { label: 'B', lat: 2, lng: 2 };
 
   beforeEach(() => {
-    fetchRoutesMock = jest.fn();
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ routes: [{ mode: "walking", duration: { text: "5 mins" } }] }),
-    });
-  });
-
-  afterEach(() => {
     jest.resetAllMocks();
   });
 
-  it("doesnt call fetchRoutes if loading true", () => {
-    const loading = true;
-    const hasValidEndpoints = true;
+  it("Retry calls fetchRoutes after fetch error", async () => {
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: "Network failure" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          routes: [{ mode: 'walking', duration: { text: '5 mins' } }],
+        }),
+      });
 
-    const handleRetry = () => {
-      if (loading) return;
-      if (!hasValidEndpoints) return;
-      fetchRoutesMock();
-    };
+    global.fetch = fetchMock;
 
-    handleRetry();
-    expect(fetchRoutesMock).not.toHaveBeenCalled();
-  });
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
 
-  it("doesnt call fetchRoutes if endpoints invalid", () => {
-    const loading = false;
-    const hasValidEndpoints = false;
+    const retryButton = await waitFor(() => getByText("Try Again"));
 
-    const handleRetry = () => {
-      if (loading) return;
-      if (!hasValidEndpoints) return;
-      fetchRoutesMock();
-    };
-
-    handleRetry();
-    expect(fetchRoutesMock).not.toHaveBeenCalled();
-  });
-
-  it("calls fetchRoutes if loading false & endpoints valid", () => {
-    const loading = false;
-    const hasValidEndpoints = true;
-
-    const handleRetry = () => {
-      if (loading) return;
-      if (!hasValidEndpoints) return;
-      fetchRoutesMock();
-    };
-
-    handleRetry();
-    expect(fetchRoutesMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("fetchRoutes calls API and returns routes", async () => {
-    const origin = { lat: 1, lng: 2 };
-    const destination = { lat: 3, lng: 4 };
-    let routes = [];
-    let error = null;
-
-    const fetchRoutes = async () => {
-      try {
-        const res = await fetch(
-          `/directions?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}`
-        );
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to fetch");
-        routes = data.routes || [];
-      } catch (e) {
-        error = e.message;
-      }
-    };
-
-    await fetchRoutes();
-
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-
-    expect(routes).toEqual([{ mode: "walking", duration: { text: "5 mins" } }]);
-
-    expect(error).toBeNull();
-  });
-
-  it("fetchRoutes sets error if API fails", async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ error: "API failure" }),
+    await act(async () => {
+      fireEvent.press(retryButton);
     });
 
-    const origin = { lat: 1, lng: 2 };
-    const destination = { lat: 3, lng: 4 };
-    let routes = [];
-    let error = null;
+    expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const fetchRoutes = async () => {
-      try {
-        const res = await fetch(
-          `/directions?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}`
-        );
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to fetch");
-        routes = data.routes || [];
-      } catch (e) {
-        error = e.message;
-      }
-    };
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
 
-    await fetchRoutes();
-
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(routes).toEqual([]);
-    expect(error).toBe("API failure");
+    delete global.fetch;
   });
+
+  it("Retry calls fetchRoutes after empty routes", async () => {
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ routes: [] }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          routes: [{ mode: 'transit', duration: { text: '10 mins' } }],
+        }),
+      });
+
+    global.fetch = fetchMock;
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    const retryButton = await waitFor(() => getByText("Try Again"));
+
+    await act(async () => {
+      fireEvent.press(retryButton);
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    await waitFor(() => expect(getByText("Transit")).toBeTruthy());
+
+    delete global.fetch;
+  });
+
+  it("Retry DNE if endpoints are invalid", async () => {
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock;
+
+    const { queryByText } = render(
+        <OutdoorDirection
+        onPressBack={() => {}}
+        origin={null}
+        destination={null}
+        buildings={[]}
+        />
+    );
+
+    const retryButton = queryByText("Try Again");
+    expect(retryButton).toBeNull();
+
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    delete global.fetch;
+    });
 });
