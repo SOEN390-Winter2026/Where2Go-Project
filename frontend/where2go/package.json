@@ -18,6 +18,8 @@
     "@vis.gl/react-google-maps": "latest",
     "expo": "~54.0.33",
     "expo-auth-session": "~7.0.10",
+    "expo-calendar": "~15.0.8",
+    "expo-checkbox": "~5.0.8",
     "expo-location": "~19.0.8",
     "expo-status-bar": "~3.0.9",
     "expo-web-browser": "~15.0.10",
@@ -26,6 +28,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-calendars": "^1.1314.0",
     "react-native-dotenv": "^3.4.11",
     "react-native-maps": "1.20.1",
     "react-native-web": "^0.21.0"

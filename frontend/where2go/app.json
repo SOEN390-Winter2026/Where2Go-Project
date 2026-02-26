@@ -20,7 +20,10 @@
     
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.where2go.app"
+      "bundleIdentifier": "com.where2go.app",
+      "infoPlist": {
+        "NSCalendarsUsageDescription": "Where2Go needs access to your calendar to show your availability and sync events."
+      }
     },
     "android": {
       "package": "com.where2go.name",
@@ -28,7 +31,11 @@
         "foregroundImage": "./assets/appListIconW2G.png",
         "backgroundColor": "#912338"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
