@@ -85,7 +85,7 @@ describe(" Buttons Test", () => {
 
                 {/* -------- POI -------- */}
                 <Pressable
-                    testID="pOIPress"
+                    testID="poiPress"
 
 
                 >
@@ -126,6 +126,40 @@ describe(" Buttons Test", () => {
 
         fireEvent.press(pressDisButton);
     });
+
+    //added for testing pois btn --
+    it("POI button calls onPressPOI callback", () => {
+        const mockOnPressPOI = jest.fn();
+        const { getByTestId } = render(
+            <SideLeftBar
+            currentCampus="SGW"
+            onToggleCampus={jest.fn()}
+            onToggleLiveLocation={jest.fn()}
+            onPressPOI={mockOnPressPOI}
+            />
+        );
+        fireEvent.press(getByTestId("poiPress"));
+        expect(mockOnPressPOI).toHaveBeenCalledTimes(1);
+    });
+
+    it("POI button toggles off on second press", () => {
+        const mockOnPressPOI = jest.fn();
+        const { getByTestId } = render(
+            <SideLeftBar
+            currentCampus="SGW"
+            onToggleCampus={jest.fn()}
+            onToggleLiveLocation={jest.fn()}
+            onPressPOI={mockOnPressPOI}
+            />
+        );
+        const btn = getByTestId("poiPress");
+        fireEvent.press(btn);
+        fireEvent.press(btn);
+        expect(mockOnPressPOI).toHaveBeenCalledTimes(2);
+        expect(btn.props.style).toEqual(
+            expect.arrayContaining([expect.objectContaining({ backgroundColor: "#ccc" })])
+        );
+    });
 })
 
 describe("Backend Functions", () => {
@@ -151,8 +185,6 @@ describe("Backend Functions", () => {
             }
         )
     });
-
-
 })
 
 describe("API Testing", () => {
