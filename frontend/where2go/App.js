@@ -1,19 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
-import MapView, { Marker, Polygon } from 'react-native-maps';
 
+import Map from './src/Map';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import PoiSlider from "./src/PoiSlider";
 import LoginScreen from "./src/Login";
-import BuildingCallout from './src/BuildingCallout';
 import BuildingInfoModal from './src/BuildingInfoModal';
 import PoiInfoModal from './src/PoiInfoModal';
 import OutdoorDirection from "./src/OutdoorDirection";
 import LoadingPage from './src/LoadingPage';
-import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 
 const CAMPUS_COORDS = {
@@ -64,42 +62,6 @@ export default function App() {
     setModalVisible(true);
     }
   };
-
-  //for points of interest (get images to display on map)
-  const POI_ICONS = {
-    restaurant: require("./assets/poi-icons/poi-marker-restaurant.png"),
-    cafe: require("./assets/poi-icons/poi-marker-cafe.png"),
-    bar: require("./assets/poi-icons/poi-marker-bar.png"),
-    pharmacy: require("./assets/poi-icons/poi-marker-pharmacy.png"),
-    gym: require("./assets/poi-icons/poi-marker-gym.png"),
-  };
-
-  const getPoiIcon = (types = []) => {
-    for (const t of types) {
-      if (POI_ICONS[t]) return POI_ICONS[t];
-    }
-  };
-
-  //Snapping back to user
-  const snapBackToUser = () => {
-    if (!mapRef.current || !userLocation) return;
-    mapRef.current.animateToRegion(
-      {
-        ...userLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      },
-      400
-    );
-    setUserDraggedMap(false);
-  };
-
-  // live location button turned on
-  useEffect(() => {
-    if (liveLocationEnabled && userLocation) {
-      snapBackToUser();
-    }
-  }, [liveLocationEnabled, userLocation]);
 
   // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
   // Also set that map loaded
@@ -186,15 +148,6 @@ export default function App() {
     setSelectedPois(poisFromSlider);
   };
 
-  const markerRef = useRef(null);
-
-  useEffect(() => {
-    if (markerRef.current) {
-      markerRef.current.showCallout();
-    }
-  }, []);
-
-
   //Login page first
   if (showLogin) {
     return (
@@ -223,84 +176,21 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.mapPlaceholder} pointerEvents="none" />
-
-      <MapView
-        testID="mapRef"
-        accessible={true}
+      <Map
         ref={mapRef}
-        initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
-        style={styles.map}
-        // When user drags map, snap back to them after they are done
-        onRegionChange={() => {
-          if (liveLocationEnabled) {
-            setUserDraggedMap(true);
-          }
+        campusCoords={campusCoords}
+        buildings={buildings}
+        onBuildingPress={handleBuildingPress}
+        liveLocationEnabled={liveLocationEnabled}
+        userLocation={userLocation}
+        userDraggedMap={userDraggedMap}
+        setUserDraggedMap={setUserDraggedMap}
+        selectedPois={selectedPois}
+        onPoiPress={(poi) => {
+          setSelectedPoi(poi);
+          setPoiModalVisible(true);
         }}
-        onRegionChangeComplete={() => {
-          if (liveLocationEnabled && userLocation && userDraggedMap) {
-            snapBackToUser();
-          }
-        }}
-        onPoiClick={(event) => {
-          const { placeId, name } = event.nativeEvent;
-          console.log(`Clicked on ${name} with ID: ${placeId}`);
-        }}
-        showsPointsOfInterest={false}
-      >
-
-        {/* Building markers with callouts */}
-        <BuildingCallout buildings={buildings} onBuildingPress={handleBuildingPress} />
-
-        {/* this section renders the campus highlighted shapes */}
-        {buildings.map((building) => (
-          <Polygon
-            key={building.id}
-            coordinates={building.coordinates}
-            fillColor={colors.buildingHighlightFill}
-            strokeColor={colors.buildingHighlightStroke}
-            strokeWidth={2}
-          />
-        ))}
-
-        {/* User marker */}
-        {liveLocationEnabled && userLocation && (
-          <Marker
-
-            coordinate={userLocation}
-            title="You"
-            pinColor="blue"
-            accessible={true}
-            accessibilityLabel="userMarker"
-          />
-        )}
-
-        {/* POI Markers (custom icons) */}
-        {selectedPois?.map((poi) => (
-          <Marker
-            key={poi.place_id}
-            coordinate={{
-              latitude: poi.geometry.location.lat,
-              longitude: poi.geometry.location.lng,
-            }}
-            title={poi.name}
-            description={poi.vicinity}
-            onPress={() => {
-              setSelectedPoi(poi);
-              setPoiModalVisible(true);
-            }}
-            tracksViewChanges={false}>
-            <View style={styles.poiMarker}>
-              <Image
-                source={getPoiIcon(poi.types)}
-                style={styles.poiMarkerIcon}
-                resizeMode="contain"
-              />
-            </View>
-          </Marker>
-        ))}
-
-      </MapView>
+      />
       <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
@@ -355,16 +245,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  mapPlaceholder: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#e5e5e5',
-    zIndex: 0,
-  },
-  map: {
-    width: '100%',
-    height: '100%',
-    zIndex: 1,
-  },
   buttons: {
     position: 'absolute',
     bottom: 40,
@@ -378,20 +258,5 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 10,
     alignSelf: 'center',
-  },
-  poiMarker: {
-    backgroundColor: "white",
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: "#912338",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  poiMarkerIcon: {
-    width: 24,
-    height: 24,
   },
 });
