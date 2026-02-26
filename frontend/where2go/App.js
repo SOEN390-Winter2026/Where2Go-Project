@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 
-import Map from './src/Map';
+import CampusMap from './src/Map';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import PoiSlider from "./src/PoiSlider";
@@ -178,7 +178,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Map
+      <CampusMap
         ref={mapRef}
         campusCoords={campusCoords}
         buildings={buildings}

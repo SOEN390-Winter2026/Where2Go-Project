@@ -19,7 +19,7 @@ const getPoiIcon = (types = []) => {
   }
 };
 
-const Map = forwardRef((props, ref) => {
+const CampusMap = forwardRef((props, ref) => {
   const {
     campusCoords,
     buildings,
@@ -156,4 +156,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Map;
+export default CampusMap;
