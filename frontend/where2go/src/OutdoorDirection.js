@@ -197,7 +197,8 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
 
-  const hasValidEndpoints = origin?.lat && destination?.lat;
+  const hasValidEndpoints =
+  origin?.lat != null && destination?.lat != null;
   const showEmptyState =
     hasValidEndpoints &&
     !loading &&
@@ -248,6 +249,25 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
       setShowErrorModal(true);
     }
   };
+
+  // retry button for  no route & error
+  const handleRetry = useCallback(() => {
+    if (loading) return; // dont spam function call
+    if (!hasValidEndpoints) return; // dont call if invalid
+    fetchRoutes();
+  }, [loading, hasValidEndpoints, fetchRoutes]);
+
+  const RetryButton = ({ onPress }) => (
+    <Pressable
+      style={[styles.retryButton, loading && { opacity: 0.6 }]} // faded opacity so button looks unclickable after first click
+      onPress={onPress}
+      disabled={loading}
+    >
+      <Text style={styles.retryButtonText}>
+        Try Again
+      </Text>
+    </Pressable>
+  );
 
   // ---- Render ----
   return (
@@ -358,9 +378,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
           {error && (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
-              <Pressable style={styles.retryButton} onPress={fetchRoutes}>
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </Pressable>
+              <RetryButton onPress={handleRetry} />
             </View>
           )}
           {showEmptyState && (
@@ -377,9 +395,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
               <Text style={styles.emptyStateText}>
                 Try selecting different locations or check your connection.
               </Text>
-              <Pressable style={styles.retryButton} onPress={fetchRoutes}>
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </Pressable>
+              <RetryButton onPress={handleRetry} />
             </View>
           )}
           {!loading && routes.map((r, i) => {
