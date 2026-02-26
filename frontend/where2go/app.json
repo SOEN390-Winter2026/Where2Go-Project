@@ -2,6 +2,7 @@
   "expo": {
     "name": "Where2Go",
     "slug": "Where2Go",
+    "scheme": "Where2Go",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/appListIconW2G.png",
@@ -12,11 +13,17 @@
       "resizeMode": "contain",
       "backgroundColor": "#912338"
     },
+
+     "plugins": [
+      "expo-web-browser"
+    ],
+    
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.where2go.app"
     },
     "android": {
+      "package": "com.where2go.name",
       "adaptiveIcon": {
         "foregroundImage": "./assets/appListIconW2G.png",
         "backgroundColor": "#912338"

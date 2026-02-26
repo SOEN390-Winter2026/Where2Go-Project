@@ -1,4 +1,4 @@
-import React, { use, useRef, useState } from "react";
+import React, {useRef, useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -10,12 +10,20 @@ import {
     Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { WEB_CLIENT_ID, ANDROID_CLIENT_ID, IOS_CLIENT_ID, API_URL } from '@env';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+WebBrowser.maybeCompleteAuthSession();
 
 const { height } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
 const PEEK_HEIGHT = 80;
 
 export default function CalendarPage({ onPressBack }) {
+    console.log(WEB_CLIENT_ID);
+    console.log(ANDROID_CLIENT_ID);
+    console.log(IOS_CLIENT_ID);
 
     const [visible, setVisible] = useState(false);
     const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -62,6 +70,24 @@ export default function CalendarPage({ onPressBack }) {
         })
     ).current;
 
+    //Sign In Google Calendar
+
+    const [accessToken, setAccessToken] = useState("");
+
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        clientId: WEB_CLIENT_ID,
+        androidClientId: ANDROID_CLIENT_ID,
+        iosClientId: IOS_CLIENT_ID,
+        scopes: ['https://www.googleapis.com/auth/calendar'],
+    });
+
+    useEffect(() => {
+        if (response?.type === 'success') {
+            const { authentication } = response;
+            setAccessToken(authentication.accessToken);
+        }
+    }, [response]);
+
     return (
         <View style={styles.container}>
             <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
@@ -71,9 +97,9 @@ export default function CalendarPage({ onPressBack }) {
                 <Ionicons name="arrow-up" size={26} color="white" />
             </Pressable>
 
-            { !isCalendarConnected && <Text style={styles.txtNoCal}> No Calendar Yet </Text>}
+            {!isCalendarConnected && <Text style={styles.txtNoCal}> No Calendar Yet </Text>}
 
-             <Modal transparent visible={visible} animationType="none">
+            <Modal transparent visible={visible} animationType="none">
                 <View style={styles.overlay}>
                     <Animated.View
                         style={[
@@ -84,8 +110,8 @@ export default function CalendarPage({ onPressBack }) {
                     >
                         <View style={styles.handle} />
 
-                    <Pressable style={styles.googleCalBtn}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
-                    <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
+                        <Pressable style={styles.googleCalBtn} onPress={() => promptAsync()}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
+                        <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
 
                     </Animated.View>
                 </View>
@@ -114,7 +140,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "flex-end",
         backgroundColor: "rgba(0,0,0,0.4)",
-        
+
     },
     sheet: {
         height: SHEET_HEIGHT,
@@ -161,14 +187,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    googleCalBtn:{
+    googleCalBtn: {
         backgroundColor: "#912338",
         padding: 12,
         borderRadius: 50,
         justifyContent: "center",
         alignItems: "center",
     },
-    btnTxt:{
+    btnTxt: {
         color: "white",
     }
 });
