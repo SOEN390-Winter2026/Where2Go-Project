@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import PropTypes from 'prop-types';
 
-export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation }) {
+export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation, onPressPOI }) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -107,10 +107,12 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 
 {/* -------- POI -------- */}
 <Pressable
-  testID="pOIPress"
+  testID="poiPress"
   style={[styles.barItem, iconState("poi")]}
   onPress={() =>
-    setActivePOI((prev) => (prev === "poi" ? null : "poi"))
+    {setActivePOI((prev) => (prev === "poi" ? null : "poi"));
+      onPressPOI();
+    }
   }
 >
   <Image source={iconSource("poi")} style={styles.icon} />
@@ -137,7 +139,8 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 SideLeftBar.propTypes = {
   currentCampus: PropTypes.string.isRequired,
   onToggleCampus: PropTypes.func.isRequired,
-  onToggleLiveLocation: PropTypes.func.isRequired
+  onToggleLiveLocation: PropTypes.func.isRequired,
+  onPressPOI: PropTypes.func.isRequired
 };
 
 /* ---------- Styles ---------- */
