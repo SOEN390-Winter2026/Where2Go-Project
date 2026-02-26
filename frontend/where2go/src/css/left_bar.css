@@ -1,3 +1,18 @@
+/**
+ * ⚠️  NOT USED in this branch.
+ *
+ * This is a plain CSS file, but the project uses React Native which requires
+ * StyleSheet.create() instead of CSS. The actual SideLeftBar component
+ * (src/SideLeftBar.js) already uses inline React Native styles.
+ *
+ * This file is not imported anywhere in the codebase.
+ *
+ * Keeping it here so the original author (Steven01231) and the team can decide
+ * whether to remove it.
+ *
+ * Original commit: 8cec8fcf — "Added left side bar" (Jan 30, 2026)
+ */
+
 @media (min-width: 600px) {
   .header {grid-area: 1 / span 6;}
   .menu {grid-area: 2 / span 1;}

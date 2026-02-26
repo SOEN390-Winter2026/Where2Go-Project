@@ -15,6 +15,7 @@
     "@expo/vector-icons": "^15.0.3",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@googlemaps/markerclusterer": "^2.5.1",
+    "@react-native-community/slider": "^5.1.2",
     "@vis.gl/react-google-maps": "latest",
     "expo": "~54.0.33",
     "expo-location": "~19.0.8",
@@ -30,6 +31,7 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "silent": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.test.{js,jsx,ts,tsx}",

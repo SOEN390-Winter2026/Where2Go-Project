@@ -163,6 +163,71 @@ describe("Initial from/to and suggestion selection", () => {
     });
 });
 
+describe("Route fetching and mode display", () => {
+    beforeEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it("fetches routes when origin and destination have coords and displays mode labels", async () => {
+        const mockRoutes = [
+            { mode: 'walking', duration: { text: '5 mins' }, distance: { text: '100 m' } },
+        ];
+
+        // mock fetch to return the routes payload
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ routes: mockRoutes }),
+        });
+
+        const { getByText } = render(
+            <OutdoorDirection
+                onPressBack={() => { }}
+                origin={{ label: 'A', lat: 1, lng: 1 }}
+                destination={{ label: 'B', lat: 2, lng: 2 }}
+                buildings={[]}
+            />
+        );
+
+        // wait for the walking mode to be rendered
+        await waitFor(() => {
+            expect(getByText('Walking')).toBeTruthy();
+        });
+
+        expect(global.fetch).toHaveBeenCalled();
+
+        // cleanup
+        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
+        else delete global.fetch;
+    }, 10000);
+
+    it("handles fetch failures and sets error state", async () => {
+        
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: false,
+            json: async () => ({ error: 'boom' }),
+        });
+
+        const { findByText, getByText } = render(
+            <OutdoorDirection
+                onPressBack={() => { }}
+                origin={{ label: 'A', lat: 1, lng: 1 }}
+                destination={{ label: 'B', lat: 2, lng: 2 }}
+                buildings={[]}
+            />
+        );
+
+        const err = await findByText('boom');
+        expect(err).toBeTruthy();
+
+        expect(global.fetch).toHaveBeenCalled();
+
+        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
+        else delete global.fetch;
+    });
+
+});
+;
+
 describe("Location Error Handling", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -510,3 +575,4 @@ describe("Location Error Handling", () => {
         expect(errorMessage).toBeTruthy();
     });
 });
+
