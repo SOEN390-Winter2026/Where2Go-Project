@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import Map from '../src/Map';
+import CampusMap from '../src/Map';
 
 jest.mock('react-native-maps');
 
@@ -16,13 +16,13 @@ const defaultProps = {
   onPoiPress: jest.fn(),
 };
 
-describe('Map', () => {
+describe('CampusMap', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('renders with mapRef testID', () => {
-    const { getByTestId } = render(<Map {...defaultProps} />);
+    const { getByTestId } = render(<CampusMap {...defaultProps} />);
     expect(getByTestId('mapRef')).toBeTruthy();
   });
 
@@ -39,7 +39,7 @@ describe('Map', () => {
       },
     ];
     const { getAllByText } = render(
-      <Map {...defaultProps} buildings={mockBuildings} />
+      <CampusMap {...defaultProps} buildings={mockBuildings} />
     );
     expect(getAllByText('H')).toBeTruthy();
   });
@@ -58,7 +58,7 @@ describe('Map', () => {
     ];
     const onBuildingPress = jest.fn();
     const { getAllByText } = render(
-      <Map
+      <CampusMap
         {...defaultProps}
         buildings={mockBuildings}
         onBuildingPress={onBuildingPress}
@@ -84,7 +84,7 @@ describe('Map', () => {
     ];
     const onPoiPress = jest.fn();
     const { getAllByTestId } = render(
-      <Map {...defaultProps} selectedPois={mockPois} onPoiPress={onPoiPress} />
+      <CampusMap {...defaultProps} selectedPois={mockPois} onPoiPress={onPoiPress} />
     );
 
     const poiMarker = getAllByTestId('marker')[0];
@@ -97,7 +97,7 @@ describe('Map', () => {
   test('renders user marker when liveLocationEnabled and userLocation are set', () => {
     const userLocation = { latitude: 45.497, longitude: -73.579 };
     const { getByLabelText } = render(
-      <Map
+      <CampusMap
         {...defaultProps}
         liveLocationEnabled={true}
         userLocation={userLocation}
@@ -109,7 +109,7 @@ describe('Map', () => {
   test('does not render user marker when liveLocationEnabled is false', () => {
     const userLocation = { latitude: 45.497, longitude: -73.579 };
     const { queryByLabelText } = render(
-      <Map
+      <CampusMap
         {...defaultProps}
         liveLocationEnabled={false}
         userLocation={userLocation}
@@ -120,21 +120,21 @@ describe('Map', () => {
 
   test('does not render user marker when userLocation is null', () => {
     const { queryByLabelText } = render(
-      <Map {...defaultProps} liveLocationEnabled={true} userLocation={null} />
+      <CampusMap {...defaultProps} liveLocationEnabled={true} userLocation={null} />
     );
     expect(queryByLabelText('userMarker')).toBeNull();
   });
 
   test('forwards ref to parent', () => {
     const ref = { current: null };
-    render(<Map {...defaultProps} ref={ref} />);
+    render(<CampusMap {...defaultProps} ref={ref} />);
     expect(ref.current).toBeDefined();
   });
 
   test('calls setUserDraggedMap(true) on regionChange when liveLocationEnabled', () => {
     const setUserDraggedMap = jest.fn();
     const { getByTestId } = render(
-      <Map
+      <CampusMap
         {...defaultProps}
         liveLocationEnabled={true}
         userLocation={{ latitude: 45.497, longitude: -73.579 }}
@@ -148,7 +148,7 @@ describe('Map', () => {
   test('does not call setUserDraggedMap on regionChange when liveLocationEnabled is false', () => {
     const setUserDraggedMap = jest.fn();
     const { getByTestId } = render(
-      <Map
+      <CampusMap
         {...defaultProps}
         liveLocationEnabled={false}
         setUserDraggedMap={setUserDraggedMap}
@@ -161,7 +161,7 @@ describe('Map', () => {
   test('calls snapBackToUser (setUserDraggedMap(false)) on regionChangeComplete when all conditions met', () => {
     const setUserDraggedMap = jest.fn();
     const { getByTestId } = render(
-      <Map
+      <CampusMap
         {...defaultProps}
         liveLocationEnabled={true}
         userLocation={{ latitude: 45.497, longitude: -73.579 }}
@@ -175,7 +175,7 @@ describe('Map', () => {
 
   test('onPoiClick handler runs and logs when poiClickTrigger is pressed', () => {
     const logSpy = jest.spyOn(console, 'log').mockImplementation();
-    const { getByTestId } = render(<Map {...defaultProps} />);
+    const { getByTestId } = render(<CampusMap {...defaultProps} />);
     fireEvent.press(getByTestId('poiClickTrigger'));
     expect(logSpy).toHaveBeenCalledWith('Clicked on Test POI with ID: test-id');
     logSpy.mockRestore();
@@ -192,7 +192,7 @@ describe('Map', () => {
       },
     ];
     const { getAllByTestId } = render(
-      <Map {...defaultProps} selectedPois={mockPois} />
+      <CampusMap {...defaultProps} selectedPois={mockPois} />
     );
     expect(getAllByTestId('marker')).toHaveLength(1);
   });
@@ -208,7 +208,7 @@ describe('Map', () => {
       },
     ];
     const { getAllByTestId } = render(
-      <Map {...defaultProps} selectedPois={mockPois} />
+      <CampusMap {...defaultProps} selectedPois={mockPois} />
     );
     expect(getAllByTestId('marker')).toHaveLength(1);
   });
