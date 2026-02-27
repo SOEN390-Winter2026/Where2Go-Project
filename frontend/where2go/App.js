@@ -230,7 +230,7 @@ export default function App() {
             setUserDraggedMap(false);
           }}
         >
-          <Ionicons name="navigate" size={24} color="white" />
+          <Ionicons name="navigate" size={24} color="#912338" />
         </Pressable>
       )}
       <SideLeftBar
@@ -321,10 +321,12 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#912338",
+    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,   
     zIndex: 12,    
+    borderColor: "#912338",
+    borderWidth: 1.5,
   },
 });
