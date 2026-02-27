@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useState, useEffect, useRef, use } from 'react';
 import * as Location from 'expo-location';
 
 import CampusMap from './src/Map';
@@ -14,6 +14,7 @@ import OutdoorDirection from "./src/OutdoorDirection";
 import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
 import { API_BASE_URL } from './src/config';
+import { Ionicons } from '@expo/vector-icons';
 
 const CAMPUS_COORDS = {
   SGW: { latitude: 45.4974, longitude: -73.5771 },
@@ -47,6 +48,9 @@ export default function App() {
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
+  //Live Loc
+  const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
+
   //for selecting buildings as departure or destination on map
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
@@ -58,11 +62,11 @@ export default function App() {
   };
 
   const handleBuildingPress = (building) => {
-    if(isPressedPOI){
+    if (isPressedPOI) {
       setPoiOriginBuilding(building);
-    }else{
-    setSelectedBuilding(building);
-    setModalVisible(true);
+    } else {
+      setSelectedBuilding(building);
+      setModalVisible(true);
     }
   };
 
@@ -151,6 +155,12 @@ export default function App() {
     setSelectedPois(poisFromSlider);
   };
 
+  useEffect(() => {
+    if (isLiveLocVisible === false) {
+      console.log("Live location is not visible on the map.");
+    }
+  }, [isLiveLocVisible]);
+
   //Login page first
   if (showLogin) {
     return (
@@ -167,22 +177,22 @@ export default function App() {
     return <LoadingPage />;
   }
 
-  if(showOutdoorDirection){
+  if (showOutdoorDirection) {
     return <OutdoorDirection
-    onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))}
-    buildings={buildings}
-    initialFrom={departureBuilding ? departureBuilding.name : ""}
-    initialTo={destinationBuilding ? destinationBuilding.name : ""}
-    destination={destinationPoi}
+      onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))}
+      buildings={buildings}
+      initialFrom={departureBuilding ? departureBuilding.name : ""}
+      initialTo={destinationBuilding ? destinationBuilding.name : ""}
+      destination={destinationPoi}
     />;
 
   }
 
-  if(showCalendar){
-    return <CalendarPage 
-    onPressBack={() => setShowCalendar((prev) => (prev !== true))} 
+  if (showCalendar) {
+    return <CalendarPage
+      onPressBack={() => setShowCalendar((prev) => (prev !== true))}
     />;
-  
+
   }
 
 
@@ -202,7 +212,27 @@ export default function App() {
           setSelectedPoi(poi);
           setPoiModalVisible(true);
         }}
+        onLiveLocDisappear={() => setIsLiveLocVisible(false)}
+        onLiveLocAppear={() => setIsLiveLocVisible(true)}
       />
+      {liveLocationEnabled && !isLiveLocVisible && userLocation && (
+        <Pressable
+          style={styles.recenterButton}
+          onPress={() => {
+            mapRef.current?.animateToRegion(
+              {
+                ...userLocation,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              },
+              400
+            );
+            setUserDraggedMap(false);
+          }}
+        >
+          <Ionicons name="navigate" size={24} color="white" />
+        </Pressable>
+      )}
       <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
@@ -218,7 +248,7 @@ export default function App() {
         }
         onPressPOI={() => {
           setIsPressedPOI(prev => {
-            if(prev) {
+            if (prev) {
               setPoiOriginBuilding(null);
               setSelectedPois([]);
             }
@@ -227,7 +257,7 @@ export default function App() {
         }}
       />
 
-      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)} onPressCalendar={() => setShowCalendar(true)}/>
+      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)} onPressCalendar={() => setShowCalendar(true)} />
       <BuildingInfoModal
         building={selectedBuilding}
         visible={modalVisible}
@@ -237,7 +267,7 @@ export default function App() {
           setDestinationBuilding(buildingCommute);
           setDestinationPoi(null);
         }}
-        selectedRole={ getBuildingRole(selectedBuilding) }
+        selectedRole={getBuildingRole(selectedBuilding)}
       />
       <PoiInfoModal
         poi={selectedPoi}
@@ -283,5 +313,18 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 10,
     alignSelf: 'center',
+  },
+  recenterButton: {
+    position: "absolute",
+    bottom: 510,
+    left: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#912338",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,   
+    zIndex: 12,    
   },
 });
