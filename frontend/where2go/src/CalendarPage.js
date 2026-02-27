@@ -10,18 +10,15 @@ import {
     Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { WEB_CLIENT_ID, ANDROID_CLIENT_ID, IOS_CLIENT_ID, API_URL } from '@env';
-import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
 import * as Calendar from 'expo-calendar';
 import Checkbox from 'expo-checkbox';
 import { Calendar as CalendarUI } from 'react-native-calendars';
+
 WebBrowser.maybeCompleteAuthSession();
 
 const { height, width } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
-const PEEK_HEIGHT = 80;
 
 export default function CalendarPage({ onPressBack }) {
 
@@ -71,25 +68,6 @@ export default function CalendarPage({ onPressBack }) {
     ).current;
 
     //Sign In Google Calendar
-
-    const getEventsForNextWeek = async () => {
-        const start = new Date(); // Right now
-        const end = new Date();
-        end.setDate(start.getDate() + 7); // 7 days from now
-
-        // You can pass an array of IDs you want to check
-        const calendarIds = [
-            "2CC033F5-D9E1-42E8-BFB2-B3CCA592DB62", // Your Gmail
-            "EC748D7A-3B62-4881-AFE2-8BDFBC335B31"  // Your iCloud Work
-        ];
-
-        const events = await Calendar.getEventsAsync(calendarIds, start, end);
-
-
-        console.log("Success! Events found:", events.length);
-        return events;
-    };
-
     const getCalendars = async () => {
 
         const { status } = await Calendar.requestCalendarPermissionsAsync();
@@ -110,7 +88,6 @@ export default function CalendarPage({ onPressBack }) {
 
     const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
     const [isCalendarsChosen, setIsCalendarsChosen] = useState(false);
-    const [isEventChanged, setIsEventChanged] = useState(false);
 
     //For Checkboxes
     const toggleCalendar = (id) => {
@@ -123,22 +100,20 @@ export default function CalendarPage({ onPressBack }) {
 
     //Retrieve events based on the day and selected Calendars
     const getEventsForDay = async (selectedDateString) => {
-        // 1. Create the Start of the Day (00:00:00)
         const start = new Date(selectedDateString);
         start.setHours(0, 0, 0, 0);
 
-        // 2. Create the End of the Day (23:59:59)
         const end = new Date(selectedDateString);
         end.setHours(23, 59, 59, 999);
 
         try {
             const dayEvents = await Calendar.getEventsAsync(
-                selectedCalendarIds, // The IDs you saved from your checkboxes
+                selectedCalendarIds,
                 start,
                 end
             );
 
-            setEvents(dayEvents); // Store in state to display in your list
+            setEvents(dayEvents);
         } catch (e) {
             console.error(e);
         }
@@ -209,8 +184,10 @@ export default function CalendarPage({ onPressBack }) {
                 </>
             ) : (
                 <View style={styles.eventListContainer}>
+                    {/* To modify: - display full info of events, choices to select specific calendars to display, option to display full calenday view (to research more) 
+                        - styles must also be modified to beautify the page
+                    */}
                     <CalendarUI
-
                         onDayPress={(day) => {
                             // day.dateString is formatted as 'YYYY-MM-DD'
                             setSelectedDate(day.dateString);
@@ -221,16 +198,11 @@ export default function CalendarPage({ onPressBack }) {
                     />
 
                     <Text> Upcoming Events: </Text>
-
                     {events.map((event) => (
                         <Pressable style={styles.btnEvent} > <Text> {event.title}</Text></Pressable>
                     ))}
-
-                    
                 </View>
             )}
-
-
 
             <Modal transparent visible={visible} animationType="none">
                 <View style={styles.overlay}>
@@ -242,10 +214,9 @@ export default function CalendarPage({ onPressBack }) {
                         {...panResponder.panHandlers}
                     >
                         <View style={styles.handle} />
-
                         <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={() => getCalendars()}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
+                        {/**Still not implemented */}
                         <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
-
                     </Animated.View>
                 </View>
             </Modal>
@@ -390,7 +361,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: height * 0.1
     },
-    btnEvent:{
+    btnEvent: {
 
     }
 });
