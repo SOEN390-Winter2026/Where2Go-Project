@@ -1,11 +1,11 @@
   const React = require("react");
   const { View, Pressable } = require("react-native");
 
-  const Marker = ({ children, accessibilityLabel }) => (
-    <View testID="marker" accessibilityLabel={accessibilityLabel}>
-      {children}
-    </View>
-  );
+const Marker = ({ children, accessibilityLabel, onPress }) => (
+  <Pressable testID="marker" accessibilityLabel={accessibilityLabel} onPress={onPress}>
+    {children}
+  </Pressable>
+);
 
   const Callout = ({ children, onPress }) => (
     <Pressable testID="callout" onPress={onPress}>
