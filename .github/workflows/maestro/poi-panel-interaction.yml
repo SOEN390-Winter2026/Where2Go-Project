@@ -1,0 +1,21 @@
+appId: host.exp.exponent
+---
+# Test: exercise the POI panel and slider
+
+- tapOn:
+    id: poiPress
+
+- waitForAnimationToEnd
+
+- swipe:
+    start:
+      x: 200
+      y: 800
+    end:
+      x: 200
+      y: 400
+    duration: 500
+
+# finally disable POI so panel disappears
+- tapOn:
+    text: "Load"
