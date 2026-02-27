@@ -51,7 +51,7 @@ describe('PoiInfoModal', () => {
         const { getByText } = render(
             <PoiInfoModal poi={POI} visible={true} onClose={jest.fn()} onSetAsDestination={onSetAsDestination} />
         );
-        fireEvent.press(getByText('Set as destination'));
+        fireEvent.press(getByText('Get directions'));
         expect(onSetAsDestination).toHaveBeenCalledTimes(1);
     });
 

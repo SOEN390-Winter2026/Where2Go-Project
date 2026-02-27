@@ -50,6 +50,7 @@ export default function App() {
   //for selecting buildings as departure or destination on map
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
+  const [destinationPoi, setDestinationPoi] = useState(null);
   const getBuildingRole = (building) => {
     if (building?.id === departureBuilding?.id) return 'departure';
     if (building?.id === destinationBuilding?.id) return 'destination';
@@ -212,13 +213,14 @@ export default function App() {
   }
 
   if(showOutdoorDirection){
-    return <OutdoorDirection 
-    onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))} 
-    buildings={buildings} 
+    return <OutdoorDirection
+    onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))}
+    buildings={buildings}
     initialFrom={departureBuilding ? departureBuilding.name : ""}
     initialTo={destinationBuilding ? destinationBuilding.name : ""}
+    destination={destinationPoi}
     />;
-  
+
   }
 
   return (
@@ -331,13 +333,26 @@ export default function App() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSetDeparture={(buildingCommute) => setDepartureBuilding(buildingCommute)}
-        onSetDestination={(buildingCommute) => setDestinationBuilding(buildingCommute)}
+        onSetDestination={(buildingCommute) => {
+          setDestinationBuilding(buildingCommute);
+          setDestinationPoi(null);
+        }}
         selectedRole={ getBuildingRole(selectedBuilding) }
       />
       <PoiInfoModal
         poi={selectedPoi}
         visible={poiModalVisible}
         onClose={() => setPoiModalVisible(false)}
+        onSetAsDestination={() => {
+          setDestinationPoi({
+            label: selectedPoi.name,
+            lat: selectedPoi.geometry.location.lat,
+            lng: selectedPoi.geometry.location.lng,
+          });
+          setDestinationBuilding(null);
+          setPoiModalVisible(false);
+          setShowOutdoorDirection(true);
+        }}
       />
       {isPressedPOI && (
         <PoiSlider
