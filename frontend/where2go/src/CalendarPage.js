@@ -123,7 +123,6 @@ export default function CalendarPage({ onPressBack }) {
 
     const [events, setEvents] = useState([]);
     const [calendars, setCalendars] = useState([]);
-    const [selectedDate, setSelectedDate] = useState('');
 
     useEffect(() => {
         console.log(calendars.map(calendar => calendar.title));
@@ -131,6 +130,7 @@ export default function CalendarPage({ onPressBack }) {
             setIsCalendarConnected(false);
         else
             setIsCalendarConnected(true);
+            close();
     }, [calendars]);
 
     useEffect(() => {
@@ -188,9 +188,9 @@ export default function CalendarPage({ onPressBack }) {
                         - styles must also be modified to beautify the page
                     */}
                     <CalendarUI
+                        testID="mock-calendar"
                         onDayPress={(day) => {
                             // day.dateString is formatted as 'YYYY-MM-DD'
-                            setSelectedDate(day.dateString);
                             console.log('User selected:', day.dateString);
                             getEventsForDay(day.dateString);
                         }}
@@ -199,7 +199,9 @@ export default function CalendarPage({ onPressBack }) {
 
                     <Text> Upcoming Events: </Text>
                     {events.map((event) => (
-                        <Pressable style={styles.btnEvent} > <Text> {event.title}</Text></Pressable>
+                        <Pressable 
+                        testID={`event-item-${event.id}`}
+                        style={styles.btnEvent} > <Text> {event.title}</Text></Pressable>
                     ))}
                 </View>
             )}
@@ -207,6 +209,7 @@ export default function CalendarPage({ onPressBack }) {
             <Modal transparent visible={visible} animationType="none">
                 <View style={styles.overlay}>
                     <Animated.View
+                        testID="bottom-sheet-view"
                         style={[
                             styles.sheet,
                             { transform: [{ translateY }] },
@@ -214,6 +217,7 @@ export default function CalendarPage({ onPressBack }) {
                         {...panResponder.panHandlers}
                     >
                         <View style={styles.handle} />
+                        <Pressable testID="closeModalBtn" style={styles.closeBtn} onPress={() => setVisible(false)}><Ionicons name="close" size={26} color="black" /></Pressable>
                         <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={() => getCalendars()}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
                         {/**Still not implemented */}
                         <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
@@ -253,7 +257,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         padding: 20,
         justifyContent: "center",
-        flexDirection: "collumn",
+        flexDirection: "column",
         gap: 20,
     },
     handle: {
@@ -361,7 +365,10 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: height * 0.1
     },
-    btnEvent: {
-
-    }
+    closeBtn: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        zIndex: 12,
+    },
 });

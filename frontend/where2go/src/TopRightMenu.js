@@ -29,7 +29,7 @@ export default function TopRightMenu({onPressDirection, onPressCalendar}) {
           <Pressable style={styles.menuItem} onPress={onPressDirection}>
             <Text style={styles.menuText}>Direction</Text>
           </Pressable>
-          <Pressable style={styles.menuItem} onPress={() => { onPressCalendar; setIsOpen(false); }}>
+          <Pressable style={styles.menuItem} onPress={ onPressCalendar }>
             <Text style={styles.menuText}>Calendar</Text>
           </Pressable>
           <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>
