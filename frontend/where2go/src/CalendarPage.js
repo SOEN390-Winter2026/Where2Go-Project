@@ -14,6 +14,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Calendar from 'expo-calendar';
 import Checkbox from 'expo-checkbox';
 import { Calendar as CalendarUI } from 'react-native-calendars';
+import PropTypes from 'prop-types';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -119,18 +120,18 @@ export default function CalendarPage({ onPressBack }) {
         }
     };
 
-
-
     const [events, setEvents] = useState([]);
     const [calendars, setCalendars] = useState([]);
 
     useEffect(() => {
         console.log(calendars.map(calendar => calendar.title));
-        if (calendars.length === 0)
+        if (calendars.length === 0){
             setIsCalendarConnected(false);
-        else
+        } else {
             setIsCalendarConnected(true);
             close();
+        }
+        
     }, [calendars]);
 
     useEffect(() => {
@@ -152,58 +153,64 @@ export default function CalendarPage({ onPressBack }) {
                 <Ionicons name="arrow-up" size={26} color="white" />
             </Pressable>
 
-            {!isCalendarConnected ? (
-                <Text style={styles.txtNoCal}> No Calendar Yet </Text>
-            ) : !isCalendarsChosen ? (
-                <>
-                    <View style={styles.titleView}>
-                        <Text style={styles.txtTitle}> Extracting Calendars</Text>
-                    </View>
-                    <View style={styles.selectCalView}>
-                        <Text style={styles.txtSelectCal}>Select Desired Calendars to Extract</Text>
-
-                        {calendars.map((calendar) => (
-                            <View key={calendar.id} style={styles.checkboxRow}>
-                                <Checkbox
-                                    testID={`checkbox-${calendar.id}`}
-                                    value={selectedCalendarIds.includes(calendar.id)}
-                                    onValueChange={() => toggleCalendar(calendar.id)}
-                                    color={calendar.color}
-                                />
-                                <Text style={styles.checkboxLabel}>{calendar.title}</Text>
-                            </View>
-                        ))}
-
-                        <Pressable
-                            style={styles.saveBtn}
-                            onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
-                        >
-                            <Text style={styles.btnTxt}>Done</Text>
-                        </Pressable>
-                    </View>
-                </>
-            ) : (
-                <View style={styles.eventListContainer}>
-                    {/* To modify: - display full info of events, choices to select specific calendars to display, option to display full calenday view (to research more) 
+            {isCalendarConnected ? (
+                isCalendarsChosen ? (
+                    <View style={styles.eventListContainer}>
+                        {/* To modify: - display full info of events, choices to select specific calendars to display, option to display full calenday view (to research more) 
                         - styles must also be modified to beautify the page
+                        - if no selected event, give a warning
+                        - still not implemented: option to add events manually
+                        - make caledar button invisible if calendar is already connected, or change it to "add more calendars" and make it open the calendar selection view again
                     */}
-                    <CalendarUI
-                        testID="mock-calendar"
-                        onDayPress={(day) => {
-                            // day.dateString is formatted as 'YYYY-MM-DD'
-                            console.log('User selected:', day.dateString);
-                            getEventsForDay(day.dateString);
-                        }}
+                        <CalendarUI
+                            testID="mock-calendar"
+                            onDayPress={(day) => {
+                                console.log('User selected:', day.dateString);
+                                getEventsForDay(day.dateString);
+                            }}
+                        />
+                        <Text> Upcoming Events: </Text>
+                        {events.map((event) => (
+                            <Pressable
+                                key={event.id}
+                                testID={`event-item-${event.id}`}
+                                style={styles.btnEvent}
+                            >
+                                <Text> {event.title}</Text>
+                            </Pressable>
+                        ))}
+                    </View>
+                ) : (
+                    <>
+                        <View style={styles.titleView}>
+                            <Text style={styles.txtTitle}> Extracting Calendars</Text>
+                        </View>
+                        <View style={styles.selectCalView}>
+                            <Text style={styles.txtSelectCal}>Select Desired Calendars to Extract</Text>
 
-                    />
+                            {calendars.map((calendar) => (
+                                <View key={calendar.id} style={styles.checkboxRow}>
+                                    <Checkbox
+                                        testID={`checkbox-${calendar.id}`}
+                                        value={selectedCalendarIds.includes(calendar.id)}
+                                        onValueChange={() => toggleCalendar(calendar.id)}
+                                        color={calendar.color}
+                                    />
+                                    <Text style={styles.checkboxLabel}>{calendar.title}</Text>
+                                </View>
+                            ))}
 
-                    <Text> Upcoming Events: </Text>
-                    {events.map((event) => (
-                        <Pressable 
-                        testID={`event-item-${event.id}`}
-                        style={styles.btnEvent} > <Text> {event.title}</Text></Pressable>
-                    ))}
-                </View>
+                            <Pressable
+                                style={styles.saveBtn}
+                                onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
+                            >
+                                <Text testID="saveBtn" style={styles.btnTxt}>Done</Text>
+                            </Pressable>
+                        </View>
+                    </>
+                )
+            ) : (
+                <Text style={styles.txtNoCal}> No Calendar Yet </Text>
             )}
 
             <Modal transparent visible={visible} animationType="none">
@@ -227,6 +234,13 @@ export default function CalendarPage({ onPressBack }) {
         </View>
     );
 }
+
+CalendarPage.propTypes = {
+    onPressBack: PropTypes.func.isRequired,
+    onPressCalendar: PropTypes.func.isRequired,
+    title: PropTypes.string,
+};
+
 
 const styles = StyleSheet.create({
     container: {
@@ -303,9 +317,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    btnTxt: {
-        color: "white",
-    },
     titleView: {
         position: "absolute",
         backgroundColor: "#912338",
@@ -322,7 +333,7 @@ const styles = StyleSheet.create({
         bottom: 10,
         position: "absolute",
         fontSize: 18,
-        fontWeight: '700', // Bold is usually enough for titles
+        fontWeight: '700',
         fontFamily: 'Helvetica Neue',
 
     },
@@ -333,21 +344,18 @@ const styles = StyleSheet.create({
     },
     txtSelectCal: {
         fontSize: 18,
-        fontWeight: '700', // Bold is usually enough for titles
+        fontWeight: '700', 
         fontFamily: 'Helvetica Neue',
         marginBottom: 10,
     },
     checkboxRow: {
-        flexDirection: "collumn",
-    },
-    checkboxRow: {
-        flexDirection: 'row', // Aligns checkbox and text in a line
-        alignItems: 'center', // Centers them vertically
-        marginBottom: 10,     // Space between rows
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        marginBottom: 10,     
         paddingHorizontal: 15,
     },
     checkboxLabel: {
-        marginLeft: 10,       // Space between the box and the text
+        marginLeft: 10,       
         fontSize: 16,
     },
     saveBtn: {

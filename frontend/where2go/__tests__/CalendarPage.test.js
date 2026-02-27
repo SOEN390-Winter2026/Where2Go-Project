@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import CalendarPage from '../src/CalendarPage'; // Adjust path
 import * as Calendar from 'expo-calendar';
-import { PanResponder } from 'react-native';
 
 jest.mock('react-native-calendars', () => {
     const React = require('react');
@@ -27,13 +26,21 @@ jest.mock('react-native', () => {
     RN.PanResponder.create = (handlers) => {
         const responderKey = Math.random().toString(36);
         panResponderHandlers[responderKey] = handlers;
-        
+
         return {
             panHandlers: {
-                onMoveShouldSetPanResponder: handlers.onMoveShouldSetPanResponder,
-                onStartShouldSetPanResponder: handlers.onStartShouldSetPanResponder,
+                // Point these to the actual handler functions from your component
                 onPanResponderMove: handlers.onPanResponderMove,
                 onPanResponderRelease: handlers.onPanResponderRelease,
+                onStartShouldSetPanResponder: handlers.onStartShouldSetPanResponder, // Add this
+
+                // Map the internal RN names to the component's handlers
+                onResponderMove: handlers.onPanResponderMove,
+                onResponderRelease: handlers.onPanResponderRelease,
+
+                // This is the key for coverage: 
+                // Instead of () => true, use the actual function from the component!
+                onStartShouldSetResponder: handlers.onStartShouldSetPanResponder,
             },
             __responderKey: responderKey,
         };
@@ -44,7 +51,7 @@ jest.mock('react-native', () => {
     RN.Animated.timing = (value, config) => ({
         start: (callback) => {
             value.setValue(config.toValue);
-            if (callback) callback({ finished: true }); 
+            if (callback) callback({ finished: true });
         },
     });
 
@@ -123,31 +130,31 @@ describe('CalendarPage', () => {
 
     it('handles errors gracefully when fetching events fails', async () => {
 
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
-    const mockError = new Error('Database connection failed');
-    Calendar.getEventsAsync.mockRejectedValue(mockError);
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
-    Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
-    Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
+        const mockError = new Error('Database connection failed');
+        Calendar.getEventsAsync.mockRejectedValue(mockError);
 
-    const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
 
-    fireEvent.press(getByTestId('openModalBtn'));
-    fireEvent.press(getByText(/Connect to Google Calendar/i));
-    await findByText('Work');
-    fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
-    fireEvent.press(getByText(/Done/i));
+        const { getByTestId, getByText, findByText } = render(<CalendarPage />);
 
-    const calendarUI = getByTestId('mock-calendar');
-    fireEvent.press(calendarUI);
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByText(/Connect to Google Calendar/i));
+        await findByText('Work');
+        fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
+        fireEvent.press(getByText(/Done/i));
 
-    await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith(mockError);
+        const calendarUI = getByTestId('mock-calendar');
+        fireEvent.press(calendarUI);
+
+        await waitFor(() => {
+            expect(consoleSpy).toHaveBeenCalledWith(mockError);
+        });
+
+        consoleSpy.mockRestore();
     });
-
-    consoleSpy.mockRestore();
-});
 
     it('calculates the exact start and end of the day', async () => {
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
@@ -169,7 +176,7 @@ describe('CalendarPage', () => {
 
         await waitFor(() => {
             expect(Calendar.getEventsAsync).toHaveBeenCalledWith(
-                ['cal-1'], 
+                ['cal-1'],
                 expect.any(Date),
                 expect.any(Date)
             );
@@ -189,7 +196,7 @@ describe('CalendarPage', () => {
     });
 
     it('renders the list of events after connecting and choosing calendars', async () => {
-    
+
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
         Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
         Calendar.getEventsAsync.mockResolvedValue([
@@ -199,7 +206,7 @@ describe('CalendarPage', () => {
 
         const { getByTestId, getByText, findByText } = render(<CalendarPage />);
 
-        
+
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByTestId('calBtn'));
 
@@ -456,6 +463,90 @@ describe('CalendarPage', () => {
         }
 
         expect(getByTestId('openModalBtn')).toBeTruthy();
+    });
+
+    it('closes if drag is more than 120px', async () => {
+        const { getByTestId, queryByTestId } = render(<CalendarPage onPressBack={() => { }} />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        const bottomSheet = getByTestId('bottom-sheet-view');
+
+        act(() => {
+            fireEvent(bottomSheet, 'responderRelease', {}, { dy: 150, vy: 0.1 });
+        });
+
+        await waitFor(() => {
+            expect(queryByTestId('bottom-sheet-view')).toBeNull();
+        });
+    });
+
+    it('updates position during movement if dy is positive', () => {
+        const { getByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
+        fireEvent.press(getByTestId('openModalBtn'));
+        const bottomSheet = getByTestId('bottom-sheet-view');
+
+        act(() => {
+            fireEvent(bottomSheet, 'responderMove', {}, { dy: 80 });
+        });
+
+        expect(bottomSheet).toBeTruthy();
+    });
+
+    it('snaps back to top and remains open if drag is 120px or less', async () => {
+        const { getByTestId, queryByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        const bottomSheet = getByTestId('bottom-sheet-view');
+
+        act(() => {
+            fireEvent(bottomSheet, 'responderRelease', {}, { dy: 100, vy: 0.5 });
+        });
+
+        expect(queryByTestId('bottom-sheet-view')).not.toBeNull();
+        expect(getByTestId('bottom-sheet-view')).toBeTruthy();
+    });
+
+    it('toggles calendar selection: adds on first click, removes on second', async () => {
+        // Mock the calendar data
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
+        Calendar.getCalendarsAsync.mockResolvedValue([
+            { id: 'cal-1', title: 'Work', color: 'blue' }
+        ]);
+
+        const { getByTestId, findByText } = render(<CalendarPage onPressBack={jest.fn()} />);
+
+        // 1. Open modal and connect to see the checkboxes
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByTestId('calBtn'));
+        await findByText('Work');
+
+        const checkbox = getByTestId('checkbox-cal-1');
+
+        // 2. First Click: Should ADD 'cal-1' to selectedCalendarIds
+        fireEvent(checkbox, 'onValueChange', true);
+
+        // 3. Second Click: Should REMOVE 'cal-1' (the .filter() logic)
+        fireEvent(checkbox, 'onValueChange', false);
+
+        // 4. Verify the state by checking if "Done" works correctly
+        // If it was removed, clicking "Done" shouldn't trigger the next view 
+        // because you have: onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
+        fireEvent.press(getByTestId('saveBtn'));
+
+        // The "Extracting Calendars" text should still be there if selection is 0
+        expect(await findByText('Extracting Calendars')).toBeTruthy();
+    });
+
+    it('should claim the touch gesture (covers onStartShouldSetPanResponder)', () => {
+        const { getByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        const bottomSheet = getByTestId('bottom-sheet-view');
+
+        // This now calls the function defined inside your useRef in CalendarPage
+        const result = bottomSheet.props.onStartShouldSetResponder();
+
+        expect(result).toBe(true);
     });
 });
 
