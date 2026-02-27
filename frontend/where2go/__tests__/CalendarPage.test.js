@@ -50,7 +50,7 @@ describe('CalendarPage', () => {
   });
 
   it('requests permissions and fetches calendars on connect', async () => {
-    // 1. Setup mock returns
+    
     Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
     Calendar.getCalendarsAsync.mockResolvedValue([
       { id: '1', title: 'Concordia Schedule', color: '#91233E' }
@@ -61,7 +61,6 @@ describe('CalendarPage', () => {
     const openModalBtn = getByTestId('openModalBtn'); 
     fireEvent.press(openModalBtn);
     
-    // 2. Open Modal and press connect (Simulate the Modal logic)
     fireEvent.press(getByTestId("calBtn"));
 
     await waitFor(() => {
@@ -211,7 +210,6 @@ describe('CalendarPage', () => {
   });
 
   it('can complete the calendar selection flow', async () => {
-    // Setup: Calendar already connected and selected
     Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
     Calendar.getCalendarsAsync.mockResolvedValue([
       { id: 'cal1', title: 'Work', color: '#FF5733' }
@@ -219,7 +217,6 @@ describe('CalendarPage', () => {
 
     const { getByTestId, getByText } = render(<CalendarPage />);
 
-    // Connect and select calendar
     fireEvent.press(getByTestId('openModalBtn'));
     fireEvent.press(getByTestId('calBtn'));
 
@@ -249,7 +246,6 @@ describe('CalendarPage', () => {
     fireEvent.press(getByTestId('openModalBtn'));
     fireEvent.press(getByTestId('calBtn'));
 
-    // Should not crash when error occurs
     await waitFor(() => {
       expect(Calendar.getEventsAsync).toBeDefined();
     });
@@ -300,7 +296,6 @@ describe('CalendarPage', () => {
       fireEvent.press(doneBtn);
     }
 
-    // Verify the component is still rendered
     expect(getByTestId('openModalBtn')).toBeTruthy();
   });
 });
