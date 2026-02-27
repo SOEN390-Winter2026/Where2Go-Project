@@ -173,7 +173,7 @@ export default function CalendarPage({ onPressBack }) {
             <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
                 <Ionicons name="arrow-back" size={26} color="white" />
             </Pressable>
-            <Pressable style={styles.buttonModalUp} onPress={open}>
+            <Pressable testID="openModalBtn" style={styles.buttonModalUp} onPress={open}>
                 <Ionicons name="arrow-up" size={26} color="white" />
             </Pressable>
 
@@ -190,6 +190,7 @@ export default function CalendarPage({ onPressBack }) {
                         {calendars.map((calendar) => (
                             <View key={calendar.id} style={styles.checkboxRow}>
                                 <Checkbox
+                                    testID={`checkbox-${calendar.id}`}
                                     value={selectedCalendarIds.includes(calendar.id)}
                                     onValueChange={() => toggleCalendar(calendar.id)}
                                     color={calendar.color}
@@ -242,7 +243,7 @@ export default function CalendarPage({ onPressBack }) {
                     >
                         <View style={styles.handle} />
 
-                        <Pressable style={styles.googleCalBtn} onPress={() => getCalendars()}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
+                        <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={() => getCalendars()}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
                         <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
 
                     </Animated.View>
@@ -390,6 +391,6 @@ const styles = StyleSheet.create({
         top: height * 0.1
     },
     btnEvent:{
-        
+
     }
 });

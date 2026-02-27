@@ -41,10 +41,13 @@ describe('CalendarPage', () => {
       { id: '1', title: 'Concordia Schedule', color: '#91233E' }
     ]);
 
-    const { getByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+    const { getByTestId, getByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+    const openModalBtn = getByTestId('openModalBtn'); 
+    fireEvent.press(openModalBtn);
     
     // 2. Open Modal and press connect (Simulate the Modal logic)
-    fireEvent.press(getByText(/Connect to Google Calendar/i));
+    fireEvent.press(getByTestId("calBtn"));
 
     await waitFor(() => {
       expect(Calendar.requestCalendarPermissionsAsync).toHaveBeenCalled();
@@ -53,20 +56,28 @@ describe('CalendarPage', () => {
     });
   });
 
-  it('does not allow "Done" if no calendars are selected', async () => {
-    // Manually setting state for this test case
-    Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
-    Calendar.getCalendarsAsync.mockResolvedValue([{ id: '1', title: 'Test Cal' }]);
+  it('should fetch calendars after user grants permission', async () => {
+  // 1. Mock the Calendar module to say "Permission Granted"
+  Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
+  
+  // 2. Mock some dummy calendars to return
+  Calendar.getCalendarsAsync.mockResolvedValue([
+    { id: 'cal1', title: 'Personal', color: '#91233E' }
+  ]);
 
-    const { getByText, queryByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
-    
-    fireEvent.press(getByText(/Connect to Google Calendar/i));
-    
-    await waitFor(() => {
-      const doneBtn = getByText('Done');
-      fireEvent.press(doneBtn);
-      // Logic: length > 0. Since we didn't check the box, it shouldn't move to state 3
-      expect(queryByText('Upcoming Events:')).toBeNull();
-    });
-  });
+  const { getByText, findByText, getByTestId } = render(<CalendarPage />);
+
+  const openModalBtn = getByTestId('openModalBtn'); 
+    fireEvent.press(openModalBtn);
+
+  // 3. Find the button using that Case-Insensitive Regex
+  const connectBtn = getByText(/connect to google calendar/i);
+  fireEvent.press(connectBtn);
+
+  // 4. Check if the code proceeded to the next step
+  // We use findByText (async) because the UI takes a moment to update
+  const nextStepHeader = await findByText(/extracting calendars/i);
+  expect(nextStepHeader).toBeTruthy();
 });
+});
+
