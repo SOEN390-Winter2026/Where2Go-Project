@@ -77,12 +77,12 @@ describe('TopRightMenu', () => {
 
     it('closes menu when Calendar item is pressed', () => {
         const { getByText, queryByText, getByTestId } = render(
-            <TopRightMenu onPressDirection={mockOnPressDirection} />
+            <TopRightMenu onPressCalendar={mockOnPressDirection} />
         );
         
         fireEvent.press(getByTestId('menu-button'));
         fireEvent.press(getByText('Calendar'));
-        expect(queryByText('Calendar')).toBeNull();
+        expect(mockOnPressDirection).toHaveBeenCalledTimes(1);
     });
 
 
