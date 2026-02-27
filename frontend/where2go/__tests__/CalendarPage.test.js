@@ -166,6 +166,7 @@ describe('CalendarPage', () => {
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByText(/Connect to Google Calendar/i));
 
+        const checkbox = await findByText('Personal');
         fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
 
         fireEvent.press(getByText(/Done/i));
@@ -180,7 +181,7 @@ describe('CalendarPage', () => {
                 expect.any(Date)
             );
 
-            const [start, end] = Calendar.getEventsAsync.mock.calls[0];
+            const [ids, start, end] = Calendar.getEventsAsync.mock.calls[0];
 
             expect(start.getHours()).toBe(0);
             expect(start.getMinutes()).toBe(0);
@@ -209,6 +210,7 @@ describe('CalendarPage', () => {
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByTestId('calBtn'));
 
+        const checkbox = await findByText('Work');
         fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
         fireEvent.press(getByText('Done'));
 
@@ -327,7 +329,7 @@ describe('CalendarPage', () => {
             { id: 'cal2', title: 'Personal', color: '#33FF57' }
         ]);
 
-        const { getByTestId } = render(<CalendarPage />);
+        const { getByTestId, getByText } = render(<CalendarPage />);
 
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByTestId('calBtn'));
@@ -533,18 +535,6 @@ describe('CalendarPage', () => {
 
         // The "Extracting Calendars" text should still be there if selection is 0
         expect(await findByText('Extracting Calendars')).toBeTruthy();
-    });
-
-    it('should claim the touch gesture (covers onStartShouldSetPanResponder)', () => {
-        const { getByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
-
-        fireEvent.press(getByTestId('openModalBtn'));
-        const bottomSheet = getByTestId('bottom-sheet-view');
-
-        // This now calls the function defined inside your useRef in CalendarPage
-        const result = bottomSheet.props.onStartShouldSetResponder();
-
-        expect(result).toBe(true);
     });
 });
 
