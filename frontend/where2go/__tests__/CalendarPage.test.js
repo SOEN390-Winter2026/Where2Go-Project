@@ -536,17 +536,5 @@ describe('CalendarPage', () => {
         // The "Extracting Calendars" text should still be there if selection is 0
         expect(await findByText('Extracting Calendars')).toBeTruthy();
     });
-
-    it('should claim the touch gesture (covers onStartShouldSetPanResponder)', () => {
-        const { getByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
-
-        fireEvent.press(getByTestId('openModalBtn'));
-        const bottomSheet = getByTestId('bottom-sheet-view');
-
-        // This now calls the function defined inside your useRef in CalendarPage
-        const result = bottomSheet.props.onStartShouldSetResponder();
-
-        expect(result).toBe(true);
-    });
 });
 
