@@ -1,0 +1,25 @@
+appId: host.exp.exponent
+---
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn: 
+    id: "menu-button"
+
+- tapOn: Direction
+
+- tapOn: 
+    id: "inputStartLoc"
+- inputText: 
+    text: "ha"
+
+- tapOn: "Hall Building"
+
+- tapOn:
+    id: "inputDestLoc"
+
+- inputText: 
+    text: "nowhere"
+
+- assertVisible:
+    text: "0 routes available"
