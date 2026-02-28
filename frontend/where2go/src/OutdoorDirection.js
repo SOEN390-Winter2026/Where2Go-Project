@@ -197,15 +197,6 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
 
-  const hasValidEndpoints =
-  origin?.lat != null && destination?.lat != null;
-  const showEmptyState =
-    hasValidEndpoints &&
-    !loading &&
-    !error &&
-    routes.length === 0;
-
-
   // ---- Live location ----
   const getCurrentLocation = async () => {
     try {
@@ -249,25 +240,6 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
       setShowErrorModal(true);
     }
   };
-
-  // retry button for  no route & error
-  const handleRetry = useCallback(() => {
-    if (loading) return; // dont spam function call
-    if (!hasValidEndpoints) return; // dont call if invalid
-    fetchRoutes();
-  }, [loading, hasValidEndpoints, fetchRoutes]);
-
-  const RetryButton = ({ onPress }) => (
-    <Pressable
-      style={[styles.retryButton, loading && { opacity: 0.6 }]} // faded opacity so button looks unclickable after first click
-      onPress={onPress}
-      disabled={loading}
-    >
-      <Text style={styles.retryButtonText}>
-        Try Again
-      </Text>
-    </Pressable>
-  );
 
   // ---- Render ----
   return (
@@ -375,29 +347,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
               <Text style={styles.loadingText}>Loading routes...</Text>
             </View>
           )}
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-              <RetryButton onPress={handleRetry} />
-            </View>
-          )}
-          {showEmptyState && (
-            <View style={styles.emptyStateContainer}>
-              <Ionicons
-                name="map-outline"
-                size={40}
-                color="#7C2B38"
-                style={{ marginBottom: 10 }}
-              />
-              <Text style={styles.emptyStateTitle}>
-                No routes found
-              </Text>
-              <Text style={styles.emptyStateText}>
-                Try selecting different locations or check your connection.
-              </Text>
-              <RetryButton onPress={handleRetry} />
-            </View>
-          )}
+          {error && <Text style={styles.errorText}>{error}</Text>}
           {!loading && routes.map((r, i) => {
             const { label, icon } = getModeDisplay(r.mode);
             return (
@@ -509,30 +459,6 @@ const styles = StyleSheet.create({
     color: "#333",
     flex: 1,
   },
-
-  /* ---- Routes area ---- */
-  loadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  errorText: {
-    fontSize: 14,
-    color: "#c00",
-    padding: 16,
-  },
-  errorContainer: {
-    marginTop: 20,
-    padding: 16,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   bottomPart: {
     flex: 1,
     marginTop: 40,
@@ -566,6 +492,20 @@ const styles = StyleSheet.create({
   filterText: {
     color: "#7C2B38",
     fontWeight: "800",
+  },
+  loadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#c00",
+    padding: 16,
   },
   routesContent: {},
   routeContainer: {
@@ -612,40 +552,4 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: "italic",
   },
-  scrollBar: {},
-
-  /* ---- No routes found ---- */
-  emptyStateContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
-
-  emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-  },
-
-  emptyStateText: {
-    fontSize: 14,
-    color: "#777",
-    textAlign: "center",
-  },
-
-  // Try Again button on no routes found & error
-  retryButton: {
-    marginTop: 20,
-    backgroundColor: '#912338',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
-  },
-  retryButtonText: {
-    color: 'white',
-    fontWeight: '600',
-  },
-
 });

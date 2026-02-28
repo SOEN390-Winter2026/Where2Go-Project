@@ -88,7 +88,7 @@ const PoiInfoModal = ({ poi, visible, onClose, onSetAsDestination }) => {
               onPress={onSetAsDestination ?? (() => {})}
             >
               <Ionicons name="navigate" size={18} color="#fff" />
-              <Text style={styles.primaryButtonText}>Get directions</Text>
+              <Text style={styles.primaryButtonText}>Set as destination</Text>
             </Pressable>
 
             {/* Close secondary button */}
