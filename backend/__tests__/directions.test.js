@@ -33,6 +33,21 @@ function mockHttpsGet(jsonData) {
   });
 }
 
+function mockHttpsGetWithStatus({ statusCode, body }) {
+  https.get.mockImplementation((url, callback) => {
+    const res = {
+      statusCode,
+      on: jest.fn((event, handler) => {
+        if (event === "data") handler(typeof body === "string" ? body : JSON.stringify(body));
+        if (event === "end") handler();
+        return res;
+      }),
+    };
+    callback(res);
+    return { on: jest.fn() };
+  });
+}
+
 function makeMockDirectionsResponse(distanceText, durationText, polyline = "mockPolyline") {
   return {
     status: "OK",
@@ -248,6 +263,39 @@ describe("receiving transportation options", () => {
         const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
         expect(result.ok).toBe(false);
         expect(result.error.code).toBe("INVALID_RESPONSE");
+    });
+
+    it("returns UPSTREAM_FAILED when Directions API responds with non-2xx HTTP status", async () => {
+        mockHttpsGetWithStatus({
+            statusCode: 500,
+            body: { status: "UNKNOWN_ERROR" },
+        });
+
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("UPSTREAM_FAILED");
+    });
+
+    it("handles non-OK statuses and invalid/empty routes shapes", async () => {
+        mockHttpsGet({ status: "REQUEST_DENIED" });
+        let result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("UPSTREAM_FAILED");
+
+        jest.clearAllMocks();
+
+        mockHttpsGet({ status: "OK", routes: null });
+        result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("INVALID_RESPONSE");
+
+        jest.clearAllMocks();
+
+        mockHttpsGet({ status: "OK", routes: [] });
+        result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("NO_ROUTES");
     });
 });
 
