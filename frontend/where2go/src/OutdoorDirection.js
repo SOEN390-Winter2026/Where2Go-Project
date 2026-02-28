@@ -92,6 +92,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [errorCode, setErrorCode] = useState(null);
 
   // ---- Live location state ----
   const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
@@ -137,23 +138,45 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
       setRoutes([]);
       return;
     }
+
     setLoading(true);
     setError(null);
+    setErrorCode(null);
     try {
       const clientTime = encodeURIComponent(new Date().toISOString());
+
       const res = await fetch(
         `${API_BASE_URL}/directions?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}&clientTime=${clientTime}`
       );
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch");
+      const errorObj = data?.error && typeof data.error === "object" ? data.error : null;
+      const nextErrorCode = errorObj?.code ?? null;
+      const errorMessage =
+        errorObj?.message ?? (typeof data?.error === "string" ? data.error : null);
+
+      if (!res.ok) {
+        throw new Error(errorMessage || "Failed to fetch");
+      }
+
       setRoutes(data.routes || []);
+
+      if (nextErrorCode && nextErrorCode !== "NO_ROUTES") {
+        setError(errorMessage || "Something went wrong");
+      } else {
+        setError(null);
+      }
+
+      setErrorCode(nextErrorCode);
     } catch (e) {
       setError(e.message);
+      setErrorCode("UPSTREAM_FAILED");
       setRoutes([]);
     } finally {
       setLoading(false);
     }
   }, [origin, destination]);
+
 
   useEffect(() => {
     fetchRoutes();
@@ -240,6 +263,11 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
       setShowErrorModal(true);
     }
   };
+  
+  const showEmptyRoutesState =
+    !loading &&
+    routes.length === 0 &&
+    (errorCode === "NO_ROUTES" || !!error);
 
   // ---- Render ----
   return (
@@ -330,7 +358,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
 
         {/* ---- Routes header ---- */}
         <View style={styles.routesHeader}>
-          <Text style={styles.routesTitle}>{routes.length} routes{"\n"}available</Text>
+          <Text style={styles.routesTitle}>{routes.length > 0 ? `${routes.length} routes\navailable` : `Routes\n`}</Text>
           <Pressable testID="pressFilter">
             <Text style={styles.filterText}>Filter</Text>
           </Pressable>
@@ -347,7 +375,16 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
               <Text style={styles.loadingText}>Loading routes...</Text>
             </View>
           )}
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && !showEmptyRoutesState && (<Text style={styles.errorText}>{error}</Text>)}
+          {showEmptyRoutesState && (
+            <View testID="noRoutesState" style={styles.emptyState}>
+              <Ionicons name="map-outline" size={28} color="#7C2B38" style={{ marginBottom: 8 }} />
+              <Text style={styles.emptyTitle}>No routes found</Text>
+              <Text style={styles.emptySubtitle}>
+                Try a different start/destination or another mode.
+              </Text>
+            </View>
+          )}
           {!loading && routes.map((r, i) => {
             const { label, icon } = getModeDisplay(r.mode);
             return (
@@ -551,5 +588,26 @@ const styles = StyleSheet.create({
     color: "#7C2B38",
     marginTop: 4,
     fontStyle: "italic",
+  },
+  emptyState: {
+  borderWidth: 1,
+  borderColor: "#E6C9CF",
+  backgroundColor: "#FFF7F8",
+  padding: 16,
+  borderRadius: 16,
+  marginHorizontal: 16,
+  marginTop: 10,
+  alignItems: "center",
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#111",
+    marginBottom: 4,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    color: "#555",
+    textAlign: "center",
   },
 });

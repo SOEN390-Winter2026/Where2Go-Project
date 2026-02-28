@@ -225,6 +225,32 @@ describe("Route fetching and mode display", () => {
         else delete global.fetch;
     });
 
+    it("shows a no-routes empty state when API returns NO_ROUTES", async () => {
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+            routes: [],
+            error: { code: "NO_ROUTES", message: "No routes found" },
+            }),
+        });
+
+        const { getByTestId, getByText } = render(
+            <OutdoorDirection
+            onPressBack={() => {}}
+            origin={{ label: "A", lat: 1, lng: 1 }}
+            destination={{ label: "B", lat: 2, lng: 2 }}
+            buildings={[]}
+            />
+        );
+
+        await waitFor(() => {
+            expect(getByTestId("noRoutesState")).toBeTruthy();
+            expect(getByText("No routes found")).toBeTruthy();
+        });
+
+        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
+        else delete global.fetch;
+    });
 });
 ;
 
