@@ -4,7 +4,7 @@ dotenv.config();
 const express = require("express");
 const cors = require("cors");
 const { getCampusCoordinates, getBuildings } = require("./services/map");
-const { getTransportOptionsResult } = require("./services/directions");
+const { getTransportOptions } = require("./services/directions");
 const app = express();
 
 app.use(cors());
@@ -47,15 +47,11 @@ app.get("/directions", async (req, res) => {
     const opts = clientTime ? { clientTime } : {};
 
     try {
-        const { routes, meta } = await getTransportOptionsResult(origin, destination, opts);
-        res.json({ routes, meta });
+        const routes = await getTransportOptions(origin, destination, opts);
+        res.json({ routes });
     } catch (err) {
         console.error("Directions error:", err);
-        // US-2.5.1: still respond with a normalized shape so frontend can show a proper state
-        res.json({
-            routes: [],
-            meta: { reason: "REQUEST_FAILED", details: String(err) }
-        });
+        res.status(500).json({ error: "Failed to fetch directions" });
     }
 });
 
