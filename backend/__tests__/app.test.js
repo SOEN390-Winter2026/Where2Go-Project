@@ -6,11 +6,11 @@ jest.mock("../src/services/map", () => ({
 }));
 
 jest.mock("../src/services/directions", () => ({
-    getTransportOptions: jest.fn(),
+  getTransportOptionsResult: jest.fn(),
 }));
 
 const { getCampusCoordinates, getBuildings } = require("../src/services/map");
-const { getTransportOptions } = require("../src/services/directions");
+const { getTransportOptionsResult } = require("../src/services/directions");
 const app = require("../src/app");
 
 describe("App endpoints", () => {
@@ -90,7 +90,7 @@ describe("App endpoints", () => {
                 { mode: "walking", duration: { text: "12 mins" }, distance: { text: "1 km" } },
                 { mode: "transit", duration: { text: "8 mins" }, distance: { text: "1.2 km" } },
             ];
-            getTransportOptions.mockResolvedValue(mockRoutes);
+            getTransportOptionsResult.mockResolvedValue({ ok: true, routes: mockRoutes });
             const res = await request(app).get("/directions").query(validQuery);
             expect(res.status).toBe(200);
             expect(res.body).toEqual({ routes: mockRoutes });
@@ -102,18 +102,45 @@ describe("App endpoints", () => {
             expect(res.body).toEqual({ error: "Invalid origin/destination coordinates" });
         });
 
-        it("returns 500 if getTransportOptions throws", async () => {
-            getTransportOptions.mockRejectedValue(new Error("API failure"));
+       it("returns 500 if getTransportOptionsResult throws", async () => {
+            getTransportOptionsResult.mockRejectedValue(new Error("API failure"));
+
             const res = await request(app).get("/directions").query(validQuery);
+
             expect(res.status).toBe(500);
-            expect(res.body).toEqual({ error: "Failed to fetch directions" });
+            expect(res.body).toEqual({
+                routes: [],
+                error: { code: "UPSTREAM_FAILED", message: "Failed to fetch directions" },
+            });
         });
 
-        it("returns empty routes array when no routes available", async () => {
-            getTransportOptions.mockResolvedValue([]);
+        it("returns 200 with NO_ROUTES error when no routes available", async () => {
+            getTransportOptionsResult.mockResolvedValue({
+                ok: false,
+                error: { code: "NO_ROUTES", message: "No routes found" },
+            });
+
             const res = await request(app).get("/directions").query(validQuery);
+
             expect(res.status).toBe(200);
-            expect(res.body).toEqual({ routes: [] });
+            expect(res.body).toEqual({
+                routes: [],
+                error: { code: "NO_ROUTES", message: "No routes found" },
+            });
+        });
+
+        it("returns 502 with UPSTREAM_FAILED error when upstream fails", async () => {
+            getTransportOptionsResult.mockResolvedValue({
+                ok: false,
+                error: { code: "UPSTREAM_FAILED", message: "Failed to fetch directions" },
+            });
+
+            const res = await request(app).get("/directions").query(validQuery);
+            expect(res.status).toBe(502);
+            expect(res.body).toEqual({
+                routes: [],
+                error: { code: "UPSTREAM_FAILED", message: "Failed to fetch directions" },
+            });
         });
     });
 });
