@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import PropTypes from 'prop-types';
 
-export default function TopRightMenu({onPressDirection}) {
+TopRightMenu.propTypes = {
+  onPressDirection: PropTypes.func.isRequired,
+};
+
+export default function TopRightMenu({onPressDirection, onPressCalendar}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <View style={styles.container}>
       {/* The Red Hamburger Button */}
-      <Pressable 
+      <Pressable testID="menu-button"
         style={styles.menuButton} 
         onPress={() => setIsOpen(!isOpen)}
       >
@@ -24,7 +29,7 @@ export default function TopRightMenu({onPressDirection}) {
           <Pressable style={styles.menuItem} onPress={onPressDirection}>
             <Text style={styles.menuText}>Direction</Text>
           </Pressable>
-          <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>
+          <Pressable style={styles.menuItem} onPress={ onPressCalendar }>
             <Text style={styles.menuText}>Calendar</Text>
           </Pressable>
           <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>

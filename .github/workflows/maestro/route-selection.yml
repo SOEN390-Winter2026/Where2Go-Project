@@ -1,0 +1,45 @@
+appId: host.exp.exponent
+---
+# Test: Select start/destination → Get directions → See options list
+# Tap a non-default route option and verify selection is reflected in UI
+
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn: 
+    id: "menu-button"
+
+
+- tapOn: Direction
+
+- tapOn: 
+    id: "inputStartLoc"
+
+
+- inputText: 
+    text: "mc"
+
+
+- waitForAnimationToEnd
+
+- tapOn: "McConnell Building"
+
+- tapOn: 
+    id: "inputDestLoc"
+
+
+- inputText: 
+    text: "admin"
+
+
+- waitForAnimationToEnd
+
+- tapOn: "Administration Building"
+
+
+- waitForAnimationToEnd
+
+- assertVisible:
+    text: "Walking"
+
+

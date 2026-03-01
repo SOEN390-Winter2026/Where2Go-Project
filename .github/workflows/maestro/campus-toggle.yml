@@ -1,5 +1,6 @@
 appId: host.exp.exponent
 ---
+- tapOn: Skip
 - waitForAnimationToEnd
 - assertVisible:
     id: mapRef
