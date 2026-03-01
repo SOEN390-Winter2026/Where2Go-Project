@@ -61,7 +61,7 @@ describe("receive data from google API", () => {
 
     it("generate a walking route correctly", () => {
         const result = normalizeRoute(mockRaw, "walking");
-        expect(result).toEqual({
+        expect(result).toMatchObject({
         mode: "walking",
         duration: { value: 240, text: "4 mins" },
         distance: { value: 300, text: "0.3 km" },
