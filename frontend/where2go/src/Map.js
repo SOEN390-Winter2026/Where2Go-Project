@@ -109,8 +109,6 @@ const CampusMap = forwardRef((props, ref) => {
               latitude: poi.geometry.location.lat,
               longitude: poi.geometry.location.lng,
             }}
-            title={poi.name}
-            description={poi.vicinity}
             onPress={() => onPoiPress(poi)}
             tracksViewChanges={false}
           >
