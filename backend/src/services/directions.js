@@ -163,6 +163,57 @@ function fetchDirections(origin, destination, mode) {
  * @returns {{ mode: string, duration: { value: number, text: string }, distance: { value: number, text: string }, polyline?: string }}
  * Keep in mind that polyline is a base64 encoded string that represents the route geometry and should be decoded to get the actual coordinates.
  */
+
+function stripHtml(html = "") {
+  return String(html).replace(/<[^>]+>/g, "").trim();
+}
+
+function normalizeSteps(leg) {
+  const steps = leg?.steps ?? [];
+
+  return steps
+    .map((s) => {
+      const stepPolyline = s.polyline?.points || null;
+
+      // WALKING
+      if (s.travel_mode === "WALKING") {
+        return {
+          type: "walk",
+          durationText: s.duration?.text ?? "",
+          distanceText: s.distance?.text ?? "",
+          instruction: stripHtml(s.html_instructions ?? ""),
+          polyline: stepPolyline,
+        };
+      }
+
+      // TRANSIT
+      if (s.travel_mode === "TRANSIT") {
+        const td = s.transit_details || {};
+        const line = td.line || {};
+        const vehicleType = line.vehicle?.type || "TRANSIT"; // BUS, SUBWAY, etc.
+
+        return {
+          type: "transit",
+          vehicle: vehicleType.toLowerCase(),               // "bus" | "subway"
+          line: line.short_name || line.name || "",        // "105" or "Green"
+          headsign: td.headsign ?? "",
+          from: td.departure_stop?.name ?? "",
+          to: td.arrival_stop?.name ?? "",
+          stops: td.num_stops ?? null,
+          departureTime: td.departure_time?.text ?? "",
+          arrivalTime: td.arrival_time?.text ?? "",
+          durationText: s.duration?.text ?? "",
+          instruction: stripHtml(s.html_instructions ?? ""),
+          polyline: stepPolyline,
+        };
+      }
+
+      // fallback (rare)
+      return null;
+    })
+    .filter(Boolean);
+}
+
 function normalizeRoute(raw, mode) {
   const leg = raw.legs?.[0];
   if (!leg) return null;
@@ -177,7 +228,13 @@ function normalizeRoute(raw, mode) {
       value: leg.distance?.value ?? 0,
       text: leg.distance?.text ?? "",
     },
-    polyline: raw.overview_polyline?.points,
+    polyline: raw.overview_polyline?.points ?? null, 
+
+    steps: normalizeSteps(leg),
+
+    // ✅ Optional (nice for "Arrive 14:10")
+    departureTime: leg.departure_time?.text ?? "",
+    arrivalTime: leg.arrival_time?.text ?? "",
   };
 }
 

@@ -1,8 +1,12 @@
 import { View, Text, TextInput, StyleSheet, Pressable, ImageBackground, ScrollView, ActivityIndicator, Keyboard } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { API_BASE_URL } from "./config";
 import { SEARCHABLE_LOCATIONS } from "./data/locations";
+
+import MapView, { Polyline as MapPolyline, Marker, Polygon } from "react-native-maps";
+import polyline from "@mapbox/polyline";
+
 
 // Re-export so existing callers (e.g. tests) still work with
 //   import { KNOWN_LOCATIONS } from './OutdoorDirection';
@@ -42,7 +46,33 @@ function getModeDisplay(mode) {
  *
  * Routes are fetched only when BOTH origin and destination have valid lat/lng.
  */
-export default function OutdoorDirection({ origin: originProp, destination: destProp, onPressBack }) {
+
+function decodePolylineToCoords(encoded) {
+  if (!encoded) return [];
+  const pts = polyline.decode(encoded); // [[lat,lng],...]
+  return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
+}
+
+function stepsToSegments(route) {
+  const steps = route?.steps ?? [];
+  return steps
+    .map((s) => {
+      const coords = decodePolylineToCoords(s.polyline);
+      if (!coords.length) return null;
+
+      return {
+        coords,
+        isWalk: s.type === "walk",
+        vehicle: s.vehicle || null, // "bus" | "subway"
+        line: s.line || "",
+        from: s.from || "",
+        to: s.to || "",
+      };
+    })
+    .filter(Boolean);
+}
+
+export default function OutdoorDirection({ origin: originProp, destination: destProp, onPressBack, onSelectRoute}) {
   // ---- State ----
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
@@ -52,6 +82,40 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+const [showFullMap, setShowFullMap] = useState(false);
+const [activeRouteCoords, setActiveRouteCoords] = useState([]);
+const [activeSegments, setActiveSegments] = useState([]);
+const [routeStart, setRouteStart] = useState(null);
+const [routeEnd, setRouteEnd] = useState(null);
+
+
+
+//////
+const handleSelectRoute = ({ route, origin, destination }) => {
+  // 1) Start & End markers
+  if (origin?.lat && origin?.lng) {
+    setRouteStart({ latitude: origin.lat, longitude: origin.lng });
+  }
+  if (destination?.lat && destination?.lng) {
+    setRouteEnd({ latitude: destination.lat, longitude: destination.lng });
+  }
+
+  // 2) Segments from steps (THIS makes bus/metro vs walk)
+  const segs = stepsToSegments(route);
+  setActiveSegments(segs);
+
+  // 3) Fallback full route (if steps missing)
+  setActiveRouteCoords(decodePolylineToCoords(route?.polyline));
+
+  // 4) Fit map to route
+  const coordsToFit = segs.length ? segs.flatMap(s => s.coords) : decodePolylineToCoords(route?.polyline);
+  if (coordsToFit.length && mapRef.current) {
+    mapRef.current.fitToCoordinates(coordsToFit, {
+      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+      animated: true,
+    });
+  }
+};
 
   // Sync from parent props when they change (e.g. user taps a building in App)
   useEffect(() => {
@@ -72,6 +136,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   const fetchRoutes = useCallback(async () => {
     if (!origin?.lat || !destination?.lat) {
       setRoutes([]);
+       setSelectedRouteIndex(-1);
       return;
     }
     setLoading(true);
@@ -83,7 +148,11 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch");
-      setRoutes(data.routes || []);
+      //setRoutes(data.routes || []);
+            const newRoutes = data.routes || [];
+      setRoutes(newRoutes);
+      setSelectedRouteIndex(newRoutes.length > 0 ? 0 : -1);
+/////////
     } catch (e) {
       setError(e.message);
       setRoutes([]);
@@ -100,6 +169,11 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   const originResults = activeField === "origin" ? filterLocations(originQuery) : [];
   const destResults = activeField === "dest" ? filterLocations(destQuery) : [];
 
+/////////////////
+  const mapRef = useRef(null);
+  // Default to first route when loaded
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+/////////////////
   // ---- Input handlers ----
   const onOriginTextChange = (text) => {
     setOriginQuery(text);
@@ -133,6 +207,36 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   };
 
   // ---- Render ----
+    const selectedRoute = selectedRouteIndex >= 0 ? routes[selectedRouteIndex] : null;
+
+  const decodeRouteToCoords = (route) => {
+    const encoded = route?.polyline;
+    if (!encoded) return [];
+
+    const pts = polyline.decode(encoded); // [[lat,lng],...]
+    return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
+  };
+
+  const selectedRouteCoords = useMemo(() => {
+    return decodeRouteToCoords(selectedRoute);
+  }, [selectedRoute]);
+
+    const fitRouteOnMap = useCallback((coords) => {
+    if (!mapRef.current || !coords?.length) return;
+
+    mapRef.current.fitToCoordinates(coords, {
+      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+      animated: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedRouteCoords.length > 0) {
+      fitRouteOnMap(selectedRouteCoords);
+    }
+  }, [selectedRouteCoords, fitRouteOnMap]);
+
+
   return (
     <ImageBackground
       source={require("../assets/background.png")}
@@ -220,6 +324,8 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
         </View>
       </View>
 
+  
+
       <View style={styles.bottomPart}>
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
@@ -247,8 +353,23 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
           )}
           {!loading && routes.map((r, i) => {
             const { label, icon } = getModeDisplay(r.mode);
+            const isSelected = i === selectedRouteIndex;
+
+
             return (
-              <View key={`${r.mode}-${i}`} style={styles.routeContainer}>
+              <Pressable
+               // key={`${r.mode}-${i}`} 
+               // key={`route-${i}`}
+               // onPress={() => setSelectedRouteIndex(i)}
+               onPress={() => {setSelectedRouteIndex(i);
+                //setShowFullMap(true);
+                if (onSelectRoute)
+                  onSelectRoute({ route: r, origin, destination,}); 
+      
+                onPressBack?.()
+              }}
+                style={[styles.routeContainer, isSelected && styles.routeContainerSelected]}
+              >
                 <View style={styles.routeBody}>
                   <Ionicons name={icon} size={28} color="#7C2B38" style={styles.routeIcon} />
                   <View style={styles.routeDetails}>
@@ -262,7 +383,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
                     )}
                   </View>
                 </View>
-              </View>
+              </Pressable>
             );
           })}
         </ScrollView>
@@ -272,6 +393,23 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
 }
 
 const styles = StyleSheet.create({
+
+    mapWrap: {
+    height: 260,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  routeContainerSelected: {
+    borderWidth: 3,
+    borderColor: "#7C2B38",
+    backgroundColor: "#fff5f6",
+  },
+
   background: {
     flex: 1,
   },

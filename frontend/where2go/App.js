@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
+import polyline from "@mapbox/polyline";
 import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
-import MapView, { Marker, Polygon } from 'react-native-maps';
+import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
 import LoginScreen from "./src/Login";
@@ -10,6 +11,7 @@ import OutdoorDirection from "./src/OutdoorDirection";
 import { colors } from './src/theme/colors';
 import { API_BASE_URL } from './src/config';
 import { polygonCentroid } from './src/utils/geo';
+import RouteDetailSheet from "./src/RouteDetailSheet";
 
 export default function App() {
   console.log(API_BASE_URL);
@@ -30,6 +32,58 @@ export default function App() {
   const mapRef = useRef(null);
 
   const [selectDestination, setSelectDestination] = useState(null);
+
+  const [activeRouteCoords, setActiveRouteCoords] = useState([]);
+const [activeRouteMeta, setActiveRouteMeta] = useState(null); 
+const [activeSegments, setActiveSegments] = useState([]);
+
+// ---- START/END markers derived from current route ----
+const routeStart =
+  activeSegments?.[0]?.coords?.[0] ??
+  activeRouteCoords?.[0] ??
+  null;
+
+const routeEnd = (() => {
+  if (activeSegments?.length) {
+    const lastSeg = activeSegments[activeSegments.length - 1];
+    return lastSeg?.coords?.[lastSeg.coords.length - 1] ?? null;
+  }
+  return activeRouteCoords?.[activeRouteCoords.length - 1] ?? null;
+})();
+
+// { origin, destination, route }
+
+const handleSelectRoute = ({ route, origin, destination }) => {
+  const coords = decodePolylineToCoords(route?.polyline);
+
+  setActiveRouteCoords(coords);
+  setActiveRouteMeta({ route, origin, destination });
+
+  const steps = Array.isArray(route?.steps) ? route.steps : [];
+  const segments = steps
+    .map((s) => {
+      const coords = decodePolylineToCoords(s.polyline);
+      if (!coords.length) return null;
+
+      const isWalk = s.type === "walk";
+      return {
+        coords,
+        isWalk,
+        vehicle: s.vehicle,
+      };
+    })
+    .filter(Boolean);
+
+  setActiveSegments(segments);
+  // Go back to the map screen
+  setShowOutdoorDirection(false);
+
+  // Fit after returning to map view
+  requestAnimationFrame(() => {
+    fitRoute(coords);
+  });
+};
+
 
   //Snapping back to user
   const snapBackToUser = () => {
@@ -123,6 +177,21 @@ export default function App() {
   startTracking();
 }, [liveLocationEnabled]);
 
+// ---- Route helpers ----
+function decodePolylineToCoords(encoded) {
+  if (!encoded) return [];
+  const pts = polyline.decode(encoded);
+  return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
+}
+
+function fitRoute(coords) {
+  if (!mapRef.current || !coords?.length) return;
+
+  mapRef.current.fitToCoordinates(coords, {
+    edgePadding: { top: 120, right: 80, bottom: 200, left: 80 },
+    animated: true,
+  });
+}
 
 
   //Login page first
@@ -143,6 +212,7 @@ export default function App() {
       <OutdoorDirection
         destination={destLocation}
         onPressBack={() => setShowOutdoorDirection(false)}
+         onSelectRoute={handleSelectRoute}   
       />
     );
   }
@@ -183,9 +253,7 @@ export default function App() {
         )}
         {/* this section renders the campus highlighted shapes */}
         {buildings.map((building) => {
-
           const destination = selectDestination?.id === building.id;
-          
           return (
             <Polygon
               key={building.id}
@@ -205,6 +273,35 @@ export default function App() {
             />
           )
       })}
+       {/* ⭐ START MARKER */}
+  {routeStart && (
+    <Marker coordinate={routeStart} title="Start" pinColor="green" />
+  )}
+
+  {/* ⭐ END MARKER */}
+  {routeEnd && (
+    <Marker coordinate={routeEnd} title="Destination" pinColor="red" />
+  )}
+
+      {activeSegments.map((seg, idx) => (
+  <Polyline
+    key={`seg-${idx}`}
+    coordinates={seg.coords}
+    strokeWidth={5}
+    strokeColor={seg.isWalk ? "#1e88e5" : "#6b0f1a"}
+    lineDashPattern={seg.isWalk ? [8, 8] : undefined}
+  />
+))}
+
+
+      {activeRouteCoords.length > 0 && activeSegments.length === 0 && (
+  <Polyline
+    coordinates={activeRouteCoords}
+    strokeWidth={5}
+    strokeColor="#6b0f1a"
+  />
+)}
+
       </MapView>
       <SideLeftBar
         currentCampus={currentCampus}
