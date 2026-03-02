@@ -15,7 +15,7 @@ jest.mock("https", () => ({
   get: jest.fn(),
 }));
 
-const https = require("node:https");
+const https = require("https");
 
 function mockHttpsGet(jsonData) {
   https.get.mockImplementation((url, callback) => {
@@ -31,6 +31,52 @@ function mockHttpsGet(jsonData) {
   });
 }
 
+function makeDirectionsWithSteps({ vehicleType = "BUS" } = {}) {
+  return {
+    status: "OK",
+    routes: [
+      {
+        overview_polyline: { points: "overview123" },
+        legs: [
+          {
+            distance: { value: 900, text: "0.9 km" },
+            duration: { value: 600, text: "10 mins" },
+            departure_time: { text: "09:00" },
+            arrival_time: { text: "09:10" },
+            steps: [
+              {
+                travel_mode: "WALKING",
+                duration: { text: "2 mins" },
+                distance: { text: "0.1 km" },
+                html_instructions: "<b>Walk</b> to stop",
+                polyline: { points: "walkStepPoly" },
+              },
+              {
+                travel_mode: "TRANSIT",
+                duration: { text: "6 mins" },
+                html_instructions: "<div>Take the metro</div>",
+                polyline: { points: "transitStepPoly" },
+                transit_details: {
+                  headsign: "Downtown",
+                  num_stops: 3,
+                  departure_stop: { name: "Stop A" },
+                  arrival_stop: { name: "Stop B" },
+                  departure_time: { text: "09:02" },
+                  arrival_time: { text: "09:08" },
+                  line: {
+                    short_name: "105",
+                    name: "105 Express",
+                    vehicle: { type: vehicleType }, // BUS / SUBWAY / METRO
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}
 function makeMockDirectionsResponse(distanceText, durationText, polyline = "mockPolyline") {
   return {
     status: "OK",
@@ -83,6 +129,60 @@ describe("receive data from google API", () => {
         const result = normalizeRoute({}, "walking");
         expect(result).toBeNull();
     });
+});
+it("normalizes steps and strips HTML + sets step polylines", () => {
+  const raw = makeDirectionsWithSteps().routes[0];
+  const result = normalizeRoute(raw, "transit");
+
+  expect(result.steps).toBeDefined();
+  expect(result.steps.length).toBe(2);
+
+  const walk = result.steps.find((s) => s.type === "walk");
+  expect(walk.instruction).toBe("Walk to stop"); // HTML stripped
+  expect(walk.polyline).toBe("walkStepPoly");
+  expect(walk.distanceText).toBe("0.1 km");
+
+  const transit = result.steps.find((s) => s.type === "transit");
+  expect(transit.line).toBe("105");
+  expect(transit.headsign).toBe("Downtown");
+  expect(transit.from).toBe("Stop A");
+  expect(transit.to).toBe("Stop B");
+  expect(transit.stops).toBe(3);
+  expect(transit.polyline).toBe("transitStepPoly");
+});
+
+it("normalizes vehicle type BUS -> bus and SUBWAY/METRO -> subway", () => {
+  const busRaw = makeDirectionsWithSteps({ vehicleType: "BUS" }).routes[0];
+  const busRoute = normalizeRoute(busRaw, "transit");
+  expect(busRoute.steps.find((s) => s.type === "transit").vehicle).toBe("bus");
+
+  const subwayRaw = makeDirectionsWithSteps({ vehicleType: "SUBWAY" }).routes[0];
+  const subwayRoute = normalizeRoute(subwayRaw, "transit");
+  expect(subwayRoute.steps.find((s) => s.type === "transit").vehicle).toBe("subway");
+
+  const metroRaw = makeDirectionsWithSteps({ vehicleType: "METRO" }).routes[0];
+  const metroRoute = normalizeRoute(metroRaw, "transit");
+  expect(metroRoute.steps.find((s) => s.type === "transit").vehicle).toBe("subway");
+});
+
+it("treats OK status with empty routes as no result (returns [])", async () => {
+  https.get.mockImplementation((url, callback) => {
+    const res = {
+      on: jest.fn((event, handler) => {
+        if (event === "data") handler(JSON.stringify({ status: "OK", routes: [] }));
+        if (event === "end") handler();
+        return res;
+      }),
+    };
+    callback(res);
+    return { on: jest.fn() };
+  });
+
+  const sgwOrigin = { lat: 45.4973, lng: -73.5789 };
+  const offCampusDestination = { lat: 45.51, lng: -73.61 };
+
+  const routes = await getTransportOptions(sgwOrigin, offCampusDestination);
+  expect(routes).toEqual([]);
 });
 
 describe("receiving transportation options", () => {

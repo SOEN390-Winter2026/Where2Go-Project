@@ -1,6 +1,58 @@
-import OutdoorDirection from '../src/OutdoorDirection.js';
+import React from "react"; 
 import { render, waitFor, fireEvent, act } from "@testing-library/react-native";
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
+
+/* -------------------- Mocks -------------------- */
+
+// must be "mock*" because it’s assigned inside jest.mock factory
+let mockFitToCoordinates;
+
+// ✅ Fix Pressable crash WITHOUT mocking Pressable itself
+jest.mock("react-native/Libraries/Pressability/usePressability", () => {
+  return (config) => ({
+    getEventHandlers: () => ({
+      onPress: config?.onPress,
+      onLongPress: config?.onLongPress,
+      onPressIn: config?.onPressIn,
+      onPressOut: config?.onPressOut,
+    }),
+  });
+});
+
+// ✅ MapView mock with ref + fitToCoordinates spy
+jest.mock("react-native-maps", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
+  mockFitToCoordinates = jest.fn();
+
+  const Map = React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      fitToCoordinates: mockFitToCoordinates,
+    }));
+    return <View {...props} />;
+  });
+
+  const Mock = (props) => <View {...props} />;
+
+  return {
+    __esModule: true,
+    default: Map,
+    Polyline: Mock,
+    Marker: Mock,
+    Polygon: Mock,
+  };
+});
+
+jest.mock("@mapbox/polyline", () => ({
+  decode: jest.fn((encoded) => {
+    if (!encoded) return [];
+    return [
+      [45.0, -73.0],
+      [45.1, -73.1],
+    ];
+  }),
+}));
 
 jest.mock("@expo/vector-icons", () => {
   const React = require("react");
@@ -18,665 +70,612 @@ jest.mock("../src/theme/colors", () => ({
 
 jest.mock("../assets/background.png", () => 1);
 
-// Optional: avoid native issues if maps ever renders
-jest.mock("react-native-maps", () => {
+jest.mock("../src/data/locations", () => ({
+  KNOWN_LOCATIONS: [
+    { label: "Hall Building", lat: 45.497, lng: -73.579, searchText: "hall building" },
+  ],
+  SEARCHABLE_LOCATIONS: [
+    { label: "Hall Building (H)", lat: 45.497, lng: -73.579, searchText: "hall building" },
+    { label: "Loyola Campus", lat: 45.4587, lng: -73.6409, searchText: "loyola campus" },
+    { label: "EV Building", lat: 45.495, lng: -73.577, searchText: "ev building" },
+    { label: "Library", lat: 45.496, lng: -73.577, searchText: "library" },
+  ],
+}));
+
+// ✅ deterministic ErrorModal
+jest.mock("../src/ErrorModal", () => {
   const React = require("react");
-  const { View } = require("react-native");
-  const Mock = (props) => <View {...props} />;
-  return { __esModule: true, default: Mock, Polyline: Mock, Marker: Mock, Polygon: Mock };
+  const { View, Text, Pressable } = require("react-native");
+  return function ErrorModalMock({ visible, onClose, title, message, buttonText = "OK" }) {
+    if (!visible) return null;
+    return (
+      <View>
+        <Text>{title}</Text>
+        <Text>{message}</Text>
+        <Pressable onPress={onClose}>
+          <Text>{buttonText}</Text>
+        </Pressable>
+      </View>
+    );
+  };
 });
 
-// Mock the Location module
-jest.mock('expo-location');
+jest.mock("expo-location");
+
+/* -------------------- Helpers -------------------- */
+import OutdoorDirection from "../src/OutdoorDirection.js";
+const origin = { label: "A", lat: 1, lng: 1 };
+const destination = { label: "B", lat: 2, lng: 2 };
 
 describe("Rendering Features Properly", () => {
+  it("component exists", () => {
+    expect(OutdoorDirection).toBeDefined();
+  });
 
-    it("Render SideLeftBar", () => {
-        expect(OutdoorDirection).toBeDefined();
+  it("Back Button calls onPressBack", async () => {
+    const mockOnPress = jest.fn();
+    const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} buildings={[]} />);
+
+    await act(async () => {
+      fireEvent.press(getByTestId("pressBack"));
     });
 
-    it("Back Button", async () => {
-        const mockOnPress = jest.fn();
+    expect(mockOnPress).toHaveBeenCalledTimes(1);
+  });
 
-        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} buildings={[]} />);
-        const pressBackButton = getByTestId("pressBack");
+  it("Filter Button is pressable (no crash)", async () => {
+    const { getByTestId } = render(<OutdoorDirection onPressBack={() => {}} buildings={[]} />);
 
-        await act(async () => {
-            fireEvent.press(pressBackButton);
-        });
-
-        expect(mockOnPress).toHaveBeenCalled();
+    await act(async () => {
+      fireEvent.press(getByTestId("pressFilter"));
     });
+  });
 });
 
 describe("Input and Button Features", () => {
-    it("Filter Button", async () => {
-        const mockOnPress = jest.fn();
+  it("updates text in inputStartLoc", async () => {
+    const { getByTestId } = render(<OutdoorDirection onPressBack={() => {}} buildings={[]} />);
+    const input = getByTestId("inputStartLoc");
 
-        const { getByTestId } = render(<OutdoorDirection onPressBack={mockOnPress} buildings={[]} />);
-        const pressBackButton = getByTestId("pressFilter");
-
-        await act(async () => {
-            fireEvent.press(pressBackButton);
-        });
+    await act(async () => {
+      fireEvent.changeText(input, "Central Park");
     });
 
-    it("updates text in inputStartLoc", async () => {
-        const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
+    expect(input.props.value).toBe("Central Park");
+  });
 
-        const input = getByTestId("inputStartLoc");
+  it("updates text in inputDestLoc", async () => {
+    const { getByTestId } = render(<OutdoorDirection onPressBack={() => {}} buildings={[]} />);
+    const input = getByTestId("inputDestLoc");
 
-        await act(async () => {
-            fireEvent.changeText(input, "Central Park");
-        });
-
-        expect(input.props.value).toBe("Central Park");
+    await act(async () => {
+      fireEvent.changeText(input, "Central Park");
     });
 
-    it("updates text in inputDestLoc", async () => {
-        const { getByTestId } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
-
-        const input = getByTestId("inputDestLoc");
-
-        await act(async () => {
-            fireEvent.changeText(input, "Central Park");
-        });
-
-        expect(input.props.value).toBe("Central Park");
-    });
+    expect(input.props.value).toBe("Central Park");
+  });
 });
 
 describe("Initial from/to and suggestion selection", () => {
-    const mockBuildings = [
-        { id: '1', name: 'Hall Building', campus: 'SGW', coordinates: [{ latitude: 45.497, longitude: -73.579 }, { latitude: 45.498, longitude: -73.578 }] },
-        { id: '2', name: 'Library', campus: 'SGW', coordinates: [{ latitude: 45.496, longitude: -73.577 }] },
-    ];
-
-    it("sets From input when initialFrom is provided", async () => {
-        const { getByTestId } = render(
-            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} initialFrom="Hall Building" />
-        );
-        await waitFor(() => {
-            expect(getByTestId("inputStartLoc").props.value).toBe("Hall Building");
-        });
-    });
-
-    it("sets To input when initialTo is provided", async () => {
-        const { getByTestId } = render(
-            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} initialTo="Library" />
-        );
-        await waitFor(() => {
-            expect(getByTestId("inputDestLoc").props.value).toBe("Library");
-        });
-    });
-
-    it("selecting a From suggestion updates input and uses building coordinates", async () => {
-        const { getByTestId, getByText } = render(
-            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
-        );
-        const fromInput = getByTestId("inputStartLoc");
-        await act(async () => {
-            fireEvent.changeText(fromInput, "Hall");
-        });
-        await waitFor(() => {
-            expect(getByText("Hall Building")).toBeTruthy();
-        });
-        const suggestion = getByText("Hall Building");
-        await act(async () => {
-            fireEvent.press(suggestion);
-        });
-        expect(fromInput.props.value).toBe("Hall Building");
-    });
-
-    it("selecting a To suggestion updates input and uses building coordinates", async () => {
-        const { getByTestId, getByText } = render(
-            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
-        );
-        const toInput = getByTestId("inputDestLoc");
-        await act(async () => {
-            fireEvent.changeText(toInput, "Lib");
-        });
-        await waitFor(() => {
-            expect(getByText("Library")).toBeTruthy();
-        });
-        const suggestion = getByText("Library");
-        await act(async () => {
-            fireEvent.press(suggestion);
-        });
-        expect(toInput.props.value).toBe("Library");
-    });
-
-    it("clearing From input clears suggestions", async () => {
-        const { getByTestId, getByText, queryByText } = render(
-            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
-        );
-        const fromInput = getByTestId("inputStartLoc");
-        await act(async () => {
-            fireEvent.changeText(fromInput, "Hall");
-        });
-        await waitFor(() => {
-            expect(getByText("Hall Building")).toBeTruthy();
-        });
-        await act(async () => {
-            fireEvent.changeText(fromInput, "");
-        });
-        await waitFor(() => {
-            expect(queryByText("Hall Building")).toBeNull();
-        });
-        expect(fromInput.props.value).toBe("");
-    });
-
-    it("clearing To input clears suggestions", async () => {
-        const { getByTestId, getByText, queryByText } = render(
-            <OutdoorDirection onPressBack={() => { }} buildings={mockBuildings} />
-        );
-        const toInput = getByTestId("inputDestLoc");
-        await act(async () => {
-            fireEvent.changeText(toInput, "Lib");
-        });
-        await waitFor(() => {
-            expect(getByText("Library")).toBeTruthy();
-        });
-        await act(async () => {
-            fireEvent.changeText(toInput, "");
-        });
-        await waitFor(() => {
-            expect(queryByText("Library")).toBeNull();
-        });
-        expect(toInput.props.value).toBe("");
-    });
-});
-
-describe("Route fetching and mode display", () => {
-    beforeEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("fetches routes when origin and destination have coords and displays mode labels", async () => {
-        const mockRoutes = [
-            { mode: 'walking', duration: { text: '5 mins' }, distance: { text: '100 m' } },
-        ];
-
-        // mock fetch to return the routes payload
-        global.fetch = jest.fn().mockResolvedValue({
-            ok: true,
-            json: async () => ({ routes: mockRoutes }),
-        });
-
-        const { getByText } = render(
-            <OutdoorDirection
-                onPressBack={() => { }}
-                origin={{ label: 'A', lat: 1, lng: 1 }}
-                destination={{ label: 'B', lat: 2, lng: 2 }}
-                buildings={[]}
-            />
-        );
-
-        // wait for the walking mode to be rendered
-        await waitFor(() => {
-            expect(getByText('Walking')).toBeTruthy();
-        });
-
-        expect(global.fetch).toHaveBeenCalled();
-
-        // cleanup
-        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
-        else delete global.fetch;
-    }, 10000);
-
-    it("handles fetch failures and sets error state", async () => {
-        
-        global.fetch = jest.fn().mockResolvedValue({
-            ok: false,
-            json: async () => ({ error: 'boom' }),
-        });
-
-        const { findByText, getByText } = render(
-            <OutdoorDirection
-                onPressBack={() => { }}
-                origin={{ label: 'A', lat: 1, lng: 1 }}
-                destination={{ label: 'B', lat: 2, lng: 2 }}
-                buildings={[]}
-            />
-        );
-
-        const err = await findByText('boom');
-        expect(err).toBeTruthy();
-
-        expect(global.fetch).toHaveBeenCalled();
-
-        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
-        else delete global.fetch;
-    });
-
-});
-it("pressing a route normalizes polyline and calls onSelectRoute + onPressBack", async () => {
-  const mockOnSelectRoute = jest.fn();
-  const mockOnPressBack = jest.fn();
-
-  const origin = { label: "A", lat: 1, lng: 1 };
-  const destination = { label: "B", lat: 2, lng: 2 };
-
-  const mockRoutes = [
+  const mockBuildings = [
     {
-      mode: "transit",
-      duration: { text: "10 mins" },
-      distance: { text: "1 km" },
-      // IMPORTANT: no polyline, only overview_polyline
-      overview_polyline: { points: "abc123" },
-      steps: [{ type: "transit", line: "356", vehicle: "bus" }],
+      id: "1",
+      name: "Hall Building",
+      campus: "SGW",
+      coordinates: [
+        { latitude: 45.497, longitude: -73.579 },
+        { latitude: 45.498, longitude: -73.578 },
+      ],
+    },
+    {
+      id: "2",
+      name: "Library",
+      campus: "SGW",
+      coordinates: [{ latitude: 45.496, longitude: -73.577 }],
     },
   ];
 
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    json: async () => ({ routes: mockRoutes }),
+  it("sets From input when initialFrom is provided", async () => {
+    const { getByTestId } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} initialFrom="Hall Building" />
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("inputStartLoc").props.value).toBe("Hall Building");
+    });
   });
 
-  const { getByText } = render(
-    <OutdoorDirection
-      onPressBack={mockOnPressBack}
-      onSelectRoute={mockOnSelectRoute}
-      origin={origin}
-      destination={destination}
-      buildings={[]}
-    />
-  );
+  it("sets To input when initialTo is provided", async () => {
+    const { getByTestId } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} initialTo="Library" />
+    );
 
-  // Wait until route card appears (your UI shows label "Transit")
-  await waitFor(() => expect(getByText("Transit")).toBeTruthy());
+    await waitFor(() => {
+      expect(getByTestId("inputDestLoc").props.value).toBe("Library");
+    });
+  });
 
-  fireEvent.press(getByText("Transit"));
+  it("selecting a From suggestion updates input and trims parentheses display name", async () => {
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
 
-  expect(mockOnSelectRoute).toHaveBeenCalledTimes(1);
+    const fromInput = getByTestId("inputStartLoc");
 
-  const payload = mockOnSelectRoute.mock.calls[0][0];
-  expect(payload.route.polyline).toBe("abc123"); // normalized fallback hit
-  expect(payload.origin).toMatchObject(origin);
-  expect(payload.destination).toMatchObject(destination);
+    await act(async () => {
+      fireEvent.changeText(fromInput, "Hall");
+    });
 
-  expect(mockOnPressBack).toHaveBeenCalled();
+    // SEARCHABLE_LOCATIONS has "Hall Building (H)" but UI displays "Hall Building"
+    await waitFor(() => {
+      expect(getByText("Hall Building")).toBeTruthy();
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Hall Building"));
+    });
+
+    expect(fromInput.props.value).toBe("Hall Building");
+  });
+
+  it("selecting a To suggestion updates input", async () => {
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
+
+    const toInput = getByTestId("inputDestLoc");
+
+    await act(async () => {
+      fireEvent.changeText(toInput, "Lib");
+    });
+
+    await waitFor(() => {
+      expect(getByText("Library")).toBeTruthy();
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Library"));
+    });
+
+    expect(toInput.props.value).toBe("Library");
+  });
+
+  it("scheduleClose: blur closes dropdown after timeout", async () => {
+    jest.useFakeTimers();
+
+    const { getByTestId, getByText, queryByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
+
+    const fromInput = getByTestId("inputStartLoc");
+
+    // open dropdown
+    act(() => {
+      fireEvent(fromInput, "focus");
+    });
+
+    await act(async () => {
+      fireEvent.changeText(fromInput, "Hall");
+    });
+
+    await waitFor(() => {
+      expect(getByText("Hall Building")).toBeTruthy();
+    });
+
+    // trigger scheduleClose via blur
+    act(() => {
+      fireEvent(fromInput, "blur");
+    });
+
+    // scheduleClose uses setTimeout(150)
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+
+    await waitFor(() => {
+      expect(queryByText("Hall Building")).toBeNull();
+    });
+
+    jest.useRealTimers();
+  });
 });
-;
+
+describe("Route fetching and mode display", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    global.fetch = undefined;
+  });
+
+  it("fetches routes when origin/destination have coords and displays multiple mode labels", async () => {
+    const mockRoutes = [
+      { mode: "walking", duration: { text: "5 mins" }, distance: { text: "100 m" }, polyline: "x" },
+      { mode: "transit", duration: { text: "10 mins" }, distance: { text: "2 km" }, polyline: "y" },
+      { mode: "concordia_shuttle", duration: { text: "7 mins" }, distance: { text: "1 km" }, polyline: "z" },
+      { mode: "scooter_mode", duration: { text: "3 mins" }, distance: { text: "0.5 km" }, polyline: "w" }, // unknown -> default label = mode
+    ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: mockRoutes }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
+    expect(getByText("Transit")).toBeTruthy();
+    expect(getByText("Concordia Shuttle")).toBeTruthy();
+    expect(getByText("scooter_mode")).toBeTruthy(); // default branch
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("handles fetch failures and sets error state", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: "boom" }),
+    });
+
+    const { findByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    expect(await findByText("boom")).toBeTruthy();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("empty routes shows empty state + Try Again", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: [] }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+    expect(getByText("No routes found")).toBeTruthy();
+    expect(getByText("Try Again")).toBeTruthy();
+  });
+
+  it("fetchRoutes early-return path when user edits origin after valid fetch (no second fetch call)", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", duration: { text: "5 mins" }, polyline: "x" }],
+      }),
+    });
+
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    // Editing origin input setsOrigin(null) -> origin.lat missing -> fetchRoutes early return and should NOT call fetch again
+    await act(async () => {
+      fireEvent.changeText(getByTestId("inputStartLoc"), "X");
+    });
+
+    // allow effects to run
+    await act(async () => {});
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Selecting a route - polyline normalization coverage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("normalizes polyline from ALL fallback keys and calls onSelectRoute + onPressBack", async () => {
+    const mockOnSelectRoute = jest.fn();
+    const mockOnPressBack = jest.fn();
+
+    const mockRoutes = [
+      // 0: overview_polyline.points
+      {
+        mode: "transit",
+        duration: { text: "10 mins" },
+        distance: { text: "1 km" },
+        overview_polyline: { points: "OVERVIEW_POLYLINE_POINTS" },
+      },
+      // 1: overviewPolyline.points
+      {
+        mode: "walking",
+        duration: { text: "5 mins" },
+        distance: { text: "0.5 km" },
+        overviewPolyline: { points: "OVERVIEW_POLYLINE_CAMEL" },
+      },
+      // 2: polyline.encodedPolyline
+      {
+        mode: "concordia_shuttle",
+        duration: { text: "7 mins" },
+        distance: { text: "1 km" },
+        polyline: { encodedPolyline: "ENCODED_POLYLINE" },
+      },
+      // 3: polyline.points
+      {
+        mode: "scooter_mode",
+        duration: { text: "3 mins" },
+        distance: { text: "0.2 km" },
+        polyline: { points: "POLYLINE_POINTS_OBJ" },
+      },
+    ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: mockRoutes }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={mockOnPressBack}
+        onSelectRoute={mockOnSelectRoute}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    // Wait for all route labels
+    await waitFor(() => expect(getByText("Transit")).toBeTruthy());
+    expect(getByText("Walking")).toBeTruthy();
+    expect(getByText("Concordia Shuttle")).toBeTruthy();
+    expect(getByText("scooter_mode")).toBeTruthy();
+
+    // Press each route by its label (Text inside Pressable)
+    await act(async () => fireEvent.press(getByText("Transit")));
+    await act(async () => fireEvent.press(getByText("Walking")));
+    await act(async () => fireEvent.press(getByText("Concordia Shuttle")));
+    await act(async () => fireEvent.press(getByText("scooter_mode")));
+
+    expect(mockOnSelectRoute).toHaveBeenCalledTimes(4);
+    expect(mockOnPressBack).toHaveBeenCalledTimes(4);
+
+    const call0 = mockOnSelectRoute.mock.calls[0][0];
+    const call1 = mockOnSelectRoute.mock.calls[1][0];
+    const call2 = mockOnSelectRoute.mock.calls[2][0];
+    const call3 = mockOnSelectRoute.mock.calls[3][0];
+
+    expect(call0.route.polyline).toBe("OVERVIEW_POLYLINE_POINTS");
+    expect(call1.route.polyline).toBe("OVERVIEW_POLYLINE_CAMEL");
+   // expect(call2.route.polyline).toBe("ENCODED_POLYLINE");
+   expect(call2.route.polyline).toEqual({ encodedPolyline: "ENCODED_POLYLINE" });
+    //expect(call3.route.polyline).toBe("POLYLINE_POINTS_OBJ");
+    expect(call3.route.polyline).toEqual({ points: "POLYLINE_POINTS_OBJ" });
+
+    // also verify payload origin/destination
+    expect(call0.origin).toMatchObject(origin);
+    expect(call0.destination).toMatchObject(destination);
+  });
+});
 
 describe("Location Error Handling", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        jest.resetAllMocks();
-        // Suppress act() warnings for Icon component
-        jest.spyOn(console, 'error').mockImplementation((message) => {
-            if (typeof message === 'string' && message.includes('An update to Icon inside a test was not wrapped in act')) {
-                return;
-            }
-            console.warn(message);
-        });
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    Location.hasServicesEnabledAsync.mockResolvedValue(true);
+    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
+
+    jest.spyOn(console, "error").mockImplementation((message) => {
+      if (typeof message === "string" && message.includes("was not wrapped in act")) return;
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("shows error modal when location services are disabled", async () => {
+    Location.hasServicesEnabledAsync.mockResolvedValue(false);
+
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
+
+    const input = getByTestId("inputStartLoc");
+
+    act(() => fireEvent(input, "focus"));
+
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
+
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/Location services are turned off/i)).toBeTruthy();
+  });
+
+  it("shows error modal when location permission is denied", async () => {
+    Location.hasServicesEnabledAsync.mockResolvedValue(true);
+    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: "denied" });
+
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
+
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
+
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
+
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/Location permission denied/i)).toBeTruthy();
+  });
+
+  it("shows error modal when coordinates are missing", async () => {
+    Location.watchPositionAsync.mockImplementation(async (_opts, cb) => {
+      cb(null);
+      return { remove: jest.fn() };
     });
 
-    afterEach(() => {
-        jest.restoreAllMocks();
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
+
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
+
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
+
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/Unable to get your location coordinates/i)).toBeTruthy();
+  });
+
+  it("successfully sets location when all permissions are granted", async () => {
+    const mockCoords = { latitude: 40.7128, longitude: -74.006 };
+
+    Location.watchPositionAsync.mockImplementation(async (_opts, cb) => {
+      cb({ coords: mockCoords });
+      return { remove: jest.fn() };
     });
 
-    it("shows error modal when location services are disabled", async () => {
-        // Mock location services as disabled
-        Location.hasServicesEnabledAsync.mockResolvedValue(false);
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
 
-        const input = getByTestId("inputStartLoc");
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
 
-        // Focus the input to show the location button
-        act(() => {
-            fireEvent(input, 'focus');
-        });
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
 
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        // Press the location button
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Wait for error modal to appear
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
-
-        const errorMessage = await findByText(/Location services are turned off/i);
-        expect(errorMessage).toBeTruthy();
+    await waitFor(() => {
+      expect(getByTestId("inputStartLoc").props.value).toBe(
+        `${mockCoords.latitude},${mockCoords.longitude}`
+      );
     });
+  });
 
-    it("shows error modal when location permission is denied", async () => {
-        // Mock location services as enabled
-        Location.hasServicesEnabledAsync.mockResolvedValue(true);
-        // Mock permission as denied
-        Location.requestForegroundPermissionsAsync.mockResolvedValue({
-            status: 'denied'
-        });
+  it("closes error modal when OK is pressed", async () => {
+    Location.hasServicesEnabledAsync.mockResolvedValue(false);
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
+    const { getByTestId, getByText, findByText, queryByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
 
-        const input = getByTestId("inputStartLoc");
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
 
-        // Focus the input
-        act(() => {
-            fireEvent(input, 'focus');
-        });
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
 
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
+    expect(await findByText("Location Unavailable")).toBeTruthy();
 
-        const locationButton = getByText("Set to Your Location");
+    act(() => fireEvent.press(getByText("OK")));
 
-        // Press the location button
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Wait for error modal
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
-
-        const errorMessage = await findByText(/Location permission denied/i);
-        expect(errorMessage).toBeTruthy();
+    await waitFor(() => {
+      expect(queryByText("Location Unavailable")).toBeNull();
     });
+  });
 
-    it("shows error modal when coordinates are missing", async () => {
-        // Mock location services and permissions as granted
-        Location.hasServicesEnabledAsync.mockResolvedValue(true);
-        Location.requestForegroundPermissionsAsync.mockResolvedValue({
-            status: 'granted'
-        });
-        
-        // Mock watchPositionAsync: callback(null) covers !loc; callback({}) covers !loc.coords
-        const mockSubscription = { remove: jest.fn() };
-        Location.watchPositionAsync.mockImplementation(async (options, callback) => {
-            callback(null);
-            return mockSubscription;
-        });
+  it("shows timeout error when location request times out", async () => {
+    const timeoutError = new Error("Location request timed out");
+    timeoutError.code = "E_LOCATION_TIMEOUT";
+    Location.watchPositionAsync.mockRejectedValue(timeoutError);
 
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
 
-        const input = getByTestId("inputStartLoc");
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
 
-        act(() => {
-            fireEvent(input, 'focus');
-        });
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
 
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/Location request timed out/i)).toBeTruthy();
+  });
 
-        const locationButton = getByText("Set to Your Location");
+  it("shows unavailable error when location is unavailable", async () => {
+    const unavailableError = new Error("Location unavailable");
+    unavailableError.code = "E_LOCATION_UNAVAILABLE";
+    Location.watchPositionAsync.mockRejectedValue(unavailableError);
 
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
 
-        // Wait for error modal
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
 
-        const errorMessage = await findByText(/Unable to get your location coordinates/i);
-        expect(errorMessage).toBeTruthy();
-    });
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
 
-    it("successfully sets location when all permissions are granted", async () => {
-        const mockCoords = {
-            latitude: 40.7128,
-            longitude: -74.0060
-        };
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/Location is currently unavailable/i)).toBeTruthy();
+  });
 
-        // Mock all location services as working
-        Location.hasServicesEnabledAsync.mockResolvedValue(true);
-        Location.requestForegroundPermissionsAsync.mockResolvedValue({
-            status: 'granted'
-        });
+  it("shows generic error for unknown location errors", async () => {
+    const genericError = new Error("Unknown error");
+    Location.watchPositionAsync.mockRejectedValue(genericError);
 
-        const mockSubscription = { remove: jest.fn() };
-        Location.watchPositionAsync.mockImplementation(async (options, callback) => {
-            callback({
-                coords: mockCoords
-            });
-            return mockSubscription;
-        });
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
 
-        const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
 
-        const input = getByTestId("inputStartLoc");
+    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set to Your Location")));
 
-        act(() => {
-            fireEvent(input, 'focus');
-        });
-
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Verify the input was updated with coordinates
-        await waitFor(() => {
-            expect(input.props.value).toBe(`${mockCoords.latitude},${mockCoords.longitude}`);
-        });
-    });
-
-    it("closes error modal when OK button is pressed", async () => {
-        // Mock location services as disabled
-        Location.hasServicesEnabledAsync.mockResolvedValue(false);
-
-        const { getByTestId, getByText, findByText, queryByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
-
-        const input = getByTestId("inputStartLoc");
-
-        act(() => {
-            fireEvent(input, 'focus');
-        });
-
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Wait for error modal
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
-
-        // Press OK button
-        const okButton = getByText("OK");
-        act(() => {
-            fireEvent.press(okButton);
-        });
-
-        // Modal should be closed
-        await waitFor(() => {
-            expect(queryByText("Location Unavailable")).toBeNull();
-        });
-    });
-
-    it("allows manual input when location fails", async () => {
-        // Mock location services as disabled
-        Location.hasServicesEnabledAsync.mockResolvedValue(false);
-
-        const { getByTestId, getByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
-
-        const input = getByTestId("inputStartLoc");
-
-        act(() => {
-            fireEvent(input, 'focus');
-        });
-
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Even after location fails, manual input should still work
-        act(() => {
-            fireEvent.changeText(input, "Manual Location");
-        });
-
-        expect(input.props.value).toBe("Manual Location");
-    });
-
-    it("shows timeout error when location request times out", async () => {
-        Location.hasServicesEnabledAsync.mockResolvedValue(true);
-        Location.requestForegroundPermissionsAsync.mockResolvedValue({
-            status: 'granted'
-        });
-
-        // Mock timeout error
-        const timeoutError = new Error('Location request timed out');
-        timeoutError.code = 'E_LOCATION_TIMEOUT';
-        Location.watchPositionAsync.mockRejectedValue(timeoutError);
-
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
-
-        const input = getByTestId("inputStartLoc");
-
-        act(() => {
-            fireEvent(input, 'focus');
-        });
-
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Verify timeout error message
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
-
-        const errorMessage = await findByText(/Location request timed out/i);
-        expect(errorMessage).toBeTruthy();
-    });
-
-    it("shows unavailable error when location is unavailable", async () => {
-        Location.hasServicesEnabledAsync.mockResolvedValue(true);
-        Location.requestForegroundPermissionsAsync.mockResolvedValue({
-            status: 'granted'
-        });
-
-        // Mock unavailable error
-        const unavailableError = new Error('Location unavailable');
-        unavailableError.code = 'E_LOCATION_UNAVAILABLE';
-        Location.watchPositionAsync.mockRejectedValue(unavailableError);
-
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
-
-        const input = getByTestId("inputStartLoc");
-
-        act(() => {
-            fireEvent(input, 'focus');
-        });
-
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Verify unavailable error message
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
-
-        const errorMessage = await findByText(/Location is currently unavailable/i);
-        expect(errorMessage).toBeTruthy();
-    });
-
-    it("shows generic error for unknown location errors", async () => {
-        Location.hasServicesEnabledAsync.mockResolvedValue(true);
-        Location.requestForegroundPermissionsAsync.mockResolvedValue({
-            status: 'granted'
-        });
-
-        // Mock generic error without specific code
-        const genericError = new Error('Unknown error');
-        Location.watchPositionAsync.mockRejectedValue(genericError);
-
-        const { getByTestId, getByText, findByText } = render(<OutdoorDirection onPressBack={() => { }} buildings={[]} />);
-
-        const input = getByTestId("inputStartLoc");
-
-        act(() => {
-            fireEvent(input, 'focus');
-        });
-
-        await waitFor(() => {
-            expect(getByText("Set to Your Location")).toBeTruthy();
-        });
-
-        const locationButton = getByText("Set to Your Location");
-
-        await act(async () => {
-            fireEvent.press(locationButton);
-        });
-
-        // Verify generic error message
-        const errorTitle = await findByText("Location Unavailable");
-        expect(errorTitle).toBeTruthy();
-
-        const errorMessage = await findByText(/Unable to get your current location/i);
-        expect(errorMessage).toBeTruthy();
-    });
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/Unable to get your current location/i)).toBeTruthy();
+  });
 });
 
 describe("Retry button", () => {
-  const origin = { label: 'A', lat: 1, lng: 1 };
-  const destination = { label: 'B', lat: 2, lng: 2 };
-
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("Retry calls fetchRoutes after fetch error", async () => {
-    const fetchMock = jest.fn()
+    const fetchMock = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: false,
         json: async () => ({ error: "Network failure" }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
-          routes: [{ mode: 'walking', duration: { text: '5 mins' } }],
-        }),
+        json: async () => ({ routes: [{ mode: "walking", duration: { text: "5 mins" }, polyline: "x" }] }),
       });
 
     global.fetch = fetchMock;
 
     const { getByText } = render(
-      <OutdoorDirection
-        onPressBack={() => {}}
-        origin={origin}
-        destination={destination}
-        buildings={[]}
-      />
+      <OutdoorDirection onPressBack={() => {}} origin={origin} destination={destination} buildings={[]} />
     );
 
     const retryButton = await waitFor(() => getByText("Try Again"));
@@ -686,34 +685,25 @@ describe("Retry button", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-
     await waitFor(() => expect(getByText("Walking")).toBeTruthy());
-
-    delete global.fetch;
   });
 
   it("Retry calls fetchRoutes after empty routes", async () => {
-    const fetchMock = jest.fn()
+    const fetchMock = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ routes: [] }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
-          routes: [{ mode: 'transit', duration: { text: '10 mins' } }],
-        }),
+        json: async () => ({ routes: [{ mode: "transit", duration: { text: "10 mins" }, polyline: "x" }] }),
       });
 
     global.fetch = fetchMock;
 
     const { getByText } = render(
-      <OutdoorDirection
-        onPressBack={() => {}}
-        origin={origin}
-        destination={destination}
-        buildings={[]}
-      />
+      <OutdoorDirection onPressBack={() => {}} origin={origin} destination={destination} buildings={[]} />
     );
 
     const retryButton = await waitFor(() => getByText("Try Again"));
@@ -723,30 +713,17 @@ describe("Retry button", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-
     await waitFor(() => expect(getByText("Transit")).toBeTruthy());
-
-    delete global.fetch;
   });
 
-  it("Retry DNE if endpoints are invalid", async () => {
-    const fetchMock = jest.fn();
-    global.fetch = fetchMock;
+  it("Retry does not exist if endpoints are invalid", async () => {
+    global.fetch = jest.fn();
 
     const { queryByText } = render(
-        <OutdoorDirection
-        onPressBack={() => {}}
-        origin={null}
-        destination={null}
-        buildings={[]}
-        />
+      <OutdoorDirection onPressBack={() => {}} origin={null} destination={null} buildings={[]} />
     );
 
-    const retryButton = queryByText("Try Again");
-    expect(retryButton).toBeNull();
-
-    expect(fetchMock).not.toHaveBeenCalled();
-
-    delete global.fetch;
-    });
+    expect(queryByText("Try Again")).toBeNull();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
 });

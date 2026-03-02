@@ -513,7 +513,8 @@ const handleSelectRoute = ({ route, origin, destination }) => {
                // onPress={() => setSelectedRouteIndex(i)}
                onPress={() => {
                 console.log("Pressed route:", i);
-                console.log("r.polyline length:", r?.polyline?.length);
+               console.log("r.polyline length:", r?.polyline?.length);
+               
                 console.log("r.steps length:", r?.steps?.length);
                 console.log("origin:", origin);
                 console.log("destination:", destination);
@@ -530,8 +531,7 @@ const handleSelectRoute = ({ route, origin, destination }) => {
                      };
 
                console.log("Normalized polyline length:", normalized?.polyline?.length);
-
-                
+               handleSelectRoute({ route: normalized, origin, destination });
                 setSelectedRouteIndex(i);
                 //setShowFullMap(true);
                 if (onSelectRoute)
