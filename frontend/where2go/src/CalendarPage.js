@@ -9,6 +9,7 @@ import {
     Dimensions,
     Pressable,
 } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from 'expo-web-browser';
 import * as Calendar from 'expo-calendar';
@@ -20,6 +21,10 @@ WebBrowser.maybeCompleteAuthSession();
 
 const { height, width } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
+// key for storing selected calendars
+const STORAGE_KEYS = {
+    selectedCalendarIds: 'selectedCalendarIds',
+};
 
 export default function CalendarPage({ onPressBack }) {
 
@@ -123,6 +128,40 @@ export default function CalendarPage({ onPressBack }) {
     const [events, setEvents] = useState([]);
     const [calendars, setCalendars] = useState([]);
 
+    // Persists the selected calendars locally
+    const saveSelectedCalendars = async () => {
+        const hasSelection = selectedCalendarIds.length > 0;
+        setIsCalendarsChosen(hasSelection);
+        try {
+            await SecureStore.setItemAsync(
+                STORAGE_KEYS.selectedCalendarIds,
+                JSON.stringify(selectedCalendarIds)
+            );
+        } catch (e) {
+            console.error('Failed to save selected calendars', e);
+        }
+    };
+
+    // Restore saved calendars 
+    useEffect(() => {
+        const restoreSelectedCalendars = async () => {
+            try {
+                const stored = await SecureStore.getItemAsync(STORAGE_KEYS.selectedCalendarIds);
+                if (!stored) return;
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    setSelectedCalendarIds(parsed);
+                    setIsCalendarsChosen(true);
+                    setIsCalendarConnected(true);
+                }
+            } catch (e) {
+                console.error('Failed to load saved calendars', e);
+            }
+        };
+
+        restoreSelectedCalendars();
+    }, []);
+
     useEffect(() => {
         console.log(calendars.map(calendar => calendar.title));
         if (calendars.length === 0){
@@ -202,7 +241,7 @@ export default function CalendarPage({ onPressBack }) {
 
                             <Pressable
                                 style={styles.saveBtn}
-                                onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
+                                onPress={saveSelectedCalendars}
                             >
                                 <Text testID="saveBtn" style={styles.btnTxt}>Done</Text>
                             </Pressable>
