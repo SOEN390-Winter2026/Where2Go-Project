@@ -221,9 +221,26 @@ function fetchDirections(origin, destination, mode) {
  */
 
 function stripHtml(html = "") {
-  return String(html).replace(/<[^>]+>/g, "").trim();
-}
+  const s = String(html);
+  let out = "";
+  let inTag = false;
 
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+
+    if (ch === "<") {
+      inTag = true;
+      continue;
+    }
+    if (ch === ">" && inTag) {
+      inTag = false;
+      continue;
+    }
+    if (!inTag) out += ch;
+  }
+
+  return out.trim();
+}
 function normalizeSteps(leg) {
   const steps = leg?.steps ?? [];
 
