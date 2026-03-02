@@ -1,6 +1,6 @@
 appId: host.exp.exponent
 ---
-# Test: exercise the POI panel and slider
+# Test: exercise the POI panel and directions
 
 - tapOn:
     id: poiPress
@@ -15,16 +15,24 @@ appId: host.exp.exponent
 
 - waitForAnimationToEnd    
 
+- tapOn: Load
+
 # 87% is the height, 40% can be changed for different distances
 - tapOn:
     point: 60%,87%
 
-- assertVisible:
-    text: "Radius Range: 400 m"
+- tapOn: Load
 
-# finally disable POI so panel disappears
 - tapOn:
-    id: poiPress
+    point: 40%,87%
 
-- assertNotVisible:
-    id: poiSlider 
+- tapOn: Load
+
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "poi-.*"
+
+- tapOn: "Get Directions"
+
+- assertVisible: "Plan Your Trip"
