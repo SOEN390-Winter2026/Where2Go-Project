@@ -2,6 +2,25 @@ import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import CalendarPage from '../src/CalendarPage'; // Adjust path
 import * as Calendar from 'expo-calendar';
+import * as SecureStore from 'expo-secure-store';
+
+jest.mock('expo-secure-store', () => {
+    let store = {};
+    return {
+        setItemAsync: jest.fn((key, value) => {
+            store[key] = value;
+            return Promise.resolve();
+        }),
+        getItemAsync: jest.fn((key) => Promise.resolve(store[key] ?? null)),
+        deleteItemAsync: jest.fn((key) => {
+            delete store[key];
+            return Promise.resolve();
+        }),
+        _clear: () => {
+            store = {};
+        },
+    };
+});
 
 jest.mock('react-native-calendars', () => {
     const React = require('react');
@@ -86,6 +105,7 @@ describe('CalendarPage', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        SecureStore._clear();
     });
 
     it('sets visibility to false after the close animation completes', async () => {
@@ -218,6 +238,43 @@ describe('CalendarPage', () => {
 
         expect(await findByText('Concordia Lecture')).toBeTruthy();
         expect(await findByText('Gym Session')).toBeTruthy();
+    });
+
+    it('persists selected calendars when Done is pressed', async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work', color: '#91233E' }]);
+        Calendar.getEventsAsync.mockResolvedValue([]);
+
+        const { getByTestId, getByText, findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByTestId('calBtn'));
+
+        await findByText('Work');
+
+        fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
+        fireEvent.press(getByText('Done'));
+
+        await waitFor(() => {
+            expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+                'selectedCalendarIds',
+                JSON.stringify(['cal-1'])
+            );
+        });
+    });
+
+    it('restores previously saved selected calendars on mount', async () => {
+        await SecureStore.setItemAsync('selectedCalendarIds', JSON.stringify(['cal-1']));
+
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
+        Calendar.getCalendarsAsync.mockResolvedValue([]);
+        Calendar.getEventsAsync.mockResolvedValue([]);
+
+        render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        await waitFor(() => {
+            expect(SecureStore.getItemAsync).toHaveBeenCalledWith('selectedCalendarIds');
+        });
     });
 
     it('requests permissions and fetches calendars on connect', async () => {
