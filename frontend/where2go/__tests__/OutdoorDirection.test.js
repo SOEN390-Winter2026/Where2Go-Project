@@ -280,6 +280,37 @@ describe("Initial from/to and suggestion selection", () => {
     jest.useRealTimers();
   });
 });
+it("dest dropdown renders when dest is focused and query matches (covers dropdown lines)", async () => {
+  const mockBuildings = [
+    {
+      id: "2",
+      name: "Library",
+      campus: "SGW",
+      coordinates: [{ latitude: 45.496, longitude: -73.577 }],
+    },
+  ];
+
+  const { getByTestId, getByText } = render(
+    <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+  );
+
+  const destInput = getByTestId("inputDestLoc");
+
+  // Focus dest (activeField = "dest")
+  act(() => {
+    fireEvent(destInput, "focus");
+  });
+
+  // Type something that matches SEARCHABLE_LOCATIONS ("Library")
+  await act(async () => {
+    fireEvent.changeText(destInput, "Lib");
+  });
+
+  // This expectation forces the dropdown to render
+  await waitFor(() => {
+    expect(getByText("Library")).toBeTruthy();
+  });
+});
 
 describe("Route fetching and mode display", () => {
   beforeEach(() => {
