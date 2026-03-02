@@ -225,6 +225,24 @@ describe("Route fetching and mode display", () => {
     if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
     else delete global.fetch;
     });
+    it("handles network exception (fetch throws)", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error("Network crash"));
+
+    const { findByText } = render(
+        <OutdoorDirection
+        onPressBack={() => {}}
+        origin={{ label: "A", lat: 1, lng: 1 }}
+        destination={{ label: "B", lat: 2, lng: 2 }}
+        buildings={[]}
+        />
+    );
+
+    await findByText("No routes found");
+
+    expect(global.fetch).toHaveBeenCalled();
+
+    delete global.fetch;
+    });
 
 });
 ;
@@ -694,5 +712,70 @@ describe("Invalid endpoint selection state", () => {
     });
 
     expect(getByText("Select valid locations")).toBeTruthy();
+  });
+});
+
+describe("Dropdown scheduleClose coverage", () => {
+  const mockBuildings = [
+    {
+      id: "1",
+      name: "Hall Building",
+      campus: "SGW",
+      coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+    },
+  ];
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
+  it("scheduleClose closes dropdown after blur on the active field", async () => {
+    const { getByTestId, getByText, queryByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
+
+    const fromInput = getByTestId("inputStartLoc");
+
+    act(() => {
+      fireEvent(fromInput, "focus");
+      fireEvent.changeText(fromInput, "Hall");
+    });
+
+    expect(getByText("Hall Building")).toBeTruthy();
+
+    act(() => {
+      fireEvent(fromInput, "blur");
+      jest.advanceTimersByTime(200); 
+    });
+
+    expect(queryByText("Hall Building")).toBeNull();
+  });
+
+  it("scheduleClose does NOT close dropdown if blur is for a different field (covers else branch)", async () => {
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
+
+    const fromInput = getByTestId("inputStartLoc");
+    const toInput = getByTestId("inputDestLoc");
+
+    act(() => {
+      fireEvent(fromInput, "focus");
+      fireEvent.changeText(fromInput, "Hall");
+    });
+
+    expect(getByText("Hall Building")).toBeTruthy();
+
+    act(() => {
+      fireEvent(toInput, "blur");
+      jest.advanceTimersByTime(200);
+    });
+
+    expect(getByText("Hall Building")).toBeTruthy();
   });
 });
