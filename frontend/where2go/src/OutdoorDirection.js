@@ -108,7 +108,7 @@ function stepsToSegments(route) {
     .filter(Boolean);
 }
 
-export default function OutdoorDirection({ origin: originProp, destination: destProp, initialFrom, onSelectRoute,initialTo, buildings, onPressBack }) {
+export default function OutdoorDirection({ origin: originProp, destination: destProp, initialFrom, onSelectRoute,initialTo, buildings, onPressBack, __testMapRef, }) {
   // ---- Endpoint state ----
 
   const [origin, setOrigin] = useState(originProp ?? null);
@@ -231,6 +231,12 @@ const handleSelectRoute = ({ route, origin, destination }) => {
 
 /////////////////
   const mapRef = useRef(null);
+  // TEST ONLY: allow injecting a fake ref so fitToCoordinates branches can be covered
+useEffect(() => {
+  if (__testMapRef && mapRef) {
+    mapRef.current = __testMapRef;
+  }
+}, [__testMapRef]);
   // Default to first route when loaded
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
 /////////////////
@@ -519,16 +525,29 @@ const handleSelectRoute = ({ route, origin, destination }) => {
                 console.log("origin:", origin);
                 console.log("destination:", destination);
 
-                 const normalized = {
-                   ...r,
-                   polyline:
-                   r?.polyline ??
-                   r?.overview_polyline?.points ??
-                   r?.overviewPolyline?.points ??
-                   r?.polyline?.encodedPolyline ??
-                   r?.polyline?.points ??
-                    null,
-                     };
+                //  const normalized = {
+                //    ...r,
+                //    polyline:
+                //    r?.polyline ??
+                //    r?.overview_polyline?.points ??
+                //    r?.overviewPolyline?.points ??
+                //    r?.polyline?.encodedPolyline ??
+                //    r?.polyline?.points ??
+                //     null,
+                //      };
+                const normalizedPolyline =
+  typeof r?.polyline === "string"
+    ? r.polyline
+    : r?.polyline?.encodedPolyline ??
+      r?.polyline?.points ??
+      r?.overview_polyline?.points ??
+      r?.overviewPolyline?.points ??
+      null;
+
+const normalized = {
+  ...r,
+  polyline: normalizedPolyline,
+};
 
                console.log("Normalized polyline length:", normalized?.polyline?.length);
                handleSelectRoute({ route: normalized, origin, destination });
@@ -805,3 +824,13 @@ const styles = StyleSheet.create({
   },
 
 });
+
+
+
+export const __test__ = {
+  getBuildingDisplayName,
+  filterLocations,
+  getModeDisplay,
+  decodePolylineToCoords,
+  stepsToSegments,
+};

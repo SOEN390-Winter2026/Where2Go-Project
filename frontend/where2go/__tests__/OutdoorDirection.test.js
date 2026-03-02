@@ -104,6 +104,7 @@ jest.mock("expo-location");
 
 /* -------------------- Helpers -------------------- */
 import OutdoorDirection from "../src/OutdoorDirection.js";
+import polyline from "@mapbox/polyline";
 const origin = { label: "A", lat: 1, lng: 1 };
 const destination = { label: "B", lat: 2, lng: 2 };
 
@@ -464,10 +465,10 @@ describe("Selecting a route - polyline normalization coverage", () => {
 
     expect(call0.route.polyline).toBe("OVERVIEW_POLYLINE_POINTS");
     expect(call1.route.polyline).toBe("OVERVIEW_POLYLINE_CAMEL");
-   // expect(call2.route.polyline).toBe("ENCODED_POLYLINE");
-   expect(call2.route.polyline).toEqual({ encodedPolyline: "ENCODED_POLYLINE" });
-    //expect(call3.route.polyline).toBe("POLYLINE_POINTS_OBJ");
-    expect(call3.route.polyline).toEqual({ points: "POLYLINE_POINTS_OBJ" });
+    expect(call2.route.polyline).toBe("ENCODED_POLYLINE");
+  // expect(call2.route.polyline).toEqual({ encodedPolyline: "ENCODED_POLYLINE" });
+    expect(call3.route.polyline).toBe("POLYLINE_POINTS_OBJ");
+    //expect(call3.route.polyline).toEqual({ points: "POLYLINE_POINTS_OBJ" });
 
     // also verify payload origin/destination
     expect(call0.origin).toMatchObject(origin);
@@ -725,5 +726,277 @@ describe("Retry button", () => {
 
     expect(queryByText("Try Again")).toBeNull();
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("handleSelectRoute - segments (without MapView ref)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("pressing a route with steps decodes step polylines and calls callbacks", async () => {
+    const mockOnPressBack = jest.fn();
+    const mockOnSelectRoute = jest.fn();
+
+    const mockRoutes = [
+      {
+        mode: "transit",
+        duration: { text: "10 mins" },
+        distance: { text: "1 km" },
+        polyline: "FULL_ROUTE_POLYLINE",
+        steps: [
+          { polyline: "STEP1", type: "walk" },
+          { polyline: "STEP2", type: "transit", vehicle: "bus", line: "356", from: "A", to: "B" },
+        ],
+      },
+    ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: mockRoutes }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={mockOnPressBack}
+        onSelectRoute={mockOnSelectRoute}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Transit")).toBeTruthy());
+
+    await act(async () => {
+      fireEvent.press(getByText("Transit"));
+    });
+
+    // decodePolylineToCoords called from stepsToSegments (STEP1, STEP2)
+    expect(polyline.decode).toHaveBeenCalledWith("STEP1");
+    expect(polyline.decode).toHaveBeenCalledWith("STEP2");
+
+    expect(mockOnSelectRoute).toHaveBeenCalledTimes(1);
+    expect(mockOnPressBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("step with missing polyline triggers the empty-coords branch and still decodes others", async () => {
+    const mockRoutes = [
+      {
+        mode: "walking",
+        duration: { text: "5 mins" },
+        polyline: "FULL_ROUTE_POLYLINE",
+        steps: [
+          { polyline: null, type: "walk" }, // decodePolylineToCoords -> []
+          { polyline: "STEP_OK", type: "walk" },
+        ],
+      },
+    ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: mockRoutes }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
+
+    await act(async () => {
+      fireEvent.press(getByText("Walking"));
+    });
+
+    // polyline.decode should be called for null and for STEP_OK
+  expect(polyline.decode).toHaveBeenCalledWith("STEP_OK");
+expect(polyline.decode).toHaveBeenCalledWith("FULL_ROUTE_POLYLINE");
+expect(polyline.decode).not.toHaveBeenCalledWith(null);
+  });
+});
+
+describe("Extra render branches (coverage)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("renders scheduleNote when provided", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [
+          {
+            mode: "walking",
+            duration: { text: "5 mins" },
+            distance: { text: "100 m" },
+            polyline: "FULL_ROUTE_POLYLINE",
+            scheduleNote: "Runs every 10 mins",
+          },
+        ],
+      }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} origin={origin} destination={destination} buildings={[]} />
+    );
+
+    await waitFor(() => expect(getByText("Runs every 10 mins")).toBeTruthy());
+  });
+});
+
+describe("Autocomplete MAX_RESULTS coverage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("caps autocomplete suggestions to MAX_RESULTS (8)", async () => {
+    // 20 building results that all match "hall"
+    const manyBuildings = Array.from({ length: 20 }, (_, i) => ({
+      id: String(i),
+      name: `Hall Extra ${i}`,
+      coordinates: [{ latitude: 45.0 + i * 0.001, longitude: -73.0 - i * 0.001 }],
+    }));
+
+    const { getByTestId, queryAllByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={manyBuildings} />
+    );
+
+    const fromInput = getByTestId("inputStartLoc");
+
+    // focus origin so dropdown can show
+    act(() => {
+      fireEvent(fromInput, "focus");
+    });
+
+    await act(async () => {
+      fireEvent.changeText(fromInput, "Hall");
+    });
+
+    // All suggestions are rendered as Text entries. Count how many "Hall Extra" are visible.
+    await waitFor(() => {
+      const items = queryAllByText(/Hall Extra/i);
+      expect(items.length).toBe(8); // MAX_RESULTS
+    });
+  });
+});
+
+describe("Polyline normalization - explicit object polyline branches", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("extracts polyline.encodedPolyline and polyline.points when polyline is an object", async () => {
+    const mockOnSelectRoute = jest.fn();
+
+    const mockRoutes = [
+      {
+        mode: "walking",
+        duration: { text: "5 mins" },
+        polyline: { encodedPolyline: "ENCODED_POLYLINE" },
+      },
+      {
+        mode: "transit",
+        duration: { text: "10 mins" },
+        polyline: { points: "POLYLINE_POINTS_OBJ" },
+      },
+    ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: mockRoutes }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        onSelectRoute={mockOnSelectRoute}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
+    expect(getByText("Transit")).toBeTruthy();
+
+    await act(async () => fireEvent.press(getByText("Walking")));
+    await act(async () => fireEvent.press(getByText("Transit")));
+
+    const call0 = mockOnSelectRoute.mock.calls[0][0];
+    const call1 = mockOnSelectRoute.mock.calls[1][0];
+
+    expect(call0.route.polyline).toBe("ENCODED_POLYLINE");
+    expect(call1.route.polyline).toBe("POLYLINE_POINTS_OBJ");
+  });
+});
+
+describe("Map fitToCoordinates coverage (test ref injection)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("fitRouteOnMap calls mapRef.fitToCoordinates when selectedRouteCoords exist", async () => {
+    const mockRef = { fitToCoordinates: jest.fn() };
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", duration: { text: "5 mins" }, polyline: "FULL_ROUTE_POLYLINE" }],
+      }),
+    });
+
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+        __testMapRef={mockRef}
+      />
+    );
+
+    await waitFor(() => {
+      expect(mockRef.fitToCoordinates).toHaveBeenCalled();
+    });
+  });
+
+  it("handleSelectRoute calls mapRef.fitToCoordinates when pressing a route", async () => {
+    const mockRef = { fitToCoordinates: jest.fn() };
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [
+          {
+            mode: "transit",
+            duration: { text: "10 mins" },
+            polyline: "FULL_ROUTE_POLYLINE",
+            steps: [{ polyline: "STEP1", type: "walk" }],
+          },
+        ],
+      }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        onSelectRoute={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+        __testMapRef={mockRef}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Transit")).toBeTruthy());
+
+    await act(async () => fireEvent.press(getByText("Transit")));
+
+    expect(mockRef.fitToCoordinates).toHaveBeenCalled();
   });
 });
