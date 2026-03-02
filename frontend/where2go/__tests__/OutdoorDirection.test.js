@@ -2,6 +2,30 @@ import OutdoorDirection from '../src/OutdoorDirection.js';
 import { render, waitFor, fireEvent, act } from "@testing-library/react-native";
 import * as Location from 'expo-location';
 
+jest.mock("@expo/vector-icons", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  return { Ionicons: ({ name }) => <Text>{name}</Text> };
+});
+
+jest.mock("../src/config", () => ({
+  API_BASE_URL: "http://test-server",
+}));
+
+jest.mock("../src/theme/colors", () => ({
+  colors: { primary: "#7C2B38" },
+}));
+
+jest.mock("../assets/background.png", () => 1);
+
+// Optional: avoid native issues if maps ever renders
+jest.mock("react-native-maps", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+  const Mock = (props) => <View {...props} />;
+  return { __esModule: true, default: Mock, Polyline: Mock, Marker: Mock, Polygon: Mock };
+});
+
 // Mock the Location module
 jest.mock('expo-location');
 
@@ -225,6 +249,53 @@ describe("Route fetching and mode display", () => {
         else delete global.fetch;
     });
 
+});
+it("pressing a route normalizes polyline and calls onSelectRoute + onPressBack", async () => {
+  const mockOnSelectRoute = jest.fn();
+  const mockOnPressBack = jest.fn();
+
+  const origin = { label: "A", lat: 1, lng: 1 };
+  const destination = { label: "B", lat: 2, lng: 2 };
+
+  const mockRoutes = [
+    {
+      mode: "transit",
+      duration: { text: "10 mins" },
+      distance: { text: "1 km" },
+      // IMPORTANT: no polyline, only overview_polyline
+      overview_polyline: { points: "abc123" },
+      steps: [{ type: "transit", line: "356", vehicle: "bus" }],
+    },
+  ];
+
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ routes: mockRoutes }),
+  });
+
+  const { getByText } = render(
+    <OutdoorDirection
+      onPressBack={mockOnPressBack}
+      onSelectRoute={mockOnSelectRoute}
+      origin={origin}
+      destination={destination}
+      buildings={[]}
+    />
+  );
+
+  // Wait until route card appears (your UI shows label "Transit")
+  await waitFor(() => expect(getByText("Transit")).toBeTruthy());
+
+  fireEvent.press(getByText("Transit"));
+
+  expect(mockOnSelectRoute).toHaveBeenCalledTimes(1);
+
+  const payload = mockOnSelectRoute.mock.calls[0][0];
+  expect(payload.route.polyline).toBe("abc123"); // normalized fallback hit
+  expect(payload.origin).toMatchObject(origin);
+  expect(payload.destination).toMatchObject(destination);
+
+  expect(mockOnPressBack).toHaveBeenCalled();
 });
 ;
 
