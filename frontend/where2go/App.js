@@ -230,7 +230,7 @@ export default function App() {
             setUserDraggedMap(false);
           }}
         >
-          <Ionicons name="navigate" size={24} color="#912338" />
+          <Ionicons name="compass" size={30} color="#912338" />
         </Pressable>
       )}
       <SideLeftBar
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   recenterButton: {
     position: "absolute",
     bottom: 510,
-    left: 20,
+    left: 23,
     width: 50,
     height: 50,
     borderRadius: 25,

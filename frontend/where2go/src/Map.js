@@ -41,10 +41,10 @@ const CampusMap = forwardRef((props, ref) => {
   const [isMarkerCurrentlyVisible, setIsMarkerCurrentlyVisible] = useState(true);
 
   const checkLiveLocationVisibility = (region) => {
-    if (!userLocation || !liveLocationEnabled) return;
+    if (!userLocation || !liveLocationEnabled || !region) return;
 
     const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
-    const { latitude: uLat, longitude: uLng } = userLocation; // Ensure naming matches your userLocation object
+    const { latitude: uLat, longitude: uLng } = userLocation; 
 
     const northBound = latitude + latitudeDelta / 2;
     const southBound = latitude - latitudeDelta / 2;
@@ -53,12 +53,12 @@ const CampusMap = forwardRef((props, ref) => {
 
     const isVisible = uLat <= northBound && uLat >= southBound && uLng <= eastBound && uLng >= westBound;
 
-    // Only call the prop if visibility status HAS CHANGED
+    
     if (isVisible !== isMarkerCurrentlyVisible) {
       setIsMarkerCurrentlyVisible(isVisible);
       if (!isVisible) {
         onLiveLocDisappear();
-      } else if (props.onLiveLocAppear) { // Optional: Create a re-appear prop!
+      } else {
         onLiveLocAppear();
       }
     }
