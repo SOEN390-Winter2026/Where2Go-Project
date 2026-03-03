@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import PropTypes from 'prop-types';
 
-export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation, onPressPOI }) {
+export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation, onPressPOI, isPressedPOI }) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -25,7 +25,7 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   const slideAnim = useRef(new Animated.Value(isSGW ? 0 : -26)).current;
 
   const [activeDis, setActiveDis] = useState(null);
-  const [activePOI, setActivePOI] = useState(null);
+  const [activePOI, setActivePOI] = useState(isPressedPOI ? "poi" : null);
   const [activeGPS, setActiveGPS] = useState(null);
 
   /* ---------- Switch Animation ---------- */
@@ -140,7 +140,8 @@ SideLeftBar.propTypes = {
   currentCampus: PropTypes.string.isRequired,
   onToggleCampus: PropTypes.func.isRequired,
   onToggleLiveLocation: PropTypes.func.isRequired,
-  onPressPOI: PropTypes.func.isRequired
+  onPressPOI: PropTypes.func.isRequired,
+  isPressedPOI: PropTypes.bool
 };
 
 /* ---------- Styles ---------- */

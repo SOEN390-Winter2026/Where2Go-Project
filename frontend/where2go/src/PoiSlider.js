@@ -32,6 +32,7 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const abortRef = useRef(null);
+  const cacheRef = useRef(null); // { key: string, results: array }
 
   const resolveOrigin = () => {
     if (selectedBuilding) {
@@ -50,6 +51,13 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
   };
 
   const fetchNearbyPOIs = async (lat, lng, radiusInMeters) => {
+    // Return cached results if the same origin + radius was already fetched
+    const cacheKey = `${lat},${lng},${radiusInMeters}`;
+    if (cacheRef.current?.key === cacheKey) {
+      return cacheRef.current.results;
+    }
+
+    // Cancel any previous in-flight request
     if (abortRef.current) abortRef.current.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -82,7 +90,11 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
           }
         }
       }
-      return merged.slice(0, 25);
+      const results = merged.slice(0, 25);
+
+      // Store in cache
+      cacheRef.current = { key: cacheKey, results };
+      return results;
     } catch (err) {
       if (err.name === "AbortError") return null;
       console.error("POI fetch failed:", err);
@@ -96,9 +108,9 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
   const handleLoad = async () => {
     const origin = resolveOrigin();
     if (!origin) {
-      onPoisChange([]);
       return;
     }
+    onPoisChange([]);
     const results = await fetchNearbyPOIs(origin.latitude, origin.longitude, displayRadius);
     if (results !== null) {
       onPoisChange(results);
@@ -186,7 +198,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     margin: 20,
-    width: CONTAINER_WIDTH, 
+    width: CONTAINER_WIDTH,
     alignItems: "center",
     alignSelf: "center",
   },

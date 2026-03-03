@@ -131,4 +131,30 @@ describe('PoiSlider', () => {
         const calledUrl = globalThis.fetch.mock.calls[0][0];
         expect(calledUrl).toContain("location=45.4955,-73.578");
     });
+
+    it('returns cached results without fetching when same origin and radius are requested twice', async () => {
+        const onPoisChange = jest.fn();
+        const { getByTestId } = render(
+            <PoiSlider onPoisChange={onPoisChange} userLocation={USER_LOCATION} selectedBuilding={null} />
+        );
+        await act(async () => { fireEvent.press(getByTestId('loadButton')); });
+        await waitFor(() => expect(onPoisChange).toHaveBeenCalled());
+        const fetchCountAfterFirst = globalThis.fetch.mock.calls.length;
+
+        await act(async () => { fireEvent.press(getByTestId('loadButton')); });
+        await waitFor(() => expect(onPoisChange).toHaveBeenCalledTimes(4));
+        expect(globalThis.fetch.mock.calls.length).toBe(fetchCountAfterFirst);
+    });
+
+    it('clears POIs before fetching new ones when Load is pressed', async () => {
+        const onPoisChange = jest.fn();
+        const { getByTestId } = render(
+            <PoiSlider onPoisChange={onPoisChange} userLocation={USER_LOCATION} selectedBuilding={null} />
+        );
+        await act(async () => { fireEvent.press(getByTestId('loadButton')); });
+        await waitFor(() => expect(onPoisChange).toHaveBeenCalled());
+        expect(onPoisChange).toHaveBeenNthCalledWith(1, []);
+        expect(onPoisChange.mock.calls[1][0].length).toBeGreaterThan(0);
+    });
+
 });
