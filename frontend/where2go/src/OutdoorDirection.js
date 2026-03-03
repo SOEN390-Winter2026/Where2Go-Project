@@ -92,6 +92,7 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [errorCode, setErrorCode] = useState(null);
 
   // ---- Live location state ----
   const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
@@ -135,21 +136,48 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
   const fetchRoutes = useCallback(async () => {
     if (!origin?.lat || !destination?.lat) {
       setRoutes([]);
+      setError(null);
+      setErrorCode(null);
       return;
     }
     setLoading(true);
     setError(null);
+    setErrorCode(null);
+
     try {
       const clientTime = encodeURIComponent(new Date().toISOString());
       const res = await fetch(
         `${API_BASE_URL}/directions?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}&clientTime=${clientTime}`
       );
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch");
-      setRoutes(data.routes || []);
+
+      const errorObj = data?.error && typeof data.error === "object" ? data.error : null;
+      const nextErrorCode = errorObj?.code ?? null;
+      const nextErrorMessage =
+        errorObj?.message ?? (typeof data?.error === "string" ? data.error : null);
+
+      if (!res.ok) {
+        setRoutes([]);
+        setError(nextErrorMessage || "Failed to fetch directions");
+        setErrorCode(nextErrorCode || "UPSTREAM_FAILED");
+        return;
+      }
+
+      const nextRoutes = Array.isArray(data?.routes) ? data.routes : [];
+      setRoutes(nextRoutes);
+
+      if (nextRoutes.length === 0) {
+        setErrorCode(nextErrorCode || "NO_ROUTES");
+        setError(null);
+      } else {
+        setError(null);
+        setErrorCode(null);
+      }
     } catch (e) {
-      setError(e.message);
       setRoutes([]);
+      setError(e?.message || "Failed to fetch directions");
+      setErrorCode("UPSTREAM_FAILED");
     } finally {
       setLoading(false);
     }
@@ -197,14 +225,16 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
 
-  const hasValidEndpoints =
-  origin?.lat != null && destination?.lat != null;
+  const hasValidEndpoints = origin?.lat != null && destination?.lat != null;
   const showEmptyState =
     hasValidEndpoints &&
     !loading &&
-    !error &&
-    routes.length === 0;
-
+    routes.length === 0 &&
+    (errorCode === "NO_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
+  const showSelectLocationsState =
+    !loading &&
+    !hasValidEndpoints &&
+    (originQuery.trim().length > 0 || destQuery.trim().length > 0);
 
   // ---- Live location ----
   const getCurrentLocation = async () => {
@@ -375,12 +405,6 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
               <Text style={styles.loadingText}>Loading routes...</Text>
             </View>
           )}
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-              <RetryButton onPress={handleRetry} />
-            </View>
-          )}
           {showEmptyState && (
             <View style={styles.emptyStateContainer}>
               <Ionicons
@@ -389,13 +413,27 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
                 color="#7C2B38"
                 style={{ marginBottom: 10 }}
               />
-              <Text style={styles.emptyStateTitle}>
-                No routes found
-              </Text>
+              <Text style={styles.emptyStateTitle}>No routes found</Text>
               <Text style={styles.emptyStateText}>
-                Try selecting different locations or check your connection.
+                {error
+                  ? "Try selecting different locations or check your connection."
+                  : "Try selecting different locations or another mode."}
               </Text>
               <RetryButton onPress={handleRetry} />
+            </View>
+          )}
+          {showSelectLocationsState && (
+            <View style={styles.emptyStateContainer} testID="selectLocationsState">
+              <Ionicons
+                name="search-outline"
+                size={40}
+                color="#7C2B38"
+                style={{ marginBottom: 10 }}
+              />
+              <Text style={styles.emptyStateTitle}>Select valid locations</Text>
+              <Text style={styles.emptyStateText}>
+                Please pick a suggestion from the dropdown.
+              </Text>
             </View>
           )}
           {!loading && routes.map((r, i) => {
