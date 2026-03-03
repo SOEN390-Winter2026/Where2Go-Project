@@ -64,9 +64,10 @@ export default function App() {
   const handleBuildingPress = (building) => {
     if (isPressedPOI) {
       setPoiOriginBuilding(building);
-    } else {
-      setSelectedBuilding(building);
-      setModalVisible(true);
+      setSelectedPois([]);
+    }else{
+    setSelectedBuilding(building);
+    setModalVisible(true);
     }
   };
 
@@ -138,14 +139,6 @@ export default function App() {
   useEffect(() => {
     if (!hasInitialized && dataLoaded) {
       setHasInitialized(true);
-
-      // >> un/comment below area if test
-      // const timer = setTimeout(() => {
-      //   setHasInitialized(true);
-      // }, 3000); // 3 sec delay for testing
-
-      // return () => clearTimeout(timer);
-      // >> comment end
     }
   }, [dataLoaded, hasInitialized]);
 
@@ -235,6 +228,7 @@ export default function App() {
       )}
       <SideLeftBar
         currentCampus={currentCampus}
+        isPressedPOI={isPressedPOI}
         onToggleCampus={() =>
           setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
         }

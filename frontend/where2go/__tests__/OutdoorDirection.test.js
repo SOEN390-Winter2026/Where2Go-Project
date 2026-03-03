@@ -200,29 +200,48 @@ describe("Route fetching and mode display", () => {
         else delete global.fetch;
     }, 10000);
 
-    it("handles fetch failures and sets error state", async () => {
-        
-        global.fetch = jest.fn().mockResolvedValue({
-            ok: false,
-            json: async () => ({ error: 'boom' }),
-        });
+    it("handles fetch failures and shows fallback UI", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: "boom" }),
+    });
 
-        const { findByText, getByText } = render(
-            <OutdoorDirection
-                onPressBack={() => { }}
-                origin={{ label: 'A', lat: 1, lng: 1 }}
-                destination={{ label: 'B', lat: 2, lng: 2 }}
-                buildings={[]}
-            />
-        );
+    const { getByText } = render(
+        <OutdoorDirection
+        onPressBack={() => {}}
+        origin={{ label: "A", lat: 1, lng: 1 }}
+        destination={{ label: "B", lat: 2, lng: 2 }}
+        buildings={[]}
+        />
+    );
 
-        const err = await findByText('boom');
-        expect(err).toBeTruthy();
+    await waitFor(() => {
+        expect(getByText("No routes found")).toBeTruthy();
+    });
 
-        expect(global.fetch).toHaveBeenCalled();
+    expect(getByText("Try Again")).toBeTruthy();
+    expect(global.fetch).toHaveBeenCalled();
 
-        if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
-        else delete global.fetch;
+    if (global.fetch && global.fetch.mockRestore) global.fetch.mockRestore();
+    else delete global.fetch;
+    });
+    it("handles network exception (fetch throws)", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error("Network crash"));
+
+    const { findByText } = render(
+        <OutdoorDirection
+        onPressBack={() => {}}
+        origin={{ label: "A", lat: 1, lng: 1 }}
+        destination={{ label: "B", lat: 2, lng: 2 }}
+        buildings={[]}
+        />
+    );
+
+    await findByText("No routes found");
+
+    expect(global.fetch).toHaveBeenCalled();
+
+    delete global.fetch;
     });
 
 });
@@ -577,23 +596,30 @@ describe("Location Error Handling", () => {
 });
 
 describe("Retry button", () => {
-  const origin = { label: 'A', lat: 1, lng: 1 };
-  const destination = { label: 'B', lat: 2, lng: 2 };
+  const origin = { label: "A", lat: 1, lng: 1 };
+  const destination = { label: "B", lat: 2, lng: 2 };
 
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
+  afterEach(() => {
+    delete global.fetch;
+  });
+
   it("Retry calls fetchRoutes after fetch error", async () => {
-    const fetchMock = jest.fn()
+    const fetchMock = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: false,
-        json: async () => ({ error: "Network failure" }),
+        json: async () => ({
+          error: { code: "UPSTREAM_FAILED", message: "Network failure" },
+        }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          routes: [{ mode: 'walking', duration: { text: '5 mins' } }],
+          routes: [{ mode: "walking", duration: { text: "5 mins" } }],
         }),
       });
 
@@ -615,22 +641,23 @@ describe("Retry button", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-
     await waitFor(() => expect(getByText("Walking")).toBeTruthy());
-
-    delete global.fetch;
   });
 
-  it("Retry calls fetchRoutes after empty routes", async () => {
-    const fetchMock = jest.fn()
+  it("Retry calls fetchRoutes after NO_ROUTES empty state", async () => {
+    const fetchMock = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ routes: [] }),
+        json: async () => ({
+          routes: [],
+          error: { code: "NO_ROUTES", message: "No routes found" },
+        }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          routes: [{ mode: 'transit', duration: { text: '10 mins' } }],
+          routes: [{ mode: "transit", duration: { text: "10 mins" } }],
         }),
       });
 
@@ -652,30 +679,103 @@ describe("Retry button", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-
     await waitFor(() => expect(getByText("Transit")).toBeTruthy());
-
-    delete global.fetch;
   });
 
-  it("Retry DNE if endpoints are invalid", async () => {
+  it("Retry is not shown when endpoints are invalid", () => {
     const fetchMock = jest.fn();
     global.fetch = fetchMock;
 
     const { queryByText } = render(
-        <OutdoorDirection
+      <OutdoorDirection
         onPressBack={() => {}}
         origin={null}
         destination={null}
         buildings={[]}
-        />
+      />
     );
 
-    const retryButton = queryByText("Try Again");
-    expect(retryButton).toBeNull();
-
+    expect(queryByText("Try Again")).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
 
-    delete global.fetch;
+describe("Invalid endpoint selection state", () => {
+  it("shows select valid locations state when user types without picking suggestion", async () => {
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+    );
+
+    await act(async () => {
+      fireEvent.changeText(getByTestId("inputStartLoc"), "asdf");
+      fireEvent.changeText(getByTestId("inputDestLoc"), "qwer");
     });
+
+    expect(getByText("Select valid locations")).toBeTruthy();
+  });
+});
+
+describe("Dropdown scheduleClose coverage", () => {
+  const mockBuildings = [
+    {
+      id: "1",
+      name: "Hall Building",
+      campus: "SGW",
+      coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+    },
+  ];
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
+  it("scheduleClose closes dropdown after blur on the active field", async () => {
+    const { getByTestId, getByText, queryByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
+
+    const fromInput = getByTestId("inputStartLoc");
+
+    act(() => {
+      fireEvent(fromInput, "focus");
+      fireEvent.changeText(fromInput, "Hall");
+    });
+
+    expect(getByText("Hall Building")).toBeTruthy();
+
+    act(() => {
+      fireEvent(fromInput, "blur");
+      jest.advanceTimersByTime(200); 
+    });
+
+    expect(queryByText("Hall Building")).toBeNull();
+  });
+
+  it("scheduleClose does NOT close dropdown if blur is for a different field (covers else branch)", async () => {
+    const { getByTestId, getByText } = render(
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+    );
+
+    const fromInput = getByTestId("inputStartLoc");
+    const toInput = getByTestId("inputDestLoc");
+
+    act(() => {
+      fireEvent(fromInput, "focus");
+      fireEvent.changeText(fromInput, "Hall");
+    });
+
+    expect(getByText("Hall Building")).toBeTruthy();
+
+    act(() => {
+      fireEvent(toInput, "blur");
+      jest.advanceTimersByTime(200);
+    });
+
+    expect(getByText("Hall Building")).toBeTruthy();
+  });
 });

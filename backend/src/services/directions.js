@@ -11,6 +11,10 @@ const { getCampusCoordinates } = require("./map");
 
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
+function makeError(code, message) {
+  return { code, message };
+}
+
 /** Meters - point is "on campus" if within this radius of campus center */
 const CAMPUS_RADIUS_METERS = 2500;
 
@@ -133,26 +137,73 @@ function buildDirectionsUrl(origin, destination, mode) {
 }
 
 function fetchDirections(origin, destination, mode) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const url = buildDirectionsUrl(origin, destination, mode);
-    https
-      .get(url, (res) => {
-        let data = "";
-        res.on("data", (chunk) => (data += chunk));
-        res.on("end", () => {
-          try {
-            const json = JSON.parse(data);
-            if (json.status === "OK" && json.routes?.length > 0) {
-              resolve(json);
-            } else {
-              resolve(null);
-            }
-          } catch {
-            resolve(null);
+
+    const req = https.get(url, (res) => {
+      let data = "";
+      res.on("data", (chunk) => (data += chunk));
+
+      res.on("end", () => {
+        
+        if (res.statusCode && (res.statusCode < 200 || res.statusCode >= 300)) {
+          return resolve({
+            ok: false,
+            error: makeError("UPSTREAM_FAILED", `Directions API HTTP ${res.statusCode}`),
+          });
+        }
+
+        let json;
+        try {
+          json = JSON.parse(data);
+        } catch {
+          return resolve({
+            ok: false,
+            error: makeError("INVALID_RESPONSE", "Directions API returned invalid JSON"),
+          });
+        }
+
+        
+        if (json.status && json.status !== "OK") {
+          if (json.status === "ZERO_RESULTS") {
+            return resolve({
+              ok: false,
+              error: makeError("NO_ROUTES", "No routes found"),
+            });
           }
-        });
-      })
-      .on("error", reject);
+
+          return resolve({
+            ok: false,
+            error: makeError("UPSTREAM_FAILED", `Directions API status: ${json.status}`),
+          });
+        }
+
+        
+        if (!Array.isArray(json.routes)) {
+          return resolve({
+            ok: false,
+            error: makeError("INVALID_RESPONSE", "Directions API missing routes array"),
+          });
+        }
+
+        if (json.routes.length === 0) {
+          return resolve({
+            ok: false,
+            error: makeError("NO_ROUTES", "No routes found"),
+          });
+        }
+
+        
+        return resolve({ ok: true, json });
+      });
+    });
+
+    req.on("error", () => {
+      resolve({
+        ok: false,
+        error: makeError("UPSTREAM_FAILED", "Directions API request failed"),
+      });
+    });
   });
 }
 
@@ -241,7 +292,7 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
  * @param {{ clientTime?: string }} [opts] - Optional. clientTime: ISO string from user's device (new Date().toISOString())
  * @returns {Promise<Array<{ mode: string, duration: { value: number, text: string }, distance: { value: number, text: string }, polyline?: string }>>}
  */
-async function getTransportOptions(origin, destination, opts = {}) {
+async function getTransportOptionsResult(origin, destination, opts = {}) {
   let refDate = new Date();
   if (opts.clientTime) {
     const parsed = new Date(opts.clientTime);
@@ -256,22 +307,39 @@ async function getTransportOptions(origin, destination, opts = {}) {
 
   const routes = [];
 
-  if (walkingRes?.routes?.[0]) {
-    const normalized = normalizeRoute(walkingRes.routes[0], "walking");
+  if (walkingRes.ok && walkingRes.json?.routes?.[0]) {
+    const normalized = normalizeRoute(walkingRes.json.routes[0], "walking");
     if (normalized) routes.push(normalized);
   }
 
-  if (transitRes?.routes?.[0]) {
-    const normalized = normalizeRoute(transitRes.routes[0], "transit");
+  if (transitRes.ok && transitRes.json?.routes?.[0]) {
+    const normalized = normalizeRoute(transitRes.json.routes[0], "transit");
     if (normalized) routes.push(normalized);
   }
 
   if (shuttleRoute) routes.push(shuttleRoute);
 
-  return routes;
+  if (routes.length > 0) return { ok: true, routes };
+
+  // If we have no routes at all, choose the best error to report
+  const errors = [walkingRes.error, transitRes.error].filter(Boolean);
+
+  if (errors.some((e) => e.code === "UPSTREAM_FAILED")) {
+    return { ok: false, error: makeError("UPSTREAM_FAILED", "Failed to fetch directions") };
+  }
+  if (errors.some((e) => e.code === "INVALID_RESPONSE")) {
+    return { ok: false, error: makeError("INVALID_RESPONSE", "Directions response invalid") };
+  }
+  return { ok: false, error: makeError("NO_ROUTES", "No routes found") };
+}
+
+async function getTransportOptions(origin, destination, opts = {}) {
+  const result = await getTransportOptionsResult(origin, destination, opts);
+  return result.ok ? result.routes : [];
 }
 
 module.exports = {
   getTransportOptions,
+  getTransportOptionsResult,
   normalizeRoute,
 };
