@@ -112,6 +112,39 @@ describe('CampusMap', () => {
     const { getByTestId } = render(<CampusMap {...defaultProps} />);
     expect(getByTestId('mapRef')).toBeTruthy();
   });
+  test("uses default prop fallbacks when optional props are omitted (covers default param lines)", () => {
+  // Only pass the required props; omit userLocation/selectedPois/activeSegments/etc.
+  const minimalProps = {
+    campusCoords: { latitude: 45.4974, longitude: -73.5771 },
+    buildings: [],
+    onBuildingPress: jest.fn(),
+  };
+
+  const { getByTestId } = render(<CampusMap {...minimalProps} />);
+  expect(getByTestId("mapRef")).toBeTruthy();
+});
+
+test("renders boarding pins safely when segment coords exist (no crash)", () => {
+  const activeSegments = [
+    {
+      type: "walk",
+      coords: [{ latitude: 45.0, longitude: -73.0 }],
+      isWalk: true,
+    },
+    {
+      type: "transit",
+      coords: [{ latitude: 45.001, longitude: -73.001 }],
+      isWalk: false,
+    },
+  ];
+
+  const { getAllByTestId } = render(
+    <CampusMap {...defaultProps} activeSegments={activeSegments} />
+  );
+
+  // Ensures the segment mapping + segKey path runs
+  expect(getAllByTestId("polyline").length).toBeGreaterThan(0);
+});
 
   test('passes buildings to BuildingCallout', () => {
     const mockBuildings = [

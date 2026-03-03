@@ -281,6 +281,108 @@ describe("Initial from/to and suggestion selection", () => {
     jest.useRealTimers();
   });
 });
+
+describe("resolveLocationByName fallback coverage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: [{ mode: "walking", duration: { text: "1 min" }, polyline: "x" }] }),
+    });
+  });
+
+  afterEach(() => {
+    delete globalThis.fetch;
+  });
+
+  it("initialFrom matches SEARCHABLE_LOCATIONS by displayName (covers getBuildingDisplayName path)", async () => {
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={[]}                    // forces SEARCHABLE_LOCATIONS branch
+        initialFrom="Hall Building"       // displayName of "Hall Building (H)"
+        initialTo="Loyola Campus"
+      />
+    );
+
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
+  });
+
+  it("initialFrom matches SEARCHABLE_LOCATIONS by raw label (covers label?.toLowerCase() path)", async () => {
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={[]}                         // forces SEARCHABLE_LOCATIONS branch
+        initialFrom="Hall Building (H)"        // raw label match
+        initialTo="Loyola Campus"
+      />
+    );
+
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
+  });
+
+  it("unknown name returns {lat:null,lng:null} and does NOT fetch routes", async () => {
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={[]}
+        initialFrom="Some Unknown Place"
+        initialTo="Loyola Campus"
+      />
+    );
+
+    // Give effects a tick; no fetch should happen because origin has null coords
+    await act(async () => {});
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+});
+
+it("clearOrigin clears origin query (press close-circle wrapper #0)", async () => {
+  const { getByTestId, getAllByText } = render(
+    <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+  );
+
+  await act(async () => {
+    fireEvent.changeText(getByTestId("inputStartLoc"), "Hall");
+  });
+
+  const closeIcons = getAllByText("close-circle");
+
+  // press the wrapper (parent) because Text itself isn't pressable
+  await act(async () => {
+    fireEvent.press(closeIcons[0].parent);
+  });
+
+  expect(getByTestId("inputStartLoc").props.value).toBe("");
+});
+
+it("clearDest clears dest query (single close-circle belongs to active dest field)", async () => {
+  const { getByTestId, getAllByText } = render(
+    <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+  );
+
+  const destInput = getByTestId("inputDestLoc");
+
+  // Make dest the active field so the clear icon belongs to dest
+  act(() => {
+    fireEvent(destInput, "focus");
+  });
+
+  await act(async () => {
+    fireEvent.changeText(destInput, "Lib");
+  });
+
+  // Your UI renders only ONE close-circle at a time
+  const closeIcons = getAllByText("close-circle");
+  expect(closeIcons.length).toBe(1);
+
+  await act(async () => {
+    fireEvent.press(closeIcons[0].parent);
+  });
+
+  expect(getByTestId("inputDestLoc").props.value).toBe("");
+});
+
 it("dest dropdown renders when dest is focused and query matches (covers dropdown lines)", async () => {
   const mockBuildings = [
     {
