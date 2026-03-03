@@ -1,4 +1,4 @@
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
 
@@ -133,19 +133,10 @@ const CampusMap = forwardRef((props, ref) => {
               latitude: poi.geometry.location.lat,
               longitude: poi.geometry.location.lng,
             }}
-            title={poi.name}
-            description={poi.vicinity}
             onPress={() => onPoiPress(poi)}
+            image={getPoiIcon(poi.types)}
             tracksViewChanges={false}
-          >
-            <View style={styles.poiMarker}>
-              <Image
-                source={getPoiIcon(poi.types)}
-                style={styles.poiMarkerIcon}
-                resizeMode="contain"
-              />
-            </View>
-          </Marker>
+          />
         ))}
       </MapView>
     </>
@@ -162,21 +153,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     zIndex: 1,
-  },
-  poiMarker: {
-    backgroundColor: "white",
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: "#912338",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  poiMarkerIcon: {
-    width: 24,
-    height: 24,
   },
 });
 

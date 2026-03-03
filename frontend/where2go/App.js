@@ -160,10 +160,11 @@ export default function App() {
   const handleBuildingPress = (building) => {
     if (isPressedPOI) {
       setPoiOriginBuilding(building);
-      return;
-    }
+      setSelectedPois([]);
+    }else{
     setSelectedBuilding(building);
     setModalVisible(true);
+    }
   };
 
   // ----- Fetch buildings when campus changes (and user is logged in) -----
@@ -315,6 +316,7 @@ export default function App() {
 
       <SideLeftBar
         currentCampus={currentCampus}
+        isPressedPOI={isPressedPOI}
         onToggleCampus={() =>
           setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
         }

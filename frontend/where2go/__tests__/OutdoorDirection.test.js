@@ -921,6 +921,10 @@ describe("Polyline normalization - explicit object polyline branches", () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    delete global.fetch;
+  });
+
   it("extracts polyline.encodedPolyline and polyline.points when polyline is an object", async () => {
     const mockOnSelectRoute = jest.fn();
 
@@ -1020,8 +1024,7 @@ describe("Map fitToCoordinates coverage (test ref injection)", () => {
         origin={origin}
         destination={destination}
         buildings={[]}
-        __testMapRef={mockRef}
-      />
+        />
     );
 
     await waitFor(() => expect(getByText("Transit")).toBeTruthy());
