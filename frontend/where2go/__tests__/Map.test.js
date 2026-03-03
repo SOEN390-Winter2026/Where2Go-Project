@@ -1,31 +1,82 @@
-
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import CampusMap from '../src/Map';
 
-/**
- * ✅ Custom mock: MapView forwards a ref with animateToRegion()
- * so snapBackToUser() doesn't crash in tests.
- */
 jest.mock('react-native-maps', () => {
   const React = require('react');
   const { View } = require('react-native');
+  const PropTypes = require('prop-types');
 
-  const MockMapView = React.forwardRef(({ children, ...props }, ref) => {
+  const MockMapView = React.forwardRef(({ children, testID, onRegionChange, onRegionChangeComplete, onPoiClick, ...props }, ref) => {
     React.useImperativeHandle(ref, () => ({
       animateToRegion: jest.fn(),
     }));
-
     return (
-      <View {...props} testID={props.testID || 'mapView'}>
+      <View
+        testID={testID || 'mapView'}
+        onRegionChange={onRegionChange}
+        onRegionChangeComplete={onRegionChangeComplete}
+        onPoiClick={onPoiClick}
+        {...props}
+      >
         {children}
       </View>
     );
   });
 
-  const MockMarker = (props) => <View {...props} testID={props.testID || 'marker'} />;
-  const MockPolygon = (props) => <View {...props} testID={props.testID || 'polygon'} />;
-  const MockPolyline = (props) => <View {...props} testID={props.testID || 'polyline'} />;
+  MockMapView.displayName = 'MockMapView';
+
+  function MockMarker({ testID, onPress, accessibilityLabel, children, ...props }) {
+    return (
+      <View
+        testID={testID || 'marker'}
+        onPress={onPress}
+        accessibilityLabel={accessibilityLabel}
+        {...props}
+      >
+        {children}
+      </View>
+    );
+  }
+
+  MockMarker.propTypes = {
+    testID: PropTypes.string,
+    onPress: PropTypes.func,
+    accessibilityLabel: PropTypes.string,
+    children: PropTypes.node,
+    coordinate: PropTypes.shape({
+      latitude: PropTypes.number.isRequired,
+      longitude: PropTypes.number.isRequired,
+    }).isRequired,
+    anchor: PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }),
+    tracksViewChanges: PropTypes.bool,
+    accessible: PropTypes.bool,
+    image: PropTypes.any,
+  };
+
+  function MockPolygon({ testID, ...props }) {
+    return <View testID={testID || 'polygon'} {...props} />;
+  }
+
+  MockPolygon.propTypes = {
+    testID: PropTypes.string,
+    coordinates: PropTypes.array.isRequired,
+    fillColor: PropTypes.string,
+    strokeColor: PropTypes.string,
+    strokeWidth: PropTypes.number,
+  };
+
+  function MockPolyline({ testID, ...props }) {
+    return <View testID={testID || 'polyline'} {...props} />;
+  }
+
+  MockPolyline.propTypes = {
+    testID: PropTypes.string,
+    coordinates: PropTypes.array.isRequired,
+    strokeColor: PropTypes.string,
+    strokeWidth: PropTypes.number,
+    lineDashPattern: PropTypes.arrayOf(PropTypes.number),
+  };
 
   return {
     __esModule: true,
@@ -46,9 +97,7 @@ const defaultProps = {
   setUserDraggedMap: jest.fn(),
   selectedPois: [],
   onPoiPress: jest.fn(),
-
-  // ✅ route props
-  activeSegments: null,
+  activeSegments: [],
   activeRouteCoords: [],
   routeStart: null,
   routeEnd: null,
@@ -167,7 +216,6 @@ describe('CampusMap', () => {
     const ref = React.createRef();
     render(<CampusMap {...defaultProps} ref={ref} />);
 
-    // our mock exposes animateToRegion via useImperativeHandle
     expect(ref.current).toBeDefined();
     expect(typeof ref.current.animateToRegion).toBe('function');
   });
@@ -240,7 +288,7 @@ describe('CampusMap', () => {
         name: 'Unknown Place',
         vicinity: '456 Other St',
         types: ['unknown_type'],
-        geometry: { location: { lat: 45.498, lng: -73.580 } },
+        geometry: { location: { lat: 45.498, lng: -73.58 } },
       },
     ];
     const { getAllByTestId } = render(
@@ -265,9 +313,6 @@ describe('CampusMap', () => {
     expect(getAllByTestId('marker')).toHaveLength(1);
   });
 
-  /**
-   * ✅ SONAR FIX: cover activeSegments?.map + lineDashPattern branch
-   */
   test('renders one Polyline per active segment and sets dash pattern for walk segments', () => {
     const activeSegments = [
       { coords: [{ latitude: 1, longitude: 1 }], isWalk: true },
@@ -280,13 +325,10 @@ describe('CampusMap', () => {
 
     const polylines = getAllByTestId('polyline');
     expect(polylines).toHaveLength(2);
-    expect(polylines[0].props.lineDashPattern).toEqual([8, 8]);
+    expect(polylines[0].props.lineDashPattern).toEqual([6, 6]);
     expect(polylines[1].props.lineDashPattern).toBeUndefined();
   });
 
-  /**
-   * ✅ SONAR FIX: cover fallback polyline when activeRouteCoords exists and activeSegments empty
-   */
   test('renders fallback Polyline when activeRouteCoords exists and activeSegments is empty', () => {
     const { getAllByTestId } = render(
       <CampusMap
@@ -298,7 +340,7 @@ describe('CampusMap', () => {
 
     const polylines = getAllByTestId('polyline');
     expect(polylines).toHaveLength(1);
-    expect(polylines[0].props.strokeWidth).toBe(5);
+    expect(polylines[0].props.strokeWidth).toBe(6);
   });
 
   test('renders start and destination markers when routeStart and routeEnd are provided', () => {

@@ -2,12 +2,8 @@ import React from "react";
 import { render, waitFor, fireEvent, act } from "@testing-library/react-native";
 import * as Location from "expo-location";
 
-/* -------------------- Mocks -------------------- */
-
-// must be "mock*" because it’s assigned inside jest.mock factory
 let mockFitToCoordinates;
 
-// ✅ Fix Pressable crash WITHOUT mocking Pressable itself
 jest.mock("react-native/Libraries/Pressability/usePressability", () => {
   return (config) => ({
     getEventHandlers: () => ({
@@ -19,14 +15,13 @@ jest.mock("react-native/Libraries/Pressability/usePressability", () => {
   });
 });
 
-// ✅ MapView mock with ref + fitToCoordinates spy
 jest.mock("react-native-maps", () => {
   const React = require("react");
   const { View } = require("react-native");
 
   mockFitToCoordinates = jest.fn();
 
-  const Map = React.forwardRef((props, ref) => {
+  const map = React.forwardRef((props, ref) => {
     React.useImperativeHandle(ref, () => ({
       fitToCoordinates: mockFitToCoordinates,
     }));
@@ -37,7 +32,7 @@ jest.mock("react-native-maps", () => {
 
   return {
     __esModule: true,
-    default: Map,
+    default: map,
     Polyline: Mock,
     Marker: Mock,
     Polygon: Mock,
@@ -48,7 +43,7 @@ jest.mock("@mapbox/polyline", () => ({
   decode: jest.fn((encoded) => {
     if (!encoded) return [];
     return [
-      [45.0, -73.0],
+      [45, -73],
       [45.1, -73.1],
     ];
   }),
@@ -82,11 +77,12 @@ jest.mock("../src/data/locations", () => ({
   ],
 }));
 
-// ✅ deterministic ErrorModal
 jest.mock("../src/ErrorModal", () => {
   const React = require("react");
   const { View, Text, Pressable } = require("react-native");
-  return function ErrorModalMock({ visible, onClose, title, message, buttonText = "OK" }) {
+  const PropTypes = require("prop-types");
+
+  function ErrorModalMock({ visible, onClose, title, message, buttonText = "OK" }) {
     if (!visible) return null;
     return (
       <View>
@@ -97,12 +93,21 @@ jest.mock("../src/ErrorModal", () => {
         </Pressable>
       </View>
     );
+  }
+
+  ErrorModalMock.propTypes = {
+    visible: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+    buttonText: PropTypes.string,
   };
+
+  return ErrorModalMock;
 });
 
 jest.mock("expo-location");
 
-/* -------------------- Helpers -------------------- */
 import OutdoorDirection from "../src/OutdoorDirection.js";
 import polyline from "@mapbox/polyline";
 const origin = { label: "A", lat: 1, lng: 1 };
@@ -207,7 +212,6 @@ describe("Initial from/to and suggestion selection", () => {
       fireEvent.changeText(fromInput, "Hall");
     });
 
-    // SEARCHABLE_LOCATIONS has "Hall Building (H)" but UI displays "Hall Building"
     await waitFor(() => {
       expect(getByText("Hall Building")).toBeTruthy();
     });
@@ -250,7 +254,6 @@ describe("Initial from/to and suggestion selection", () => {
 
     const fromInput = getByTestId("inputStartLoc");
 
-    // open dropdown
     act(() => {
       fireEvent(fromInput, "focus");
     });
@@ -263,12 +266,10 @@ describe("Initial from/to and suggestion selection", () => {
       expect(getByText("Hall Building")).toBeTruthy();
     });
 
-    // trigger scheduleClose via blur
     act(() => {
       fireEvent(fromInput, "blur");
     });
 
-    // scheduleClose uses setTimeout(150)
     act(() => {
       jest.advanceTimersByTime(200);
     });
@@ -296,17 +297,14 @@ it("dest dropdown renders when dest is focused and query matches (covers dropdow
 
   const destInput = getByTestId("inputDestLoc");
 
-  // Focus dest (activeField = "dest")
   act(() => {
     fireEvent(destInput, "focus");
   });
 
-  // Type something that matches SEARCHABLE_LOCATIONS ("Library")
   await act(async () => {
     fireEvent.changeText(destInput, "Lib");
   });
 
-  // This expectation forces the dropdown to render
   await waitFor(() => {
     expect(getByText("Library")).toBeTruthy();
   });
@@ -315,7 +313,7 @@ it("dest dropdown renders when dest is focused and query matches (covers dropdow
 describe("Route fetching and mode display", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    global.fetch = undefined;
+    globalThis.fetch = undefined;
   });
 
   it("fetches routes when origin/destination have coords and displays multiple mode labels", async () => {
@@ -323,10 +321,10 @@ describe("Route fetching and mode display", () => {
       { mode: "walking", duration: { text: "5 mins" }, distance: { text: "100 m" }, polyline: "x" },
       { mode: "transit", duration: { text: "10 mins" }, distance: { text: "2 km" }, polyline: "y" },
       { mode: "concordia_shuttle", duration: { text: "7 mins" }, distance: { text: "1 km" }, polyline: "z" },
-      { mode: "scooter_mode", duration: { text: "3 mins" }, distance: { text: "0.5 km" }, polyline: "w" }, // unknown -> default label = mode
+      { mode: "scooter_mode", duration: { text: "3 mins" }, distance: { text: "0.5 km" }, polyline: "w" },
     ];
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ routes: mockRoutes }),
     });
@@ -343,13 +341,13 @@ describe("Route fetching and mode display", () => {
     await waitFor(() => expect(getByText("Walking")).toBeTruthy());
     expect(getByText("Transit")).toBeTruthy();
     expect(getByText("Concordia Shuttle")).toBeTruthy();
-    expect(getByText("scooter_mode")).toBeTruthy(); // default branch
+    expect(getByText("scooter_mode")).toBeTruthy();
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 
-  it("handles fetch failures and sets error state", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+  it("handles fetch failures and shows no-routes empty state", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ error: "boom" }),
     });
@@ -363,12 +361,13 @@ describe("Route fetching and mode display", () => {
       />
     );
 
-    expect(await findByText("boom")).toBeTruthy();
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(await findByText("No routes found")).toBeTruthy();
+    expect(await findByText("Try selecting different locations or check your connection.")).toBeTruthy();
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 
   it("empty routes shows empty state + Try Again", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ routes: [] }),
     });
@@ -382,13 +381,13 @@ describe("Route fetching and mode display", () => {
       />
     );
 
-    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
     expect(getByText("No routes found")).toBeTruthy();
     expect(getByText("Try Again")).toBeTruthy();
   });
 
   it("fetchRoutes early-return path when user edits origin after valid fetch (no second fetch call)", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         routes: [{ mode: "walking", duration: { text: "5 mins" }, polyline: "x" }],
@@ -405,17 +404,15 @@ describe("Route fetching and mode display", () => {
     );
 
     await waitFor(() => expect(getByText("Walking")).toBeTruthy());
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
 
-    // Editing origin input setsOrigin(null) -> origin.lat missing -> fetchRoutes early return and should NOT call fetch again
     await act(async () => {
       fireEvent.changeText(getByTestId("inputStartLoc"), "X");
     });
 
-    // allow effects to run
     await act(async () => {});
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -429,28 +426,24 @@ describe("Selecting a route - polyline normalization coverage", () => {
     const mockOnPressBack = jest.fn();
 
     const mockRoutes = [
-      // 0: overview_polyline.points
       {
         mode: "transit",
         duration: { text: "10 mins" },
         distance: { text: "1 km" },
         overview_polyline: { points: "OVERVIEW_POLYLINE_POINTS" },
       },
-      // 1: overviewPolyline.points
       {
         mode: "walking",
         duration: { text: "5 mins" },
         distance: { text: "0.5 km" },
         overviewPolyline: { points: "OVERVIEW_POLYLINE_CAMEL" },
       },
-      // 2: polyline.encodedPolyline
       {
         mode: "concordia_shuttle",
         duration: { text: "7 mins" },
         distance: { text: "1 km" },
         polyline: { encodedPolyline: "ENCODED_POLYLINE" },
       },
-      // 3: polyline.points
       {
         mode: "scooter_mode",
         duration: { text: "3 mins" },
@@ -459,7 +452,7 @@ describe("Selecting a route - polyline normalization coverage", () => {
       },
     ];
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ routes: mockRoutes }),
     });
@@ -474,13 +467,11 @@ describe("Selecting a route - polyline normalization coverage", () => {
       />
     );
 
-    // Wait for all route labels
     await waitFor(() => expect(getByText("Transit")).toBeTruthy());
     expect(getByText("Walking")).toBeTruthy();
     expect(getByText("Concordia Shuttle")).toBeTruthy();
     expect(getByText("scooter_mode")).toBeTruthy();
 
-    // Press each route by its label (Text inside Pressable)
     await act(async () => fireEvent.press(getByText("Transit")));
     await act(async () => fireEvent.press(getByText("Walking")));
     await act(async () => fireEvent.press(getByText("Concordia Shuttle")));
@@ -497,11 +488,8 @@ describe("Selecting a route - polyline normalization coverage", () => {
     expect(call0.route.polyline).toBe("OVERVIEW_POLYLINE_POINTS");
     expect(call1.route.polyline).toBe("OVERVIEW_POLYLINE_CAMEL");
     expect(call2.route.polyline).toBe("ENCODED_POLYLINE");
-  // expect(call2.route.polyline).toEqual({ encodedPolyline: "ENCODED_POLYLINE" });
     expect(call3.route.polyline).toBe("POLYLINE_POINTS_OBJ");
-    //expect(call3.route.polyline).toEqual({ points: "POLYLINE_POINTS_OBJ" });
 
-    // also verify payload origin/destination
     expect(call0.origin).toMatchObject(origin);
     expect(call0.destination).toMatchObject(destination);
   });
@@ -531,7 +519,6 @@ describe("Location Error Handling", () => {
     );
 
     const input = getByTestId("inputStartLoc");
-
     act(() => fireEvent(input, "focus"));
 
     await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
@@ -704,7 +691,7 @@ describe("Retry button", () => {
         json: async () => ({ routes: [{ mode: "walking", duration: { text: "5 mins" }, polyline: "x" }] }),
       });
 
-    global.fetch = fetchMock;
+    globalThis.fetch = fetchMock;
 
     const { getByText } = render(
       <OutdoorDirection onPressBack={() => {}} origin={origin} destination={destination} buildings={[]} />
@@ -732,7 +719,7 @@ describe("Retry button", () => {
         json: async () => ({ routes: [{ mode: "transit", duration: { text: "10 mins" }, polyline: "x" }] }),
       });
 
-    global.fetch = fetchMock;
+    globalThis.fetch = fetchMock;
 
     const { getByText } = render(
       <OutdoorDirection onPressBack={() => {}} origin={origin} destination={destination} buildings={[]} />
@@ -749,14 +736,14 @@ describe("Retry button", () => {
   });
 
   it("Retry does not exist if endpoints are invalid", async () => {
-    global.fetch = jest.fn();
+    globalThis.fetch = jest.fn();
 
     const { queryByText } = render(
       <OutdoorDirection onPressBack={() => {}} origin={null} destination={null} buildings={[]} />
     );
 
     expect(queryByText("Try Again")).toBeNull();
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 });
 
@@ -782,7 +769,7 @@ describe("handleSelectRoute - segments (without MapView ref)", () => {
       },
     ];
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ routes: mockRoutes }),
     });
@@ -803,7 +790,6 @@ describe("handleSelectRoute - segments (without MapView ref)", () => {
       fireEvent.press(getByText("Transit"));
     });
 
-    // decodePolylineToCoords called from stepsToSegments (STEP1, STEP2)
     expect(polyline.decode).toHaveBeenCalledWith("STEP1");
     expect(polyline.decode).toHaveBeenCalledWith("STEP2");
 
@@ -818,13 +804,13 @@ describe("handleSelectRoute - segments (without MapView ref)", () => {
         duration: { text: "5 mins" },
         polyline: "FULL_ROUTE_POLYLINE",
         steps: [
-          { polyline: null, type: "walk" }, // decodePolylineToCoords -> []
+          { polyline: null, type: "walk" },
           { polyline: "STEP_OK", type: "walk" },
         ],
       },
     ];
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ routes: mockRoutes }),
     });
@@ -844,10 +830,9 @@ describe("handleSelectRoute - segments (without MapView ref)", () => {
       fireEvent.press(getByText("Walking"));
     });
 
-    // polyline.decode should be called for null and for STEP_OK
-  expect(polyline.decode).toHaveBeenCalledWith("STEP_OK");
-expect(polyline.decode).toHaveBeenCalledWith("FULL_ROUTE_POLYLINE");
-expect(polyline.decode).not.toHaveBeenCalledWith(null);
+    expect(polyline.decode).toHaveBeenCalledWith("STEP_OK");
+    expect(polyline.decode).toHaveBeenCalledWith("FULL_ROUTE_POLYLINE");
+    expect(polyline.decode).not.toHaveBeenCalledWith(null);
   });
 });
 
@@ -857,7 +842,7 @@ describe("Extra render branches (coverage)", () => {
   });
 
   it("renders scheduleNote when provided", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         routes: [
@@ -886,11 +871,10 @@ describe("Autocomplete MAX_RESULTS coverage", () => {
   });
 
   it("caps autocomplete suggestions to MAX_RESULTS (8)", async () => {
-    // 20 building results that all match "hall"
     const manyBuildings = Array.from({ length: 20 }, (_, i) => ({
       id: String(i),
       name: `Hall Extra ${i}`,
-      coordinates: [{ latitude: 45.0 + i * 0.001, longitude: -73.0 - i * 0.001 }],
+      coordinates: [{ latitude: 45 + i * 0.001, longitude: -73 - i * 0.001 }],
     }));
 
     const { getByTestId, queryAllByText } = render(
@@ -899,7 +883,6 @@ describe("Autocomplete MAX_RESULTS coverage", () => {
 
     const fromInput = getByTestId("inputStartLoc");
 
-    // focus origin so dropdown can show
     act(() => {
       fireEvent(fromInput, "focus");
     });
@@ -908,10 +891,9 @@ describe("Autocomplete MAX_RESULTS coverage", () => {
       fireEvent.changeText(fromInput, "Hall");
     });
 
-    // All suggestions are rendered as Text entries. Count how many "Hall Extra" are visible.
     await waitFor(() => {
       const items = queryAllByText(/Hall Extra/i);
-      expect(items.length).toBe(8); // MAX_RESULTS
+      expect(items.length).toBe(8);
     });
   });
 });
@@ -922,7 +904,7 @@ describe("Polyline normalization - explicit object polyline branches", () => {
   });
 
   afterEach(() => {
-    delete global.fetch;
+    delete globalThis.fetch;
   });
 
   it("extracts polyline.encodedPolyline and polyline.points when polyline is an object", async () => {
@@ -941,7 +923,7 @@ describe("Polyline normalization - explicit object polyline branches", () => {
       },
     ];
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ routes: mockRoutes }),
     });
@@ -978,7 +960,7 @@ describe("Map fitToCoordinates coverage (test ref injection)", () => {
   it("fitRouteOnMap calls mapRef.fitToCoordinates when selectedRouteCoords exist", async () => {
     const mockRef = { fitToCoordinates: jest.fn() };
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         routes: [{ mode: "walking", duration: { text: "5 mins" }, polyline: "FULL_ROUTE_POLYLINE" }],
@@ -1003,7 +985,7 @@ describe("Map fitToCoordinates coverage (test ref injection)", () => {
   it("handleSelectRoute calls mapRef.fitToCoordinates when pressing a route", async () => {
     const mockRef = { fitToCoordinates: jest.fn() };
 
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         routes: [
@@ -1024,7 +1006,8 @@ describe("Map fitToCoordinates coverage (test ref injection)", () => {
         origin={origin}
         destination={destination}
         buildings={[]}
-        />
+        __testMapRef={mockRef}
+      />
     );
 
     await waitFor(() => expect(getByText("Transit")).toBeTruthy());

@@ -10,18 +10,11 @@ import { colors } from "./theme/colors";
 import ErrorModal from "./ErrorModal";
 import { API_BASE_URL } from "./config";
 import { SEARCHABLE_LOCATIONS } from "./data/locations";
-import MapView, { Polyline as MapPolyline, Marker, Polygon } from "react-native-maps";
 import polyline from "@mapbox/polyline";
 
-// Re-export so existing callers (e.g. tests) still work with
-//   import { KNOWN_LOCATIONS } from './OutdoorDirection';
 export { KNOWN_LOCATIONS } from "./data/locations";
 
-/* ── Helper constants & functions ─────────────────────────────────────────── */
-
-/** Max autocomplete results shown in the dropdown */
 const MAX_RESULTS = 8;
-
 
 function getBuildingDisplayName(label) {
   if (!label) return label;
@@ -29,41 +22,63 @@ function getBuildingDisplayName(label) {
   return parenIndex > 0 ? label.slice(0, parenIndex).trimEnd() : label;
 }
 
-
-/** Case-insensitive location filter for the autocomplete dropdown */
 function filterLocations(query, buildings) {
   if (!query || query.trim().length === 0) return [];
   const q = query.toLowerCase().trim();
-  
-  // Search SEARCHABLE_LOCATIONS
+
   const searchableResults = SEARCHABLE_LOCATIONS.filter((loc) => loc.searchText.includes(q));
-  
-  // Also search buildings prop (if provided) by name
+
   let buildingResults = [];
   if (buildings && buildings.length > 0) {
-    buildingResults = buildings.filter((building) => {
-      const name = building.name?.toLowerCase() || "";
-      return name.includes(q);
-    }).map((building) => ({
-      label: building.name,
-      lat: building.coordinates?.[0]?.latitude || null,
-      lng: building.coordinates?.[0]?.longitude || null,
-      searchText: building.name?.toLowerCase() || "",
-    }));
+    buildingResults = buildings
+      .filter((building) => (building.name?.toLowerCase() || "").includes(q))
+      .map((building) => ({
+        label: building.name,
+        lat: building.coordinates?.[0]?.latitude || null,
+        lng: building.coordinates?.[0]?.longitude || null,
+        searchText: building.name?.toLowerCase() || "",
+      }));
   }
-  
-  // Merge results, preferring building matches, then deduplicate by display name
+
   const combined = [...buildingResults, ...searchableResults];
   const seen = new Set();
-  return combined.filter((loc) => {
-    const displayName = getBuildingDisplayName(loc.label);
-    if (seen.has(displayName)) return false;
-    seen.add(displayName);
-    return true;
-  }).slice(0, MAX_RESULTS);
+  return combined
+    .filter((loc) => {
+      const displayName = getBuildingDisplayName(loc.label);
+      if (seen.has(displayName)) return false;
+      seen.add(displayName);
+      return true;
+    })
+    .slice(0, MAX_RESULTS);
 }
 
-/** Map an API transport mode to a human-readable label and Ionicons icon name */
+function resolveLocationByName(name, buildings) {
+  if (!name) return null;
+  const q = name.toLowerCase().trim();
+
+  if (buildings?.length) {
+    const b = buildings.find((b) => b.name?.toLowerCase() === q);
+    if (b) {
+      return {
+        label: b.name,
+        lat: b.coordinates?.[0]?.latitude ?? null,
+        lng: b.coordinates?.[0]?.longitude ?? null,
+      };
+    }
+  }
+
+  const loc = SEARCHABLE_LOCATIONS.find(
+    (l) =>
+      getBuildingDisplayName(l.label)?.toLowerCase() === q ||
+      l.label?.toLowerCase() === q
+  );
+  if (loc) {
+    return { label: getBuildingDisplayName(loc.label), lat: loc.lat, lng: loc.lng };
+  }
+
+  return { label: name, lat: null, lng: null };
+}
+
 function getModeDisplay(mode) {
   if (mode === "concordia_shuttle") return { label: "Concordia Shuttle", icon: "bus" };
   if (mode === "walking") return { label: "Walking", icon: "walk" };
@@ -71,21 +86,9 @@ function getModeDisplay(mode) {
   return { label: mode, icon: "navigate" };
 }
 
-/**
- * OutdoorDirection — route planner screen with searchable From / To fields.
- *
- * Props:
- *   origin        – optional { label, lat, lng } for the starting point
- *   destination   – optional { label, lat, lng } for the destination
- *   initialFrom   – optional building name string to pre-populate origin
- *   initialTo     – optional building name string to pre-populate destination
- *   buildings     – optional array of building objects for filtering suggestions
- *   onPressBack   – callback to close this screen
- */
-
 function decodePolylineToCoords(encoded) {
   if (!encoded) return [];
-  const pts = polyline.decode(encoded); // [[lat,lng],...]
+  const pts = polyline.decode(encoded);
   return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
 }
 
@@ -95,11 +98,10 @@ function stepsToSegments(route) {
     .map((s) => {
       const coords = decodePolylineToCoords(s.polyline);
       if (!coords.length) return null;
-
       return {
         coords,
         isWalk: s.type === "walk",
-        vehicle: s.vehicle || null, // "bus" | "subway"
+        vehicle: s.vehicle || null,
         line: s.line || "",
         from: s.from || "",
         to: s.to || "",
@@ -108,61 +110,44 @@ function stepsToSegments(route) {
     .filter(Boolean);
 }
 
-export default function OutdoorDirection({ origin: originProp, destination: destProp, initialFrom, onSelectRoute,initialTo, buildings, onPressBack, __testMapRef, }) {
-  // ---- Endpoint state ----
-
+export default function OutdoorDirection({
+  origin: originProp,
+  destination: destProp,
+  initialFrom,
+  onSelectRoute,
+  initialTo,
+  buildings,
+  onPressBack,
+  __testMapRef,
+}) {
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
   const [originQuery, setOriginQuery] = useState(originProp?.label ?? "");
   const [destQuery, setDestQuery] = useState(destProp?.label ?? "");
-  const [activeField, setActiveField] = useState(null); // "origin" | "dest" | null
+  const [activeField, setActiveField] = useState(null);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(-1);
 
-  // ---- Route state ----
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [errorCode, setErrorCode] = useState(null);
-  const [showFullMap, setShowFullMap] = useState(false);
   const [activeRouteCoords, setActiveRouteCoords] = useState([]);
   const [activeSegments, setActiveSegments] = useState([]);
   const [routeStart, setRouteStart] = useState(null);
   const [routeEnd, setRouteEnd] = useState(null);
 
-//////
-const handleSelectRoute = ({ route, origin, destination }) => {
-  // 1) Start & End markers
-  if (origin?.lat && origin?.lng) {
-    setRouteStart({ latitude: origin.lat, longitude: origin.lng });
-  }
-  if (destination?.lat && destination?.lng) {
-    setRouteEnd({ latitude: destination.lat, longitude: destination.lng });
-  }
-
-  // 2) Segments from steps (THIS makes bus/metro vs walk)
-  const segs = stepsToSegments(route);
-  setActiveSegments(segs);
-
-  // 3) Fallback full route (if steps missing)
-  setActiveRouteCoords(decodePolylineToCoords(route?.polyline));
-
-  // 4) Fit map to route
-  const coordsToFit = segs.length ? segs.flatMap(s => s.coords) : decodePolylineToCoords(route?.polyline);
-  if (coordsToFit.length && mapRef.current) {
-    mapRef.current.fitToCoordinates(coordsToFit, {
-      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-      animated: true,
-    });
-  }
-};
-
-  // ---- Live location state ----
   const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
-
-  // ---- Error modal state ----
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Sync from parent props when they change (e.g. user taps a building in App)
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    if (__testMapRef && mapRef) {
+      mapRef.current = __testMapRef;
+    }
+  }, [__testMapRef]);
+
   useEffect(() => {
     if (originProp) {
       setOrigin(originProp);
@@ -177,27 +162,47 @@ const handleSelectRoute = ({ route, origin, destination }) => {
     }
   }, [destProp]);
 
-  // Handle initialFrom prop
   useEffect(() => {
-    if (initialFrom) {
-      setOriginQuery(initialFrom);
-      setOrigin({ label: initialFrom, lat: null, lng: null });
-    }
-  }, [initialFrom]);
+    if (!initialFrom) return;
+    const resolved = resolveLocationByName(initialFrom, buildings);
+    setOriginQuery(resolved.label ?? initialFrom);
+    setOrigin(resolved);
+  }, [initialFrom, buildings]);
 
-  // Handle initialTo prop
   useEffect(() => {
-    if (initialTo) {
-      setDestQuery(initialTo);
-      setDestination({ label: initialTo, lat: null, lng: null });
-    }
-  }, [initialTo]);
+    if (!initialTo) return;
+    const resolved = resolveLocationByName(initialTo, buildings);
+    setDestQuery(resolved.label ?? initialTo);
+    setDestination(resolved);
+  }, [initialTo, buildings]);
 
-  // ---- Route fetching (only when both endpoints are set) ----
+  const handleSelectRoute = ({ route, origin, destination }) => {
+    if (origin?.lat && origin?.lng) {
+      setRouteStart({ latitude: origin.lat, longitude: origin.lng });
+    }
+    if (destination?.lat && destination?.lng) {
+      setRouteEnd({ latitude: destination.lat, longitude: destination.lng });
+    }
+
+    const segs = stepsToSegments(route);
+    setActiveSegments(segs);
+    setActiveRouteCoords(decodePolylineToCoords(route?.polyline));
+
+    const coordsToFit = segs.length
+      ? segs.flatMap((s) => s.coords)
+      : decodePolylineToCoords(route?.polyline);
+    if (coordsToFit.length && mapRef.current) {
+      mapRef.current.fitToCoordinates(coordsToFit, {
+        edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+        animated: true,
+      });
+    }
+  };
+
   const fetchRoutes = useCallback(async () => {
     if (!origin?.lat || !destination?.lat) {
       setRoutes([]);
-       setSelectedRouteIndex(-1);
+      setSelectedRouteIndex(-1);
       setError(null);
       setErrorCode(null);
       return;
@@ -230,7 +235,7 @@ const handleSelectRoute = ({ route, origin, destination }) => {
       setRoutes(newRoutes);
       setSelectedRouteIndex(newRoutes.length > 0 ? 0 : -1);
 
-      if (nextRoutes.length === 0) {
+      if (newRoutes.length === 0) {
         setErrorCode(nextErrorCode || "NO_ROUTES");
         setError(null);
       } else {
@@ -250,22 +255,31 @@ const handleSelectRoute = ({ route, origin, destination }) => {
     fetchRoutes();
   }, [fetchRoutes]);
 
-  // ---- Autocomplete filtering (only when the field is focused) ----
   const originResults = activeField === "origin" ? filterLocations(originQuery, buildings) : [];
   const destResults = activeField === "dest" ? filterLocations(destQuery, buildings) : [];
 
-/////////////////
-  const mapRef = useRef(null);
-  // TEST ONLY: allow injecting a fake ref so fitToCoordinates branches can be covered
-useEffect(() => {
-  if (__testMapRef && mapRef) {
-    mapRef.current = __testMapRef;
-  }
-}, [__testMapRef]);
-  // Default to first route when loaded
-  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
-/////////////////
-  // ---- Input handlers ----
+  const selectedRoute = selectedRouteIndex >= 0 ? routes[selectedRouteIndex] : null;
+
+  const selectedRouteCoords = useMemo(() => {
+    if (!selectedRoute?.polyline) return [];
+    const pts = polyline.decode(selectedRoute.polyline);
+    return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
+  }, [selectedRoute]);
+
+  const fitRouteOnMap = useCallback((coords) => {
+    if (!mapRef.current || !coords?.length) return;
+    mapRef.current.fitToCoordinates(coords, {
+      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+      animated: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedRouteCoords.length > 0) {
+      fitRouteOnMap(selectedRouteCoords);
+    }
+  }, [selectedRouteCoords, fitRouteOnMap]);
+
   const onOriginTextChange = (text) => {
     setOriginQuery(text);
     setOrigin(null);
@@ -276,6 +290,20 @@ useEffect(() => {
     setDestQuery(text);
     setDestination(null);
     setActiveField("dest");
+  };
+
+  const clearOrigin = () => {
+    setOriginQuery("");
+    setOrigin(null);
+    setRoutes([]);
+    setSelectedRouteIndex(-1);
+  };
+
+  const clearDest = () => {
+    setDestQuery("");
+    setDestination(null);
+    setRoutes([]);
+    setSelectedRouteIndex(-1);
   };
 
   const pickOrigin = (loc) => {
@@ -294,7 +322,6 @@ useEffect(() => {
     Keyboard.dismiss();
   };
 
-  /** Delayed close so dropdown onPress fires before unmount */
   const scheduleClose = (field) => {
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
@@ -310,7 +337,6 @@ useEffect(() => {
     !hasValidEndpoints &&
     (originQuery.trim().length > 0 || destQuery.trim().length > 0);
 
-  // ---- Live location ----
   const getCurrentLocation = async () => {
     try {
       const isLocationEnabled = await Location.hasServicesEnabledAsync();
@@ -330,7 +356,7 @@ useEffect(() => {
       await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
-          if (!loc || !loc.coords) {
+          if (!loc?.coords) {
             setErrorMessage("Unable to get your location coordinates. Please try again or enter your starting location manually.");
             setShowErrorModal(true);
             return;
@@ -354,55 +380,21 @@ useEffect(() => {
     }
   };
 
-  // retry button for  no route & error
   const handleRetry = useCallback(() => {
-    if (loading) return; // dont spam function call
-    if (!hasValidEndpoints) return; // dont call if invalid
+    if (loading) return;
+    if (!hasValidEndpoints) return;
     fetchRoutes();
   }, [loading, hasValidEndpoints, fetchRoutes]);
 
   const RetryButton = ({ onPress }) => (
     <Pressable
-      style={[styles.retryButton, loading && { opacity: 0.6 }]} // faded opacity so button looks unclickable after first click
+      style={[styles.retryButton, loading && { opacity: 0.6 }]}
       onPress={onPress}
       disabled={loading}
     >
-      <Text style={styles.retryButtonText}>
-        Try Again
-      </Text>
+      <Text style={styles.retryButtonText}>Try Again</Text>
     </Pressable>
   );
-
-  // ---- Render ----
-    const selectedRoute = selectedRouteIndex >= 0 ? routes[selectedRouteIndex] : null;
-
-  const decodeRouteToCoords = (route) => {
-    const encoded = route?.polyline;
-    if (!encoded) return [];
-
-    const pts = polyline.decode(encoded); // [[lat,lng],...]
-    return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
-  };
-
-  const selectedRouteCoords = useMemo(() => {
-    return decodeRouteToCoords(selectedRoute);
-  }, [selectedRoute]);
-
-    const fitRouteOnMap = useCallback((coords) => {
-    if (!mapRef.current || !coords?.length) return;
-
-    mapRef.current.fitToCoordinates(coords, {
-      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-      animated: true,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (selectedRouteCoords.length > 0) {
-      fitRouteOnMap(selectedRouteCoords);
-    }
-  }, [selectedRouteCoords, fitRouteOnMap]);
-
 
   return (
     <ImageBackground
@@ -418,21 +410,27 @@ useEffect(() => {
         <Text style={styles.headerTitle}>Plan Your Trip</Text>
         <Text style={styles.headerSubtitle}>Find the best route between locations</Text>
 
-        {/* ---- From ---- */}
         <View style={[styles.input, { zIndex: activeField === "origin" ? 20 : 1 }]}>
           <Text style={styles.inputLabel}>From</Text>
-          <TextInput
-            testID="inputStartLoc"
-            style={styles.inputField}
-            value={originQuery}
-            onChangeText={onOriginTextChange}
-            onFocus={() => setActiveField("origin")}
-            onBlur={() => scheduleClose("origin")}
-            placeholder="Search campus or building..."
-            placeholderTextColor="#999"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
+          <View style={styles.inputRow}>
+            <TextInput
+              testID="inputStartLoc"
+              style={styles.inputField}
+              value={originQuery}
+              onChangeText={onOriginTextChange}
+              onFocus={() => setActiveField("origin")}
+              onBlur={() => scheduleClose("origin")}
+              placeholder="Search campus or building..."
+              placeholderTextColor="#999"
+              autoCorrect={false}
+              returnKeyType="search"
+            />
+            {originQuery.length > 0 && (
+              <Pressable onPress={clearOrigin} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color="#aaa" />
+              </Pressable>
+            )}
+          </View>
           {activeField === "origin" && originResults.length > 0 && (
             <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
               {originResults.map((loc, i) => (
@@ -442,28 +440,36 @@ useEffect(() => {
                   onPress={() => pickOrigin(loc)}
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>{getBuildingDisplayName(loc.label)}</Text>
+                  <Text style={styles.dropdownText} numberOfLines={1}>
+                    {getBuildingDisplayName(loc.label)}
+                  </Text>
                 </Pressable>
               ))}
             </ScrollView>
           )}
         </View>
 
-        {/* ---- To ---- */}
         <View style={[styles.input, { zIndex: activeField === "dest" ? 20 : 1 }]}>
           <Text style={styles.inputLabel}>To</Text>
-          <TextInput
-            testID="inputDestLoc"
-            style={styles.inputField}
-            value={destQuery}
-            onChangeText={onDestTextChange}
-            onFocus={() => setActiveField("dest")}
-            onBlur={() => scheduleClose("dest")}
-            placeholder="Search campus or building..."
-            placeholderTextColor="#999"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
+          <View style={styles.inputRow}>
+            <TextInput
+              testID="inputDestLoc"
+              style={styles.inputField}
+              value={destQuery}
+              onChangeText={onDestTextChange}
+              onFocus={() => setActiveField("dest")}
+              onBlur={() => scheduleClose("dest")}
+              placeholder="Search campus or building..."
+              placeholderTextColor="#999"
+              autoCorrect={false}
+              returnKeyType="search"
+            />
+            {destQuery.length > 0 && (
+              <Pressable onPress={clearDest} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color="#aaa" />
+              </Pressable>
+            )}
+          </View>
           {activeField === "dest" && destResults.length > 0 && (
             <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
               {destResults.map((loc, i) => (
@@ -473,7 +479,9 @@ useEffect(() => {
                   onPress={() => pickDestination(loc)}
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>{getBuildingDisplayName(loc.label)}</Text>
+                  <Text style={styles.dropdownText} numberOfLines={1}>
+                    {getBuildingDisplayName(loc.label)}
+                  </Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -481,10 +489,7 @@ useEffect(() => {
         </View>
       </View>
 
-  
-
       <View style={styles.bottomPart}>
-        {/* ---- Live Location Button (shown when From field is active) ---- */}
         {activeField === "origin" && (
           <Pressable onPress={getCurrentLocation} style={styles.liveLoc}>
             <Ionicons name="location" size={26} color="#912338" />
@@ -492,9 +497,10 @@ useEffect(() => {
           </Pressable>
         )}
 
-        {/* ---- Routes header ---- */}
         <View style={styles.routesHeader}>
-          <Text style={styles.routesTitle}>{routes.length} routes{"\n"}available</Text>
+          <Text style={styles.routesTitle}>
+            {routes.length} routes{"\n"}available
+          </Text>
           <Pressable testID="pressFilter">
             <Text style={styles.filterText}>Filter</Text>
           </Pressable>
@@ -513,12 +519,7 @@ useEffect(() => {
           )}
           {showEmptyState && (
             <View style={styles.emptyStateContainer}>
-              <Ionicons
-                name="map-outline"
-                size={40}
-                color="#7C2B38"
-                style={{ marginBottom: 10 }}
-              />
+              <Ionicons name="map-outline" size={40} color="#7C2B38" style={{ marginBottom: 10 }} />
               <Text style={styles.emptyStateTitle}>No routes found</Text>
               <Text style={styles.emptyStateText}>
                 {error
@@ -530,87 +531,71 @@ useEffect(() => {
           )}
           {showSelectLocationsState && (
             <View style={styles.emptyStateContainer} testID="selectLocationsState">
-              <Ionicons
-                name="search-outline"
-                size={40}
-                color="#7C2B38"
-                style={{ marginBottom: 10 }}
-              />
+              <Ionicons name="search-outline" size={40} color="#7C2B38" style={{ marginBottom: 10 }} />
               <Text style={styles.emptyStateTitle}>Select valid locations</Text>
-              <Text style={styles.emptyStateText}>
-                Please pick a suggestion from the dropdown.
-              </Text>
+              <Text style={styles.emptyStateText}>Please pick a suggestion from the dropdown.</Text>
             </View>
           )}
-          {!loading && routes.map((r, i) => {
-            const { label, icon } = getModeDisplay(r.mode);
-            const isSelected = i === selectedRouteIndex;
+          {!loading &&
+            routes.map((r, i) => {
+              const { label, icon } = getModeDisplay(r.mode);
+              const isSelected = i === selectedRouteIndex;
 
+              return (
+                <Pressable
+                  key={`route-${i}`}
+                  onPress={() => {
+                    const normalizedPolyline =
+                      typeof r?.polyline === "string"
+                        ? r.polyline
+                        : r?.polyline?.encodedPolyline ??
+                          r?.polyline?.points ??
+                          r?.overview_polyline?.points ??
+                          r?.overviewPolyline?.points ??
+                          null;
 
-            return (
-              <Pressable
-               // key={`${r.mode}-${i}`} 
-               // key={`route-${i}`}
-               // onPress={() => setSelectedRouteIndex(i)}
-               onPress={() => {
-                console.log("Pressed route:", i);
-               console.log("r.polyline length:", r?.polyline?.length);
-               
-                console.log("r.steps length:", r?.steps?.length);
-                console.log("origin:", origin);
-                console.log("destination:", destination);
+                    const normalized = { ...r, polyline: normalizedPolyline };
 
-                //  const normalized = {
-                //    ...r,
-                //    polyline:
-                //    r?.polyline ??
-                //    r?.overview_polyline?.points ??
-                //    r?.overviewPolyline?.points ??
-                //    r?.polyline?.encodedPolyline ??
-                //    r?.polyline?.points ??
-                //     null,
-                //      };
-                const normalizedPolyline =
-  typeof r?.polyline === "string"
-    ? r.polyline
-    : r?.polyline?.encodedPolyline ??
-      r?.polyline?.points ??
-      r?.overview_polyline?.points ??
-      r?.overviewPolyline?.points ??
-      null;
+                    handleSelectRoute({ route: normalized, origin, destination });
+                    setSelectedRouteIndex(i);
 
-const normalized = {
-  ...r,
-  polyline: normalizedPolyline,
-};
-
-               console.log("Normalized polyline length:", normalized?.polyline?.length);
-               handleSelectRoute({ route: normalized, origin, destination });
-                setSelectedRouteIndex(i);
-                //setShowFullMap(true);
-                if (onSelectRoute)
-                  onSelectRoute({ route: normalized, origin, destination,}); 
-      
-                onPressBack?.()
-              }}
-                style={[styles.routeContainer, isSelected && styles.routeContainerSelected]}
-              >
-                <View style={styles.routeBody}>
-                  <Ionicons name={icon} size={28} color="#7C2B38" style={styles.routeIcon} />
-                  <View style={styles.routeDetails}>
-                    <Text style={styles.routeMode}>{label}</Text>
-                    <Text style={styles.routeTime}>{r.duration?.text || "—"}</Text>
-                    {r.distance?.text && <Text style={styles.routeDistance}>{r.distance.text}</Text>}
-                    {r.scheduleNote && <Text style={styles.routeSchedule}>{r.scheduleNote}</Text>}
+                    if (onSelectRoute) onSelectRoute({ route: normalized, origin, destination });
+                    onPressBack?.();
+                  }}
+                  style={[styles.routeContainer, isSelected && styles.routeContainerSelected]}
+                >
+                  <View style={styles.routeBody}>
+                    <Ionicons
+                      name={icon}
+                      size={28}
+                      color={isSelected ? "#fff" : "#7C2B38"}
+                      style={styles.routeIcon}
+                    />
+                    <View style={styles.routeDetails}>
+                      <Text style={[styles.routeMode, isSelected && styles.routeTextSelected]}>
+                        {label}
+                      </Text>
+                      <Text style={[styles.routeTime, isSelected && styles.routeTextSelected]}>
+                        {r.duration?.text || "—"}
+                      </Text>
+                      {r.distance?.text && (
+                        <Text style={[styles.routeDistance, isSelected && styles.routeSubTextSelected]}>
+                          {r.distance.text}
+                        </Text>
+                      )}
+                      {r.scheduleNote && (
+                        <Text style={[styles.routeSchedule, isSelected && styles.routeSubTextSelected]}>
+                          {r.scheduleNote}
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            );
-          })}
+                </Pressable>
+              );
+            })}
         </ScrollView>
       </View>
 
-      {/* ---- Error Modal ---- */}
       <ErrorModal
         visible={showErrorModal}
         onClose={() => setShowErrorModal(false)}
@@ -634,8 +619,7 @@ OutdoorDirection.propTypes = {
 };
 
 const styles = StyleSheet.create({
-
-    mapWrap: {
+  mapWrap: {
     height: 260,
     marginHorizontal: 16,
     borderRadius: 16,
@@ -644,16 +628,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
   },
-
   routeContainerSelected: {
     borderWidth: 3,
     borderColor: "#7C2B38",
-    backgroundColor: "#fff5f6",
+    backgroundColor: "#7C2B38",
   },
-
-  background: {
-    flex: 1,
+  routeTextSelected: {
+    color: "#fff",
   },
+  routeSubTextSelected: {
+    color: "rgba(255,255,255,0.8)",
+  },
+  background: { flex: 1 },
   header: {
     width: "100%",
     paddingTop: 35,
@@ -695,7 +681,12 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 4,
   },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   inputField: {
+    flex: 1,
     fontSize: 16,
     color: "#111",
     paddingVertical: 4,
@@ -719,8 +710,6 @@ const styles = StyleSheet.create({
     color: "#333",
     flex: 1,
   },
-
-  /* ---- Routes area ---- */
   loadingRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -738,10 +727,10 @@ const styles = StyleSheet.create({
   errorContainer: {
     marginTop: 20,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   bottomPart: {
     flex: 1,
@@ -795,12 +784,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
   },
-  routeIcon: {
-    marginRight: 14,
-  },
-  routeDetails: {
-    flex: 1,
-  },
+  routeIcon: { marginRight: 14 },
+  routeDetails: { flex: 1 },
   routeMode: {
     fontSize: 18,
     fontWeight: "700",
@@ -822,45 +807,35 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: "italic",
   },
-  scrollBar: {},
-
-  /* ---- No routes found ---- */
   emptyStateContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 40,
     paddingHorizontal: 20,
   },
-
   emptyStateTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#333",
     marginBottom: 6,
   },
-
   emptyStateText: {
     fontSize: 14,
     color: "#777",
     textAlign: "center",
   },
-
-  // Try Again button on no routes found & error
   retryButton: {
     marginTop: 20,
-    backgroundColor: '#912338',
+    backgroundColor: "#912338",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 6,
   },
   retryButtonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
-
 });
-
-
 
 export const __test__ = {
   getBuildingDisplayName,

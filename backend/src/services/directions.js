@@ -11,7 +11,7 @@ function normalizeVehicleType(vehicleType) {
  * Includes Concordia shuttle option for SGW ↔ Loyola campus trips.
  */
 
-const https = require("https");
+const https = require("node:https");
 const { getCampusCoordinates } = require("./map");
 
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
@@ -225,8 +225,8 @@ function stripHtml(html = "") {
   let out = "";
   let inTag = false;
 
-  for (let i = 0; i < s.length; i++) {
-    const ch = s[i];
+  for (const element of s) {
+    const ch = element;
 
     if (ch === "<") {
       inTag = true;
@@ -349,7 +349,7 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
   if (!isShuttleOperatingNow(refDate)) return null;
 
   const drivingRes = await fetchDirections(origin, destination, "driving");
-  const polyline = drivingRes?.routes?.[0]?.overview_polyline?.points || null;
+  const polyline = drivingRes?.json?.routes?.[0]?.overview_polyline?.points || null;
   const nextDeparture = getNextDeparture(fromCampus, refDate);
 
   return {
@@ -375,7 +375,7 @@ async function getTransportOptionsResult(origin, destination, opts = {}) {
   let refDate = new Date();
   if (opts.clientTime) {
     const parsed = new Date(opts.clientTime);
-    if (!isNaN(parsed.getTime())) refDate = parsed;
+    if (!Number.isNaN(parsed.getTime())) refDate = parsed;
   }
 
   const [walkingRes, transitRes, shuttleRoute] = await Promise.all([
