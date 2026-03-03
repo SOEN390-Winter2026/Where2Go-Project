@@ -28,13 +28,6 @@ const mockProps = {
 
 const setIsMarkerCurrentlyVisible = jest.fn();
 
-const region = {
-    latitude: 45.5,
-    longitude: -73.5,
-    latitudeDelta: 0.1,
-    longitudeDelta: 0.1,
-};
-
 describe('CampusMap Live Location Visibility', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -89,40 +82,48 @@ test("triggers region change visibility logic", () => {
     expect(true).toBeTruthy();
 });
 
-test("does not trigger region change visibility logic", () => {
+test("triggers onLiveLocAppear when marker becomes visible", () => {
+  const mockDisappear = jest.fn();
+  const mockAppear = jest.fn();
+  const mockSetUserDraggedMap = jest.fn();
 
-    const mockDisappear = jest.fn();
-    const mockAppear = jest.fn();
-    const mockSetUserDraggedMap = jest.fn();
-
-    const { getByTestId } = render(
-        <CampusMap
-            liveLocationEnabled={true}
-            userLocation={{
-                latitude: 45,
-                longitude: -73
-            }}
-            onLiveLocDisappear={mockDisappear}
-            onLiveLocAppear={mockAppear}
-            setUserDraggedMap={mockSetUserDraggedMap}
-            buildings={[]}
-            selectedPois={[]}
-            campusCoords={{
-                latitude: 45,
-                longitude: -73,
-            }}
-        />
-    );
-
-    const map = getByTestId("mapRef");
-
-    fireEvent(map, "regionChangeComplete", {
+  const { getByTestId } = render(
+    <CampusMap
+      liveLocationEnabled={true}
+      userLocation={{
         latitude: 45,
         longitude: -73,
-        latitudeDelta: 0.1,
-        longitudeDelta: 0.1,
-    });
+      }}
+      onLiveLocDisappear={mockDisappear}
+      onLiveLocAppear={mockAppear}
+      setUserDraggedMap={mockSetUserDraggedMap}
+      buildings={[]}
+      selectedPois={[]}
+      campusCoords={{
+        latitude: 45,
+        longitude: -73,
+      }}
+    />
+  );
 
-    expect(mockAppear).not.toHaveBeenCalled();
-    expect(mockDisappear).not.toHaveBeenCalled();
+  const map = getByTestId("mapRef");
+
+  // 1️⃣ First region: user OUTSIDE view
+  fireEvent(map, "regionChangeComplete", {
+    latitude: 50, // far away
+    longitude: -80,
+    latitudeDelta: 0.1,
+    longitudeDelta: 0.1,
+  });
+
+  // 2️⃣ Second region: user INSIDE view
+  fireEvent(map, "regionChangeComplete", {
+    latitude: 45,
+    longitude: -73,
+    latitudeDelta: 0.1,
+    longitudeDelta: 0.1,
+  });
+
+  expect(mockAppear).toHaveBeenCalledTimes(1);
+  expect(mockDisappear).toHaveBeenCalled();
 });
