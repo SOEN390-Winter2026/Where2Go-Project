@@ -13,6 +13,7 @@ import PoiInfoModal from './src/PoiInfoModal';
 import OutdoorDirection from "./src/OutdoorDirection";
 import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
+import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
 
 const CAMPUS_COORDS = {
@@ -35,6 +36,9 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
+  
+  //indoors stuff
+  const [showIndoorMaps, setShowIndoorMaps] = useState(false);
 
   // POI state
   const [isPressedPOI, setIsPressedPOI] = useState(false);
@@ -51,6 +55,11 @@ export default function App() {
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
   const [destinationPoi, setDestinationPoi] = useState(null);
+  const [selectedPois, setSelectedPois] = useState([]);
+  const handlePoisChange = (poisFromSlider) => {
+    setSelectedPois(poisFromSlider);
+  };
+
   const getBuildingRole = (building) => {
     if (building?.id === departureBuilding?.id) return 'departure';
     if (building?.id === destinationBuilding?.id) return 'destination';
@@ -69,7 +78,6 @@ export default function App() {
 
   // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
   // Also set that map loaded
-
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
     setCampusCoords(nextCoords);
@@ -138,12 +146,6 @@ export default function App() {
     }
   }, [dataLoaded, hasInitialized]);
 
-  //handle POI Change
-  const [selectedPois, setSelectedPois] = useState([]);
-  const handlePoisChange = (poisFromSlider) => {
-    setSelectedPois(poisFromSlider);
-  };
-
   //Login page first
   if (showLogin) {
     return (
@@ -160,6 +162,16 @@ export default function App() {
     return <LoadingPage />;
   }
 
+  if (showIndoorMaps) {
+    return (
+      <IndoorMaps
+        building={selectedBuilding}
+        onPressBack={() => setShowIndoorMaps(false)}
+        campus={currentCampus}
+      />
+    );
+  }
+
   if(showOutdoorDirection){
     return <OutdoorDirection
     onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))}
@@ -168,14 +180,12 @@ export default function App() {
     initialTo={destinationBuilding ? destinationBuilding.name : ""}
     destination={destinationPoi}
     />;
-
   }
 
   if(showCalendar){
     return <CalendarPage 
     onPressBack={() => setShowCalendar((prev) => (prev !== true))} 
     />;
-  
   }
 
 
@@ -232,6 +242,10 @@ export default function App() {
           setDestinationPoi(null);
         }}
         selectedRole={ getBuildingRole(selectedBuilding) }
+        onGoInside={() => {
+          setModalVisible(false);
+          setShowIndoorMaps(true);
+        }}
       />
       <PoiInfoModal
         poi={selectedPoi}
