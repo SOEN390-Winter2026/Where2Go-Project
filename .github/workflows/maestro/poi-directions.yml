@@ -5,19 +5,22 @@ appId: host.exp.exponent
 - tapOn:
     id: poiPress
 
-- waitForAnimationToEnd
-
-- tapOn: "gps"
-
-- tapOn:
-    text: "Only this time"
-    optional: true
-
 - waitForAnimationToEnd    
+
+# adjusting place for specific tapping
+- tapOn: SGW
+- waitForAnimationToEnd    
+- tapOn: Loyola
+- waitForAnimationToEnd    
+
+# looking for JMSB -> CL
+- tapOn:
+    point: 30%,68%
 
 - tapOn: Load
 
 # 87% is the height, 40% can be changed for different distances
+# loading multiple times to guarantee the starbucks pops out
 - tapOn:
     point: 60%,87%
 
@@ -28,10 +31,15 @@ appId: host.exp.exponent
 
 - tapOn: Load
 
+- tapOn:
+    point: 20%,87%
+
+- tapOn: Load
+
 - waitForAnimationToEnd
 
 - tapOn:
-    id: "poi-.*"
+    point: 45%,46%
 
 - tapOn: "Get Directions"
 
