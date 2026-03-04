@@ -1,15 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
-import * as Location from 'expo-location';
+import { StatusBar } from "expo-status-bar";
+import polyline from "@mapbox/polyline";
+import { StyleSheet, View, Pressable } from "react-native";
+import React, { useState, useEffect, useRef, use } from "react";
+import * as Location from "expo-location";
+import { Ionicons } from "@expo/vector-icons";
 
-import CampusMap from './src/Map';
-import SideLeftBar from './src/SideLeftBar';
-import TopRightMenu from './src/TopRightMenu';
+import CampusMap from "./src/Map";
+import SideLeftBar from "./src/SideLeftBar";
+import TopRightMenu from "./src/TopRightMenu";
 import PoiSlider from "./src/PoiSlider";
 import LoginScreen from "./src/Login";
-import BuildingInfoModal from './src/BuildingInfoModal';
-import PoiInfoModal from './src/PoiInfoModal';
+import BuildingInfoModal from "./src/BuildingInfoModal";
+import PoiInfoModal from "./src/PoiInfoModal";
 import OutdoorDirection from "./src/OutdoorDirection";
 import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
@@ -21,33 +23,49 @@ const CAMPUS_COORDS = {
   Loyola: { latitude: 45.4587, longitude: -73.6409 },
 };
 
-export default function App() {
-  console.log(API_BASE_URL);
+const colors = {
+  buildingHighlightFill: "rgba(107,15,26,0.20)",
+  buildingHighlightStroke: "rgba(107,15,26,0.85)",
+  destinationHighlightFill: "rgba(30,136,229,0.25)",
+};
 
+function decodePolylineToCoords(encoded) {
+  if (!encoded) return [];
+  const pts = polyline.decode(encoded);
+  return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
+}
+
+export default function App() {
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
-  const [currentCampus, setCurrentCampus] = useState('SGW');
+
+  const [currentCampus, setCurrentCampus] = useState("SGW");
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
 
   const [buildings, setBuildings] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
   const [userLocation, setUserLocation] = useState(null);
-  const [userDraggedMap, setUserDraggedMap] = useState(false); //to snap back to user when dragged away
+  const [userDraggedMap, setUserDraggedMap] = useState(false);
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
   
   //indoors stuff
   const [showIndoorMaps, setShowIndoorMaps] = useState(false);
 
-  // POI state
   const [isPressedPOI, setIsPressedPOI] = useState(false);
   const [poiOriginBuilding, setPoiOriginBuilding] = useState(null);
+  const [selectedPois, setSelectedPois] = useState([]);
   const [selectedPoi, setSelectedPoi] = useState(null);
   const [poiModalVisible, setPoiModalVisible] = useState(false);
 
   const [dataLoaded, setDataLoaded] = useState(false); // for loading check
   const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
+
+  //Live Loc
+  const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
+
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -55,52 +73,107 @@ export default function App() {
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
   const [destinationPoi, setDestinationPoi] = useState(null);
-  const [selectedPois, setSelectedPois] = useState([]);
+
+  const [activeRouteCoords, setActiveRouteCoords] = useState([]);
+  const [activeRouteMeta, setActiveRouteMeta] = useState(null);
+  const [activeSegments, setActiveSegments] = useState([]);
+  const [isRouteActive, setIsRouteActive] = useState(false);
+
   const handlePoisChange = (poisFromSlider) => {
     setSelectedPois(poisFromSlider);
   };
 
   const getBuildingRole = (building) => {
-    if (building?.id === departureBuilding?.id) return 'departure';
-    if (building?.id === destinationBuilding?.id) return 'destination';
+    if (building?.id === departureBuilding?.id) return "departure";
+    if (building?.id === destinationBuilding?.id) return "destination";
     return null;
   };
 
+  function fitRoute(coords) {
+    if (!mapRef.current || !coords?.length) return;
+    mapRef.current.fitToCoordinates(coords, {
+      edgePadding: { top: 120, right: 80, bottom: 200, left: 80 },
+      animated: true,
+    });
+  }
+
+  const routeStart =
+    activeSegments?.[0]?.coords?.[0] ?? activeRouteCoords?.[0] ?? null;
+
+  const routeEnd = (() => {
+    if (activeSegments?.length) {
+      const lastSeg = activeSegments.at(-1);
+      return lastSeg?.coords?.[lastSeg.coords.length - 1] ?? null;
+    }
+    return activeRouteCoords?.at(-1) ?? null;
+  })();
+
+  const handleSelectRoute = ({ route, origin, destination }) => {
+    const coords = decodePolylineToCoords(route?.polyline);
+
+    setActiveRouteCoords(coords);
+    setActiveRouteMeta({ route, origin, destination });
+
+    const steps = Array.isArray(route?.steps) ? route.steps : [];
+    const segments = steps
+      .map((s) => {
+        const c = decodePolylineToCoords(s?.polyline);
+        if (!c.length) return null;
+        return { coords: c, isWalk: s?.type === "walk", vehicle: s?.vehicle };
+      })
+      .filter(Boolean);
+
+    setActiveSegments(segments);
+    setIsRouteActive(true);
+    setShowOutdoorDirection(false);
+
+    requestAnimationFrame(() => fitRoute(coords));
+  };
+
+  const handleCancelRoute = () => {
+    setActiveRouteCoords([]);
+    setActiveSegments([]);
+    setActiveRouteMeta(null);
+    setIsRouteActive(false);
+  };
+
   const handleBuildingPress = (building) => {
-    if(isPressedPOI){
+    if (isPressedPOI) {
       setPoiOriginBuilding(building);
       setSelectedPois([]);
-    }else{
-    setSelectedBuilding(building);
-    setModalVisible(true);
+    } else {
+      setSelectedBuilding(building);
+      setModalVisible(true);
     }
   };
 
-  // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
-  // Also set that map loaded
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
     setCampusCoords(nextCoords);
-    setDataLoaded(true);
+
+    if (showLogin) return;
+
+    setDataLoaded(false);
+
     mapRef.current?.animateToRegion(
-      {
-        ...nextCoords,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      },
+      { ...nextCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 },
       500
     );
 
-    console.log('Fetching buildings from:', `${API_BASE_URL}/campus/${currentCampus}/buildings`);
-    fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
+    const url = `${API_BASE_URL}/campus/${currentCampus}/buildings`;
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log('Buildings received:', data.length);
-        setBuildings(data);
+        setBuildings(Array.isArray(data) ? data : []);
+        setDataLoaded(true);
       })
-      .catch((err) => console.error('Error fetching buildings:', err));
+      .catch((err) => {
+        console.error("Error fetching buildings:", err);
+        setBuildings([]);
+        setDataLoaded(true);
+      });
   }, [currentCampus, showLogin]);
-
 
   useEffect(() => {
     if (!liveLocationEnabled) {
@@ -112,52 +185,43 @@ export default function App() {
     }
 
     const startTracking = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.log("Permission denied");
-        return;
-      }
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
 
       const sub = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 1000,
-          distanceInterval: 5,
-        },
+        { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
-          const coords = {
+          setUserLocation({
             latitude: loc.coords.latitude,
             longitude: loc.coords.longitude,
-          };
-          console.log("USER LOCATION:", coords);
-          setUserLocation(coords);
+          });
         }
       );
+
       watchRef.current = sub;
     };
 
     startTracking();
   }, [liveLocationEnabled]);
 
-  // to change the loading to done/wont long load again
   useEffect(() => {
     if (!hasInitialized && dataLoaded) {
       setHasInitialized(true);
     }
   }, [dataLoaded, hasInitialized]);
 
-  //Login page first
   if (showLogin) {
     return (
       <LoginScreen
         onSkip={() => {
           setShowLogin(false);
-          setHasInitialized(false); // for loading
+          setHasInitialized(false);
+          setDataLoaded(false);
         }}
       />
     );
   }
-  // start loading if the map still isn't done
+
   if (!hasInitialized) {
     return <LoadingPage />;
   }
@@ -172,25 +236,27 @@ export default function App() {
     );
   }
 
-  if(showOutdoorDirection){
-    return <OutdoorDirection
-    onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))}
-    buildings={buildings}
-    initialFrom={departureBuilding ? departureBuilding.name : ""}
-    initialTo={destinationBuilding ? destinationBuilding.name : ""}
-    destination={destinationPoi}
-    />;
+  if (showOutdoorDirection) {
+    return (
+      <OutdoorDirection
+        onPressBack={() => setShowOutdoorDirection(false)}
+        buildings={buildings}
+        initialFrom={departureBuilding ? departureBuilding.name : ""}
+        initialTo={destinationBuilding ? destinationBuilding.name : ""}
+        destination={destinationPoi}
+        onSelectRoute={handleSelectRoute}
+      />
+    );
   }
 
-  if(showCalendar){
-    return <CalendarPage 
-    onPressBack={() => setShowCalendar((prev) => (prev !== true))} 
-    />;
+  if (showCalendar) {
+    return <CalendarPage onPressBack={() => setShowCalendar(false)} />;
   }
-
 
   return (
     <View style={styles.container}>
+      <View style={styles.mapPlaceholder} pointerEvents="none" />
+
       <CampusMap
         ref={mapRef}
         campusCoords={campusCoords}
@@ -205,7 +271,32 @@ export default function App() {
           setSelectedPoi(poi);
           setPoiModalVisible(true);
         }}
+        activeSegments={activeSegments}
+        activeRouteCoords={activeRouteCoords}
+        routeStart={routeStart}
+        routeEnd={routeEnd}
+        onLiveLocDisappear={() => setIsLiveLocVisible(false)}
+        onLiveLocAppear={() => setIsLiveLocVisible(true)}
       />
+      {liveLocationEnabled && !isLiveLocVisible && userLocation && (
+        <Pressable
+          style={styles.recenterButton}
+          onPress={() => {
+            mapRef.current?.animateToRegion(
+              {
+                ...userLocation,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              },
+              400
+            );
+            setUserDraggedMap(false);
+          }}
+        >
+          <Ionicons name="compass" size={30} color="#912338" />
+        </Pressable>
+      )}
+
       <SideLeftBar
         currentCampus={currentCampus}
         isPressedPOI={isPressedPOI}
@@ -214,15 +305,13 @@ export default function App() {
         }
         onToggleLiveLocation={() =>
           setLiveLocationEnabled((prev) => {
-            if (prev) {
-              setUserLocation(null);
-            }
+            if (prev) setUserLocation(null);
             return !prev;
           })
         }
         onPressPOI={() => {
-          setIsPressedPOI(prev => {
-            if(prev) {
+          setIsPressedPOI( prev => {
+            if (prev) {
               setPoiOriginBuilding(null);
               setSelectedPois([]);
             }
@@ -231,14 +320,18 @@ export default function App() {
         }}
       />
 
-      <TopRightMenu onPressDirection={() => setShowOutdoorDirection(true)} onPressCalendar={() => setShowCalendar(true)}/>
+      <TopRightMenu
+        onPressDirection={() => setShowOutdoorDirection(true)}
+        onPressCalendar={() => setShowCalendar(true)}
+      />
+
       <BuildingInfoModal
         building={selectedBuilding}
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSetDeparture={(buildingCommute) => setDepartureBuilding(buildingCommute)}
-        onSetDestination={(buildingCommute) => {
-          setDestinationBuilding(buildingCommute);
+        onSetDeparture={(b) => setDepartureBuilding(b)}
+        onSetDestination={(b) => {
+          setDestinationBuilding(b);
           setDestinationPoi(null);
         }}
         selectedRole={ getBuildingRole(selectedBuilding) }
@@ -247,21 +340,23 @@ export default function App() {
           setShowIndoorMaps(true);
         }}
       />
+
       <PoiInfoModal
         poi={selectedPoi}
         visible={poiModalVisible}
         onClose={() => setPoiModalVisible(false)}
         onSetAsDestination={() => {
           setDestinationPoi({
-            label: selectedPoi.name,
-            lat: selectedPoi.geometry.location.lat,
-            lng: selectedPoi.geometry.location.lng,
+            label: selectedPoi?.name,
+            lat: selectedPoi?.geometry?.location?.lat,
+            lng: selectedPoi?.geometry?.location?.lng,
           });
           setDestinationBuilding(null);
           setPoiModalVisible(false);
           setShowOutdoorDirection(true);
         }}
       />
+
       {isPressedPOI && (
         <PoiSlider
           onPoisChange={handlePoisChange}
@@ -269,27 +364,52 @@ export default function App() {
           selectedBuilding={poiOriginBuilding}
         />
       )}
+
+      {isRouteActive && (
+        <Pressable style={styles.cancelButton} onPress={handleCancelRoute}>
+          <Ionicons name="close" size={22} color="white" />
+        </Pressable>
+      )}
+
       <StatusBar style="auto" />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  buttons: {
-    position: 'absolute',
-    bottom: 40,
-    width: '90%',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#6b0f1a',
+  container: { flex: 1, backgroundColor: "#fff" },
+  map: { ...StyleSheet.absoluteFillObject },
+  mapPlaceholder: { ...StyleSheet.absoluteFillObject },
+  cancelButton: {
+    position: "absolute",
+    bottom: 30,
+    left: 20,
+    backgroundColor: "#912338",
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: "center",
+    justifyContent: "center",
     zIndex: 10,
     elevation: 10,
-    alignSelf: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
+  recenterButton: {
+    position: "absolute",
+    top: '33%',
+    left: '6%',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,   
+    zIndex: 12,    
+    borderColor: "#912338",
+    borderWidth: 1.5,
+  }
 });
