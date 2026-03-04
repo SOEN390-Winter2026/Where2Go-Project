@@ -145,8 +145,8 @@ export function parseEventLocation(location) {
   let buildingPart = roomMatch ? s.slice(0, roomMatch.index) : s;
 
   buildingPart = buildingPart
-    .replace(/,?\s*(?:room|rm\.?|salle)\s*:?\s*$/i, "")
-    .replace(/\s*\(SGW\)|\s*\(Loyola\)/i, "")
+    .replace(/,?\s*(?:room|rm\.?|salle)[\s:]*$/i, "")
+    .replace(/\s*\((?:SGW|Loyola)\)/i, "")
     .trim();
 
   // try whole string as name or code
