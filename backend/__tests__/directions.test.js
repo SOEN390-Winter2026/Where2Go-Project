@@ -347,6 +347,30 @@ describe("receiving transportation options", () => {
         expect(result.ok).toBe(false);
         expect(result.error.code).toBe("UPSTREAM_FAILED");
     });
+    it("normalizeVehicleType fallback returns 'transit' for unknown vehicle type (covers line 5)", () => {
+  const raw = makeDirectionsWithSteps({ vehicleType: "PLANE" }).routes[0]; // unknown
+  const route = normalizeRoute(raw, "transit");
+
+  const transitStep = route.steps.find((s) => s.type === "transit");
+  expect(transitStep).toBeDefined();
+  expect(transitStep.vehicle).toBe("transit"); // ✅ hits return "transit"
+});
+
+it("normalizeSteps fallback returns null for unsupported step and filters it out (covers line 285)", () => {
+  const raw = makeDirectionsWithSteps().routes[0];
+
+  // inject an invalid step that should hit the fallback (default) -> return null
+  raw.legs[0].steps.unshift({
+    travel_mode: "UNKNOWN_MODE", // not WALKING or TRANSIT
+    polyline: { points: "badStepPoly" },
+  });
+
+  const route = normalizeRoute(raw, "transit");
+
+  // The invalid step should be dropped by .filter(Boolean)
+  expect(route.steps.length).toBe(2); // still only the 2 valid ones
+  expect(route.steps.some((s) => s.polyline === "badStepPoly")).toBe(false);
+});
 
     it("handle malformed JSON from API", async () => {
         https.get.mockImplementation((url, callback) => {
