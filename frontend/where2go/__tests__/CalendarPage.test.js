@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import CalendarPage from '../src/CalendarPage'; // Adjust path
+import CalendarPage from '../src/CalendarPage';
 import * as Calendar from 'expo-calendar';
+import { parseEventLocation } from '../src/utils/eventLocationParser';
 
 jest.mock('react-native-calendars', () => {
     const React = require('react');
@@ -75,6 +76,10 @@ jest.mock('expo-calendar', () => ({
 
 jest.mock('expo-web-browser', () => ({
     maybeCompleteAuthSession: jest.fn(),
+}));
+
+jest.mock('../src/utils/eventLocationParser', () => ({
+    parseEventLocation: jest.fn((location) => ({ building: location || null, room: null })),
 }));
 
 describe('CalendarPage', () => {
@@ -218,6 +223,32 @@ describe('CalendarPage', () => {
 
         expect(await findByText('Concordia Lecture')).toBeTruthy();
         expect(await findByText('Gym Session')).toBeTruthy();
+    });
+
+    it('calls parseEventLocation for each event location when events are loaded', async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
+        Calendar.getEventsAsync.mockResolvedValue([
+            { id: 'e1', title: 'Class', location: 'H 435' },
+            { id: 'e2', title: 'Lab', location: 'EV 213' },
+        ]);
+
+        const { getByTestId, getByText, findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByTestId('calBtn'));
+
+        const checkbox = await findByText('Work');
+        fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
+        fireEvent.press(getByText('Done'));
+
+        fireEvent.press(getByTestId('mock-calendar'));
+
+        await waitFor(() => {
+            expect(parseEventLocation).toHaveBeenCalledWith('H 435');
+            expect(parseEventLocation).toHaveBeenCalledWith('EV 213');
+            expect(parseEventLocation).toHaveBeenCalledTimes(2);
+        });
     });
 
     it('requests permissions and fetches calendars on connect', async () => {
