@@ -298,6 +298,26 @@ describe('CalendarPage', () => {
         alertSpy.mockRestore();
     });
 
+    it('shows generic message when permission is not granted and not denied', async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'undetermined' });
+
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+
+        const { getByTestId, getByText } = render(<CalendarPage />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByText(/Connect to Google Calendar/i));
+
+        await waitFor(() => {
+            expect(alertSpy).toHaveBeenCalledWith(
+                "Calendar Access Required",
+                "Calendar access is needed to show your events.",
+                expect.any(Array)
+            );
+        });
+        alertSpy.mockRestore();
+    });
+
     it('calls Linking.openSettings when user taps Open Settings in permission alert', async () => {
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'denied' });
         const openSettingsSpy = jest.spyOn(Linking, 'openSettings').mockResolvedValue();
