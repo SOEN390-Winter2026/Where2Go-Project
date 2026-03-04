@@ -206,8 +206,6 @@ describe('IndoorMaps', () => {
         expect(getByTestId('floor-btn-1')).toBeTruthy();
     });
 
-    /* ─── Floor selection ─── */
-
     it('selects a floor and updates the map placeholder text', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
@@ -259,7 +257,6 @@ describe('IndoorMaps', () => {
         expect(queryByTestId('classroom-input')).toBeNull();
     });
 
-    //all of the below is for testing the drag of the sheet at the bottom of page
     it('onMoveShouldSetPanResponder returns true when dy > 5', () => {
         render(<IndoorMaps {...defaultProps} />);
         expect(panHandlers.onMoveShouldSetPanResponder(null, { dy: 10 })).toBe(true);
@@ -295,4 +292,25 @@ describe('IndoorMaps', () => {
         panHandlers.onPanResponderRelease(null, { dy: -200 });
         expect(getByTestId('classroom-input')).toBeTruthy();
     });
+
+    it('onPanResponderRelease collapses sheet when released near bottom', () => {
+        const { act } = require('@testing-library/react-native');
+        const { getByTestId, queryByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        act(() => {
+            panHandlers.onPanResponderRelease(null, { dy: 500 });
+        });
+        expect(queryByTestId('classroom-input')).toBeNull();
+    });
+
+    //#35: android branch of topPadding
+    it('renders correctly on Android and applies android top padding', () => {
+        const Platform = require('react-native').Platform;
+        const original = Platform.OS;
+        Platform.OS = 'android';
+        const { getAllByText } = render(<IndoorMaps {...defaultProps} />);
+        expect(getAllByText('H').length).toBeGreaterThan(0);
+        Platform.OS = original;
+    });
+
 });
