@@ -4,9 +4,9 @@ jest.mock('@react-native-community/slider', () => {
     const React = require('react');
     const { View } = require('react-native');
     const PropTypes = require('prop-types');
-    const SliderMock = ({ onValueChange, ...props }) => 
+    const SliderMock = ({ onValueChange, ...props }) =>
         React.createElement(View, { testID: 'slider', onValueChange, ...props });
-    
+
     SliderMock.propTypes = {
         onValueChange: PropTypes.func,
     };
@@ -14,20 +14,21 @@ jest.mock('@react-native-community/slider', () => {
 });
 
 const makeFetchResponse = (results, status = 'OK') =>
-  Promise.resolve({ ok: true, json: () => Promise.resolve({ status, results }) });
+    Promise.resolve({ ok: true, json: () => Promise.resolve({ status, results }) });
 
 const USER_LOCATION = { latitude: 45.497, longitude: -73.577 };
 const MOCK_RESULTS = [
-  { place_id: 'p1', name: 'Place 1', geometry: { location: { lat: 45.5, lng: -73.5 } } },
+    { place_id: 'p1', name: 'Place 1', geometry: { location: { lat: 45.5, lng: -73.5 } } },
 ];
 
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import PoiSlider from '../src/PoiSlider';
 
+
 describe('PoiSlider', () => {
-  beforeEach(() => { globalThis.fetch = jest.fn(() => makeFetchResponse(MOCK_RESULTS)); });
-  afterEach(() => { jest.clearAllMocks(); });
+    beforeEach(() => { globalThis.fetch = jest.fn(() => makeFetchResponse(MOCK_RESULTS)); });
+    afterEach(() => { jest.clearAllMocks(); });
 
     it('shows "From: Your location" when userLocation is set', () => {
         const { getByText } = render(
@@ -52,8 +53,8 @@ describe('PoiSlider', () => {
         const { getByTestId } = render(
             <PoiSlider onPoisChange={jest.fn()} userLocation={null} selectedBuilding={null} />
         );
-        expect(getByTestId('loadButton').props.accessibilityState?.disabled ?? 
-               getByTestId('loadButton').props.disabled).toBeTruthy();
+        expect(getByTestId('loadButton').props.accessibilityState?.disabled ??
+            getByTestId('loadButton').props.disabled).toBeTruthy();
     });
 
     it('fetches once per POI type when Load is pressed', async () => {
