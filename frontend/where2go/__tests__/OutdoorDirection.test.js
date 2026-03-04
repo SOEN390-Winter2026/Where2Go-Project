@@ -280,6 +280,56 @@ describe("Initial from/to and suggestion selection", () => {
 
     jest.useRealTimers();
   });
+
+  it("scheduleClose: dest blur closes dropdown after timeout (covers onBlur scheduleClose('dest') line 461)", async () => {
+  jest.useFakeTimers();
+
+  const mockBuildings = [
+    {
+      id: "2",
+      name: "Library",
+      campus: "SGW",
+      coordinates: [{ latitude: 45.496, longitude: -73.577 }],
+    },
+  ];
+
+  const { getByTestId, getByText, queryByText } = render(
+    <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} />
+  );
+
+  const destInput = getByTestId("inputDestLoc");
+
+  // make dest active so dest dropdown is allowed to render
+  act(() => {
+    fireEvent(destInput, "focus");
+  });
+
+  await act(async () => {
+    fireEvent.changeText(destInput, "Lib");
+  });
+
+  // dropdown appears
+  await waitFor(() => {
+    expect(getByText("Library")).toBeTruthy();
+  });
+
+  // trigger the exact line: onBlur={() => scheduleClose("dest")}
+  act(() => {
+    fireEvent(destInput, "blur");
+  });
+
+  // scheduleClose uses a timeout; advance past it
+  act(() => {
+    jest.advanceTimersByTime(250);
+  });
+
+  // dropdown should be closed
+  await waitFor(() => {
+    expect(queryByText("Library")).toBeNull();
+  });
+
+  jest.useRealTimers();
+});
 });
 
 describe("resolveLocationByName fallback coverage", () => {
