@@ -148,12 +148,6 @@ export default function App() {
     setSelectedPois(poisFromSlider);
   };
 
-  useEffect(() => {
-    if (isLiveLocVisible === false) {
-      console.log("Live location is not visible on the map.");
-    }
-  }, [isLiveLocVisible]);
-
   //Login page first
   if (showLogin) {
     return (
@@ -310,8 +304,8 @@ const styles = StyleSheet.create({
   },
   recenterButton: {
     position: "absolute",
-    bottom: 510,
-    left: 23,
+    top: '33%',
+    left: '6%',
     width: 50,
     height: 50,
     borderRadius: 25,
