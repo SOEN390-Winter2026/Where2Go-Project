@@ -133,25 +133,19 @@ export function parseEventLocation(location) {
 
   const s = location.trim();
 
-  // if it's already formatted as "H 435" or "EV-213"
-  const codeRoom = s.match(/^([A-Z]{1,3})[- ]*(\d{2,4}[A-Z]?(?:\.[-]?\d+)?)$/i);
+  // Room: digits, optional letter prefix (S2.230, B090), optional decimal (2.130)
+  const ROOM_PATTERN = /([A-Z]?\d{1,4}(?:\.[-]?\d+)?)/;
+
+  // if it's already formatted as "H 435" or "EV S2.230"
+  const codeRoom = s.match(new RegExp(`^([A-Z]{1,3})[- ]*${ROOM_PATTERN.source}$`, 'i'));
   if (codeRoom && KNOWN_CODES.has(codeRoom[1].toUpperCase())) {
     return { building: codeRoom[1].toUpperCase(), room: codeRoom[2] };
   }
 
   // pull room from end if present
-  const roomMatch = s.match(/(\d{2,4}[A-Z]?(?:\.[-]?\d+)?)\s*$/);
+  const roomMatch = s.match(new RegExp(`${ROOM_PATTERN.source}\\s*$`));
   const room = roomMatch ? roomMatch[1] : null;
-  let buildingPart = roomMatch ? s.slice(0, roomMatch.index) : s;
-
-  // strip ", Room 435", "(SGW)", etc. — use simple patterns to avoid ReDoS
-  buildingPart = buildingPart
-    .replace(/,?[ \t]*room[ \t:]*$/gi, "")
-    .replace(/,?[ \t]*salle[ \t:]*$/gi, "")
-    .replace(/,?[ \t]*rm\.?[ \t:]*$/gi, "")
-    .replace(/[ \t]*\(SGW\)/gi, "")
-    .replace(/[ \t]*\(Loyola\)/gi, "")
-    .trim();
+  const buildingPart = (roomMatch ? s.slice(0, roomMatch.index) : s).trim();
 
   // try whole string as name or code
   let code = BUILDING_NAME_TO_CODE[buildingPart.toLowerCase()];

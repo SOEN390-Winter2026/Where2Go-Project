@@ -36,6 +36,14 @@ describe('parseEventLocation', () => {
       expect(parseEventLocation('H435')).toEqual({ building: 'H', room: '435' });
     });
 
+    it('parses room with letter prefix "EV S2.230"', () => {
+      expect(parseEventLocation('EV S2.230')).toEqual({ building: 'EV', room: 'S2.230' });
+    });
+
+    it('parses room with letter prefix "H B090"', () => {
+      expect(parseEventLocation('H B090')).toEqual({ building: 'H', room: 'B090' });
+    });
+
     it('returns null building for unknown code (still extracts room)', () => {
       expect(parseEventLocation('XYZ 123')).toEqual({ building: null, room: '123' });
     });
@@ -52,6 +60,10 @@ describe('parseEventLocation', () => {
 
     it('parses "Engineering & Visual Arts 213"', () => {
       expect(parseEventLocation('Engineering & Visual Arts 213')).toEqual({ building: 'EV', room: '213' });
+    });
+
+    it('parses "Hall Building S2.230"', () => {
+      expect(parseEventLocation('Hall Building S2.230')).toEqual({ building: 'H', room: 'S2.230' });
     });
   });
 
@@ -88,6 +100,15 @@ describe('parseEventLocation', () => {
     it('parses "1590 docteur penfield" as SB', () => {
       expect(parseEventLocation('1590 docteur penfield montreal')).toEqual({ building: 'SB', room: null });
     });
+
+    it('parses address with number and street only', () => {
+      expect(parseEventLocation('1455 de maisonneuve')).toEqual({ building: 'H', room: null });
+    });
+
+    it('parses address that matches multiple keys (picks longest match)', () => {
+      // "1590 docteur penfield 1190 guy" matches both; sort picks longest -> SB
+      expect(parseEventLocation('1590 docteur penfield 1190 guy')).toEqual({ building: 'SB', room: null });
+    });
   });
 
   describe('building name without room', () => {
@@ -99,8 +120,16 @@ describe('parseEventLocation', () => {
       expect(parseEventLocation('John Molson Building')).toEqual({ building: 'MB', room: null });
     });
 
-    it('parses bare code "H"', () => {
+    it('parses bare code "H" via KNOWN_CODES', () => {
       expect(parseEventLocation('H')).toEqual({ building: 'H', room: null });
+    });
+
+    it('parses building from second part when first does not match', () => {
+      expect(parseEventLocation('Some prefix, Hall Building')).toEqual({ building: 'H', room: null });
+    });
+
+    it('parses code from second part when first does not match', () => {
+      expect(parseEventLocation('Unknown, JW')).toEqual({ building: 'JW', room: null });
     });
   });
 
