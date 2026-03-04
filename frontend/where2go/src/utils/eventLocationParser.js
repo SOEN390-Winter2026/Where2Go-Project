@@ -146,11 +146,11 @@ export function parseEventLocation(location) {
 
   // strip ", Room 435", "(SGW)", etc. — use simple patterns to avoid ReDoS
   buildingPart = buildingPart
-    .replace(/,?\s*room[\s:]*$/gi, "")
-    .replace(/,?\s*salle[\s:]*$/gi, "")
-    .replace(/,?\s*rm\.?[\s:]*$/gi, "")
-    .replace(/\s*\(SGW\)/gi, "")
-    .replace(/\s*\(Loyola\)/gi, "")
+    .replace(/,?[ \t]*room[ \t:]*$/gi, "")
+    .replace(/,?[ \t]*salle[ \t:]*$/gi, "")
+    .replace(/,?[ \t]*rm\.?[ \t:]*$/gi, "")
+    .replace(/[ \t]*\(SGW\)/gi, "")
+    .replace(/[ \t]*\(Loyola\)/gi, "")
     .trim();
 
   // try whole string as name or code
