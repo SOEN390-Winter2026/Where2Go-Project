@@ -144,9 +144,13 @@ export function parseEventLocation(location) {
   const room = roomMatch ? roomMatch[1] : null;
   let buildingPart = roomMatch ? s.slice(0, roomMatch.index) : s;
 
+  // strip ", Room 435", "(SGW)", etc. — use simple patterns to avoid ReDoS
   buildingPart = buildingPart
-    .replace(/,?\s*(?:room|rm\.?|salle)[\s:]*$/i, "")
-    .replace(/\s*\((?:SGW|Loyola)\)/i, "")
+    .replace(/,?\s*room[\s:]*$/gi, "")
+    .replace(/,?\s*salle[\s:]*$/gi, "")
+    .replace(/,?\s*rm\.?[\s:]*$/gi, "")
+    .replace(/\s*\(SGW\)/gi, "")
+    .replace(/\s*\(Loyola\)/gi, "")
     .trim();
 
   // try whole string as name or code
