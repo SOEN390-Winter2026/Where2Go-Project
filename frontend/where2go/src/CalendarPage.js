@@ -25,6 +25,19 @@ WebBrowser.maybeCompleteAuthSession();
 
 const SAVED_CALENDAR_IDS_KEY = "where2go_saved_calendar_ids";
 const { height, width } = Dimensions.get("window");
+
+function getValidCalendarIds(savedIds, allCalendars) {
+    const idSet = new Set(allCalendars.map((c) => String(c.id)));
+    return savedIds.filter((id) => idSet.has(String(id)));
+}
+
+async function fetchCalendarsIfPermitted() {
+    try {
+        return await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    } catch {
+        return null;
+    }
+}
 const SHEET_HEIGHT = height * 0.6;
 
 function pad2(n) {
@@ -798,3 +811,4 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 });
+
