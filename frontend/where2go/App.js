@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import polyline from "@mapbox/polyline";
 import { StyleSheet, View, Pressable } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -14,9 +14,8 @@ import BuildingInfoModal from "./src/BuildingInfoModal";
 import PoiInfoModal from "./src/PoiInfoModal";
 import OutdoorDirection from "./src/OutdoorDirection";
 import CalendarPage from "./src/CalendarPage";
-import LoadingPage from "./src/LoadingPage";
-
-import { API_BASE_URL } from "./src/config";
+import LoadingPage from './src/LoadingPage';
+import { API_BASE_URL } from './src/config';
 
 const CAMPUS_COORDS = {
   SGW: { latitude: 45.4974, longitude: -73.5771 },
@@ -59,9 +58,13 @@ export default function App() {
   const [selectedPoi, setSelectedPoi] = useState(null);
   const [poiModalVisible, setPoiModalVisible] = useState(false);
 
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false); // for loading check
+  const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
 
+  //Live Loc
+  const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
+
+  //for selecting buildings as departure or destination on map
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
   const [destinationPoi, setDestinationPoi] = useState(null);
@@ -123,15 +126,6 @@ export default function App() {
     setActiveSegments([]);
     setActiveRouteMeta(null);
     setIsRouteActive(false);
-  };
-
-  const snapBackToUser = () => {
-    if (!mapRef.current || !userLocation) return;
-    mapRef.current.animateToRegion(
-      { ...userLocation, latitudeDelta: 0.01, longitudeDelta: 0.01 },
-      500
-    );
-    setUserDraggedMap(false);
   };
 
   const handleBuildingPress = (building) => {
@@ -266,7 +260,27 @@ export default function App() {
         activeRouteCoords={activeRouteCoords}
         routeStart={routeStart}
         routeEnd={routeEnd}
+        onLiveLocDisappear={() => setIsLiveLocVisible(false)}
+        onLiveLocAppear={() => setIsLiveLocVisible(true)}
       />
+      {liveLocationEnabled && !isLiveLocVisible && userLocation && (
+        <Pressable
+          style={styles.recenterButton}
+          onPress={() => {
+            mapRef.current?.animateToRegion(
+              {
+                ...userLocation,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              },
+              400
+            );
+            setUserDraggedMap(false);
+          }}
+        >
+          <Ionicons name="compass" size={30} color="#912338" />
+        </Pressable>
+      )}
 
       <SideLeftBar
         currentCampus={currentCampus}
@@ -281,7 +295,7 @@ export default function App() {
           })
         }
         onPressPOI={() => {
-          setIsPressedPOI((prev) => {
+          setIsPressedPOI( prev => {
             if (prev) {
               setPoiOriginBuilding(null);
               setSelectedPois([]);
@@ -364,4 +378,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
+  recenterButton: {
+    position: "absolute",
+    top: '33%',
+    left: '6%',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,   
+    zIndex: 12,    
+    borderColor: "#912338",
+    borderWidth: 1.5,
+  }
 });
