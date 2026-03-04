@@ -101,23 +101,22 @@ export default function CalendarPage({ onPressBack }) {
 
     //Retrieve events based on the day and selected Calendars
     const getEventsForDay = async (selectedDateString) => {
-        const start = new Date(selectedDateString);
-        start.setHours(0, 0, 0, 0);
+        const [year, month, day] = selectedDateString.split("-").map(Number);
 
-        const end = new Date(selectedDateString);
-        end.setHours(23, 59, 59, 999);
+    const start = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const end = new Date(year, month - 1, day, 23, 59, 59, 999);
 
-        try {
-            const dayEvents = await Calendar.getEventsAsync(
-                selectedCalendarIds,
-                start,
-                end
-            );
+    try {
+        const dayEvents = await Calendar.getEventsAsync(
+            selectedCalendarIds,
+            start,
+            end
+        );
 
-            setEvents(dayEvents);
-        } catch (e) {
-            console.error(e);
-        }
+        setEvents(dayEvents);
+    } catch (e) {
+        console.error(e);
+    }
     };
 
     const [events, setEvents] = useState([]);

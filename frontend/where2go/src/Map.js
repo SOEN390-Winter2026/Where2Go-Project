@@ -1,5 +1,5 @@
-import { StyleSheet, View } from 'react-native';
-import React, { useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
+import { StyleSheet, View,} from 'react-native';
+import React, { useEffect, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 
 import BuildingCallout from './BuildingCallout';
@@ -30,9 +30,39 @@ const CampusMap = forwardRef((props, ref) => {
     setUserDraggedMap,
     selectedPois,
     onPoiPress,
+    onLiveLocDisappear,
+    onLiveLocAppear,
   } = props;
 
   const mapRef = useRef(null);
+  const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
+  const [currentRegion, setCurrentRegion] = useState(null);
+
+  const [isMarkerCurrentlyVisible, setIsMarkerCurrentlyVisible] = useState(true);
+
+  const checkLiveLocationVisibility = (region) => {
+    if (!userLocation || !liveLocationEnabled || !region) return;
+
+    const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
+    const { latitude: uLat, longitude: uLng } = userLocation; 
+
+    const northBound = latitude + latitudeDelta / 2;
+    const southBound = latitude - latitudeDelta / 2;
+    const eastBound = longitude + longitudeDelta / 2;
+    const westBound = longitude - longitudeDelta / 2;
+
+    const isVisible = uLat <= northBound && uLat >= southBound && uLng <= eastBound && uLng >= westBound;
+
+    
+    if (isVisible !== isMarkerCurrentlyVisible) {
+      setIsMarkerCurrentlyVisible(isVisible);
+      if (!isVisible) {
+        onLiveLocDisappear();
+      } else {
+        onLiveLocAppear();
+      }
+    }
+  };
 
   useImperativeHandle(ref, () => mapRef.current);
 
@@ -69,10 +99,9 @@ const CampusMap = forwardRef((props, ref) => {
             setUserDraggedMap(true);
           }
         }}
-        onRegionChangeComplete={() => {
-          if (liveLocationEnabled && userLocation && userDraggedMap) {
-            snapBackToUser();
-          }
+        onRegionChangeComplete={(region) => {
+          // Check if user is out of view every time they stop moving the map
+          checkLiveLocationVisibility(region);
         }}
         onPoiClick={(event) => {
           const { placeId, name } = event.nativeEvent;
