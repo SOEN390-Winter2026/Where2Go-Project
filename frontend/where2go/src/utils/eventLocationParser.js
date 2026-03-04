@@ -123,6 +123,34 @@ const ADDRESS_TO_CODE = {
 
 const ADDRESS_KEYS = Object.keys(ADDRESS_TO_CODE);
 
+const ROOM_PATTERN = /([A-Z]?\d{1,4}(?:\.[-]?\d+)?)/;
+
+function lookupBuildingByNameOrCode(text) {
+  const lower = text.toLowerCase();
+  const upper = text.toUpperCase();
+  return BUILDING_NAME_TO_CODE[lower] ?? (KNOWN_CODES.has(upper) ? upper : null);
+}
+
+function lookupBuildingInChunks(buildingPart) {
+  const parts = buildingPart.split(/\n|,/).map((p) => p.trim()).filter(Boolean);
+  return parts.map((p) => lookupBuildingByNameOrCode(p)).find(Boolean) ?? null;
+}
+
+function lookupBuildingByAddress(s) {
+  const normalized = s
+    .toLowerCase()
+    .replace(/[.,]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\b(boulevard|blvd\.?|street|st\.?|avenue|ave\.?|av\.?)\s*(ouest|west|w\.?)?\s*/gi, " ")
+    .replace(/\b(ouest|west)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const matched = ADDRESS_KEYS
+    .filter((k) => normalized.includes(k))
+    .sort((a, b) => b.length - a.length)[0];
+  return matched ? ADDRESS_TO_CODE[matched] : null;
+}
+
 /**
  * Returns { building, room }. Either can be null if we could not parse it.
  */
@@ -132,54 +160,18 @@ export function parseEventLocation(location) {
   }
 
   const s = location.trim();
-
-  // Room: digits, optional letter prefix (S2.230, B090), optional decimal (2.130)
-  const ROOM_PATTERN = /([A-Z]?\d{1,4}(?:\.[-]?\d+)?)/;
-
-  // if it's already formatted as "H 435" or "EV S2.230"
-  const codeRoom = s.match(new RegExp(`^([A-Z]{1,3})[- ]*${ROOM_PATTERN.source}$`, 'i'));
+  const codeRoom = s.match(new RegExp(`^([A-Z]{1,3})[- ]*${ROOM_PATTERN.source}$`, "i"));
   if (codeRoom && KNOWN_CODES.has(codeRoom[1].toUpperCase())) {
     return { building: codeRoom[1].toUpperCase(), room: codeRoom[2] };
   }
 
-  // pull room from end if present
   const roomMatch = s.match(new RegExp(`${ROOM_PATTERN.source}\\s*$`));
   const room = roomMatch ? roomMatch[1] : null;
   const buildingPart = (roomMatch ? s.slice(0, roomMatch.index) : s).trim();
 
-  // try whole string as name or code
-  let code = BUILDING_NAME_TO_CODE[buildingPart.toLowerCase()];
-  if (!code) {
-    code = KNOWN_CODES.has(buildingPart.toUpperCase()) ? buildingPart.toUpperCase() : null;
-  }
-
-  // try each line or comma-separated chunk
-  if (!code) {
-    const parts = buildingPart.split(/\n|,/).map((p) => p.trim()).filter(Boolean);
-    for (const part of parts) {
-      code = BUILDING_NAME_TO_CODE[part.toLowerCase()] ||
-        (KNOWN_CODES.has(part.toUpperCase()) ? part.toUpperCase() : null);
-      if (code) break;
-    }
-  }
-
-  // last resort: match as address (French or English)
-  if (!code) {
-    const normalized = s
-      .toLowerCase()
-      .replace(/[.,]/g, " ")
-      .replace(/\s+/g, " ")
-      .replace(/\b(boulevard|blvd\.?|street|st\.?|avenue|ave\.?|av\.?)\s*(ouest|west|w\.?)?\s*/gi, " ")
-      .replace(/\b(ouest|west)\b/gi, "")
-      .replace(/\s+/g, " ")
-      .trim();
-    const matched = ADDRESS_KEYS
-      .filter((k) => normalized.includes(k))
-      .sort((a, b) => b.length - a.length)[0];
-    if (matched) {
-      code = ADDRESS_TO_CODE[matched];
-    }
-  }
-
+  const code =
+    lookupBuildingByNameOrCode(buildingPart) ??
+    lookupBuildingInChunks(buildingPart) ??
+    lookupBuildingByAddress(s);
   return { building: code, room };
 }
