@@ -299,7 +299,6 @@ describe("Initial from/to and suggestion selection", () => {
 
   const destInput = getByTestId("inputDestLoc");
 
-  // make dest active so dest dropdown is allowed to render
   act(() => {
     fireEvent(destInput, "focus");
   });
@@ -308,12 +307,10 @@ describe("Initial from/to and suggestion selection", () => {
     fireEvent.changeText(destInput, "Lib");
   });
 
-  // dropdown appears
   await waitFor(() => {
     expect(getByText("Library")).toBeTruthy();
   });
 
-  // trigger the exact line: onBlur={() => scheduleClose("dest")}
   act(() => {
     fireEvent(destInput, "blur");
   });
@@ -349,8 +346,8 @@ describe("resolveLocationByName fallback coverage", () => {
     render(
       <OutdoorDirection
         onPressBack={() => {}}
-        buildings={[]}                    // forces SEARCHABLE_LOCATIONS branch
-        initialFrom="Hall Building"       // displayName of "Hall Building (H)"
+        buildings={[]}
+        initialFrom="Hall Building"
         initialTo="Loyola Campus"
       />
     );
@@ -362,8 +359,8 @@ describe("resolveLocationByName fallback coverage", () => {
     render(
       <OutdoorDirection
         onPressBack={() => {}}
-        buildings={[]}                         // forces SEARCHABLE_LOCATIONS branch
-        initialFrom="Hall Building (H)"        // raw label match
+        buildings={[]}
+        initialFrom="Hall Building (H)"
         initialTo="Loyola Campus"
       />
     );
@@ -381,7 +378,6 @@ describe("resolveLocationByName fallback coverage", () => {
       />
     );
 
-    // Give effects a tick; no fetch should happen because origin has null coords
     await act(async () => {});
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
@@ -398,7 +394,6 @@ it("clearOrigin clears origin query (press close-circle wrapper #0)", async () =
 
   const closeIcons = getAllByText("close-circle");
 
-  // press the wrapper (parent) because Text itself isn't pressable
   await act(async () => {
     fireEvent.press(closeIcons[0].parent);
   });
@@ -413,7 +408,6 @@ it("clearDest clears dest query (single close-circle belongs to active dest fiel
 
   const destInput = getByTestId("inputDestLoc");
 
-  // Make dest the active field so the clear icon belongs to dest
   act(() => {
     fireEvent(destInput, "focus");
   });
@@ -422,7 +416,6 @@ it("clearDest clears dest query (single close-circle belongs to active dest fiel
     fireEvent.changeText(destInput, "Lib");
   });
 
-  // Your UI renders only ONE close-circle at a time
   const closeIcons = getAllByText("close-circle");
   expect(closeIcons.length).toBe(1);
 
@@ -644,6 +637,67 @@ describe("Selecting a route - polyline normalization coverage", () => {
 
     expect(call0.origin).toMatchObject(origin);
     expect(call0.destination).toMatchObject(destination);
+  });
+
+  it("uses polyline directly when it is already a string", async () => {
+    const onSelectRoute = jest.fn();
+    const encoded = "test";
+
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", polyline: encoded, duration: { text: "10 min" } }],
+      }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        onSelectRoute={onSelectRoute}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
+    fireEvent.press(getByText("Walking"));
+
+    expect(onSelectRoute).toHaveBeenCalledWith(
+      expect.objectContaining({ route: expect.objectContaining({ polyline: encoded }) })
+    );
+
+    delete globalThis.fetch;
+  });
+
+  it("normalizes polyline to null when polyline is an empty object with no known fields", async () => {
+    const onSelectRoute = jest.fn();
+
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", polyline: {}, duration: { text: "10 min" } }],
+      }),
+    });
+
+    const { getByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        onSelectRoute={onSelectRoute}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    await waitFor(() => expect(getByText("Walking")).toBeTruthy());
+    fireEvent.press(getByText("Walking"));
+
+    expect(onSelectRoute).toHaveBeenCalledWith(
+      expect.objectContaining({ route: expect.objectContaining({ polyline: null }) })
+    );
+
+    delete globalThis.fetch;
   });
 });
 
@@ -897,6 +951,7 @@ describe("Retry button", () => {
     expect(queryByText("Try Again")).toBeNull();
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
+
 });
 
 describe("handleSelectRoute - segments (without MapView ref)", () => {

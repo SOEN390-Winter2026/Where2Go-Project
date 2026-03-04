@@ -388,4 +388,28 @@ test("renders boarding pins safely when segment coords exist (no crash)", () => 
     const markers = getAllByTestId('marker');
     expect(markers).toHaveLength(2);
   });
+
+  it('BoardingPins returns null when segment is not a small walk to transit', async () => {
+      const segments = [
+          { coords: [{ latitude: 45.1, longitude: -73.1 }, { latitude: 45.2, longitude: -73.2 }], isWalk: false, vehicle: null },
+          { coords: [{ latitude: 45.2, longitude: -73.2 }, { latitude: 45.3, longitude: -73.3 }], isWalk: false, vehicle: null },
+      ];
+
+      const { queryByLabelText } = render(
+          <CampusMap
+              campusCoords={{ latitude: 45.1, longitude: -73.1 }}
+              buildings={[]}
+              onBuildingPress={() => {}}
+              liveLocationEnabled={false}
+              userDraggedMap={false}
+              setUserDraggedMap={() => {}}
+              onLiveLocDisappear={() => {}}
+              onLiveLocAppear={() => {}}
+              activeSegments={segments}
+          />
+      );
+
+      expect(queryByLabelText('boardingPin')).toBeNull();
+  });
+
 });
