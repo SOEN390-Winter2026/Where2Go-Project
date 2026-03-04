@@ -6,6 +6,7 @@ import * as Calendar from 'expo-calendar';
 jest.mock('react-native-calendars', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
+    
     return {
         Calendar: ({ onDayPress }) => (
             <Pressable
@@ -15,6 +16,14 @@ jest.mock('react-native-calendars', () => {
                 <Text>Mock CalendarUI</Text>
             </Pressable>
         ),
+        CalendarList: ({ onDayPress }) => (
+      <Pressable
+        testID="full-calendar-list"
+        onPress={() => onDayPress({ dateString: "2026-02-28" })}
+      >
+        <Text>Mock CalendarList</Text>
+      </Pressable>
+    ),
     };
 });
 
@@ -537,4 +546,106 @@ describe('CalendarPage', () => {
         expect(await findByText('Extracting Calendars')).toBeTruthy();
     });
 });
+it("toggles full calendar view and presses CalendarList day (covers CalendarList path)", async () => {
+  Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+  Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#123456" }]);
+  Calendar.getEventsAsync.mockResolvedValue([{ id: "e1", title: "Event 1" }]);
 
+  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+
+  fireEvent.press(getByTestId("openModalBtn"));
+  fireEvent.press(getByTestId("calBtn"));
+
+  await findByText("Work");
+  fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+  fireEvent.press(getByText("Done"));
+
+  // toggle to full calendar view (CalendarList)
+  fireEvent.press(getByLabelText("Toggle full calendar view"));
+
+  await findByText("Mock CalendarList");
+
+  fireEvent.press(getByTestId("full-calendar-list"));
+
+  await waitFor(() => {
+    expect(Calendar.getEventsAsync).toHaveBeenCalled();
+  });
+
+  expect(await findByText("Event 1")).toBeTruthy();
+});
+
+it("opens Selected Calendars modal and lists the chosen calendar", async () => {
+  Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+  Calendar.getCalendarsAsync.mockResolvedValue([
+    { id: "cal-1", title: "Work", color: "#ff0000" },
+    { id: "cal-2", title: "Personal", color: "#00ff00" },
+  ]);
+  Calendar.getEventsAsync.mockResolvedValue([]);
+
+  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+
+  fireEvent.press(getByTestId("openModalBtn"));
+  fireEvent.press(getByTestId("calBtn"));
+
+  await findByText("Work");
+  fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+  fireEvent.press(getByText("Done"));
+
+  // open selected calendars modal (menu icon)
+  fireEvent.press(getByLabelText("Selected calendars"));
+
+  expect(await findByText("Selected Calendars")).toBeTruthy();
+  expect(await findByText("Work")).toBeTruthy();
+});
+
+it('pressing "Change" in Selected Calendars modal returns to "Extracting Calendars" screen', async () => {
+  Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+  Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+  Calendar.getEventsAsync.mockResolvedValue([]);
+
+  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+
+  fireEvent.press(getByTestId("openModalBtn"));
+  fireEvent.press(getByTestId("calBtn"));
+
+  await findByText("Work");
+  fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+  fireEvent.press(getByText("Done"));
+
+  fireEvent.press(getByLabelText("Selected calendars"));
+  await findByText("Selected Calendars");
+
+  fireEvent.press(getByText("Change"));
+
+  expect(await findByText(/Extracting Calendars/i)).toBeTruthy();
+  expect(await findByText(/Select Desired Calendars to Extract/i)).toBeTruthy();
+});
+
+it("renders date parts from event startDate (covers monthShort + getDatePartsFromEvent helpers)", async () => {
+  Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+  Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+  Calendar.getEventsAsync.mockResolvedValue([
+    {
+      id: "e-dec",
+      title: "December Event",
+      startDate: "2026-12-01T10:00:00.000Z",
+      endDate: "2026-12-01T11:00:00.000Z",
+      location: "Hall",
+    },
+  ]);
+
+  const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+
+  fireEvent.press(getByTestId("openModalBtn"));
+  fireEvent.press(getByTestId("calBtn"));
+  await findByText("Work");
+  fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+  fireEvent.press(getByText("Done"));
+
+  fireEvent.press(getByTestId("mock-calendar"));
+
+  expect(await findByText("December Event")).toBeTruthy();
+  // Month short should appear as DEC somewhere in the event card
+  expect(await findByText("DEC")).toBeTruthy();
+});
