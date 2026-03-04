@@ -111,7 +111,6 @@ export default function CalendarPage({ onPressBack }) {
 
   const getCalendars = async () => {
     const { status } = await Calendar.requestCalendarPermissionsAsync();
-
     if (status === "granted") {
       const calList = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
       setCalendars(calList);
@@ -125,7 +124,7 @@ export default function CalendarPage({ onPressBack }) {
           : "Calendar access is needed to show your events.",
         [
           { text: "Cancel", style: "cancel" },
-          { text: "Open Settings", onPress: () => Linking.openSettings() },
+          { text: "Open Settings", onPress: () => { Linking.openSettings(); } },
         ]
       );
     }
@@ -205,46 +204,6 @@ export default function CalendarPage({ onPressBack }) {
     return () => {
       cancelled = true;
     };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function restoreSavedCalendars() {
-      try {
-        const saved = await AsyncStorage.getItem(SAVED_CALENDAR_IDS_KEY);
-        if (!saved) {
-          if (!cancelled) setIsRestoring(false);
-          return;
-        }
-        const savedIds = JSON.parse(saved);
-        if (!Array.isArray(savedIds) || savedIds.length === 0) {
-          if (!cancelled) setIsRestoring(false);
-          return;
-        }
-        let allCalendars;
-        try {
-          allCalendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-        } catch (permErr) {
-          if (!cancelled) setIsRestoring(false);
-          return;
-        }
-        const validIds = savedIds.filter((id) =>
-          allCalendars.some((c) => String(c.id) === String(id))
-        );
-        if (!cancelled && validIds.length > 0) {
-          setCalendars(allCalendars);
-          setSelectedCalendarIds(validIds);
-          setIsCalendarConnected(true);
-          setIsCalendarsChosen(true);
-        }
-      } catch (e) {
-        // AsyncStorage can fail in Expo Go/web
-      } finally {
-        if (!cancelled) setIsRestoring(false);
-      }
-    }
-    restoreSavedCalendars();
-    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
