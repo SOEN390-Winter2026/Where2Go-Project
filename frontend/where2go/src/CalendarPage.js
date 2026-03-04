@@ -239,6 +239,21 @@ export default function CalendarPage({ onPressBack }) {
     [selectedDate]: { selected: true, selectedColor: "#912338" },
   };
 
+  const notConnectedView = isRestoring ? (
+    <View style={styles.noCalContainer}>
+      <Text style={styles.txtNoCal}>Loading…</Text>
+    </View>
+  ) : (
+    <View style={styles.noCalContainer}>
+      <Image
+        testID="calendar-icon"
+        source={require("../assets/calendar.png")}
+        style={styles.calendar}
+      />
+      <Text style={styles.txtNoCal}>No Calendar Yet</Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -253,11 +268,7 @@ export default function CalendarPage({ onPressBack }) {
         <Ionicons name="arrow-up" size={26} color="white" />
       </Pressable>
 
-      {isRestoring ? (
-        <View style={styles.noCalContainer}>
-          <Text style={styles.txtNoCal}>Loading…</Text>
-        </View>
-      ) : isCalendarConnected ? (
+      {isCalendarConnected ? (
         isCalendarsChosen ? (
           <View style={styles.pageWrap}>
             <View style={styles.calendarCard}>
@@ -469,14 +480,7 @@ export default function CalendarPage({ onPressBack }) {
           </>
         )
       ) : (
-        <View style={styles.noCalContainer}>
-          <Image
-            testID="calendar-icon"
-            source={require("../assets/calendar.png")}
-            style={styles.calendar}
-          />
-          <Text style={styles.txtNoCal}>No Calendar Yet</Text>
-        </View>
+        notConnectedView
       )}
 
       <Modal transparent visible={visible} animationType="none">
