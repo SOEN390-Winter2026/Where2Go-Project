@@ -1,4 +1,9 @@
-/**
+function normalizeVehicleType(vehicleType) {
+  const t = (vehicleType || "").toUpperCase();
+  if (t === "SUBWAY" || t === "METRO") return "subway";
+  if (t === "BUS") return "bus";
+  return "transit";
+}/**
  * Directions service (US-2.3.1)
  * Calls Google Directions API with start/destination coords.
  * Requests walking and transit modes.
@@ -6,7 +11,7 @@
  * Includes Concordia shuttle option for SGW ↔ Loyola campus trips.
  */
 
-const https = require("https");
+const https = require("node:https");
 const { getCampusCoordinates } = require("./map");
 
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
@@ -214,6 +219,74 @@ function fetchDirections(origin, destination, mode) {
  * @returns {{ mode: string, duration: { value: number, text: string }, distance: { value: number, text: string }, polyline?: string }}
  * Keep in mind that polyline is a base64 encoded string that represents the route geometry and should be decoded to get the actual coordinates.
  */
+
+function stripHtml(html = "") {
+  const s = String(html);
+  let out = "";
+  let inTag = false;
+
+  for (const element of s) {
+    const ch = element;
+
+    if (ch === "<") {
+      inTag = true;
+      continue;
+    }
+    if (ch === ">" && inTag) {
+      inTag = false;
+      continue;
+    }
+    if (!inTag) out += ch;
+  }
+
+  return out.trim();
+}
+function normalizeSteps(leg) {
+  const steps = leg?.steps ?? [];
+
+  return steps
+    .map((s) => {
+      const stepPolyline = s.polyline?.points || null;
+
+      // WALKING
+      if (s.travel_mode === "WALKING") {
+        return {
+          type: "walk",
+          durationText: s.duration?.text ?? "",
+          distanceText: s.distance?.text ?? "",
+          instruction: stripHtml(s.html_instructions ?? ""),
+          polyline: stepPolyline,
+        };
+      }
+
+      // TRANSIT
+      if (s.travel_mode === "TRANSIT") {
+        const td = s.transit_details || {};
+        const line = td.line || {};
+        const vehicleType = line.vehicle?.type || "TRANSIT"; // BUS, SUBWAY, etc.
+
+        return {
+          type: "transit",
+          vehicle: normalizeVehicleType(vehicleType),               // "bus" | "subway"
+          line: line.short_name || line.name || "",        // "105" or "Green"
+          headsign: td.headsign ?? "",
+          from: td.departure_stop?.name ?? "",
+          to: td.arrival_stop?.name ?? "",
+          stops: td.num_stops ?? null,
+          departureTime: td.departure_time?.text ?? "",
+          arrivalTime: td.arrival_time?.text ?? "",
+          durationText: s.duration?.text ?? "",
+          instruction: stripHtml(s.html_instructions ?? ""),
+          polyline: stepPolyline,
+        };
+      }
+
+      // fallback (rare)
+      return null;
+    })
+    .filter(Boolean);
+}
+
 function normalizeRoute(raw, mode) {
   const leg = raw.legs?.[0];
   if (!leg) return null;
@@ -228,7 +301,13 @@ function normalizeRoute(raw, mode) {
       value: leg.distance?.value ?? 0,
       text: leg.distance?.text ?? "",
     },
-    polyline: raw.overview_polyline?.points,
+    polyline: raw.overview_polyline?.points ?? null, 
+
+    steps: normalizeSteps(leg),
+
+    // ✅ Optional (nice for "Arrive 14:10")
+    departureTime: leg.departure_time?.text ?? "",
+    arrivalTime: leg.arrival_time?.text ?? "",
   };
 }
 
@@ -270,7 +349,7 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
   if (!isShuttleOperatingNow(refDate)) return null;
 
   const drivingRes = await fetchDirections(origin, destination, "driving");
-  const polyline = drivingRes?.routes?.[0]?.overview_polyline?.points || null;
+  const polyline = drivingRes?.json?.routes?.[0]?.overview_polyline?.points || null;
   const nextDeparture = getNextDeparture(fromCampus, refDate);
 
   return {
@@ -296,7 +375,7 @@ async function getTransportOptionsResult(origin, destination, opts = {}) {
   let refDate = new Date();
   if (opts.clientTime) {
     const parsed = new Date(opts.clientTime);
-    if (!isNaN(parsed.getTime())) refDate = parsed;
+    if (!Number.isNaN(parsed.getTime())) refDate = parsed;
   }
 
   const [walkingRes, transitRes, shuttleRoute] = await Promise.all([
