@@ -8,6 +8,7 @@ import {
     PanResponder,
     Dimensions,
     Pressable,
+    Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from 'expo-web-browser';
@@ -16,14 +17,15 @@ import Checkbox from 'expo-checkbox';
 import { Calendar as CalendarUI } from 'react-native-calendars';
 import PropTypes from 'prop-types';
 import { parseEventLocation } from './utils/eventLocationParser'; // location string → { building, room }
+import TopRightMenu from "./TopRightMenu";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const { height, width } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
 
-export default function CalendarPage({ onPressBack }) {
-
+export default function CalendarPage({ onPressBack}) {
+   
     const [visible, setVisible] = useState(false);
     const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
 
@@ -148,11 +150,16 @@ export default function CalendarPage({ onPressBack }) {
 
     return (
         <View style={styles.container}>
-            <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
+           <View style={styles.header}>
+                <Pressable testID="pressBack" style={styles.headerBtn} onPress={onPressBack}>
                 <Ionicons name="arrow-back" size={26} color="white" />
-            </Pressable>
+                </Pressable>
+            
+
+            </View>
+
             <Pressable testID="openModalBtn" style={styles.buttonModalUp} onPress={open}>
-                <Ionicons name="arrow-up" size={26} color="white" />
+            <Ionicons name="arrow-up" size={26} color="white" />
             </Pressable>
 
             {isCalendarConnected ? (
@@ -212,7 +219,13 @@ export default function CalendarPage({ onPressBack }) {
                     </>
                 )
             ) : (
-                <Text style={styles.txtNoCal}> No Calendar Yet </Text>
+                <View style={styles.noCalContainer}>
+                    <Image testID="calendar-icon"
+                           source={require('../assets/calendar.png')} 
+                           style={styles.calendar}
+                    />
+                    <Text style={styles.txtNoCal}>No Calendar Yet</Text>
+                </View>
             )}
 
             <Modal transparent visible={visible} animationType="none">
@@ -247,16 +260,23 @@ CalendarPage.propTypes = {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
     },
+    header: {
+        height: 100,
+        backgroundColor: "#912338",
+        paddingTop: 35,
+        paddingHorizontal: 16,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+  },
+
     buttonModalUp: {
         backgroundColor: "#912338",
         padding: 12,
         borderRadius: 50,
         position: "absolute",
-        bottom: 15,
+        bottom: 25,
         right: 15,
         justifyContent: "center",
     },
@@ -265,6 +285,12 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
         backgroundColor: "rgba(0,0,0,0.4)",
 
+    },
+    calendar: {
+        width: 150,       
+        height: 150,
+        marginBottom: 10,
+        borderRadius: 45, 
     },
     sheet: {
         height: SHEET_HEIGHT,
@@ -286,23 +312,22 @@ const styles = StyleSheet.create({
         top: 10,
         marginBottom: 15,
     },
-    backBtn: {
-        backgroundColor: "#912338",
-        position: "absolute",
-        top: 50,
-        left: 10,
+    headerBtn: {
         width: 44,
         height: 44,
         borderRadius: 22,
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 12,
-    },
+     },
     txtNoCal: {
         fontSize: 30,
-        position: "absolute",
-        justifyContent: "center",
+        fontWeight: "700",
+    },
+    noCalContainer: {
+        flex: 1,
+        justifyContent: "flex-start",
         alignItems: "center",
+        marginTop: 220,
     },
 
     manualBtn: {
@@ -320,29 +345,23 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     titleView: {
-        position: "absolute",
         backgroundColor: "#912338",
         width: width,
-        height: height * 0.3,
-        top: 0,
-        zIndex: 11,
         justifyContent: "center",
         alignItems: "center",
-
     },
     txtTitle: {
         color: "white",
-        bottom: 10,
-        position: "absolute",
         fontSize: 18,
-        fontWeight: '700',
+        bottom: 30,
+        fontWeight: '800',
         fontFamily: 'Helvetica Neue',
-
     },
     selectCalView: {
-        position: "absolute",
-        top: height * 0.35,
-
+        flex: 1,
+        width: "100%",
+        paddingTop: 20,
+        paddingHorizontal: 20,
     },
     txtSelectCal: {
         fontSize: 18,
