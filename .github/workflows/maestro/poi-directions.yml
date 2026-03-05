@@ -13,31 +13,13 @@ appId: host.exp.exponent
 - tapOn: Loyola
 - waitForAnimationToEnd    
 
-# looking for JMSB -> CL
+# looking for JMSB
 - tapOn:
-    point: 30%,68%
+    point: 30%,60%
 
 - tapOn: Load
 
-# 87% is the height, 40% can be changed for different distances
-# loading multiple times to guarantee the starbucks pops out
-- tapOn:
-    point: 60%,87%
-
-- tapOn: Load
-
-- tapOn:
-    point: 40%,87%
-
-- tapOn: Load
-
-- tapOn:
-    point: 20%,87%
-
-- tapOn: Load
-
-- waitForAnimationToEnd
-
+# tap on starbucks
 - tapOn:
     point: 45%,46%
 
