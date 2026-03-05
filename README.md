@@ -46,6 +46,21 @@ For both backend and frontend, open path for folders where ``\backend\src`` and 
 
 Run ```npm install```
 
+## Environment Variables
+
+In order to generate the map and its components, users need the API_KEY. The API_URL will allow users to run their application in Expo Go.
+
+Go to where2go directory:
+``` cd frontend/where2go ```
+Create a file named
+``` .env ```
+
+Follow this template with your own IP Address and API_KEY
+```
+API_URL=http:your_ip_address
+GOOGLE_MAPS_API_KEY=your_google_maps_key_here
+```
+
 ## How to run
 
 ### Backend

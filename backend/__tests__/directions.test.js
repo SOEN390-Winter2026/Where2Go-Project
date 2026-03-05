@@ -1,6 +1,7 @@
 const {
-    getTransportOptions,
-    normalizeRoute,
+  getTransportOptions,
+  getTransportOptionsResult,
+  normalizeRoute,
 } = require("../src/services/directions");
 
 jest.mock("../src/services/map", () => ({
@@ -15,11 +16,12 @@ jest.mock("https", () => ({
   get: jest.fn(),
 }));
 
-const https = require("node:https");
+const https = require("https");
 
 function mockHttpsGet(jsonData) {
   https.get.mockImplementation((url, callback) => {
     const res = {
+      statusCode: 200,
       on: jest.fn((event, handler) => {
         if (event === "data") handler(JSON.stringify(jsonData));
         if (event === "end") handler();
@@ -30,6 +32,70 @@ function mockHttpsGet(jsonData) {
     return { on: jest.fn() };
   });
 }
+
+
+function makeDirectionsWithSteps({ vehicleType = "BUS" } = {}) {
+  return {
+    status: "OK",
+    routes: [
+      {
+        overview_polyline: { points: "overview123" },
+        legs: [
+          {
+            distance: { value: 900, text: "0.9 km" },
+            duration: { value: 600, text: "10 mins" },
+            departure_time: { text: "09:00" },
+            arrival_time: { text: "09:10" },
+            steps: [
+              {
+                travel_mode: "WALKING",
+                duration: { text: "2 mins" },
+                distance: { text: "0.1 km" },
+                html_instructions: "<b>Walk</b> to stop",
+                polyline: { points: "walkStepPoly" },
+              },
+              {
+                travel_mode: "TRANSIT",
+                duration: { text: "6 mins" },
+                html_instructions: "<div>Take the metro</div>",
+                polyline: { points: "transitStepPoly" },
+                transit_details: {
+                  headsign: "Downtown",
+                  num_stops: 3,
+                  departure_stop: { name: "Stop A" },
+                  arrival_stop: { name: "Stop B" },
+                  departure_time: { text: "09:02" },
+                  arrival_time: { text: "09:08" },
+                  line: {
+                    short_name: "105",
+                    name: "105 Express",
+                    vehicle: { type: vehicleType }, // BUS / SUBWAY / METRO
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}
+
+function mockHttpsGetWithStatus({ statusCode, body }) {
+  https.get.mockImplementation((url, callback) => {
+    const res = {
+      statusCode,
+      on: jest.fn((event, handler) => {
+        if (event === "data") handler(typeof body === "string" ? body : JSON.stringify(body));
+        if (event === "end") handler();
+        return res;
+      }),
+    };
+    callback(res);
+    return { on: jest.fn() };
+  });
+}
+
 
 function makeMockDirectionsResponse(distanceText, durationText, polyline = "mockPolyline") {
   return {
@@ -61,7 +127,7 @@ describe("receive data from google API", () => {
 
     it("generate a walking route correctly", () => {
         const result = normalizeRoute(mockRaw, "walking");
-        expect(result).toEqual({
+        expect(result).toMatchObject({
         mode: "walking",
         duration: { value: 240, text: "4 mins" },
         distance: { value: 300, text: "0.3 km" },
@@ -83,6 +149,60 @@ describe("receive data from google API", () => {
         const result = normalizeRoute({}, "walking");
         expect(result).toBeNull();
     });
+});
+it("normalizes steps and strips HTML + sets step polylines", () => {
+  const raw = makeDirectionsWithSteps().routes[0];
+  const result = normalizeRoute(raw, "transit");
+
+  expect(result.steps).toBeDefined();
+  expect(result.steps.length).toBe(2);
+
+  const walk = result.steps.find((s) => s.type === "walk");
+  expect(walk.instruction).toBe("Walk to stop"); // HTML stripped
+  expect(walk.polyline).toBe("walkStepPoly");
+  expect(walk.distanceText).toBe("0.1 km");
+
+  const transit = result.steps.find((s) => s.type === "transit");
+  expect(transit.line).toBe("105");
+  expect(transit.headsign).toBe("Downtown");
+  expect(transit.from).toBe("Stop A");
+  expect(transit.to).toBe("Stop B");
+  expect(transit.stops).toBe(3);
+  expect(transit.polyline).toBe("transitStepPoly");
+});
+
+it("normalizes vehicle type BUS -> bus and SUBWAY/METRO -> subway", () => {
+  const busRaw = makeDirectionsWithSteps({ vehicleType: "BUS" }).routes[0];
+  const busRoute = normalizeRoute(busRaw, "transit");
+  expect(busRoute.steps.find((s) => s.type === "transit").vehicle).toBe("bus");
+
+  const subwayRaw = makeDirectionsWithSteps({ vehicleType: "SUBWAY" }).routes[0];
+  const subwayRoute = normalizeRoute(subwayRaw, "transit");
+  expect(subwayRoute.steps.find((s) => s.type === "transit").vehicle).toBe("subway");
+
+  const metroRaw = makeDirectionsWithSteps({ vehicleType: "METRO" }).routes[0];
+  const metroRoute = normalizeRoute(metroRaw, "transit");
+  expect(metroRoute.steps.find((s) => s.type === "transit").vehicle).toBe("subway");
+});
+
+it("treats OK status with empty routes as no result (returns [])", async () => {
+  https.get.mockImplementation((url, callback) => {
+    const res = {
+      on: jest.fn((event, handler) => {
+        if (event === "data") handler(JSON.stringify({ status: "OK", routes: [] }));
+        if (event === "end") handler();
+        return res;
+      }),
+    };
+    callback(res);
+    return { on: jest.fn() };
+  });
+
+  const sgwOrigin = { lat: 45.4973, lng: -73.5789 };
+  const offCampusDestination = { lat: 45.51, lng: -73.61 };
+
+  const routes = await getTransportOptions(sgwOrigin, offCampusDestination);
+  expect(routes).toEqual([]);
 });
 
 describe("receiving transportation options", () => {
@@ -136,17 +256,21 @@ describe("receiving transportation options", () => {
     it("returns empty array when API returns no routes", async () => {
         https.get.mockImplementation((url, callback) => {
             const res = {
-                on: jest.fn((event, handler) => {
-                    if (event === "data") handler(JSON.stringify({ status: "ZERO_RESULTS", routes: [] }));
-                    if (event === "end") handler();
-                    return res;
-                }),
+            statusCode: 200,
+            on: jest.fn((event, handler) => {
+                if (event === "data") handler(JSON.stringify({ status: "ZERO_RESULTS", routes: [] }));
+                if (event === "end") handler();
+                return res;
+            }),
             };
             callback(res);
             return { on: jest.fn() };
         });
         const routes = await getTransportOptions(sgwOrigin, offCampusDestination);
         expect(routes).toEqual([]);
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("NO_ROUTES");
     });
 
     it("uses clientTime for shuttle schedule calculation", async () => {
@@ -204,35 +328,101 @@ describe("receiving transportation options", () => {
         expect(routes.find((r) => r.mode === "concordia_shuttle")).toBeUndefined();
     });
 
-    it("handles https network error", async () => {
+    it("handles https network error as UPSTREAM_FAILED", async () => {
         https.get.mockImplementation(() => {
             const emitter = {
-                on: jest.fn((event, handler) => {
-                    if (event === "error") handler(new Error("Network failure"));
-                    return emitter;
-                }),
+            on: jest.fn((event, handler) => {
+                if (event === "error") handler(new Error("Network failure"));
+                return emitter;
+            }),
             };
             return emitter;
         });
+
         await expect(
             getTransportOptions(sgwOrigin, offCampusDestination)
-        ).rejects.toThrow("Network failure");
+        ).resolves.toEqual([]);
+
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("UPSTREAM_FAILED");
     });
+    it("normalizeVehicleType fallback returns 'transit' for unknown vehicle type (covers line 5)", () => {
+  const raw = makeDirectionsWithSteps({ vehicleType: "PLANE" }).routes[0]; // unknown
+  const route = normalizeRoute(raw, "transit");
+
+  const transitStep = route.steps.find((s) => s.type === "transit");
+  expect(transitStep).toBeDefined();
+  expect(transitStep.vehicle).toBe("transit"); // ✅ hits return "transit"
+});
+
+it("normalizeSteps fallback returns null for unsupported step and filters it out (covers line 285)", () => {
+  const raw = makeDirectionsWithSteps().routes[0];
+
+  // inject an invalid step that should hit the fallback (default) -> return null
+  raw.legs[0].steps.unshift({
+    travel_mode: "UNKNOWN_MODE", // not WALKING or TRANSIT
+    polyline: { points: "badStepPoly" },
+  });
+
+  const route = normalizeRoute(raw, "transit");
+
+  // The invalid step should be dropped by .filter(Boolean)
+  expect(route.steps.length).toBe(2); // still only the 2 valid ones
+  expect(route.steps.some((s) => s.polyline === "badStepPoly")).toBe(false);
+});
 
     it("handle malformed JSON from API", async () => {
         https.get.mockImplementation((url, callback) => {
             const res = {
-                on: jest.fn((event, handler) => {
-                    if (event === "data") handler("not valid json {{{{");
-                    if (event === "end") handler();
-                    return res;
-                }),
+            statusCode: 200,
+            on: jest.fn((event, handler) => {
+                if (event === "data") handler("not valid json {{{{");
+                if (event === "end") handler();
+                return res;
+            }),
             };
             callback(res);
             return { on: jest.fn() };
         });
         const routes = await getTransportOptions(sgwOrigin, offCampusDestination);
         expect(routes).toEqual([]);
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("INVALID_RESPONSE");
+    });
+
+    it("returns UPSTREAM_FAILED when Directions API responds with non-2xx HTTP status", async () => {
+        mockHttpsGetWithStatus({
+            statusCode: 500,
+            body: { status: "UNKNOWN_ERROR" },
+        });
+
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("UPSTREAM_FAILED");
+    });
+
+    it("handles non-OK statuses and invalid/empty routes shapes", async () => {
+        mockHttpsGet({ status: "REQUEST_DENIED" });
+        let result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("UPSTREAM_FAILED");
+
+        jest.clearAllMocks();
+
+        mockHttpsGet({ status: "OK", routes: null });
+        result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("INVALID_RESPONSE");
+
+        jest.clearAllMocks();
+
+        mockHttpsGet({ status: "OK", routes: [] });
+        result = await getTransportOptionsResult(sgwOrigin, offCampusDestination);
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("NO_ROUTES");
     });
 });
 

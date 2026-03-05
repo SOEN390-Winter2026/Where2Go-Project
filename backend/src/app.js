@@ -4,7 +4,7 @@ dotenv.config();
 const express = require("express");
 const cors = require("cors");
 const { getCampusCoordinates, getBuildings } = require("./services/map");
-const { getTransportOptions } = require("./services/directions");
+const { getTransportOptionsResult } = require("./services/directions");
 const app = express();
 
 app.use(cors());
@@ -47,17 +47,34 @@ app.get("/directions", async (req, res) => {
     const opts = clientTime ? { clientTime } : {};
 
     try {
-        const routes = await getTransportOptions(origin, destination, opts);
-        res.json({ routes });
+    const result = await getTransportOptionsResult(origin, destination, opts);
+
+    if (result.ok) {
+        return res.json({ routes: result.routes });
+    }
+
+    if (result.error?.code === "UPSTREAM_FAILED") {
+        return res.status(502).json({ routes: [], error: result.error });
+    }
+
+    return res.status(200).json({ routes: [], error: result.error });
     } catch (err) {
         console.error("Directions error:", err);
-        res.status(500).json({ error: "Failed to fetch directions" });
+        res.status(500).json({
+            routes: [],
+            error: { code: "UPSTREAM_FAILED", message: "Failed to fetch directions" },
+        });
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(3000, '0.0.0.0', () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
+
+app.listen(PORT, "0.0.0.0",() => {
+    console.log(`Backend server running on http://0.0.0.0:${PORT}`);
+
+// app.listen(3000, '0.0.0.0', () => {
+//     console.log(`Backend server running on http://localhost:${PORT}`);
+
 });
 
 module.exports = app;

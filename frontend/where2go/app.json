@@ -2,6 +2,7 @@
   "expo": {
     "name": "Where2Go",
     "slug": "Where2Go",
+    "scheme": "Where2Go",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/appListIconW2G.png",
@@ -12,16 +13,29 @@
       "resizeMode": "contain",
       "backgroundColor": "#912338"
     },
+
+     "plugins": [
+      "expo-web-browser"
+    ],
+    
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.where2go.app"
+      "bundleIdentifier": "com.where2go.app",
+      "infoPlist": {
+        "NSCalendarsUsageDescription": "Where2Go needs access to your calendar to show your availability and sync events."
+      }
     },
     "android": {
+      "package": "com.where2go.name",
       "adaptiveIcon": {
         "foregroundImage": "./assets/appListIconW2G.png",
         "backgroundColor": "#912338"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

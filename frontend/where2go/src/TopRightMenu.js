@@ -7,7 +7,7 @@ TopRightMenu.propTypes = {
   onPressDirection: PropTypes.func.isRequired,
 };
 
-export default function TopRightMenu({onPressDirection}) {
+export default function TopRightMenu({onPressDirection, onPressCalendar}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -29,7 +29,7 @@ export default function TopRightMenu({onPressDirection}) {
           <Pressable style={styles.menuItem} onPress={onPressDirection}>
             <Text style={styles.menuText}>Direction</Text>
           </Pressable>
-          <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>
+          <Pressable style={styles.menuItem} onPress={ onPressCalendar }>
             <Text style={styles.menuText}>Calendar</Text>
           </Pressable>
           <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>

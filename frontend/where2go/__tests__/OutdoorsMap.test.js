@@ -8,8 +8,8 @@ import React, { useState } from 'react';
 const map = {
     getCampusCoordinates: (name) => {
         const campuses = {
-        SGW: { lat: 45.4974, lng: -73.5771 },
-        Loyola: { lat: 45.4587, lng: -73.6409 },
+            SGW: { lat: 45.4974, lng: -73.5771 },
+            Loyola: { lat: 45.4587, lng: -73.6409 },
         };
         return campuses[name] || null;
     },
@@ -22,15 +22,15 @@ jest.mock('supertest', () => () => ({
 
 let fetchSpy;
 beforeAll(() => {
-  fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(jest.fn());
+    fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(jest.fn());
 });
 
 afterEach(() => {
-  fetchSpy.mockReset();
+    fetchSpy.mockReset();
 });
 
 afterAll(() => {
-  fetchSpy.mockRestore();
+    fetchSpy.mockRestore();
 });
 
 afterAll(async () => {
@@ -105,7 +105,7 @@ describe(" Buttons Test", () => {
 
     it("Toggle Button", async () => {
         const { getByTestId } = render(<TestWrapper />);
-        
+
         const pressToggleButton = getByTestId("campusToggle");
         const currentCampus = getByTestId("campusText");
 
@@ -127,15 +127,50 @@ describe(" Buttons Test", () => {
         fireEvent.press(pressDisButton);
     });
 
+    test("press disability button toggles state", () => {
+
+        const { getByTestId } = render(<SideLeftBar
+            currentCampus="SGW"
+            onToggleCampus={jest.fn()}
+            onToggleLiveLocation={jest.fn()}
+            onPressPOI={jest.fn()}
+        />);
+
+        const disButton = getByTestId("disPress");
+
+        fireEvent.press(disButton);
+
+        expect(disButton).toBeTruthy();
+    });
+
+    it("GPS Button", () => {
+        const mockToggleLiveLocation = jest.fn();
+
+        const { getByTestId } = render(
+            <SideLeftBar
+                currentCampus="SGW"
+                onToggleCampus={jest.fn()}
+                onToggleLiveLocation={mockToggleLiveLocation}
+                onPressPOI={jest.fn()}
+            />
+        );
+
+        const gpsButton = getByTestId("gps");
+
+        fireEvent.press(gpsButton);
+
+        expect(mockToggleLiveLocation).toHaveBeenCalled();
+    });
+
     //added for testing pois btn --
     it("POI button calls onPressPOI callback", () => {
         const mockOnPressPOI = jest.fn();
         const { getByTestId } = render(
             <SideLeftBar
-            currentCampus="SGW"
-            onToggleCampus={jest.fn()}
-            onToggleLiveLocation={jest.fn()}
-            onPressPOI={mockOnPressPOI}
+                currentCampus="SGW"
+                onToggleCampus={jest.fn()}
+                onToggleLiveLocation={jest.fn()}
+                onPressPOI={mockOnPressPOI}
             />
         );
         fireEvent.press(getByTestId("poiPress"));
@@ -146,10 +181,10 @@ describe(" Buttons Test", () => {
         const mockOnPressPOI = jest.fn();
         const { getByTestId } = render(
             <SideLeftBar
-            currentCampus="SGW"
-            onToggleCampus={jest.fn()}
-            onToggleLiveLocation={jest.fn()}
-            onPressPOI={mockOnPressPOI}
+                currentCampus="SGW"
+                onToggleCampus={jest.fn()}
+                onToggleLiveLocation={jest.fn()}
+                onPressPOI={mockOnPressPOI}
             />
         );
         const btn = getByTestId("poiPress");

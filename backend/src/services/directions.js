@@ -1,4 +1,9 @@
-/**
+function normalizeVehicleType(vehicleType) {
+  const t = (vehicleType || "").toUpperCase();
+  if (t === "SUBWAY" || t === "METRO") return "subway";
+  if (t === "BUS") return "bus";
+  return "transit";
+}/**
  * Directions service (US-2.3.1)
  * Calls Google Directions API with start/destination coords.
  * Requests walking and transit modes.
@@ -6,10 +11,14 @@
  * Includes Concordia shuttle option for SGW ↔ Loyola campus trips.
  */
 
-const https = require("https");
+const https = require("node:https");
 const { getCampusCoordinates } = require("./map");
 
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+
+function makeError(code, message) {
+  return { code, message };
+}
 
 /** Meters - point is "on campus" if within this radius of campus center */
 const CAMPUS_RADIUS_METERS = 2500;
@@ -133,26 +142,73 @@ function buildDirectionsUrl(origin, destination, mode) {
 }
 
 function fetchDirections(origin, destination, mode) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const url = buildDirectionsUrl(origin, destination, mode);
-    https
-      .get(url, (res) => {
-        let data = "";
-        res.on("data", (chunk) => (data += chunk));
-        res.on("end", () => {
-          try {
-            const json = JSON.parse(data);
-            if (json.status === "OK" && json.routes?.length > 0) {
-              resolve(json);
-            } else {
-              resolve(null);
-            }
-          } catch {
-            resolve(null);
+
+    const req = https.get(url, (res) => {
+      let data = "";
+      res.on("data", (chunk) => (data += chunk));
+
+      res.on("end", () => {
+        
+        if (res.statusCode && (res.statusCode < 200 || res.statusCode >= 300)) {
+          return resolve({
+            ok: false,
+            error: makeError("UPSTREAM_FAILED", `Directions API HTTP ${res.statusCode}`),
+          });
+        }
+
+        let json;
+        try {
+          json = JSON.parse(data);
+        } catch {
+          return resolve({
+            ok: false,
+            error: makeError("INVALID_RESPONSE", "Directions API returned invalid JSON"),
+          });
+        }
+
+        
+        if (json.status && json.status !== "OK") {
+          if (json.status === "ZERO_RESULTS") {
+            return resolve({
+              ok: false,
+              error: makeError("NO_ROUTES", "No routes found"),
+            });
           }
-        });
-      })
-      .on("error", reject);
+
+          return resolve({
+            ok: false,
+            error: makeError("UPSTREAM_FAILED", `Directions API status: ${json.status}`),
+          });
+        }
+
+        
+        if (!Array.isArray(json.routes)) {
+          return resolve({
+            ok: false,
+            error: makeError("INVALID_RESPONSE", "Directions API missing routes array"),
+          });
+        }
+
+        if (json.routes.length === 0) {
+          return resolve({
+            ok: false,
+            error: makeError("NO_ROUTES", "No routes found"),
+          });
+        }
+
+        
+        return resolve({ ok: true, json });
+      });
+    });
+
+    req.on("error", () => {
+      resolve({
+        ok: false,
+        error: makeError("UPSTREAM_FAILED", "Directions API request failed"),
+      });
+    });
   });
 }
 
@@ -163,6 +219,74 @@ function fetchDirections(origin, destination, mode) {
  * @returns {{ mode: string, duration: { value: number, text: string }, distance: { value: number, text: string }, polyline?: string }}
  * Keep in mind that polyline is a base64 encoded string that represents the route geometry and should be decoded to get the actual coordinates.
  */
+
+function stripHtml(html = "") {
+  const s = String(html);
+  let out = "";
+  let inTag = false;
+
+  for (const element of s) {
+    const ch = element;
+
+    if (ch === "<") {
+      inTag = true;
+      continue;
+    }
+    if (ch === ">" && inTag) {
+      inTag = false;
+      continue;
+    }
+    if (!inTag) out += ch;
+  }
+
+  return out.trim();
+}
+function normalizeSteps(leg) {
+  const steps = leg?.steps ?? [];
+
+  return steps
+    .map((s) => {
+      const stepPolyline = s.polyline?.points || null;
+
+      // WALKING
+      if (s.travel_mode === "WALKING") {
+        return {
+          type: "walk",
+          durationText: s.duration?.text ?? "",
+          distanceText: s.distance?.text ?? "",
+          instruction: stripHtml(s.html_instructions ?? ""),
+          polyline: stepPolyline,
+        };
+      }
+
+      // TRANSIT
+      if (s.travel_mode === "TRANSIT") {
+        const td = s.transit_details || {};
+        const line = td.line || {};
+        const vehicleType = line.vehicle?.type || "TRANSIT"; // BUS, SUBWAY, etc.
+
+        return {
+          type: "transit",
+          vehicle: normalizeVehicleType(vehicleType),               // "bus" | "subway"
+          line: line.short_name || line.name || "",        // "105" or "Green"
+          headsign: td.headsign ?? "",
+          from: td.departure_stop?.name ?? "",
+          to: td.arrival_stop?.name ?? "",
+          stops: td.num_stops ?? null,
+          departureTime: td.departure_time?.text ?? "",
+          arrivalTime: td.arrival_time?.text ?? "",
+          durationText: s.duration?.text ?? "",
+          instruction: stripHtml(s.html_instructions ?? ""),
+          polyline: stepPolyline,
+        };
+      }
+
+      // fallback (rare)
+      return null;
+    })
+    .filter(Boolean);
+}
+
 function normalizeRoute(raw, mode) {
   const leg = raw.legs?.[0];
   if (!leg) return null;
@@ -177,7 +301,13 @@ function normalizeRoute(raw, mode) {
       value: leg.distance?.value ?? 0,
       text: leg.distance?.text ?? "",
     },
-    polyline: raw.overview_polyline?.points,
+    polyline: raw.overview_polyline?.points ?? null, 
+
+    steps: normalizeSteps(leg),
+
+    // ✅ Optional (nice for "Arrive 14:10")
+    departureTime: leg.departure_time?.text ?? "",
+    arrivalTime: leg.arrival_time?.text ?? "",
   };
 }
 
@@ -219,7 +349,7 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
   if (!isShuttleOperatingNow(refDate)) return null;
 
   const drivingRes = await fetchDirections(origin, destination, "driving");
-  const polyline = drivingRes?.routes?.[0]?.overview_polyline?.points || null;
+  const polyline = drivingRes?.json?.routes?.[0]?.overview_polyline?.points || null;
   const nextDeparture = getNextDeparture(fromCampus, refDate);
 
   return {
@@ -241,11 +371,11 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
  * @param {{ clientTime?: string }} [opts] - Optional. clientTime: ISO string from user's device (new Date().toISOString())
  * @returns {Promise<Array<{ mode: string, duration: { value: number, text: string }, distance: { value: number, text: string }, polyline?: string }>>}
  */
-async function getTransportOptions(origin, destination, opts = {}) {
+async function getTransportOptionsResult(origin, destination, opts = {}) {
   let refDate = new Date();
   if (opts.clientTime) {
     const parsed = new Date(opts.clientTime);
-    if (!isNaN(parsed.getTime())) refDate = parsed;
+    if (!Number.isNaN(parsed.getTime())) refDate = parsed;
   }
 
   const [walkingRes, transitRes, shuttleRoute] = await Promise.all([
@@ -256,22 +386,39 @@ async function getTransportOptions(origin, destination, opts = {}) {
 
   const routes = [];
 
-  if (walkingRes?.routes?.[0]) {
-    const normalized = normalizeRoute(walkingRes.routes[0], "walking");
+  if (walkingRes.ok && walkingRes.json?.routes?.[0]) {
+    const normalized = normalizeRoute(walkingRes.json.routes[0], "walking");
     if (normalized) routes.push(normalized);
   }
 
-  if (transitRes?.routes?.[0]) {
-    const normalized = normalizeRoute(transitRes.routes[0], "transit");
+  if (transitRes.ok && transitRes.json?.routes?.[0]) {
+    const normalized = normalizeRoute(transitRes.json.routes[0], "transit");
     if (normalized) routes.push(normalized);
   }
 
   if (shuttleRoute) routes.push(shuttleRoute);
 
-  return routes;
+  if (routes.length > 0) return { ok: true, routes };
+
+  // If we have no routes at all, choose the best error to report
+  const errors = [walkingRes.error, transitRes.error].filter(Boolean);
+
+  if (errors.some((e) => e.code === "UPSTREAM_FAILED")) {
+    return { ok: false, error: makeError("UPSTREAM_FAILED", "Failed to fetch directions") };
+  }
+  if (errors.some((e) => e.code === "INVALID_RESPONSE")) {
+    return { ok: false, error: makeError("INVALID_RESPONSE", "Directions response invalid") };
+  }
+  return { ok: false, error: makeError("NO_ROUTES", "No routes found") };
+}
+
+async function getTransportOptions(origin, destination, opts = {}) {
+  const result = await getTransportOptionsResult(origin, destination, opts);
+  return result.ok ? result.routes : [];
 }
 
 module.exports = {
   getTransportOptions,
+  getTransportOptionsResult,
   normalizeRoute,
 };

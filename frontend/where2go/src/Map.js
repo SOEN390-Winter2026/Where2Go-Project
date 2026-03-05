@@ -1,9 +1,11 @@
-import { StyleSheet, View, Image } from 'react-native';
-import React, { useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
-import MapView, { Marker, Polygon } from 'react-native-maps';
+import { View,} from 'react-native';
+import React, { useEffect, useCallback, forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
+import PropTypes from 'prop-types';
 
 import BuildingCallout from './BuildingCallout';
 import { colors } from './theme/colors';
+import { styles, BURGUNDY, BURGUNDY_LIGHT } from './css/Map_styles';
 
 const POI_ICONS = {
   restaurant: require("../assets/poi-icons/poi-marker-restaurant.png"),
@@ -13,11 +15,136 @@ const POI_ICONS = {
   gym: require("../assets/poi-icons/poi-marker-gym.png"),
 };
 
-const getPoiIcon = (types = []) => {
+const coordShape = PropTypes.shape({
+  latitude: PropTypes.number.isRequired,
+  longitude: PropTypes.number.isRequired,
+});
+
+const segmentShape = PropTypes.shape({
+  coords: PropTypes.arrayOf(coordShape).isRequired,
+  isWalk: PropTypes.bool.isRequired,
+  vehicle: PropTypes.string,
+});
+
+function getPoiIcon(types = []) {
   for (const t of types) {
     if (POI_ICONS[t]) return POI_ICONS[t];
   }
-};
+  return undefined;
+}
+
+function isBoardingTransition(seg, next) {
+  return seg.isWalk && next && !next.isWalk;
+}
+
+function segKey(seg) {
+  const { latitude, longitude } = seg.coords[0];
+  return `${latitude},${longitude}`;
+}
+
+function StopDot() {
+  return (
+    <View style={styles.stopDotOuter}>
+      <View style={styles.stopDotInner} />
+    </View>
+  );
+}
+
+function BoardingPin() {
+  return (
+    <View style={styles.boardingPinOuter}>
+      <View style={styles.boardingPinInner} />
+    </View>
+  );
+}
+
+function StartMarker() {
+  return (
+    <View style={styles.startMarker}>
+      <View style={styles.startMarkerInner} />
+    </View>
+  );
+}
+
+function EndMarker() {
+  return (
+    <View style={styles.endPin}>
+      <View style={styles.endPinDot} />
+    </View>
+  );
+}
+
+function WalkPolylines({ segments }) {
+  return segments
+    .filter((s) => s.isWalk)
+    .map((seg) => (
+      <Polyline
+        key={`walk-${segKey(seg)}`}
+        coordinates={seg.coords}
+        strokeColor={BURGUNDY_LIGHT}
+        strokeWidth={3}
+        lineDashPattern={[6, 6]}
+      />
+    ));
+}
+
+WalkPolylines.propTypes = { segments: PropTypes.arrayOf(segmentShape).isRequired };
+
+function TransitPolylines({ segments }) {
+  return segments
+    .filter((s) => !s.isWalk)
+    .map((seg) => (
+      <Polyline
+        key={`transit-${segKey(seg)}`}
+        coordinates={seg.coords}
+        strokeColor={BURGUNDY}
+        strokeWidth={6}
+      />
+    ));
+}
+
+TransitPolylines.propTypes = { segments: PropTypes.arrayOf(segmentShape).isRequired };
+
+function TransitStopDots({ segments }) {
+  return segments
+    .filter((s) => !s.isWalk)
+    .map((seg) => {
+      const start = seg.coords[0];
+      const end = seg.coords[seg.coords.length - 1];
+      const key = segKey(seg);
+      return (
+        <React.Fragment key={`stops-${key}`}>
+          {start && (
+            <Marker coordinate={start} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
+              <StopDot />
+            </Marker>
+          )}
+          {end && (
+            <Marker coordinate={end} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
+              <StopDot />
+            </Marker>
+          )}
+        </React.Fragment>
+      );
+    });
+}
+
+TransitStopDots.propTypes = { segments: PropTypes.arrayOf(segmentShape).isRequired };
+
+function BoardingPins({ segments }) {
+  return segments.map((seg, idx) => {
+    const next = segments[idx + 1];
+    if (!isBoardingTransition(seg, next)) return null;
+    const coord = next.coords[0];
+    return coord ? (
+      <Marker key={`board-${segKey(next)}`} coordinate={coord} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
+        <BoardingPin />
+      </Marker>
+    ) : null;
+  });
+}
+
+BoardingPins.propTypes = { segments: PropTypes.arrayOf(segmentShape).isRequired };
 
 const CampusMap = forwardRef((props, ref) => {
   const {
@@ -25,35 +152,68 @@ const CampusMap = forwardRef((props, ref) => {
     buildings,
     onBuildingPress,
     liveLocationEnabled,
-    userLocation,
+    userLocation = null,
     userDraggedMap,
     setUserDraggedMap,
-    selectedPois,
+    selectedPois = [],
     onPoiPress,
+    onLiveLocDisappear,
+    onLiveLocAppear,
+    activeSegments = [],
+    activeRouteCoords = [],
+    routeStart = null,
+    routeEnd = null,
   } = props;
 
   const mapRef = useRef(null);
+  const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
+  const [currentRegion, setCurrentRegion] = useState(null);
+
+  const [isMarkerCurrentlyVisible, setIsMarkerCurrentlyVisible] = useState(true);
+
+  const checkLiveLocationVisibility = (region) => {
+    if (!userLocation || !liveLocationEnabled || !region) return;
+
+    const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
+    const { latitude: uLat, longitude: uLng } = userLocation; 
+
+    const northBound = latitude + latitudeDelta / 2;
+    const southBound = latitude - latitudeDelta / 2;
+    const eastBound = longitude + longitudeDelta / 2;
+    const westBound = longitude - longitudeDelta / 2;
+
+    const isVisible = uLat <= northBound && uLat >= southBound && uLng <= eastBound && uLng >= westBound;
+
+    
+    if (isVisible !== isMarkerCurrentlyVisible) {
+      setIsMarkerCurrentlyVisible(isVisible);
+      if (!isVisible) {
+        onLiveLocDisappear();
+      } else {
+        onLiveLocAppear();
+      }
+    }
+  };
 
   useImperativeHandle(ref, () => mapRef.current);
 
-  const snapBackToUser = () => {
+  const snapBackToUser = useCallback(() => {
     if (!mapRef.current || !userLocation) return;
     mapRef.current.animateToRegion(
-      {
-        ...userLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      },
+      { ...userLocation, latitudeDelta: 0.005, longitudeDelta: 0.005 },
       400
     );
     setUserDraggedMap(false);
-  };
+  }, [userLocation, setUserDraggedMap]);
 
   useEffect(() => {
     if (liveLocationEnabled && userLocation) {
       snapBackToUser();
     }
-  }, [liveLocationEnabled, userLocation]);
+  }, [liveLocationEnabled, userLocation, snapBackToUser]);
+
+  const hasSegments = activeSegments.length > 0;
+  const showFallbackRoute = !hasSegments && activeRouteCoords.length > 0;
 
   return (
     <>
@@ -65,14 +225,11 @@ const CampusMap = forwardRef((props, ref) => {
         initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
         style={styles.map}
         onRegionChange={() => {
-          if (liveLocationEnabled) {
-            setUserDraggedMap(true);
-          }
+          if (liveLocationEnabled) setUserDraggedMap(true);
         }}
-        onRegionChangeComplete={() => {
-          if (liveLocationEnabled && userLocation && userDraggedMap) {
-            snapBackToUser();
-          }
+        onRegionChangeComplete={(region) => {
+          // Check if user is out of view every time they stop moving the map
+          checkLiveLocationVisibility(region);
         }}
         onPoiClick={(event) => {
           const { placeId, name } = event.nativeEvent;
@@ -92,68 +249,56 @@ const CampusMap = forwardRef((props, ref) => {
           />
         ))}
 
+        {hasSegments && <WalkPolylines segments={activeSegments} />}
+        {hasSegments && <TransitPolylines segments={activeSegments} />}
+        {hasSegments && <TransitStopDots segments={activeSegments} />}
+        {hasSegments && <BoardingPins segments={activeSegments} />}
+
+        {showFallbackRoute && (
+          <Polyline coordinates={activeRouteCoords} strokeColor={BURGUNDY} strokeWidth={6} />
+        )}
+
+        {routeStart && (
+          <Marker coordinate={routeStart} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
+            <StartMarker />
+          </Marker>
+        )}
+
+        {routeEnd && (
+          <Marker coordinate={routeEnd} anchor={{ x: 0.5, y: 1 }} tracksViewChanges={false}>
+            <EndMarker />
+          </Marker>
+        )}
+
         {liveLocationEnabled && userLocation && (
           <Marker
             coordinate={userLocation}
-            title="You"
-            pinColor="blue"
+            anchor={{ x: 0.5, y: 0.5 }}
+            tracksViewChanges={false}
             accessible={true}
             accessibilityLabel="userMarker"
-          />
+          >
+            <View style={styles.userDot} />
+          </Marker>
         )}
 
-        {selectedPois?.map((poi) => (
+        {selectedPois.map((poi) => (
           <Marker
             key={poi.place_id}
             coordinate={{
               latitude: poi.geometry.location.lat,
               longitude: poi.geometry.location.lng,
             }}
-            title={poi.name}
-            description={poi.vicinity}
             onPress={() => onPoiPress(poi)}
+            image={getPoiIcon(poi.types)}
             tracksViewChanges={false}
-          >
-            <View style={styles.poiMarker}>
-              <Image
-                source={getPoiIcon(poi.types)}
-                style={styles.poiMarkerIcon}
-                resizeMode="contain"
-              />
-            </View>
-          </Marker>
+          />
         ))}
       </MapView>
     </>
   );
 });
 
-const styles = StyleSheet.create({
-  mapPlaceholder: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#e5e5e5',
-    zIndex: 0,
-  },
-  map: {
-    width: '100%',
-    height: '100%',
-    zIndex: 1,
-  },
-  poiMarker: {
-    backgroundColor: "white",
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: "#912338",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  poiMarkerIcon: {
-    width: 24,
-    height: 24,
-  },
-});
+CampusMap.displayName = 'CampusMap';
 
 export default CampusMap;
