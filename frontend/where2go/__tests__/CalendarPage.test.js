@@ -249,7 +249,7 @@ describe('CalendarPage', () => {
             { id: 'e2', title: 'Lab', location: 'EV 213' },
         ]);
 
-        const { getByTestId, getByText, findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+        const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage onPressBack={mockOnPressBack} />);
 
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByTestId('calBtn'));
@@ -258,7 +258,8 @@ describe('CalendarPage', () => {
         fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
         fireEvent.press(getByText('Done'));
 
-        fireEvent.press(getByTestId('mock-calendar'));
+        const calendarUI = await findByTestId('mock-calendar');
+        fireEvent.press(calendarUI);
 
         await waitFor(() => {
             expect(parseEventLocation).toHaveBeenCalledWith('H 435');

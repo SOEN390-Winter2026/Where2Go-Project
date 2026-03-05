@@ -228,6 +228,7 @@ export default function CalendarPage({ onPressBack }) {
       close();
     }
   }, [calendars]);
+
   useEffect(() => {
     console.log("CalendarPage events:", events.map(event => event.title));
         // Turn each event’s location string into { building, room } for nav/routing later
