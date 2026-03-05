@@ -282,7 +282,7 @@ export default function CalendarPage({ onPressBack }) {
               </ScrollView>
             </View>
 
-            <Modal
+            {/* <Modal
               transparent
               visible={selectedCalsModalVisible}
               animationType="fade"
@@ -333,7 +333,68 @@ export default function CalendarPage({ onPressBack }) {
                   </Pressable>
                 </Pressable>
               </Pressable>
-            </Modal>
+            </Modal> */}
+           <Modal
+  testID="selectedCalsModal"
+  transparent
+  visible={selectedCalsModalVisible}
+  animationType="fade"
+  onRequestClose={() => setSelectedCalsModalVisible(false)}
+>
+  <Pressable
+    testID="selectedCalsOverlay"
+    style={styles.modalOverlay}
+    onPress={() => setSelectedCalsModalVisible(false)}
+  >
+    <Pressable
+      testID="selectedCalsContent"
+      style={styles.selectedCalsModal}
+      onPress={() => {}}
+    >
+      <View style={styles.selectedCalsHeader}>
+        <Text style={styles.selectedCalsTitle}>Selected Calendars</Text>
+
+        <Pressable
+          testID="selectedCalsCloseBtn"
+          onPress={() => setSelectedCalsModalVisible(false)}
+        >
+          <Ionicons name="close" size={20} color="#333" />
+        </Pressable>
+      </View>
+
+      {chosenCalendars.length === 0 ? (
+        <Text style={styles.selectedCalsEmpty}>
+          No calendars selected. Tap “Change” to choose calendars.
+        </Text>
+      ) : (
+        chosenCalendars.map((cal) => (
+          <View key={cal.id} style={styles.calRow}>
+            <View
+              style={[
+                styles.colorDot,
+                { backgroundColor: cal.color || "#912338" },
+              ]}
+            />
+            <Text style={styles.calName} numberOfLines={1}>
+              {cal.title}
+            </Text>
+          </View>
+        ))
+      )}
+
+      <Pressable
+        testID="selectedCalsChangeBtn"
+        style={styles.changeBtn}
+        onPress={() => {
+          setSelectedCalsModalVisible(false);
+          setIsCalendarsChosen(false);
+        }}
+      >
+        <Text style={styles.changeBtnTxt}>Change</Text>
+      </Pressable>
+    </Pressable>
+  </Pressable>
+</Modal>
           </View>
         ) : (
           <>
@@ -358,7 +419,8 @@ export default function CalendarPage({ onPressBack }) {
 
               <Pressable
                 style={styles.saveBtn}
-                onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
+                onPress={() => setIsCalendarsChosen(true)}
+                //onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
               >
                 <Text testID="saveBtn" style={styles.btnTxt}>
                   Done
