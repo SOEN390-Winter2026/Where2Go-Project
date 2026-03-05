@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView } from "react-native";
-import { SEARCHABLE_LOCATIONS } from "../data/locations"; 
+import { SEARCHABLE_LOCATIONS } from "../data/locations";
 
 const PAGES = {
   HOME: "HOME",
@@ -17,22 +17,64 @@ const normalize = (s) => (s ?? "").trim().toLowerCase();
 
 function isValidBuilding(name) {
   const n = normalize(name);
-  return SEARCHABLE_LOCATIONS?.some((b) => normalize(b.name) === n || normalize(b.label) === n);
+  return SEARCHABLE_LOCATIONS?.some(
+    (b) => normalize(b.name) === n || normalize(b.label) === n
+  );
+}
+
+function pageToHash(page) {
+  switch (page) {
+    case PAGES.MAP:
+      return "#/map";
+    case PAGES.OUTDOOR:
+      return "#/outdoor";
+    case PAGES.NEXT:
+      return "#/next-class";
+    case PAGES.POI:
+      return "#/pois";
+    case PAGES.HOME:
+    default:
+      return "#/";
+  }
+}
+
+function hashToPage(hash) {
+  const h = (hash || "#/").toLowerCase();
+
+  if (h.startsWith("#/map")) return PAGES.MAP;
+  if (h.startsWith("#/outdoor")) return PAGES.OUTDOOR;
+  if (h.startsWith("#/next-class")) return PAGES.NEXT;
+  if (h.startsWith("#/pois")) return PAGES.POI;
+  return PAGES.HOME;
 }
 
 export default function WebTestingShell() {
   const [page, setPage] = useState(PAGES.HOME);
 
+  useEffect(() => {
+    const applyHash = () => setPage(hashToPage(window.location.hash));
+
+    applyHash(); 
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
+  const navigate = (nextPage) => {
+    const nextHash = pageToHash(nextPage);
+    if (window.location.hash !== nextHash) window.location.hash = nextHash;
+    setPage(nextPage);
+  };
+
   return (
     <View style={styles.page}>
       <View style={styles.shell}>
-        <Header page={page} onNavigate={setPage} />
+        <Header page={page} onNavigate={navigate} />
         <View style={styles.content}>
-          {page === PAGES.HOME && <Home onNavigate={setPage} />}
+          {page === PAGES.HOME && <Home onNavigate={navigate} />}
           {page === PAGES.MAP && <CampusExplorer />}
-          {page === PAGES.OUTDOOR && <OutdoorDirections onNavigate={setPage} />}
-          {page === PAGES.NEXT && <NextClassGoogleCalendar onNavigate={setPage} />}
-          {page === PAGES.POI && <OutdoorPOIs onNavigate={setPage} />}
+          {page === PAGES.OUTDOOR && <OutdoorDirections onNavigate={navigate} />}
+          {page === PAGES.NEXT && <NextClassGoogleCalendar onNavigate={navigate} />}
+          {page === PAGES.POI && <OutdoorPOIs onNavigate={navigate} />}
         </View>
       </View>
     </View>
@@ -50,34 +92,26 @@ function Header({ page, onNavigate }) {
       </View>
 
       <View style={styles.navRow}>
-        <NavBtn active={page === PAGES.HOME} 
-        onPress={() =>{window.history.pushState({},"","/");
-          onNavigate(PAGES.HOME);} } 
-          label="Home" />
-        <NavBtn active={page === PAGES.MAP} 
-        onPress={() =>{window.history.pushState({},"","/map");
-          onNavigate(PAGES.MAP);} } 
-        label="Explore map" />
-        <NavBtn active={page === PAGES.OUTDOOR} 
-        onPress={() => {window.history.pushState({},"","/outdoor");
-          onNavigate(PAGES.OUTDOOR)}}
-        label="Outdoor" />
-        <NavBtn active={page === PAGES.NEXT} 
-        onPress={() =>{window.history.pushState({},"","/next-class");
-          onNavigate(PAGES.NEXT)}} 
-        label="Next class" />
-        <NavBtn active={page === PAGES.POI} 
-        onPress={() =>{window.history.pushState({},"","/pois");
-          onNavigate(PAGES.POI)}} 
-        label="POIs" />
+        <NavBtn active={page === PAGES.HOME} onPress={() => onNavigate(PAGES.HOME)} label="Home" />
+        <NavBtn active={page === PAGES.MAP} onPress={() => onNavigate(PAGES.MAP)} label="Explore map" />
+        <NavBtn active={page === PAGES.OUTDOOR} onPress={() => onNavigate(PAGES.OUTDOOR)} label="Outdoor" />
+        <NavBtn active={page === PAGES.NEXT} onPress={() => onNavigate(PAGES.NEXT)} label="Next class" />
+        <NavBtn active={page === PAGES.POI} onPress={() => onNavigate(PAGES.POI)} label="POIs" />
       </View>
+
+      {/* Optional*/}
+      <Text style={styles.pathHint}>Current path: {window.location.hash || "#/"}</Text>
     </View>
   );
 }
 
 function NavBtn({ active, onPress, label }) {
   return (
-    <Pressable onPress={onPress} style={[styles.navBtn, active && styles.navBtnActive]} accessibilityRole="button">
+    <Pressable
+      onPress={onPress}
+      style={[styles.navBtn, active && styles.navBtnActive]}
+      accessibilityRole="button"
+    >
       <Text style={[styles.navBtnText, active && styles.navBtnTextActive]}>{label}</Text>
     </Pressable>
   );
@@ -124,7 +158,6 @@ function Home({ onNavigate }) {
   );
 }
 
-/** Requirement 1 flow (toggle campus, find building, view info, "current location") */
 function CampusExplorer() {
   const [campus, setCampus] = useState("SGW");
   const [building, setBuilding] = useState("");
@@ -183,7 +216,6 @@ function CampusExplorer() {
   );
 }
 
-/** Requirement 2 flow */
 function OutdoorDirections({ onNavigate }) {
   const [start, setStart] = useState("");
   const [dest, setDest] = useState("");
@@ -199,7 +231,13 @@ function OutdoorDirections({ onNavigate }) {
       <Text style={styles.h2}>Outdoor directions (Flow)</Text>
 
       <Text style={styles.label}>Start</Text>
-      <TextInput style={styles.input} value={start} onChangeText={setStart} placeholder="e.g., Hall" editable={!useCurrent} />
+      <TextInput
+        style={styles.input}
+        value={start}
+        onChangeText={setStart}
+        placeholder="e.g., Hall"
+        editable={!useCurrent}
+      />
       <Pressable style={styles.checkboxRow} onPress={() => setUseCurrent((v) => !v)} accessibilityRole="button">
         <View style={[styles.checkbox, useCurrent && styles.checkboxChecked]} />
         <Text>Use my current location as start</Text>
@@ -211,7 +249,12 @@ function OutdoorDirections({ onNavigate }) {
       <Text style={styles.label}>Mode</Text>
       <View style={styles.row}>
         {MODES.map((m) => (
-          <Pressable key={m} onPress={() => setMode(m)} style={[styles.chip, mode === m && styles.chipActive]} accessibilityRole="button">
+          <Pressable
+            key={m}
+            onPress={() => setMode(m)}
+            style={[styles.chip, mode === m && styles.chipActive]}
+            accessibilityRole="button"
+          >
             <Text>{m}</Text>
           </Pressable>
         ))}
@@ -234,7 +277,7 @@ function OutdoorDirections({ onNavigate }) {
           <Text style={styles.p}>Mode: {mode}</Text>
           <Text style={styles.p}>Map visualization is available on mobile; this confirms the flow.</Text>
 
-          <Pressable style={styles.secondary} onPress={() => onNavigate("POI")} accessibilityRole="button">
+          <Pressable style={styles.secondary} onPress={() => onNavigate(PAGES.POI)} accessibilityRole="button">
             <Text style={styles.secondaryText}>Go test POIs</Text>
           </Pressable>
         </View>
@@ -243,7 +286,6 @@ function OutdoorDirections({ onNavigate }) {
   );
 }
 
-/** Requirement 3 (Google Calendar) flow */
 function NextClassGoogleCalendar({ onNavigate }) {
   const [connected, setConnected] = useState(false);
   const [calendar, setCalendar] = useState("");
@@ -295,7 +337,7 @@ function NextClassGoogleCalendar({ onNavigate }) {
           <Text style={styles.p}>Calendar: {calendar}</Text>
           <Text style={styles.p}>Next event: SOEN 390 — Hall Building (example)</Text>
 
-          <Pressable style={styles.primary} onPress={() => onNavigate("OUTDOOR")} accessibilityRole="button">
+          <Pressable style={styles.primary} onPress={() => onNavigate(PAGES.OUTDOOR)} accessibilityRole="button">
             <Text style={styles.primaryText}>Generate directions</Text>
           </Pressable>
         </View>
@@ -304,7 +346,6 @@ function NextClassGoogleCalendar({ onNavigate }) {
   );
 }
 
-/** Requirement 6 flow */
 function OutdoorPOIs({ onNavigate }) {
   const [type, setType] = useState("cafe");
   const [generated, setGenerated] = useState(false);
@@ -325,7 +366,12 @@ function OutdoorPOIs({ onNavigate }) {
       <Text style={styles.label}>POI type</Text>
       <View style={styles.row}>
         {POI_TYPES.map((t) => (
-          <Pressable key={t} onPress={() => setType(t)} style={[styles.chip, type === t && styles.chipActive]} accessibilityRole="button">
+          <Pressable
+            key={t}
+            onPress={() => setType(t)}
+            style={[styles.chip, type === t && styles.chipActive]}
+            accessibilityRole="button"
+          >
             <Text>{t}</Text>
           </Pressable>
         ))}
@@ -344,11 +390,7 @@ function OutdoorPOIs({ onNavigate }) {
                 <Text style={styles.resultTitle}>{r.name}</Text>
                 <Text style={styles.p}>{r.vicinity}</Text>
               </View>
-              <Pressable
-                style={styles.link}
-                onPress={() => onNavigate("OUTDOOR")}
-                accessibilityRole="button"
-              >
+              <Pressable style={styles.link} onPress={() => onNavigate(PAGES.OUTDOOR)} accessibilityRole="button">
                 <Text style={styles.linkText}>Directions</Text>
               </Pressable>
             </View>
@@ -375,6 +417,8 @@ const styles = StyleSheet.create({
   navBtnActive: { borderColor: "#912338" },
   navBtnText: { fontSize: 12 },
   navBtnTextActive: { fontWeight: "700" },
+
+  pathHint: { marginTop: 10, fontSize: 11, color: "#666" },
 
   content: { flex: 1 },
   card: { padding: 16, borderRadius: 16, borderWidth: 1, borderColor: "#eee", backgroundColor: "white", gap: 10 },

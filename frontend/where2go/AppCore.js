@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Platform} from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
-
+import WebTestingShell from './src/web/WebTestingShell';
 import CampusMap from './src/Map';
 import SideLeftBar from './src/SideLeftBar';
 import TopRightMenu from './src/TopRightMenu';
@@ -38,6 +38,21 @@ function findBuilding(buildings, name) {
       (b) => getBuildingDisplayName(b?.name).toLowerCase() === clean
     ) ?? null
   );
+}
+
+const isWeb = typeof window !== "undefined";
+
+function updateURL(params) {
+  if (!isWeb) return;
+
+  const q = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) q.set(key, value);
+  });
+
+  const newUrl = `${window.location.pathname}?${q.toString()}`;
+  window.history.replaceState({}, "", newUrl);
 }
 
 export default function AppCore() {
@@ -89,6 +104,17 @@ export default function AppCore() {
 
   // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
   // Also set that map loaded
+  useEffect(() => {
+    updateURL({
+      campus: currentCampus?.toLowerCase(),
+      panel: showOutdoorDirection
+        ? "directions"
+        : showCalendar
+        ? "calendar"
+        : null,
+      poi: isPressedPOI ? "open" : null,
+    });
+  }, [currentCampus, showOutdoorDirection, showCalendar, isPressedPOI]);
 
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
