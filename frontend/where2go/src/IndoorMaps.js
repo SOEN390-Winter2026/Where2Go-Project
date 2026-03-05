@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import {
     View,
     Text,
-    StyleSheet,
     Pressable,
     Platform,
     StatusBar,
@@ -28,8 +27,8 @@ export default function IndoorMaps({ building, onPressBack, campus }) {
     const [activeTab, setActiveTab] = useState(null);
     const [classroomInput, setClassroomInput] = useState('');
 
-    const sheetHeight = useRef(new Animated.Value(height * 0.11)).current;
-    const lastHeight = useRef(height * 0.11);
+    const sheetHeight = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
+    const lastHeight = useRef(SHEET_COLLAPSED);
 
     const topPadding = Platform.OS === 'android'
         ? (StatusBar.currentHeight ?? 24) + 8
