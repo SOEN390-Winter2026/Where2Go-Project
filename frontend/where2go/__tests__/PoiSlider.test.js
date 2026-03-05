@@ -5,7 +5,7 @@ jest.mock('@react-native-community/slider', () => {
     const { View } = require('react-native');
     const PropTypes = require('prop-types');
     const SliderMock = ({ onValueChange, ...props }) =>
-        React.createElement(View, { testID: 'slider', onValueChange, ...props });
+        React.createElement(View, { testID: 'poiSlider', onValueChange, ...props });
 
     SliderMock.propTypes = {
         onValueChange: PropTypes.func,
@@ -71,7 +71,7 @@ describe('PoiSlider', () => {
         const { getByTestId, getByText } = render(
             <PoiSlider onPoisChange={jest.fn()} userLocation={USER_LOCATION} selectedBuilding={null} />
         );
-        act(() => { fireEvent(getByTestId('slider'), 'onValueChange', 300); });
+        act(() => { fireEvent(getByTestId('poiSlider'), 'onValueChange', 300); });
         expect(getByText('Radius Range: 300 m')).toBeTruthy();
         expect(globalThis.fetch).not.toHaveBeenCalled();
     });
