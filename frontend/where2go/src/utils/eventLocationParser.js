@@ -151,7 +151,7 @@ function lookupBuildingInChunks(buildingPart) {
 
 function lookupBuildingByAddress(s) {
   const streetTypeRe = /\b(boulevard|blvd\.?)\s*|\b(street|st\.?)\s*|\b(avenue|ave\.?|av\.?)\s*/gi;
-  const dirRe = /\s+(ouest|west|w\.?)\s*/gi;
+  const dirRe = /\s+(ouest|west|w\.?)(?=\s|$)/gi;
   const normalized = s
     .toLowerCase()
     .replace(/[.,]/g, " ")
