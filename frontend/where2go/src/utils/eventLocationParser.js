@@ -1,6 +1,6 @@
 /**
  * Parses event location strings into { building, room }.
- * Handles "H 435", "Hall Building 435", full addresses, French/English.
+ * Handles "H 435", "Hall Building 435", "Campus - Hall Building Rm 531", full addresses, French/English.
  */
 
 // full building name → official code
@@ -133,10 +133,19 @@ function lookupBuildingByNameOrCode(text) {
 
 function lookupBuildingInChunks(buildingPart) {
   // Split by newline, comma, or " - " (e.g. "Campus - Hall Building Rm 531")
-  const parts = buildingPart.split(/\n|,|\s+-\s+/).map((p) => p.trim()).filter(Boolean);
-  // Strip trailing " Rm" so "Hall Building Rm" matches "hall building"
+  const parts = buildingPart
+    .split(/\r?\n|,| - /)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  // Strip trailing " Rm" so "Hall Building Rm" matches "hall building" (avoids regex/ReDoS)
   return parts
-    .map((p) => lookupBuildingByNameOrCode(p.replace(/\s+Rm\s*$/i, "").trim()))
+    .map((p) => {
+      const t = p.trim();
+      const cleaned =
+        t.toLowerCase().endsWith(" rm") ? t.slice(0, t.length - 3).trim() : t;
+      return lookupBuildingByNameOrCode(cleaned);
+    })
     .find(Boolean) ?? null;
 }
 
