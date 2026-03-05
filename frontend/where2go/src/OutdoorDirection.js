@@ -2,6 +2,7 @@ import {
   View, Text, TextInput, StyleSheet, Pressable,
   ImageBackground, ScrollView, ActivityIndicator, Keyboard,
 } from "react-native";
+import { Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
@@ -80,6 +81,26 @@ function getModeDisplay(mode) {
  *   buildings     – optional array of building objects for filtering suggestions
  *   onPressBack   – callback to close this screen
  */
+function getBuildingCenterLatLng(building) {
+  const coords = building?.coordinates;
+  if (Array.isArray(coords) && coords.length > 0) {
+    const lat = coords.reduce((sum, c) => sum + c.latitude, 0) / coords.length;
+    const lng = coords.reduce((sum, c) => sum + c.longitude, 0) / coords.length;
+    return { lat, lng };
+  }
+  return { lat: null, lng: null };
+}
+
+function findBuilding(buildings, name) {
+  if (!name || !Array.isArray(buildings)) return null;
+  const clean = getBuildingDisplayName(name).toLowerCase();
+  return (
+    buildings.find(
+      (b) => getBuildingDisplayName(b?.name).toLowerCase() === clean
+    ) ?? null
+  );
+}
+
 export default function OutdoorDirection({ origin: originProp, destination: destProp, initialFrom, initialTo, buildings, onPressBack }) {
   // ---- Endpoint state ----
   const [origin, setOrigin] = useState(originProp ?? null);
@@ -117,23 +138,34 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
 
   // Handle initialFrom prop
   useEffect(() => {
-    if (initialFrom) {
-      setOriginQuery(initialFrom);
-      setOrigin({ label: initialFrom, lat: null, lng: null });
-    }
-  }, [initialFrom]);
+    if (!initialFrom) return;
+
+    const building = findBuilding(buildings, initialFrom);
+    const { lat, lng } = getBuildingCenterLatLng(building);
+
+    const label = getBuildingDisplayName(initialFrom);
+    setOriginQuery(label);
+    setOrigin({ label, lat, lng });
+  }, [initialFrom, buildings]);
 
   // Handle initialTo prop
   useEffect(() => {
-    if (initialTo) {
-      setDestQuery(initialTo);
-      setDestination({ label: initialTo, lat: null, lng: null });
-    }
-  }, [initialTo]);
+    if (!initialTo) return;
+
+    const building = findBuilding(buildings, initialTo);
+    const { lat, lng } = getBuildingCenterLatLng(building);
+
+    const label = getBuildingDisplayName(initialTo);
+    setDestQuery(label);
+    setDestination({ label, lat, lng });
+  }, [initialTo, buildings]);
 
   // ---- Route fetching (only when both endpoints are set) ----
   const fetchRoutes = useCallback(async () => {
-    if (!origin?.lat || !destination?.lat) {
+    const hasOrigin = Number.isFinite(origin?.lat) && Number.isFinite(origin?.lng);
+    const hasDest = Number.isFinite(destination?.lat) && Number.isFinite(destination?.lng);
+
+    if (!hasOrigin || !hasDest) {
       setRoutes([]);
       return;
     }
@@ -305,7 +337,9 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
                 <Pressable
                   key={`origin-${loc.label}-${i}`}
                   style={styles.dropdownItem}
-                  onPress={() => pickOrigin(loc)}
+                  onPressIn={() => pickOrigin(loc)}      
+                  onMouseDown={() => pickOrigin(loc)}    
+                  onPress={() => pickOrigin(loc)}        
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
                   <Text style={styles.dropdownText} numberOfLines={1}>{getBuildingDisplayName(loc.label)}</Text>
@@ -336,7 +370,9 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
                 <Pressable
                   key={`dest-${loc.label}-${i}`}
                   style={styles.dropdownItem}
-                  onPress={() => pickDestination(loc)}
+                  onPressIn={() => pickDestination(loc)}      
+                  onMouseDown={() => pickDestination(loc)}    
+                  onPress={() => pickDestination(loc)}        
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
                   <Text style={styles.dropdownText} numberOfLines={1}>{getBuildingDisplayName(loc.label)}</Text>
@@ -443,6 +479,10 @@ OutdoorDirection.propTypes = {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    width: Platform.OS === "web" ? 430 : "100%",
+    alignSelf: "center",
+    borderRadius: Platform.OS === "web" ? 28 : 0,
+    overflow: "hidden",
   },
   header: {
     width: "100%",
@@ -491,6 +531,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   dropdown: {
+    zIndex:9999,
+    elevation:50,
     maxHeight: 200,
     borderTopWidth: 1,
     borderTopColor: "#eee",

@@ -1,5 +1,3 @@
-import { useFonts } from 'expo-font';
-import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Platform} from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
@@ -22,16 +20,30 @@ const CAMPUS_COORDS = {
   Loyola: { latitude: 45.4587, longitude: -73.6409 },
 };
 
-export default function App() {
+function getBuildingCenterLatLng(building) {
+  const coords = building?.coordinates;
+  if (Array.isArray(coords) && coords.length > 0) {
+    const lat = coords.reduce((sum, c) => sum + c.latitude, 0) / coords.length;
+    const lng = coords.reduce((sum, c) => sum + c.longitude, 0) / coords.length;
+    return { lat, lng };
+  }
+  return { lat: null, lng: null };
+}
+
+function findBuilding(buildings, name) {
+  if (!name || !Array.isArray(buildings)) return null;
+  const clean = getBuildingDisplayName(name).toLowerCase();
+  return (
+    buildings.find(
+      (b) => getBuildingDisplayName(b?.name).toLowerCase() === clean
+    ) ?? null
+  );
+}
+
+export default function AppCore() {
   console.log(API_BASE_URL);
 
   const IS_WEB = Platform.OS === "web";
-  const [fontsLoaded] = useFonts({
-  ...Ionicons.font,
-  });
-  if (!fontsLoaded) {
-  return null;
-}
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showLogin, setShowLogin] = useState(!IS_WEB);
@@ -81,16 +93,7 @@ export default function App() {
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
     setCampusCoords(nextCoords);
-
-    console.log('Fetching buildings from:', `${API_BASE_URL}/campus/${currentCampus}/buildings`);
-    fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('Buildings received:', data.length);
-        setBuildings(data);
-        setDataLoaded(true);
-      })
-      .catch((err) => console.error('Error fetching buildings:', err));
+    setDataLoaded(true);
 
     if (!IS_WEB) {
       mapRef.current?.animateToRegion(
@@ -98,6 +101,16 @@ export default function App() {
         500
       );
     }
+
+    console.log("Fetching buildings from:", `${API_BASE_URL}/campus/${currentCampus}/buildings`);
+
+    fetch(`${API_BASE_URL}/campus/${currentCampus}/buildings`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Buildings received:", data.length);
+        setBuildings(data);
+      })
+      .catch((err) => console.error("Error fetching buildings:", err));
   }, [currentCampus, showLogin]);
 
 
@@ -242,9 +255,26 @@ export default function App() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSetDeparture={(buildingCommute) => setDepartureBuilding(buildingCommute)}
-        onSetDestination={(buildingCommute) => {
-          setDestinationBuilding(buildingCommute);
-          setDestinationPoi(null);
+        onSetAsDestination={() => {
+          const loc = selectedPoi?.geometry?.location;
+
+          const lat = typeof loc?.lat === "function" ? loc.lat() : loc?.lat;
+          const lng = typeof loc?.lng === "function" ? loc.lng() : loc?.lng;
+
+          if (typeof lat !== "number" || typeof lng !== "number") {
+            console.error("POI missing coords:", selectedPoi);
+            return;
+          }
+
+          setDestinationPoi({
+            label: selectedPoi?.name ?? "POI",
+            lat,
+            lng,
+          });
+
+          setDestinationBuilding(null);
+          setPoiModalVisible(false);
+          setShowOutdoorDirection(true);
         }}
         selectedRole={ getBuildingRole(selectedBuilding) }
       />
@@ -253,11 +283,22 @@ export default function App() {
         visible={poiModalVisible}
         onClose={() => setPoiModalVisible(false)}
         onSetAsDestination={() => {
+          const lat =
+            typeof selectedPoi.geometry.location.lat === "function"
+              ? selectedPoi.geometry.location.lat()
+              : selectedPoi.geometry.location.lat;
+
+          const lng =
+            typeof selectedPoi.geometry.location.lng === "function"
+              ? selectedPoi.geometry.location.lng()
+              : selectedPoi.geometry.location.lng;
+
           setDestinationPoi({
             label: selectedPoi.name,
-            lat: selectedPoi.geometry.location.lat,
-            lng: selectedPoi.geometry.location.lng,
+            lat,
+            lng,
           });
+
           setDestinationBuilding(null);
           setPoiModalVisible(false);
           setShowOutdoorDirection(true);

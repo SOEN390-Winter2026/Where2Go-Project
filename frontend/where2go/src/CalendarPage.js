@@ -1,3 +1,4 @@
+import { useGoogleLogin } from "@react-oauth/google";
 import React, { useRef, useState, useEffect } from "react";
 import {
     View,
@@ -8,6 +9,7 @@ import {
     PanResponder,
     Dimensions,
     Pressable,
+    Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from 'expo-web-browser';
@@ -69,22 +71,98 @@ export default function CalendarPage({ onPressBack }) {
     ).current;
 
     //Sign In Google Calendar
-    const getCalendars = async () => {
+    const [googleAccessToken, setGoogleAccessToken] = useState(null);
 
+    const getGoogleCalendars = async (accessToken) => {
+        try {
+            const res = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+            console.error("Google calendarList error:", data);
+            return;
+            }
+
+            const normalized = (data.items ?? []).map((cal) => ({
+            id: cal.id,
+            title: cal.summary,
+            color: cal.backgroundColor || "#912338",
+            }));
+
+            setCalendars(normalized);
+        } catch (e) {
+            console.error("Failed to fetch Google calendars:", e);
+        }
+        };
+
+        const getGoogleEventsForDay = async (accessToken, selectedDateString) => {
+        const start = new Date(selectedDateString);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(selectedDateString);
+        end.setHours(23, 59, 59, 999);
+
+        try {
+            const allEvents = [];
+
+            for (const calId of selectedCalendarIds) {
+            const url =
+                `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events` +
+                `?timeMin=${encodeURIComponent(start.toISOString())}` +
+                `&timeMax=${encodeURIComponent(end.toISOString())}` +
+                `&singleEvents=true&orderBy=startTime`;
+
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error("Google events error:", calId, data);
+                continue;
+            }
+
+            for (const ev of data.items ?? []) {
+                allEvents.push({
+                id: ev.id,
+                title: ev.summary || "(No title)",
+                });
+            }
+            }
+
+            setEvents(allEvents);
+        } catch (e) {
+            console.error("Failed to fetch Google events:", e);
+        }
+        };
+
+        const googleLogin = useGoogleLogin({
+        scope: "https://www.googleapis.com/auth/calendar.readonly",
+        flow: "implicit",
+        onSuccess: async (tokenResponse) => {
+            setGoogleAccessToken(tokenResponse.access_token);
+            await getGoogleCalendars(tokenResponse.access_token);
+        },
+        onError: (err) => console.error("Google login error:", err),
+        });
+
+        const getCalendarsNative = async () => {
         const { status } = await Calendar.requestCalendarPermissionsAsync();
-
-        let calendars = [];
-
-
-        if (status === 'granted') {
-            calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        if (status === "granted") {
+            const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
             setCalendars(calendars);
-            console.log("Permission granted. Calendars retrieved!");
         } else {
             console.log("Permission denied for calendar");
         }
+        };
 
-
+        const handleConnectCalendar = async () => {
+        if (Platform.OS === "web") {
+            googleLogin();
+        } else {
+            await getCalendarsNative();
+        }
     };
 
     const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
@@ -165,8 +243,14 @@ export default function CalendarPage({ onPressBack }) {
                         <CalendarUI
                             testID="mock-calendar"
                             onDayPress={(day) => {
-                                console.log('User selected:', day.dateString);
+                            console.log("User selected:", day.dateString);
+
+                            if (Platform.OS === "web") {
+                                if (!googleAccessToken) return;
+                                getGoogleEventsForDay(googleAccessToken, day.dateString);
+                            } else {
                                 getEventsForDay(day.dateString);
+                            }
                             }}
                         />
                         <Text> Upcoming Events: </Text>
@@ -225,7 +309,7 @@ export default function CalendarPage({ onPressBack }) {
                     >
                         <View style={styles.handle} />
                         <Pressable testID="closeModalBtn" style={styles.closeBtn} onPress={() => setVisible(false)}><Ionicons name="close" size={26} color="black" /></Pressable>
-                        <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={() => getCalendars()}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
+                        <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={handleConnectCalendar}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
                         {/**Still not implemented */}
                         <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
                     </Animated.View>
@@ -236,9 +320,7 @@ export default function CalendarPage({ onPressBack }) {
 }
 
 CalendarPage.propTypes = {
-    onPressBack: PropTypes.func.isRequired,
-    onPressCalendar: PropTypes.func.isRequired,
-    title: PropTypes.string,
+  onPressBack: PropTypes.func.isRequired,
 };
 
 
