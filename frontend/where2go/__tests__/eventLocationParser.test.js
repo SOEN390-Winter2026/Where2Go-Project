@@ -65,6 +65,13 @@ describe('parseEventLocation', () => {
     it('parses "Hall Building S2.230"', () => {
       expect(parseEventLocation('Hall Building S2.230')).toEqual({ building: 'H', room: 'S2.230' });
     });
+
+    it('parses campus - building Rm XXX format (e.g. Google Calendar)', () => {
+      expect(parseEventLocation('Sir George Williams Campus - Hall Building Rm 531')).toEqual({
+        building: 'H',
+        room: '531',
+      });
+    });
   });
 
   describe('multi-line or comma-separated', () => {

@@ -131,8 +131,17 @@ function lookupBuildingByNameOrCode(text) {
   return BUILDING_NAME_TO_CODE[lower] ?? (KNOWN_CODES.has(upper) ? upper : null);
 }
 
+// Strips trailing "Rm" so "Hall Building Rm" → "Hall Building"
+function stripTrailingRoomKeyword(text) {
+  return text.replace(/\s+Rm\s*$/i, "").trim();
+}
+
 function lookupBuildingInChunks(buildingPart) {
-  const parts = buildingPart.split(/\n|,/).map((p) => p.trim()).filter(Boolean);
+  // Split by newline, comma, or " - " / " – " (campus - building format)
+  const parts = buildingPart
+    .split(/\n|,\s*|\s+[-–]\s+/)
+    .map((p) => stripTrailingRoomKeyword(p.trim()))
+    .filter(Boolean);
   return parts.map((p) => lookupBuildingByNameOrCode(p)).find(Boolean) ?? null;
 }
 
