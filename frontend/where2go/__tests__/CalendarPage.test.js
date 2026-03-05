@@ -650,7 +650,7 @@ it("toggles full calendar view and presses CalendarList day (covers CalendarList
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#123456" }]);
   Calendar.getEventsAsync.mockResolvedValue([{ id: "e1", title: "Event 1" }]);
 
-  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -658,6 +658,9 @@ it("toggles full calendar view and presses CalendarList day (covers CalendarList
   await findByText("Work");
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
+
+  // wait for calendar view to appear (Done handler is async)
+  await findByTestId("mock-calendar");
 
   // toggle to full calendar view (CalendarList)
   fireEvent.press(getByLabelText("Toggle full calendar view"));
@@ -681,7 +684,7 @@ it("opens Selected Calendars modal and lists the chosen calendar", async () => {
   ]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -689,6 +692,8 @@ it("opens Selected Calendars modal and lists the chosen calendar", async () => {
   await findByText("Work");
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
+
+  await findByTestId("mock-calendar");
 
   // open selected calendars modal (menu icon)
   fireEvent.press(getByLabelText("Selected calendars"));
@@ -702,7 +707,7 @@ it('pressing "Change" in Selected Calendars modal returns to "Extracting Calenda
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -711,6 +716,7 @@ it('pressing "Change" in Selected Calendars modal returns to "Extracting Calenda
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
+  await findByTestId("mock-calendar");
   fireEvent.press(getByLabelText("Selected calendars"));
   await findByText("Selected Calendars");
 
@@ -734,7 +740,7 @@ it("renders date parts from event startDate (covers monthShort + getDatePartsFro
     },
   ]);
 
-  const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -742,7 +748,8 @@ it("renders date parts from event startDate (covers monthShort + getDatePartsFro
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  fireEvent.press(getByTestId("mock-calendar"));
+  const calendarUI = await findByTestId("mock-calendar");
+  fireEvent.press(calendarUI);
 
   expect(await findByText("December Event")).toBeTruthy();
   // Month short should appear as DEC somewhere in the event card
@@ -754,7 +761,7 @@ it("Selected Calendars modal: content press does not close, overlay/close button
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, queryByText, getByLabelText } =
+  const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } =
     render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
@@ -764,7 +771,7 @@ it("Selected Calendars modal: content press does not close, overlay/close button
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  // open selected calendars modal (your trigger must have accessibilityLabel="Selected calendars")
+  await findByTestId("mock-calendar");
   fireEvent.press(getByLabelText("Selected calendars"));
   expect(await findByText("Selected Calendars")).toBeTruthy();
 
@@ -778,7 +785,7 @@ it("Selected Calendars modal: content press does not close, overlay/close button
     expect(queryByText("Selected Calendars")).toBeNull();
   });
 
-  // open again
+  // open again (menu button is in same view as mock-calendar)
   fireEvent.press(getByLabelText("Selected calendars"));
   expect(await findByText("Selected Calendars")).toBeTruthy();
 
@@ -794,7 +801,7 @@ it("Selected Calendars modal closes via Modal requestClose (covers onRequestClos
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, queryByText, getByLabelText } =
+  const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } =
     render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
@@ -804,6 +811,7 @@ it("Selected Calendars modal closes via Modal requestClose (covers onRequestClos
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
+  await findByTestId("mock-calendar");
   fireEvent.press(getByLabelText("Selected calendars"));
   expect(await findByText("Selected Calendars")).toBeTruthy();
 
@@ -824,7 +832,7 @@ it("clears events if no calendars are selected (covers early return)", async () 
     { id: "e1", title: "Event 1", startDate: "2026-12-01T10:00:00.000Z", endDate: "2026-12-01T11:00:00.000Z" },
   ]);
 
-  const { getByTestId, getByText, findByText, queryByText, getByLabelText } = render(
+  const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } = render(
     <CalendarPage onPressBack={jest.fn()} />
   );
 
@@ -835,8 +843,8 @@ it("clears events if no calendars are selected (covers early return)", async () 
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  // fetch events
-  fireEvent.press(getByTestId("mock-calendar"));
+  const calendarUI = await findByTestId("mock-calendar");
+  fireEvent.press(calendarUI);
   await findByText("Event 1");
 
   // open selected calendars modal -> Change (go back to extraction)
@@ -872,7 +880,7 @@ it("pressing an event logs Selected event (covers line 254)", async () => {
     },
   ]);
 
-  const { getByTestId, getByText, findByText } = render(<CalendarPage onPressBack={jest.fn()} />);
+  const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -880,7 +888,8 @@ it("pressing an event logs Selected event (covers line 254)", async () => {
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  fireEvent.press(getByTestId("mock-calendar"));
+  const calendarUI = await findByTestId("mock-calendar");
+  fireEvent.press(calendarUI);
   await findByText("Event 1");
 
   fireEvent.press(getByTestId("event-item-e1"));
