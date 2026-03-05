@@ -1,7 +1,9 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
+import { Alert, Linking } from 'react-native';
 import CalendarPage from '../src/CalendarPage'; // Adjust path
 import * as Calendar from 'expo-calendar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 jest.mock('react-native-calendars', () => {
     const React = require('react');
@@ -75,6 +77,12 @@ jest.mock('react-native', () => {
 });
 
 
+jest.mock('@react-native-async-storage/async-storage', () => ({
+    getItem: jest.fn(() => Promise.resolve(null)),
+    setItem: jest.fn(() => Promise.resolve()),
+    removeItem: jest.fn(() => Promise.resolve()),
+}));
+
 jest.mock('expo-calendar', () => ({
     requestCalendarPermissionsAsync: jest.fn(),
     getCalendarsAsync: jest.fn(),
@@ -89,12 +97,10 @@ jest.mock('expo-web-browser', () => ({
 describe('CalendarPage', () => {
     const mockOnPressBack = jest.fn();
 
-    Calendar.requestCalendarPermissionsAsync.mockResolvedValue({
-        status: 'granted',
-    });
-
     beforeEach(() => {
         jest.clearAllMocks();
+        AsyncStorage.getItem.mockResolvedValue(null);
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
     });
 
     it('sets visibility to false after the close animation completes', async () => {
@@ -114,9 +120,9 @@ describe('CalendarPage', () => {
         expect(CalendarPage).toBeDefined();
     });
 
-    it('renders "No Calendar Yet" by default', () => {
-        const { getByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
-        expect(getByText(/No Calendar Yet/i)).toBeTruthy();
+    it('renders "No Calendar Yet" by default', async () => {
+        const { findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+        expect(await findByText(/No Calendar Yet/i)).toBeTruthy();
     });
 
     it('calls onPressBack when back button is pressed', () => {
@@ -147,7 +153,7 @@ describe('CalendarPage', () => {
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'granted' });
         Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
 
-        const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+        const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage />);
 
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByText(/Connect to Google Calendar/i));
@@ -155,7 +161,7 @@ describe('CalendarPage', () => {
         fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
         fireEvent.press(getByText(/Done/i));
 
-        const calendarUI = getByTestId('mock-calendar');
+        const calendarUI = await findByTestId('mock-calendar');
         fireEvent.press(calendarUI);
 
         await waitFor(() => {
@@ -170,7 +176,7 @@ describe('CalendarPage', () => {
         Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Personal', color: 'blue' }]);
         Calendar.getEventsAsync.mockResolvedValue([]);
 
-        const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+        const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage />);
 
         fireEvent.press(getByTestId('openModalBtn'));
         fireEvent.press(getByText(/Connect to Google Calendar/i));
@@ -180,7 +186,7 @@ describe('CalendarPage', () => {
 
         fireEvent.press(getByText(/Done/i));
 
-        const calendarUI = getByTestId('mock-calendar');
+        const calendarUI = await findByTestId('mock-calendar');
         fireEvent.press(calendarUI);
 
         await waitFor(() => {
@@ -213,7 +219,7 @@ describe('CalendarPage', () => {
             { id: 'e2', title: 'Gym Session' }
         ]);
 
-        const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+        const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage />);
 
 
         fireEvent.press(getByTestId('openModalBtn'));
@@ -223,7 +229,8 @@ describe('CalendarPage', () => {
         fireEvent(getByTestId('checkbox-cal-1'), 'onValueChange', true);
         fireEvent.press(getByText('Done'));
 
-        fireEvent.press(getByTestId('mock-calendar'));
+        const calendarUI = await findByTestId('mock-calendar');
+        fireEvent.press(calendarUI);
 
         expect(await findByText('Concordia Lecture')).toBeTruthy();
         expect(await findByText('Gym Session')).toBeTruthy();
@@ -273,17 +280,113 @@ describe('CalendarPage', () => {
 
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'denied' });
 
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+
         const { getByTestId, getByText, queryByText } = render(<CalendarPage />);
 
-        const openModalBtn = getByTestId('openModalBtn');
-        fireEvent.press(openModalBtn);
-
-        const connectBtn = getByText(/connect to google calendar/i);
-        fireEvent.press(connectBtn);
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByText(/connect to google calendar/i));
 
         await waitFor(() => {
-            expect(queryByText(/Extracting Calendars/i)).not.toBeTruthy();
+            expect(alertSpy).toHaveBeenCalledWith(
+                "Calendar Access Required",
+                expect.stringContaining("previously denied"),
+                expect.any(Array)
+            );
         });
+        expect(queryByText(/Extracting Calendars/i)).not.toBeTruthy();
+        alertSpy.mockRestore();
+    });
+
+    it('shows generic message when permission is not granted and not denied', async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'undetermined' });
+
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+
+        const { getByTestId, getByText } = render(<CalendarPage />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByText(/Connect to Google Calendar/i));
+
+        await waitFor(() => {
+            expect(alertSpy).toHaveBeenCalledWith(
+                "Calendar Access Required",
+                "Calendar access is needed to show your events.",
+                expect.any(Array)
+            );
+        });
+        alertSpy.mockRestore();
+    });
+
+    it('calls Linking.openSettings when user taps Open Settings in permission alert', async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'denied' });
+        const openSettingsSpy = jest.spyOn(Linking, 'openSettings').mockResolvedValue();
+
+        let alertButtons;
+        jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+            alertButtons = buttons;
+        });
+
+        const { getByTestId, getByText } = render(<CalendarPage />);
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByText(/connect to google calendar/i));
+
+        await waitFor(() => {
+            expect(alertButtons).toBeDefined();
+        });
+
+        const openSettingsBtn = alertButtons.find((b) => b.text === "Open Settings");
+        openSettingsBtn.onPress();
+
+        expect(openSettingsSpy).toHaveBeenCalled();
+        openSettingsSpy.mockRestore();
+        jest.restoreAllMocks();
+    });
+
+    it('restores saved calendars on mount when AsyncStorage has valid data', async () => {
+        AsyncStorage.getItem.mockResolvedValue(JSON.stringify(['cal-1']));
+        Calendar.getCalendarsAsync.mockResolvedValue([
+            { id: 'cal-1', title: 'Work', color: '#912338' },
+        ]);
+        Calendar.getEventsAsync.mockResolvedValue([]);
+
+        const { findByTestId } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        const calendarUI = await findByTestId('mock-calendar');
+        expect(calendarUI).toBeTruthy();
+    });
+
+    it('handles restore when getCalendarsAsync throws', async () => {
+        AsyncStorage.getItem.mockResolvedValue(JSON.stringify(['cal-1']));
+        Calendar.getCalendarsAsync.mockRejectedValue(new Error('Permission denied'));
+
+        const { findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        expect(await findByText(/No Calendar Yet/i)).toBeTruthy();
+    });
+
+    it('handles restore when AsyncStorage throws', async () => {
+        AsyncStorage.getItem.mockRejectedValue(new Error('Storage unavailable'));
+
+        const { findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        expect(await findByText(/No Calendar Yet/i)).toBeTruthy();
+    });
+
+    it('handles restore when saved data is empty array', async () => {
+        AsyncStorage.getItem.mockResolvedValue(JSON.stringify([]));
+
+        const { findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        expect(await findByText(/No Calendar Yet/i)).toBeTruthy();
+    });
+
+    it('handles restore when saved data is not a valid array', async () => {
+        AsyncStorage.getItem.mockResolvedValue(JSON.stringify({ ids: ['cal-1'] }));
+
+        const { findByText } = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+        expect(await findByText(/No Calendar Yet/i)).toBeTruthy();
     });
 
     it('displays checkboxes for each calendar', async () => {
@@ -547,7 +650,7 @@ it("toggles full calendar view and presses CalendarList day (covers CalendarList
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#123456" }]);
   Calendar.getEventsAsync.mockResolvedValue([{ id: "e1", title: "Event 1" }]);
 
-  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -555,6 +658,9 @@ it("toggles full calendar view and presses CalendarList day (covers CalendarList
   await findByText("Work");
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
+
+  // wait for calendar view to appear (Done handler is async)
+  await findByTestId("mock-calendar");
 
   // toggle to full calendar view (CalendarList)
   fireEvent.press(getByLabelText("Toggle full calendar view"));
@@ -578,7 +684,7 @@ it("opens Selected Calendars modal and lists the chosen calendar", async () => {
   ]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -586,6 +692,8 @@ it("opens Selected Calendars modal and lists the chosen calendar", async () => {
   await findByText("Work");
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
+
+  await findByTestId("mock-calendar");
 
   // open selected calendars modal (menu icon)
   fireEvent.press(getByLabelText("Selected calendars"));
@@ -599,7 +707,7 @@ it('pressing "Change" in Selected Calendars modal returns to "Extracting Calenda
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, getByLabelText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -608,6 +716,7 @@ it('pressing "Change" in Selected Calendars modal returns to "Extracting Calenda
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
+  await findByTestId("mock-calendar");
   fireEvent.press(getByLabelText("Selected calendars"));
   await findByText("Selected Calendars");
 
@@ -631,7 +740,7 @@ it("renders date parts from event startDate (covers monthShort + getDatePartsFro
     },
   ]);
 
-  const { getByTestId, getByText, findByText } = render(<CalendarPage />);
+  const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -639,7 +748,8 @@ it("renders date parts from event startDate (covers monthShort + getDatePartsFro
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  fireEvent.press(getByTestId("mock-calendar"));
+  const calendarUI = await findByTestId("mock-calendar");
+  fireEvent.press(calendarUI);
 
   expect(await findByText("December Event")).toBeTruthy();
   // Month short should appear as DEC somewhere in the event card
@@ -651,7 +761,7 @@ it("Selected Calendars modal: content press does not close, overlay/close button
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, queryByText, getByLabelText } =
+  const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } =
     render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
@@ -661,7 +771,7 @@ it("Selected Calendars modal: content press does not close, overlay/close button
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  // open selected calendars modal (your trigger must have accessibilityLabel="Selected calendars")
+  await findByTestId("mock-calendar");
   fireEvent.press(getByLabelText("Selected calendars"));
   expect(await findByText("Selected Calendars")).toBeTruthy();
 
@@ -675,7 +785,7 @@ it("Selected Calendars modal: content press does not close, overlay/close button
     expect(queryByText("Selected Calendars")).toBeNull();
   });
 
-  // open again
+  // open again (menu button is in same view as mock-calendar)
   fireEvent.press(getByLabelText("Selected calendars"));
   expect(await findByText("Selected Calendars")).toBeTruthy();
 
@@ -691,7 +801,7 @@ it("Selected Calendars modal closes via Modal requestClose (covers onRequestClos
   Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
   Calendar.getEventsAsync.mockResolvedValue([]);
 
-  const { getByTestId, getByText, findByText, queryByText, getByLabelText } =
+  const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } =
     render(<CalendarPage />);
 
   fireEvent.press(getByTestId("openModalBtn"));
@@ -701,6 +811,7 @@ it("Selected Calendars modal closes via Modal requestClose (covers onRequestClos
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
+  await findByTestId("mock-calendar");
   fireEvent.press(getByLabelText("Selected calendars"));
   expect(await findByText("Selected Calendars")).toBeTruthy();
 
@@ -721,7 +832,7 @@ it("clears events if no calendars are selected (covers early return)", async () 
     { id: "e1", title: "Event 1", startDate: "2026-12-01T10:00:00.000Z", endDate: "2026-12-01T11:00:00.000Z" },
   ]);
 
-  const { getByTestId, getByText, findByText, queryByText, getByLabelText } = render(
+  const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } = render(
     <CalendarPage onPressBack={jest.fn()} />
   );
 
@@ -732,8 +843,8 @@ it("clears events if no calendars are selected (covers early return)", async () 
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  // fetch events
-  fireEvent.press(getByTestId("mock-calendar"));
+  const calendarUI = await findByTestId("mock-calendar");
+  fireEvent.press(calendarUI);
   await findByText("Event 1");
 
   // open selected calendars modal -> Change (go back to extraction)
@@ -769,7 +880,7 @@ it("pressing an event logs Selected event (covers line 254)", async () => {
     },
   ]);
 
-  const { getByTestId, getByText, findByText } = render(<CalendarPage onPressBack={jest.fn()} />);
+  const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
 
   fireEvent.press(getByTestId("openModalBtn"));
   fireEvent.press(getByTestId("calBtn"));
@@ -777,7 +888,8 @@ it("pressing an event logs Selected event (covers line 254)", async () => {
   fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
   fireEvent.press(getByText("Done"));
 
-  fireEvent.press(getByTestId("mock-calendar"));
+  const calendarUI = await findByTestId("mock-calendar");
+  fireEvent.press(calendarUI);
   await findByText("Event 1");
 
   fireEvent.press(getByTestId("event-item-e1"));

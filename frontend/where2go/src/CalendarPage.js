@@ -10,6 +10,8 @@ import {
   Pressable,
   Image,
   ScrollView,
+  Alert,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
@@ -17,10 +19,25 @@ import * as Calendar from "expo-calendar";
 import Checkbox from "expo-checkbox";
 import { Calendar as CalendarUI, CalendarList } from "react-native-calendars";
 import PropTypes from "prop-types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 WebBrowser.maybeCompleteAuthSession();
 
+const SAVED_CALENDAR_IDS_KEY = "where2go_saved_calendar_ids";
 const { height, width } = Dimensions.get("window");
+
+function getValidCalendarIds(savedIds, allCalendars) {
+    const idSet = new Set(allCalendars.map((c) => String(c.id)));
+    return savedIds.filter((id) => idSet.has(String(id)));
+}
+
+async function fetchCalendarsIfPermitted() {
+    try {
+        return await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    } catch {
+        return null;
+    }
+}
 const SHEET_HEIGHT = height * 0.6;
 
 function pad2(n) {
@@ -96,6 +113,7 @@ export default function CalendarPage({ onPressBack }) {
   const [calendars, setCalendars] = useState([]);
   const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
   const [isCalendarsChosen, setIsCalendarsChosen] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(true);
 
   const [events, setEvents] = useState([]);
 
@@ -106,13 +124,22 @@ export default function CalendarPage({ onPressBack }) {
 
   const getCalendars = async () => {
     const { status } = await Calendar.requestCalendarPermissionsAsync();
-
     if (status === "granted") {
       const calList = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
       setCalendars(calList);
+      setIsCalendarsChosen(false);
       console.log("Permission granted. Calendars retrieved!");
     } else {
-      console.log("Permission denied for calendar");
+      Alert.alert(
+        "Calendar Access Required",
+        status === "denied"
+          ? "Calendar access was previously denied. To connect your calendar, enable it in Settings."
+          : "Calendar access is needed to show your events.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Open Settings", onPress: () => { Linking.openSettings(); } },
+        ]
+      );
     }
   };
 
@@ -145,6 +172,54 @@ export default function CalendarPage({ onPressBack }) {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function restoreSavedCalendars() {
+      try {
+        const saved = await AsyncStorage.getItem(SAVED_CALENDAR_IDS_KEY);
+        if (!saved) {
+          setIsRestoring(false);
+          return;
+        }
+
+        const savedIds = JSON.parse(saved);
+        if (!Array.isArray(savedIds) || savedIds.length === 0) {
+          setIsRestoring(false);
+          return;
+        }
+
+        let allCalendars;
+        try {
+          allCalendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        } catch (permErr) {
+          setIsRestoring(false);
+          return;
+        }
+
+        const validIds = savedIds.filter((id) =>
+          allCalendars.some((c) => String(c.id) === String(id))
+        );
+
+        if (!cancelled && validIds.length > 0) {
+          setCalendars(allCalendars);
+          setSelectedCalendarIds(validIds);
+          setIsCalendarConnected(true);
+          setIsCalendarsChosen(true);
+        }
+      } catch (e) {
+        // AsyncStorage can fail in Expo Go/web
+      } finally {
+        if (!cancelled) setIsRestoring(false);
+      }
+    }
+
+    restoreSavedCalendars();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (calendars.length === 0) {
       setIsCalendarConnected(false);
     } else {
@@ -163,6 +238,21 @@ export default function CalendarPage({ onPressBack }) {
   const markedDates = {
     [selectedDate]: { selected: true, selectedColor: "#912338" },
   };
+
+  const notConnectedView = isRestoring ? (
+    <View style={styles.noCalContainer}>
+      <Text style={styles.txtNoCal}>Loading…</Text>
+    </View>
+  ) : (
+    <View style={styles.noCalContainer}>
+      <Image
+        testID="calendar-icon"
+        source={require("../assets/calendar.png")}
+        style={styles.calendar}
+      />
+      <Text style={styles.txtNoCal}>No Calendar Yet</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -282,29 +372,37 @@ export default function CalendarPage({ onPressBack }) {
               </ScrollView>
             </View>
 
-            {/* <Modal
+            <Modal
+              testID="selectedCalsModal"
               transparent
               visible={selectedCalsModalVisible}
               animationType="fade"
               onRequestClose={() => setSelectedCalsModalVisible(false)}
             >
               <Pressable
+                testID="selectedCalsOverlay"
                 style={styles.modalOverlay}
                 onPress={() => setSelectedCalsModalVisible(false)}
               >
-                <Pressable 
-                style={styles.selectedCalsModal} onPress={() => {}}>
+                <Pressable
+                  testID="selectedCalsContent"
+                  style={styles.selectedCalsModal}
+                  onPress={() => {}}
+                >
                   <View style={styles.selectedCalsHeader}>
                     <Text style={styles.selectedCalsTitle}>Selected Calendars</Text>
-                    <Pressable 
-                    onPress={() => setSelectedCalsModalVisible(false)}>
+
+                    <Pressable
+                      testID="selectedCalsCloseBtn"
+                      onPress={() => setSelectedCalsModalVisible(false)}
+                    >
                       <Ionicons name="close" size={20} color="#333" />
                     </Pressable>
                   </View>
 
                   {chosenCalendars.length === 0 ? (
                     <Text style={styles.selectedCalsEmpty}>
-                      No calendars selected. Tap “Change” to choose calendars.
+                      No calendars selected. Tap "Change" to choose calendars.
                     </Text>
                   ) : (
                     chosenCalendars.map((cal) => (
@@ -323,78 +421,18 @@ export default function CalendarPage({ onPressBack }) {
                   )}
 
                   <Pressable
+                    testID="selectedCalsChangeBtn"
                     style={styles.changeBtn}
                     onPress={() => {
                       setSelectedCalsModalVisible(false);
-                      setIsCalendarsChosen(false); 
+                      setIsCalendarsChosen(false);
                     }}
                   >
                     <Text style={styles.changeBtnTxt}>Change</Text>
                   </Pressable>
                 </Pressable>
               </Pressable>
-            </Modal> */}
-           <Modal
-  testID="selectedCalsModal"
-  transparent
-  visible={selectedCalsModalVisible}
-  animationType="fade"
-  onRequestClose={() => setSelectedCalsModalVisible(false)}
->
-  <Pressable
-    testID="selectedCalsOverlay"
-    style={styles.modalOverlay}
-    onPress={() => setSelectedCalsModalVisible(false)}
-  >
-    <Pressable
-      testID="selectedCalsContent"
-      style={styles.selectedCalsModal}
-      onPress={() => {}}
-    >
-      <View style={styles.selectedCalsHeader}>
-        <Text style={styles.selectedCalsTitle}>Selected Calendars</Text>
-
-        <Pressable
-          testID="selectedCalsCloseBtn"
-          onPress={() => setSelectedCalsModalVisible(false)}
-        >
-          <Ionicons name="close" size={20} color="#333" />
-        </Pressable>
-      </View>
-
-      {chosenCalendars.length === 0 ? (
-        <Text style={styles.selectedCalsEmpty}>
-          No calendars selected. Tap “Change” to choose calendars.
-        </Text>
-      ) : (
-        chosenCalendars.map((cal) => (
-          <View key={cal.id} style={styles.calRow}>
-            <View
-              style={[
-                styles.colorDot,
-                { backgroundColor: cal.color || "#912338" },
-              ]}
-            />
-            <Text style={styles.calName} numberOfLines={1}>
-              {cal.title}
-            </Text>
-          </View>
-        ))
-      )}
-
-      <Pressable
-        testID="selectedCalsChangeBtn"
-        style={styles.changeBtn}
-        onPress={() => {
-          setSelectedCalsModalVisible(false);
-          setIsCalendarsChosen(false);
-        }}
-      >
-        <Text style={styles.changeBtnTxt}>Change</Text>
-      </Pressable>
-    </Pressable>
-  </Pressable>
-</Modal>
+            </Modal>
           </View>
         ) : (
           <>
@@ -419,8 +457,20 @@ export default function CalendarPage({ onPressBack }) {
 
               <Pressable
                 style={styles.saveBtn}
-                onPress={() => setIsCalendarsChosen(true)}
-                //onPress={() => setIsCalendarsChosen(selectedCalendarIds.length > 0)}
+                onPress={async () => {
+                  if (selectedCalendarIds.length > 0) {
+                    try {
+                      const idsToSave = selectedCalendarIds.map((id) => String(id));
+                      await AsyncStorage.setItem(
+                        SAVED_CALENDAR_IDS_KEY,
+                        JSON.stringify(idsToSave)
+                      );
+                    } catch (e) {
+                      // AsyncStorage can fail in Expo Go/web
+                    }
+                  }
+                  setIsCalendarsChosen(true);
+                }}
               >
                 <Text testID="saveBtn" style={styles.btnTxt}>
                   Done
@@ -430,14 +480,7 @@ export default function CalendarPage({ onPressBack }) {
           </>
         )
       ) : (
-        <View style={styles.noCalContainer}>
-          <Image
-            testID="calendar-icon"
-            source={require("../assets/calendar.png")}
-            style={styles.calendar}
-          />
-          <Text style={styles.txtNoCal}>No Calendar Yet</Text>
-        </View>
+        notConnectedView
       )}
 
       <Modal transparent visible={visible} animationType="none">
@@ -772,3 +815,4 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 });
+
