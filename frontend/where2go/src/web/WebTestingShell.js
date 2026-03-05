@@ -50,11 +50,26 @@ function Header({ page, onNavigate }) {
       </View>
 
       <View style={styles.navRow}>
-        <NavBtn active={page === PAGES.HOME} onPress={() => onNavigate(PAGES.HOME)} label="Home" />
-        <NavBtn active={page === PAGES.MAP} onPress={() => onNavigate(PAGES.MAP)} label="Explore map" />
-        <NavBtn active={page === PAGES.OUTDOOR} onPress={() => onNavigate(PAGES.OUTDOOR)} label="Outdoor" />
-        <NavBtn active={page === PAGES.NEXT} onPress={() => onNavigate(PAGES.NEXT)} label="Next class" />
-        <NavBtn active={page === PAGES.POI} onPress={() => onNavigate(PAGES.POI)} label="POIs" />
+        <NavBtn active={page === PAGES.HOME} 
+        onPress={() =>{window.history.pushState({},"","/");
+          onNavigate(PAGES.HOME);} } 
+          label="Home" />
+        <NavBtn active={page === PAGES.MAP} 
+        onPress={() =>{window.history.pushState({},"","/map");
+          onNavigate(PAGES.MAP);} } 
+        label="Explore map" />
+        <NavBtn active={page === PAGES.OUTDOOR} 
+        onPress={() => {window.history.pushState({},"","/outdoor");
+          onNavigate(PAGES.OUTDOOR)}}
+        label="Outdoor" />
+        <NavBtn active={page === PAGES.NEXT} 
+        onPress={() =>{window.history.pushState({},"","/next-class");
+          onNavigate(PAGES.NEXT)}} 
+        label="Next class" />
+        <NavBtn active={page === PAGES.POI} 
+        onPress={() =>{window.history.pushState({},"","/pois");
+          onNavigate(PAGES.POI)}} 
+        label="POIs" />
       </View>
     </View>
   );
