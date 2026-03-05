@@ -15,6 +15,7 @@ import PoiInfoModal from "./src/PoiInfoModal";
 import OutdoorDirection from "./src/OutdoorDirection";
 import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
+import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
 
 const CAMPUS_COORDS = {
@@ -49,8 +50,9 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false);
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
-  const watchRef = useRef(null);
-  const mapRef = useRef(null);
+  
+  //indoors stuff
+  const [showIndoorMaps, setShowIndoorMaps] = useState(false);
 
   const [isPressedPOI, setIsPressedPOI] = useState(false);
   const [poiOriginBuilding, setPoiOriginBuilding] = useState(null);
@@ -64,6 +66,9 @@ export default function App() {
   //Live Loc
   const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
 
+  const watchRef = useRef(null);
+  const mapRef = useRef(null);
+
   //for selecting buildings as departure or destination on map
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
@@ -73,6 +78,10 @@ export default function App() {
   const [activeRouteMeta, setActiveRouteMeta] = useState(null);
   const [activeSegments, setActiveSegments] = useState([]);
   const [isRouteActive, setIsRouteActive] = useState(false);
+
+  const handlePoisChange = (poisFromSlider) => {
+    setSelectedPois(poisFromSlider);
+  };
 
   const getBuildingRole = (building) => {
     if (building?.id === departureBuilding?.id) return "departure";
@@ -201,10 +210,6 @@ export default function App() {
     }
   }, [dataLoaded, hasInitialized]);
 
-  const handlePoisChange = (poisFromSlider) => {
-    setSelectedPois(poisFromSlider);
-  };
-
   if (showLogin) {
     return (
       <LoginScreen
@@ -219,6 +224,16 @@ export default function App() {
 
   if (!hasInitialized) {
     return <LoadingPage />;
+  }
+
+  if (showIndoorMaps) {
+    return (
+      <IndoorMaps
+        building={selectedBuilding}
+        onPressBack={() => setShowIndoorMaps(false)}
+        campus={currentCampus}
+      />
+    );
   }
 
   if (showOutdoorDirection) {
@@ -319,7 +334,11 @@ export default function App() {
           setDestinationBuilding(b);
           setDestinationPoi(null);
         }}
-        selectedRole={getBuildingRole(selectedBuilding)}
+        selectedRole={ getBuildingRole(selectedBuilding) }
+        onGoInside={() => {
+          setModalVisible(false);
+          setShowIndoorMaps(true);
+        }}
       />
 
       <PoiInfoModal

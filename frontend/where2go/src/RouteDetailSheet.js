@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import { styles } from "./css/routeDetailsSheet_styles";
+import { styles } from "./styles/routeDetailsSheet_styles";
 
 const ICON_COLOR = "#6b0f1a";
 
