@@ -16,6 +16,7 @@ import * as Calendar from 'expo-calendar';
 import Checkbox from 'expo-checkbox';
 import { Calendar as CalendarUI } from 'react-native-calendars';
 import PropTypes from 'prop-types';
+import { parseEventLocation } from './utils/eventLocationParser'; // location string → { building, room }
 import TopRightMenu from "./TopRightMenu";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -136,8 +137,10 @@ export default function CalendarPage({ onPressBack}) {
     }, [calendars]);
 
     useEffect(() => {
-        console.log(events.map(event => event.title));
-
+        console.log("CalendarPage events:", events.map(event => event.title));
+        // Turn each event’s location string into { building, room } for nav/routing later
+        const parsedLocations = events.map((e) => parseEventLocation(e.location));
+        console.log("CalendarPage parsed locations:", parsedLocations);
     }, [events])
 
     useEffect(() => {
