@@ -24,7 +24,7 @@ WebBrowser.maybeCompleteAuthSession();
 const { height, width } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
 
-export default function CalendarPage({ onPressBack}) {
+export default function CalendarPage({ onPressBack, onGenerateDirections }) {
    
     const [visible, setVisible] = useState(false);
     const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -184,6 +184,20 @@ export default function CalendarPage({ onPressBack}) {
                                 key={event.id}
                                 testID={`event-item-${event.id}`}
                                 style={styles.btnEvent}
+                                onPress={() => {
+                                  if (!onGenerateDirections) return;
+                                  const parsed = parseEventLocation(event.location);
+                                  if (!parsed || !parsed.building) {
+                                    console.log("Event location is missing or not a Concordia building. Skipping directions.");
+                                    return;
+                                  }
+                                  onGenerateDirections({
+                                    event,
+                                    buildingCode: parsed.building,
+                                    room: parsed.room ?? null,
+                                    rawLocation: event.location ?? null,
+                                  });
+                                }}
                             >
                                 <Text> {event.title}</Text>
                             </Pressable>
@@ -254,6 +268,7 @@ CalendarPage.propTypes = {
     onPressBack: PropTypes.func.isRequired,
     onPressCalendar: PropTypes.func.isRequired,
     title: PropTypes.string,
+    onGenerateDirections: PropTypes.func,
 };
 
 
