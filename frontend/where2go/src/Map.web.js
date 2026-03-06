@@ -54,13 +54,6 @@ function centroid(path = []) {
   return { lat: lat / path.length, lng: lng / path.length };
 }
 
-// Simple centroid to place an optional label marker (not required)
-// function getCentroid(path) {
-//   if (!path?.length) return null;
-//   const sum = path.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
-//   return { lat: sum.lat / path.length, lng: sum.lng / path.length };
-// }
-
 const CampusMapWeb = forwardRef((props, ref) => {
   const {
     campusCoords,
@@ -76,6 +69,7 @@ const CampusMapWeb = forwardRef((props, ref) => {
   const mapRef = useRef(null);
 
   const polygonsRef = useRef([]);
+  const labelMarkersRef = useRef([]);
   const markersRef = useRef([]);
 
   const [mapReady, setMapReady] = useState(false);
@@ -144,13 +138,11 @@ const CampusMapWeb = forwardRef((props, ref) => {
     if (!mapsApi) return;
     if (!mapRef.current) return;
 
-    // Debug (keep for now)
-    // console.log("Map ready:", mapReady, "Buildings:", buildings.length);
-
-    // Clear old polygons
     polygonsRef.current.forEach((p) => p.setMap(null));
     polygonsRef.current = [];
 
+    labelMarkersRef.current.forEach((m) => m.setMap(null));
+    labelMarkersRef.current = [];
     buildings.forEach((building) => {
       const path = toLatLngPath(building.coordinates);
       if (path.length < 3) return;
@@ -193,26 +185,16 @@ const CampusMapWeb = forwardRef((props, ref) => {
           zIndex: 3,
         });
 
-        markersRef.current.push(labelMarker);
+        labelMarkersRef.current.push(labelMarker);
 }
-
-      // Optional: label marker at centroid (uncomment if you want)
-      // const centroid = getCentroid(path);
-      // if (centroid) {
-      //   const labelMarker = new mapsApi.Marker({
-      //     position: centroid,
-      //     map: mapRef.current,
-      //     label: { text: building.code || "", color: "#7C2B38", fontWeight: "700" },
-      //     clickable: false,
-      //   });
-      //   markersRef.current.push(labelMarker);
-      // }
     });
 
     // Cleanup polygons when buildings change/unmount
     return () => {
       polygonsRef.current.forEach((p) => p.setMap(null));
       polygonsRef.current = [];
+      labelMarkersRef.current.forEach((m) => m.setMap(null));
+      labelMarkersRef.current = [];
     };
   }, [buildings, onBuildingPress, mapReady, mapsApi]);
 
