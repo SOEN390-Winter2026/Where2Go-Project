@@ -123,8 +123,8 @@ describe('parseEventLocation', () => {
       expect(parseEventLocation('Hall Building')).toEqual({ building: 'H', room: null });
     });
 
-    it('parses "John Molson Building"', () => {
-      expect(parseEventLocation('John Molson Building')).toEqual({ building: 'MB', room: null });
+    it('parses "John Molson School of Business"', () => {
+      expect(parseEventLocation('John Molson School of Business')).toEqual({ building: 'MB', room: null });
     });
 
     it('parses bare code "H" via KNOWN_CODES', () => {
