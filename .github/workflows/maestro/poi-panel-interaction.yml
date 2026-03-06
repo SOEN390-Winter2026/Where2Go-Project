@@ -3,6 +3,11 @@ appId: host.exp.exponent
 # Test: exercise the POI panel and slider
 
 - tapOn:
+    text: "Skip"
+    optional: true
+- waitForAnimationToEnd    
+
+- tapOn:
     id: poiPress
 
 - waitForAnimationToEnd

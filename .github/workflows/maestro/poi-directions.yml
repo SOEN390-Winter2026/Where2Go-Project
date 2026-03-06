@@ -3,8 +3,12 @@ appId: host.exp.exponent
 # Test: exercise the POI panel and directions
 
 - tapOn:
-    id: poiPress
+    text: "Skip"
+    optional: true
+- waitForAnimationToEnd    
 
+- tapOn:
+    id: poiPress
 - waitForAnimationToEnd    
 
 # adjusting place for specific tapping
