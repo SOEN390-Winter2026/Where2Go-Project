@@ -17,6 +17,7 @@ import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
 import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
+import { getDestinationFromBuildingCode } from './src/utils/eventDestinationResolver';
 
 const CAMPUS_COORDS = {
   SGW: { latitude: 45.4974, longitude: -73.5771 },
@@ -139,18 +140,6 @@ export default function App() {
     setIsRouteActive(false);
   };
 
-  const resolveBuildingCoords = (building) => {
-    if (!building) return null;
-    const firstCoord = building.coordinates?.[0];
-    if (firstCoord?.latitude != null && firstCoord?.longitude != null) {
-      return { lat: firstCoord.latitude, lng: firstCoord.longitude };
-    }
-    if (building.latitude != null && building.longitude != null) {
-      return { lat: building.latitude, lng: building.longitude };
-    }
-    return null;
-  };
-
   const handleGenerateDirectionsFromEvent = ({ buildingCode, room, event }) => {
     if (!buildingCode) {
       console.log(
@@ -160,23 +149,16 @@ export default function App() {
       return;
     }
 
+    const dest = getDestinationFromBuildingCode(buildingCode, buildings);
+    if (!dest) {
+      console.log(
+        "Cannot generate directions: no building found for code or building has no coordinates.",
+        buildingCode
+      );
+      return;
+    }
+
     const targetBuilding = buildings.find((b) => b.code === buildingCode);
-    if (!targetBuilding) {
-      console.log("Cannot generate directions: no building found for code", buildingCode);
-      return;
-    }
-
-    const destCoords = resolveBuildingCoords(targetBuilding);
-    if (!destCoords) {
-      console.log("Cannot generate directions: building has no coordinates", targetBuilding);
-      return;
-    }
-
-    const dest = {
-      label: targetBuilding.name,
-      lat: destCoords.lat,
-      lng: destCoords.lng,
-    };
 
     let origin = null;
     if (userLocation?.latitude != null && userLocation?.longitude != null) {
