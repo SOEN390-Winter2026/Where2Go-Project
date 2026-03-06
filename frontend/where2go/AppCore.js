@@ -45,13 +45,15 @@ const isWeb = typeof window !== "undefined";
 function updateURL(params) {
   if (!isWeb) return;
 
-  const q = new URLSearchParams();
+  const url = new URL(window.location.href);
+  const q = url.searchParams;
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value) q.set(key, value);
+    if (value === null || value === undefined || value === "") q.delete(key);
+    else q.set(key, String(value));
   });
 
-  const newUrl = `${window.location.pathname}?${q.toString()}`;
+  const newUrl = `${url.pathname}?${q.toString()}`;
   window.history.replaceState({}, "", newUrl);
 }
 
@@ -61,6 +63,7 @@ export default function AppCore() {
   const IS_WEB = Platform.OS === "web";
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [isGoogleCalendarConnected, setIsGoogleCalendarConnected] = useState(false);
   const [showLogin, setShowLogin] = useState(!IS_WEB);
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
@@ -87,6 +90,9 @@ export default function AppCore() {
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
   const [destinationPoi, setDestinationPoi] = useState(null);
+  const [directionFromLabel, setDirectionFromLabel] = useState(null);
+  const [directionToLabel, setDirectionToLabel] = useState(null);
+  const [directionMode, setDirectionMode] = useState(null);
   const getBuildingRole = (building) => {
     if (building?.id === departureBuilding?.id) return 'departure';
     if (building?.id === destinationBuilding?.id) return 'destination';
@@ -94,27 +100,46 @@ export default function AppCore() {
   };
 
   const handleBuildingPress = (building) => {
-    if(isPressedPOI){
+    if (isPressedPOI) {
       setPoiOriginBuilding(building);
-    }else{
-    setSelectedBuilding(building);
-    setModalVisible(true);
+
+    } else {
+      setSelectedBuilding(building);
+      setModalVisible(true);
+
+      updateURL({ building: "open" });
     }
   };
 
   // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
   // Also set that map loaded
   useEffect(() => {
+    const isDirections = showOutdoorDirection;
+
     updateURL({
       campus: currentCampus?.toLowerCase(),
-      panel: showOutdoorDirection
+      panel: isDirections
         ? "directions"
         : showCalendar
         ? "calendar"
         : null,
       poi: isPressedPOI ? "open" : null,
+      calendar: showCalendar && isGoogleCalendarConnected ? "connected" : null,
+
+      from: isDirections ? directionFromLabel : null,
+      to: isDirections ? directionToLabel : null,
+      mode: isDirections ? directionMode : null,
     });
-  }, [currentCampus, showOutdoorDirection, showCalendar, isPressedPOI]);
+  }, [
+    currentCampus,
+    showOutdoorDirection,
+    showCalendar,
+    isPressedPOI,
+    isGoogleCalendarConnected,
+    directionFromLabel,
+    directionToLabel,
+    directionMode,
+  ]);
 
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
@@ -215,22 +240,37 @@ export default function AppCore() {
     return <LoadingPage />;
   }
 
-  if(showOutdoorDirection){
-    return <OutdoorDirection
-    onPressBack={() => setShowOutdoorDirection((prev) => (prev !== true))}
-    buildings={buildings}
-    initialFrom={departureBuilding ? departureBuilding.name : ""}
-    initialTo={destinationBuilding ? destinationBuilding.name : ""}
-    destination={destinationPoi}
-    />;
+  if (showOutdoorDirection) {
+    return (
+      <OutdoorDirection
+        onPressBack={() => {
+          setShowOutdoorDirection((prev) => prev !== true);
+          setDirectionFromLabel(null);
+          setDirectionToLabel(null);
+          setDirectionMode(null);
+        }}
+        buildings={buildings}
+        initialFrom={departureBuilding ? departureBuilding.name : ""}
+        initialTo={destinationBuilding ? destinationBuilding.name : ""}
+        destination={destinationPoi}
 
+        onUrlFromChange={setDirectionFromLabel}
+        onUrlToChange={setDirectionToLabel}
+        onUrlModeChange={setDirectionMode}
+      />
+    );
   }
 
-  if(showCalendar){
-    return <CalendarPage 
-    onPressBack={() => setShowCalendar((prev) => (prev !== true))} 
-    />;
-  
+  if (showCalendar) {
+    return (
+      <CalendarPage
+        onPressBack={() => {
+          setShowCalendar((prev) => prev !== true);
+          setIsGoogleCalendarConnected(false);
+        }}
+        onCalendarConnected={() => setIsGoogleCalendarConnected(true)}
+      />
+    );
   }
 
 
@@ -249,12 +289,21 @@ export default function AppCore() {
         onPoiPress={(poi) => {
           setSelectedPoi(poi);
           setPoiModalVisible(true);
+          updateURL({ selectedPoi: "open" });
         }}
       />
       <SideLeftBar
         currentCampus={currentCampus}
         onToggleCampus={() =>
-          setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
+          setCurrentCampus((prev) => {
+            const next = prev === "SGW" ? "Loyola" : "SGW";
+
+            setSelectedBuilding(null);
+            setModalVisible(false);
+            updateURL({ building: null });
+
+            return next;
+          })
         }
         onToggleLiveLocation={() =>
           setLiveLocationEnabled((prev) => {
@@ -279,7 +328,9 @@ export default function AppCore() {
       <BuildingInfoModal
         building={selectedBuilding}
         visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        onClose={() => {
+          setModalVisible(false);
+          updateURL({ building: null });}}
         onSetDeparture={(buildingCommute) => setDepartureBuilding(buildingCommute)}
         onSetAsDestination={() => {
           const loc = selectedPoi?.geometry?.location;
@@ -307,7 +358,10 @@ export default function AppCore() {
       <PoiInfoModal
         poi={selectedPoi}
         visible={poiModalVisible}
-        onClose={() => setPoiModalVisible(false)}
+        onClose={() => {
+          setPoiModalVisible(false);
+          updateURL({ selectedPoi: null });
+        }}
         onSetAsDestination={() => {
           const lat =
             typeof selectedPoi.geometry.location.lat === "function"

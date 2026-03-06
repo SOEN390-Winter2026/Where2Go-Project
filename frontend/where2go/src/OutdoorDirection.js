@@ -101,7 +101,24 @@ function findBuilding(buildings, name) {
   );
 }
 
-export default function OutdoorDirection({ origin: originProp, destination: destProp, initialFrom, initialTo, buildings, onPressBack }) {
+function toUrlSlug(label) {
+  return (label ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]/g, "");
+}
+
+export default function OutdoorDirection({
+  origin: originProp,
+  destination: destProp,
+  initialFrom,
+  initialTo,
+  buildings,
+  onPressBack,
+  onUrlFromChange,
+  onUrlToChange,
+  onUrlModeChange,}) {
   // ---- Endpoint state ----
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
@@ -159,6 +176,18 @@ export default function OutdoorDirection({ origin: originProp, destination: dest
     setDestQuery(label);
     setDestination({ label, lat, lng });
   }, [initialTo, buildings]);
+
+  useEffect(() => {
+    const fromOk = typeof origin?.lat === "number" && typeof origin?.lng === "number";
+    const toOk = typeof destination?.lat === "number" && typeof destination?.lng === "number";
+
+    if (typeof onUrlFromChange === "function") {
+      onUrlFromChange(fromOk ? toUrlSlug(origin?.label) : null);
+    }
+    if (typeof onUrlToChange === "function") {
+      onUrlToChange(toOk ? toUrlSlug(destination?.label) : null);
+    }
+  }, [origin, destination, onUrlFromChange, onUrlToChange]);
 
   // ---- Route fetching (only when both endpoints are set) ----
   const fetchRoutes = useCallback(async () => {

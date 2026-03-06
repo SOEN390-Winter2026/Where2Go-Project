@@ -23,7 +23,7 @@ WebBrowser.maybeCompleteAuthSession();
 const { height, width } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
 
-export default function CalendarPage({ onPressBack }) {
+export default function CalendarPage({ onPressBack, onCalendarConnected }) {
 
     const [visible, setVisible] = useState(false);
     const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -202,15 +202,18 @@ export default function CalendarPage({ onPressBack }) {
     const [calendars, setCalendars] = useState([]);
 
     useEffect(() => {
-        console.log(calendars.map(calendar => calendar.title));
-        if (calendars.length === 0){
+        console.log(calendars.map((calendar) => calendar.title));
+
+        if (calendars.length === 0) {
             setIsCalendarConnected(false);
         } else {
             setIsCalendarConnected(true);
+            if (typeof onCalendarConnected === "function") {
+            onCalendarConnected();
+            }
             close();
         }
-        
-    }, [calendars]);
+    }, [calendars, onCalendarConnected]);
 
     useEffect(() => {
         console.log(events.map(event => event.title));
@@ -321,6 +324,7 @@ export default function CalendarPage({ onPressBack }) {
 
 CalendarPage.propTypes = {
   onPressBack: PropTypes.func.isRequired,
+  onCalendarConnected: PropTypes.func,
 };
 
 
