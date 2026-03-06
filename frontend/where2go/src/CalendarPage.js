@@ -339,6 +339,11 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                           const parsed = parseEventLocation(event.location);
                           if (!parsed || !parsed.building) {
                             console.log("Event location is missing or not a Concordia building. Skipping directions.");
+                            Alert.alert(
+                              "Cannot Generate Directions",
+                              "This event has no location or the location is not a Concordia building.",
+                              [{ text: "OK" }]
+                            );
                             return;
                           }
                           onGenerateDirections({
