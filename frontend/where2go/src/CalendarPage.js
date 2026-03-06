@@ -20,24 +20,14 @@ import Checkbox from "expo-checkbox";
 import { Calendar as CalendarUI, CalendarList } from "react-native-calendars";
 import PropTypes from "prop-types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { parseEventLocation } from './utils/eventLocationParser'; // location string → { building, room }
+import { getValidCalendarIds, fetchCalendarsIfPermitted } from './utils/calendarUtils';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const SAVED_CALENDAR_IDS_KEY = "where2go_saved_calendar_ids";
 const { height, width } = Dimensions.get("window");
 
-function getValidCalendarIds(savedIds, allCalendars) {
-    const idSet = new Set(allCalendars.map((c) => String(c.id)));
-    return savedIds.filter((id) => idSet.has(String(id)));
-}
-
-async function fetchCalendarsIfPermitted() {
-    try {
-        return await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-    } catch {
-        return null;
-    }
-}
 const SHEET_HEIGHT = height * 0.6;
 
 function pad2(n) {
@@ -188,17 +178,13 @@ export default function CalendarPage({ onPressBack }) {
           return;
         }
 
-        let allCalendars;
-        try {
-          allCalendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-        } catch (permErr) {
+        const allCalendars = await fetchCalendarsIfPermitted();
+        if (!allCalendars) {
           setIsRestoring(false);
           return;
         }
 
-        const validIds = savedIds.filter((id) =>
-          allCalendars.some((c) => String(c.id) === String(id))
-        );
+        const validIds = getValidCalendarIds(savedIds, allCalendars);
 
         if (!cancelled && validIds.length > 0) {
           setCalendars(allCalendars);
@@ -227,6 +213,13 @@ export default function CalendarPage({ onPressBack }) {
       close();
     }
   }, [calendars]);
+
+  useEffect(() => {
+    console.log("CalendarPage events:", events.map(event => event.title));
+        // Turn each event’s location string into { building, room } for nav/routing later
+    const parsedLocations = events.map((e) => parseEventLocation(e.location));
+    console.log("CalendarPage parsed locations:", parsedLocations);
+  }, [events]);
 
   useEffect(() => {
     if (isCalendarConnected && isCalendarsChosen) {
