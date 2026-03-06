@@ -19,6 +19,9 @@ import { Calendar as CalendarUI } from 'react-native-calendars';
 import PropTypes from 'prop-types';
 
 WebBrowser.maybeCompleteAuthSession();
+const isUseberry =
+  typeof window !== "undefined" &&
+  window.location.hostname.includes("useberry");
 
 const { height, width } = Dimensions.get("window");
 const SHEET_HEIGHT = height * 0.6;
@@ -158,7 +161,24 @@ export default function CalendarPage({ onPressBack, onCalendarConnected }) {
         };
 
         const handleConnectCalendar = async () => {
-        if (Platform.OS === "web") {
+        if (isUseberry) {
+            const mockCalendars = [
+                {
+                    id: "mock-calendar-1",
+                    title: "Mock Google Calendar",
+                    color: "#912338",
+                },
+            ];
+            setCalendars(mockCalendars);
+            setIsCalendarConnected(true);
+
+            if (typeof onCalendarConnected === "function") {
+                onCalendarConnected();
+            }
+            close();
+            return;
+        }
+        else if (Platform.OS === "web") {
             googleLogin();
         } else {
             await getCalendarsNative();
@@ -312,7 +332,13 @@ export default function CalendarPage({ onPressBack, onCalendarConnected }) {
                     >
                         <View style={styles.handle} />
                         <Pressable testID="closeModalBtn" style={styles.closeBtn} onPress={() => setVisible(false)}><Ionicons name="close" size={26} color="black" /></Pressable>
-                        <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={handleConnectCalendar}><Text style={styles.btnTxt}>Connect to Google Calendar</Text></Pressable>
+                        <Pressable
+                            testID="calBtn"
+                            style={styles.googleCalBtn}
+                            onPress={handleConnectCalendar}
+                        >
+                            <Text style={styles.btnTxt}>Connect to Google Calendar</Text>
+                        </Pressable>
                         {/**Still not implemented */}
                         <Pressable style={styles.manualBtn}><Text style={styles.btnTxt}>Manually Add Events</Text></Pressable>
                     </Animated.View>
