@@ -73,6 +73,8 @@ export default function App() {
   const [activeRouteMeta, setActiveRouteMeta] = useState(null);
   const [activeSegments, setActiveSegments] = useState([]);
   const [isRouteActive, setIsRouteActive] = useState(false);
+  const [directionOrigin, setDirectionOrigin] = useState(null);
+  const [directionDestination, setDirectionDestination] = useState(null);
 
   const getBuildingRole = (building) => {
     if (building?.id === departureBuilding?.id) return "departure";
@@ -126,6 +128,64 @@ export default function App() {
     setActiveSegments([]);
     setActiveRouteMeta(null);
     setIsRouteActive(false);
+  };
+
+  const resolveBuildingCoords = (building) => {
+    if (!building) return null;
+    const firstCoord = building.coordinates?.[0];
+    if (firstCoord?.latitude != null && firstCoord?.longitude != null) {
+      return { lat: firstCoord.latitude, lng: firstCoord.longitude };
+    }
+    if (building.latitude != null && building.longitude != null) {
+      return { lat: building.latitude, lng: building.longitude };
+    }
+    return null;
+  };
+
+  const handleGenerateDirectionsFromEvent = ({ buildingCode, room, event }) => {
+    if (!buildingCode) {
+      console.log(
+        "Cannot generate directions: event location did not resolve to a building code.",
+        event?.location
+      );
+      return;
+    }
+
+    const targetBuilding = buildings.find((b) => b.code === buildingCode);
+    if (!targetBuilding) {
+      console.log("Cannot generate directions: no building found for code", buildingCode);
+      return;
+    }
+
+    const destCoords = resolveBuildingCoords(targetBuilding);
+    if (!destCoords) {
+      console.log("Cannot generate directions: building has no coordinates", targetBuilding);
+      return;
+    }
+
+    const dest = {
+      label: targetBuilding.name,
+      lat: destCoords.lat,
+      lng: destCoords.lng,
+    };
+
+    let origin = null;
+    if (userLocation?.latitude != null && userLocation?.longitude != null) {
+      origin = {
+        label: "Your location",
+        lat: userLocation.latitude,
+        lng: userLocation.longitude,
+      };
+    }
+
+    setDirectionDestination(dest);
+    setDirectionOrigin(origin);
+
+    setDepartureBuilding(null);
+    setDestinationBuilding(targetBuilding);
+    setDestinationPoi(null);
+    setShowCalendar(false);
+    setShowOutdoorDirection(true);
   };
 
   const handleBuildingPress = (building) => {
@@ -224,18 +284,28 @@ export default function App() {
   if (showOutdoorDirection) {
     return (
       <OutdoorDirection
-        onPressBack={() => setShowOutdoorDirection(false)}
+        onPressBack={() => {
+          setShowOutdoorDirection(false);
+          setDirectionOrigin(null);
+          setDirectionDestination(null);
+        }}
         buildings={buildings}
+        origin={directionOrigin}
+        destination={directionDestination ?? destinationPoi}
         initialFrom={departureBuilding ? departureBuilding.name : ""}
         initialTo={destinationBuilding ? destinationBuilding.name : ""}
-        destination={destinationPoi}
         onSelectRoute={handleSelectRoute}
       />
     );
   }
 
   if (showCalendar) {
-    return <CalendarPage onPressBack={() => setShowCalendar(false)} />;
+    return (
+      <CalendarPage
+        onPressBack={() => setShowCalendar(false)}
+        onGenerateDirections={handleGenerateDirectionsFromEvent}
+      />
+    );
   }
 
   return (
