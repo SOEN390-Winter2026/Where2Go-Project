@@ -22,7 +22,7 @@ appId: host.exp.exponent
 
 # 87% is the height, 40% can be changed for different distances
 - tapOn:
-    point: 60%,87%
+    point: 40%,87%
 
 - assertVisible:
     text: "Radius Range: 400 m"
