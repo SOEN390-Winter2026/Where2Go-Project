@@ -123,7 +123,7 @@ const ADDRESS_TO_CODE = {
 
 const ADDRESS_KEYS = Object.keys(ADDRESS_TO_CODE);
 
-const ROOM_PATTERN = /([A-Z]?\d{1,4}(?:\.[-]?\d+)?)/;
+const ROOM_PATTERN = /([A-Z]?\d{1,4}(?:\.-?\d+)?)/;
 
 function lookupBuildingByNameOrCode(text) {
   const lower = text.toLowerCase();
@@ -150,11 +150,14 @@ function lookupBuildingInChunks(buildingPart) {
 }
 
 function lookupBuildingByAddress(s) {
+  const streetTypeRe = /\b(boulevard|blvd\.?|street|st\.?|avenue|ave\.?|av\.?)\b/gi;
+  const dirRe = /\b(ouest|west|w\.?)\s*$/gi;
   const normalized = s
     .toLowerCase()
     .replace(/[.,]/g, " ")
     .replace(/\s+/g, " ")
-    .replace(/\b(boulevard|blvd\.?|street|st\.?|avenue|ave\.?|av\.?)\s*(ouest|west|w\.?)?\s*/gi, " ")
+    .replace(streetTypeRe, " ")
+    .replace(dirRe, " ")
     .replace(/\b(ouest|west)\b/gi, "")
     .replace(/\s+/g, " ")
     .trim();
@@ -171,7 +174,6 @@ export function parseEventLocation(location) {
   if (!location || typeof location !== "string") {
     return { building: null, room: null };
   }
-
   const s = location.trim();
   const codeRoom = s.match(new RegExp(`^([A-Z]{1,3})[- ]*${ROOM_PATTERN.source}$`, "i"));
   if (codeRoom && KNOWN_CODES.has(codeRoom[1].toUpperCase())) {

@@ -1,11 +1,11 @@
 import { View,} from 'react-native';
 import React, { useEffect, useCallback, forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
+import MapView, { Marker, Polygon, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import PropTypes from 'prop-types';
 
 import BuildingCallout from './BuildingCallout';
 import { colors } from './theme/colors';
-import { styles, BURGUNDY, BURGUNDY_LIGHT } from './css/Map_styles';
+import { styles, BURGUNDY, BURGUNDY_LIGHT } from './styles/Map_styles';
 
 const POI_ICONS = {
   restaurant: require("../assets/poi-icons/poi-marker-restaurant.png"),
@@ -221,6 +221,7 @@ const CampusMap = forwardRef((props, ref) => {
       <MapView
         testID="mapRef"
         accessible={true}
+        provider={PROVIDER_GOOGLE}
         ref={mapRef}
         initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
         style={styles.map}
@@ -273,8 +274,9 @@ const CampusMap = forwardRef((props, ref) => {
         {liveLocationEnabled && userLocation && (
           <Marker
             coordinate={userLocation}
+            zIndex={999}
             anchor={{ x: 0.5, y: 0.5 }}
-            tracksViewChanges={false}
+            tracksViewChanges={true}
             accessible={true}
             accessibilityLabel="userMarker"
           >
