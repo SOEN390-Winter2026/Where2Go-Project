@@ -1,16 +1,18 @@
 import {
-  View, Text, TextInput, StyleSheet, Pressable,
+  View, Text, TextInput, Pressable,
   ImageBackground, ScrollView, ActivityIndicator, Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import * as Location from "expo-location";
-import { colors } from "./theme/colors";
 import ErrorModal from "./ErrorModal";
-import { API_BASE_URL } from "./config";
 import { SEARCHABLE_LOCATIONS } from "./data/locations";
 import polyline from "@mapbox/polyline";
+
+import NavigationContext from "./navigation/NavigationContext"; //strategy
+
+import { styles } from "./styles/OutdoorDirection_styles";
 
 export { KNOWN_LOCATIONS } from "./data/locations";
 
@@ -141,6 +143,8 @@ export default function OutdoorDirection({
   const [errorMessage, setErrorMessage] = useState("");
 
   const mapRef = useRef(null);
+  //Strategy for transport options (default is all)
+  const navContext = useRef(new NavigationContext("all"));
 
   useEffect(() => {
     if (__testMapRef && mapRef) {
@@ -212,36 +216,10 @@ export default function OutdoorDirection({
     setErrorCode(null);
 
     try {
-      const clientTime = encodeURIComponent(new Date().toISOString());
-      const res = await fetch(
-        `${API_BASE_URL}/directions?originLat=${origin.lat}&originLng=${origin.lng}&destLat=${destination.lat}&destLng=${destination.lng}&clientTime=${clientTime}`
-      );
-
-      const data = await res.json();
-
-      const errorObj = data?.error && typeof data.error === "object" ? data.error : null;
-      const nextErrorCode = errorObj?.code ?? null;
-      const nextErrorMessage =
-        errorObj?.message ?? (typeof data?.error === "string" ? data.error : null);
-
-      if (!res.ok) {
-        setRoutes([]);
-        setError(nextErrorMessage || "Failed to fetch directions");
-        setErrorCode(nextErrorCode || "UPSTREAM_FAILED");
-        return;
-      }
-
-      const newRoutes = data.routes || [];
+      const newRoutes = await navContext.current.getRoutes(origin, destination);
       setRoutes(newRoutes);
       setSelectedRouteIndex(newRoutes.length > 0 ? 0 : -1);
-
-      if (newRoutes.length === 0) {
-        setErrorCode(nextErrorCode || "NO_ROUTES");
-        setError(null);
-      } else {
-        setError(null);
-        setErrorCode(null);
-      }
+      if (newRoutes.length === 0) setErrorCode("NO_ROUTES");
     } catch (e) {
       setRoutes([]);
       setError(e?.message || "Failed to fetch directions");
@@ -252,6 +230,12 @@ export default function OutdoorDirection({
   }, [origin, destination]);
 
   useEffect(() => {
+    fetchRoutes();
+  }, [fetchRoutes]);
+
+    //For the strategy dp
+  const handleModeFilter = useCallback((mode) => {
+    navContext.current.setStrategy(mode);
     fetchRoutes();
   }, [fetchRoutes]);
 
@@ -501,9 +485,6 @@ export default function OutdoorDirection({
           <Text style={styles.routesTitle}>
             {routes.length} routes{"\n"}available
           </Text>
-          <Pressable testID="pressFilter">
-            <Text style={styles.filterText}>Filter</Text>
-          </Pressable>
         </View>
 
         <ScrollView
@@ -617,225 +598,6 @@ OutdoorDirection.propTypes = {
   initialTo: PropTypes.string,
   buildings: PropTypes.array,
 };
-
-const styles = StyleSheet.create({
-  mapWrap: {
-    height: 260,
-    marginHorizontal: 16,
-    borderRadius: 16,
-    overflow: "hidden",
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  routeContainerSelected: {
-    borderWidth: 3,
-    borderColor: "#7C2B38",
-    backgroundColor: "#7C2B38",
-  },
-  routeTextSelected: {
-    color: "#fff",
-  },
-  routeSubTextSelected: {
-    color: "rgba(255,255,255,0.8)",
-  },
-  background: { flex: 1 },
-  header: {
-    width: "100%",
-    paddingTop: 35,
-    paddingHorizontal: 20,
-    position: "relative",
-    zIndex: 10,
-  },
-  backBtn: {
-    position: "absolute",
-    top: 30,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 28,
-    fontWeight: "700",
-    marginTop: 30,
-  },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.8)",
-    marginTop: 6,
-    marginBottom: 6,
-    fontSize: 13,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "white",
-    borderRadius: 14,
-    padding: 10,
-    marginTop: 14,
-    backgroundColor: "white",
-  },
-  inputLabel: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 4,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  inputField: {
-    flex: 1,
-    fontSize: 16,
-    color: "#111",
-    paddingVertical: 4,
-  },
-  dropdown: {
-    maxHeight: 200,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    marginTop: 6,
-  },
-  dropdownItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#eee",
-  },
-  dropdownText: {
-    fontSize: 14,
-    color: "#333",
-    flex: 1,
-  },
-  loadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  errorText: {
-    fontSize: 14,
-    color: "#c00",
-    padding: 16,
-  },
-  errorContainer: {
-    marginTop: 20,
-    padding: 16,
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bottomPart: {
-    flex: 1,
-    marginTop: 40,
-    paddingHorizontal: 16,
-    backgroundColor: "white",
-    paddingTop: 10,
-    overflow: "hidden",
-  },
-  liveLoc: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 14,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "white",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  routesHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  routesTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
-  },
-  filterText: {
-    color: "#7C2B38",
-    fontWeight: "800",
-  },
-  routesContent: {},
-  routeContainer: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#7C2B38",
-    flexDirection: "row",
-    marginBottom: 16,
-    marginHorizontal: 16,
-    height: 170,
-  },
-  routeBody: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  routeIcon: { marginRight: 14 },
-  routeDetails: { flex: 1 },
-  routeMode: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 4,
-  },
-  routeTime: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 2,
-  },
-  routeDistance: {
-    fontSize: 13,
-    color: "#666",
-  },
-  routeSchedule: {
-    fontSize: 12,
-    color: "#7C2B38",
-    marginTop: 4,
-    fontStyle: "italic",
-  },
-  emptyStateContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
-  emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-  },
-  emptyStateText: {
-    fontSize: 14,
-    color: "#777",
-    textAlign: "center",
-  },
-  retryButton: {
-    marginTop: 20,
-    backgroundColor: "#912338",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
-  },
-  retryButtonText: {
-    color: "white",
-    fontWeight: "600",
-  },
-});
 
 export const __test__ = {
   getBuildingDisplayName,
