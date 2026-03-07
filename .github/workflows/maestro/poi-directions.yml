@@ -1,0 +1,32 @@
+appId: host.exp.exponent
+---
+# Test: exercise the POI panel and directions
+
+- tapOn:
+    text: "Skip"
+    optional: true
+- waitForAnimationToEnd    
+
+- tapOn:
+    id: poiPress
+- waitForAnimationToEnd    
+
+# adjusting place for specific tapping
+- tapOn: SGW
+- waitForAnimationToEnd    
+- tapOn: Loyola
+- waitForAnimationToEnd    
+
+# looking for JMSB
+- tapOn:
+    point: 30%,60%
+
+- tapOn: Load
+
+# tap on starbucks
+- tapOn:
+    point: 45%,46%
+
+- tapOn: "Get Directions"
+
+- assertVisible: "Plan Your Trip"

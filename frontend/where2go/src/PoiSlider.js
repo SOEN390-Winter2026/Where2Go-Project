@@ -129,6 +129,7 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
       </Text>
 
       <Slider
+        testID="poiSlider"
         style={{ width: 300, height: 40 }}
         minimumValue={MIN_RADIUS}
         maximumValue={MAX_RADIUS}
