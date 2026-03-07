@@ -62,7 +62,7 @@ function formatTimeRange(event) {
   return "Time not specified";
 }
 
-export default function CalendarPage({ onPressBack }) {
+export default function CalendarPage({ onPressBack, onGenerateDirections }) {
   const [visible, setVisible] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
 
@@ -334,7 +334,25 @@ export default function CalendarPage({ onPressBack }) {
                         key={event.id}
                         testID={`event-item-${event.id}`}
                         style={styles.eventRow}
-                        onPress={() => console.log("Selected event:", event.title)}
+                        onPress={() => {
+                          if (!onGenerateDirections) return;
+                          const parsed = parseEventLocation(event.location);
+                          if (!parsed || !parsed.building) {
+                            console.log("Event location is missing or not a Concordia building. Skipping directions.");
+                            Alert.alert(
+                              "Cannot Generate Directions",
+                              "This event has no location or the location is not a Concordia building.",
+                              [{ text: "OK" }]
+                            );
+                            return;
+                          }
+                          onGenerateDirections({
+                            event,
+                            buildingCode: parsed.building,
+                            room: parsed.room ?? null,
+                            rawLocation: event.location ?? null,
+                          });
+                        }}
                       >
                         <View style={styles.leftAccent} />
 
@@ -510,6 +528,9 @@ export default function CalendarPage({ onPressBack }) {
 
 CalendarPage.propTypes = {
   onPressBack: PropTypes.func.isRequired,
+  onPressCalendar: PropTypes.func,
+  title: PropTypes.string,
+  onGenerateDirections: PropTypes.func,
 };
 
 /* Styles CSS*/
