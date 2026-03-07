@@ -1146,9 +1146,7 @@ describe('CalendarPage', () => {
         expect(queryByText("No events for this day")).toBeTruthy();
     });
 
-    it("pressing an event logs Selected event (covers line 254)", async () => {
-        const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-
+    it("pressing an event triggers onGenerateDirections with the correct payload", async () => {
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
         Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
         Calendar.getEventsAsync.mockResolvedValue([
@@ -1161,7 +1159,13 @@ describe('CalendarPage', () => {
             },
         ]);
 
-        const { getByTestId, getByText, findByText, findByTestId } = render(<CalendarPage onPressBack={jest.fn()} />);
+        parseEventLocation.mockReturnValue({ building: "Hall", room: null });
+
+        const onGenerateDirections = jest.fn();
+
+        const { getByTestId, getByText, findByText, findByTestId } = render(
+            <CalendarPage onPressBack={jest.fn()} onGenerateDirections={onGenerateDirections} />
+        );
 
         fireEvent.press(getByTestId("openModalBtn"));
         fireEvent.press(getByTestId("calBtn"));
@@ -1174,8 +1178,13 @@ describe('CalendarPage', () => {
         await findByText("Event 1");
 
         fireEvent.press(getByTestId("event-item-e1"));
-        expect(logSpy).toHaveBeenCalledWith("Selected event:", "Event 1");
 
-        logSpy.mockRestore();
+        expect(onGenerateDirections).toHaveBeenCalledWith(
+            expect.objectContaining({
+                buildingCode: "Hall",
+                rawLocation: "Hall",
+                event: expect.objectContaining({ id: "e1", title: "Event 1" }),
+            })
+        );
     });
 });
