@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import IndoorMaps from '../src/IndoorMaps';
+import IndoorMaps from '../../src/IndoorMaps';
 
-jest.mock('../src/IndoorSideLeftBar', () => {
+jest.mock('../../src/IndoorSideLeftBar', () => {
     const { Pressable, Text } = require('react-native');
     return ({ onPressBack }) => (
         <Pressable testID="mock-back-btn" onPress={onPressBack}>

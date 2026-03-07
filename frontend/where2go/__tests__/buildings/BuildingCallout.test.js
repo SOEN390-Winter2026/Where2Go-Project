@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
-import BuildingCallout from "../src/BuildingCallout";
+import BuildingCallout from "../../src/BuildingCallout";
 
 jest.mock("react-native-maps");
 

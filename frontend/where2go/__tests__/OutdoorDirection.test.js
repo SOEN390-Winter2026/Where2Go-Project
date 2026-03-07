@@ -129,13 +129,6 @@ describe("Rendering Features Properly", () => {
     expect(mockOnPress).toHaveBeenCalledTimes(1);
   });
 
-  it("Filter Button is pressable (no crash)", async () => {
-    const { getByTestId } = render(<OutdoorDirection onPressBack={() => {}} buildings={[]} />);
-
-    await act(async () => {
-      fireEvent.press(getByTestId("pressFilter"));
-    });
-  });
 });
 
 describe("Input and Button Features", () => {

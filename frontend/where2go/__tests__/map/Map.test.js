@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import CampusMap from '../src/Map';
+import CampusMap from '../../src/Map';
 
 jest.mock('react-native-maps', () => {
   const React = require('react');
@@ -128,7 +128,7 @@ test("renders boarding pins safely when segment coords exist (no crash)", () => 
   const activeSegments = [
     {
       type: "walk",
-      coords: [{ latitude: 45.0, longitude: -73.0 }],
+      coords: [{ latitude: 45, longitude: -73 }],
       isWalk: true,
     },
     {

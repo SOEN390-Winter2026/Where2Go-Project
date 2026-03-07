@@ -453,7 +453,7 @@ export default function CalendarPage({ onPressBack }) {
                 onPress={async () => {
                   if (selectedCalendarIds.length > 0) {
                     try {
-                      const idsToSave = selectedCalendarIds.map((id) => String(id));
+                      const idsToSave = selectedCalendarIds.map(String);
                       await AsyncStorage.setItem(
                         SAVED_CALENDAR_IDS_KEY,
                         JSON.stringify(idsToSave)

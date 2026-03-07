@@ -1,11 +1,11 @@
 jest.mock('@env', () => ({ GOOGLE_MAPS_API_KEY: 'TEST_API_KEY' }), { virtual: true });
-jest.mock('../src/utils/placePhotoUrl', () => ({ getPlacePhotoUrl: jest.fn(() => null) }));
-jest.mock('../src/theme/colors', () => ({ colors: { primary: '#912338' } }));
+jest.mock('../../src/utils/placePhotoUrl', () => ({ getPlacePhotoUrl: jest.fn(() => null) }));
+jest.mock('../../src/theme/colors', () => ({ colors: { primary: '#912338' } }));
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'Ionicons' }));
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import PoiInfoModal from '../src/PoiInfoModal';
+import PoiInfoModal from '../../src/PoiInfoModal';
 
 const POI = {
     place_id: 'place_001',
@@ -56,7 +56,7 @@ describe('PoiInfoModal', () => {
     });
 
     it('renders an image when there is one available', () => {
-        const { getPlacePhotoUrl } = require('../src/utils/placePhotoUrl');
+        const { getPlacePhotoUrl } = require('../../src/utils/placePhotoUrl');
         getPlacePhotoUrl.mockReturnValueOnce('https://example.com/photo.jpg');
         const { UNSAFE_getByType } = render(
             <PoiInfoModal poi={POI} visible={true} onClose={jest.fn()} />

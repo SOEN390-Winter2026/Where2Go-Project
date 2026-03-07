@@ -1,6 +1,6 @@
 jest.mock('@env', () => ({ GOOGLE_MAPS_API_KEY: 'TEST_API_KEY' }), { virtual: true });
 
-import { getPlacePhotoUrl } from '../src/utils/placePhotoUrl';
+import { getPlacePhotoUrl } from '../../src/utils/placePhotoUrl';
 
 describe('getPlacePhotoUrl', () => {
   const REF = 'abc123photoRef';

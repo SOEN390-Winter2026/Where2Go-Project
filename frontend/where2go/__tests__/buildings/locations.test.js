@@ -1,4 +1,4 @@
-import { KNOWN_LOCATIONS, SEARCHABLE_LOCATIONS } from "../src/data/locations";
+import { KNOWN_LOCATIONS, SEARCHABLE_LOCATIONS } from "../../src/data/locations";
 
 describe("KNOWN_LOCATIONS", () => {
   it("contains SGW and Loyola", () => {

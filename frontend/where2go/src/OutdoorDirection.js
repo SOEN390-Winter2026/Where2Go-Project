@@ -10,7 +10,7 @@ import ErrorModal from "./ErrorModal";
 import { SEARCHABLE_LOCATIONS } from "./data/locations";
 import polyline from "@mapbox/polyline";
 
-import NavigationContext from "./navigation/NavigationContext"; //strategy
+import NavigationContext from "./navigation/NavigationContext";
 
 import { styles } from "./styles/OutdoorDirection_styles";
 
@@ -18,6 +18,24 @@ export { KNOWN_LOCATIONS } from "./data/locations";
 
 const MAX_RESULTS = 8;
 
+const RetryButton = ({ onPress, loading }) => (
+  <Pressable
+    style={[styles.retryButton, loading && { opacity: 0.6 }]}
+    onPress={onPress}
+    disabled={loading}
+  >
+    <Text style={styles.retryButtonText}>Try Again</Text>
+  </Pressable>
+);
+
+RetryButton.propTypes = {
+  onPress: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+};
+
+RetryButton.defaultProps = {
+  loading: false,
+};
 function getBuildingDisplayName(label) {
   if (!label) return label;
   const parenIndex = label.indexOf("(");
@@ -111,7 +129,6 @@ function stepsToSegments(route) {
     })
     .filter(Boolean);
 }
-
 export default function OutdoorDirection({
   origin: originProp,
   destination: destProp,
@@ -133,17 +150,12 @@ export default function OutdoorDirection({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [errorCode, setErrorCode] = useState(null);
-  const [activeRouteCoords, setActiveRouteCoords] = useState([]);
-  const [activeSegments, setActiveSegments] = useState([]);
-  const [routeStart, setRouteStart] = useState(null);
-  const [routeEnd, setRouteEnd] = useState(null);
 
-  const [liveLocCoordinates, setLiveLocCoordinates] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const mapRef = useRef(null);
-  //Strategy for transport options (default is all)
+  // Strategy pattern: default strategy fetches all modes
   const navContext = useRef(new NavigationContext("all"));
 
   useEffect(() => {
@@ -180,27 +192,19 @@ export default function OutdoorDirection({
     setDestination(resolved);
   }, [initialTo, buildings]);
 
-  const handleSelectRoute = ({ route, origin, destination }) => {
-    if (origin?.lat && origin?.lng) {
-      setRouteStart({ latitude: origin.lat, longitude: origin.lng });
-    }
-    if (destination?.lat && destination?.lng) {
-      setRouteEnd({ latitude: destination.lat, longitude: destination.lng });
-    }
-
+  const handleSelectRoute = ({ route, origin: o, destination: d }) => {
     const segs = stepsToSegments(route);
-    setActiveSegments(segs);
-    setActiveRouteCoords(decodePolylineToCoords(route?.polyline));
-
     const coordsToFit = segs.length
       ? segs.flatMap((s) => s.coords)
       : decodePolylineToCoords(route?.polyline);
+
     if (coordsToFit.length && mapRef.current) {
       mapRef.current.fitToCoordinates(coordsToFit, {
         edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
         animated: true,
       });
     }
+    if (onSelectRoute) onSelectRoute({ route, origin: o, destination: d });
   };
 
   const fetchRoutes = useCallback(async () => {
@@ -230,12 +234,6 @@ export default function OutdoorDirection({
   }, [origin, destination]);
 
   useEffect(() => {
-    fetchRoutes();
-  }, [fetchRoutes]);
-
-    //For the strategy dp
-  const handleModeFilter = useCallback((mode) => {
-    navContext.current.setStrategy(mode);
     fetchRoutes();
   }, [fetchRoutes]);
 
@@ -310,17 +308,6 @@ export default function OutdoorDirection({
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
 
-  const hasValidEndpoints = origin?.lat != null && destination?.lat != null;
-  const showEmptyState =
-    hasValidEndpoints &&
-    !loading &&
-    routes.length === 0 &&
-    (errorCode === "NO_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
-  const showSelectLocationsState =
-    !loading &&
-    !hasValidEndpoints &&
-    (originQuery.trim().length > 0 || destQuery.trim().length > 0);
-
   const getCurrentLocation = async () => {
     try {
       const isLocationEnabled = await Location.hasServicesEnabledAsync();
@@ -330,7 +317,7 @@ export default function OutdoorDirection({
         return;
       }
 
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMessage("Location permission denied. Please enable location permission in your app settings to use your current location.");
         setShowErrorModal(true);
@@ -346,7 +333,6 @@ export default function OutdoorDirection({
             return;
           }
           const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
-          setLiveLocCoordinates(coords);
           const label = `${coords.latitude},${coords.longitude}`;
           setOriginQuery(label);
           setOrigin({ label, lat: coords.latitude, lng: coords.longitude });
@@ -366,19 +352,15 @@ export default function OutdoorDirection({
 
   const handleRetry = useCallback(() => {
     if (loading) return;
-    if (!hasValidEndpoints) return;
+    if (!origin?.lat || !destination?.lat) return;
     fetchRoutes();
-  }, [loading, hasValidEndpoints, fetchRoutes]);
+  }, [loading, origin, destination, fetchRoutes]);
 
-  const RetryButton = ({ onPress }) => (
-    <Pressable
-      style={[styles.retryButton, loading && { opacity: 0.6 }]}
-      onPress={onPress}
-      disabled={loading}
-    >
-      <Text style={styles.retryButtonText}>Try Again</Text>
-    </Pressable>
-  );
+  const hasValidEndpoints = origin?.lat != null && destination?.lat != null;
+  const showEmptyState = hasValidEndpoints && !loading && routes.length === 0 &&
+      (errorCode === "NO_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
+  const showSelectLocationsState = !loading &&
+    !hasValidEndpoints && (originQuery.trim().length > 0 || destQuery.trim().length > 0);
 
   return (
     <ImageBackground
@@ -417,9 +399,9 @@ export default function OutdoorDirection({
           </View>
           {activeField === "origin" && originResults.length > 0 && (
             <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {originResults.map((loc, i) => (
+              {originResults.map((loc) => (
                 <Pressable
-                  key={`origin-${loc.label}-${i}`}
+                  key={`origin-${loc.label}`}
                   style={styles.dropdownItem}
                   onPress={() => pickOrigin(loc)}
                 >
@@ -456,9 +438,9 @@ export default function OutdoorDirection({
           </View>
           {activeField === "dest" && destResults.length > 0 && (
             <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {destResults.map((loc, i) => (
+              {destResults.map((loc) => (
                 <Pressable
-                  key={`dest-${loc.label}-${i}`}
+                  key={`dest-${loc.label}`}
                   style={styles.dropdownItem}
                   onPress={() => pickDestination(loc)}
                 >
@@ -507,7 +489,7 @@ export default function OutdoorDirection({
                   ? "Try selecting different locations or check your connection."
                   : "Try selecting different locations or another mode."}
               </Text>
-              <RetryButton onPress={handleRetry} />
+              <RetryButton onPress={handleRetry} loading={loading} />
             </View>
           )}
           {showSelectLocationsState && (
@@ -517,14 +499,17 @@ export default function OutdoorDirection({
               <Text style={styles.emptyStateText}>Please pick a suggestion from the dropdown.</Text>
             </View>
           )}
+
+          {/* route list */}
           {!loading &&
             routes.map((r, i) => {
               const { label, icon } = getModeDisplay(r.mode);
               const isSelected = i === selectedRouteIndex;
+              const routeKey = `${r.mode}-${r.duration?.text ?? i}`;
 
               return (
                 <Pressable
-                  key={`route-${i}`}
+                  key={routeKey}
                   onPress={() => {
                     const normalizedPolyline =
                       typeof r?.polyline === "string"
@@ -536,11 +521,8 @@ export default function OutdoorDirection({
                           null;
 
                     const normalized = { ...r, polyline: normalizedPolyline };
-
                     handleSelectRoute({ route: normalized, origin, destination });
                     setSelectedRouteIndex(i);
-
-                    if (onSelectRoute) onSelectRoute({ route: normalized, origin, destination });
                     onPressBack?.();
                   }}
                   style={[styles.routeContainer, isSelected && styles.routeContainerSelected]}
@@ -592,11 +574,13 @@ export default function OutdoorDirection({
 
 OutdoorDirection.propTypes = {
   onPressBack: PropTypes.func.isRequired,
+  onSelectRoute: PropTypes.func,
   origin: PropTypes.shape({ label: PropTypes.string, lat: PropTypes.number, lng: PropTypes.number }),
   destination: PropTypes.shape({ label: PropTypes.string, lat: PropTypes.number, lng: PropTypes.number }),
   initialFrom: PropTypes.string,
   initialTo: PropTypes.string,
   buildings: PropTypes.array,
+  __testMapRef: PropTypes.object,
 };
 
 export const __test__ = {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import LoadingPage from '../src/LoadingPage';
+import LoadingPage from '../../src/LoadingPage';
 
 describe('LoadingPage', () => {
 

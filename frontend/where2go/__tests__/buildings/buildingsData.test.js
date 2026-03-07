@@ -1,4 +1,4 @@
-import buildings from "../__mocks__/data/buildings.json";
+import buildings from "../../__mocks__/data/buildings.json";
 
 describe("buildings.json data sanity", () => {
   test("every building has required fields", () => {

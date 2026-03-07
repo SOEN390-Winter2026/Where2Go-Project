@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import TopRightMenu from '../src/TopRightMenu.js';
+import TopRightMenu from '../../src/TopRightMenu.js';
 
 describe('TopRightMenu', () => {
     const mockOnPressDirection = jest.fn();
@@ -76,7 +76,7 @@ describe('TopRightMenu', () => {
     });
 
     it('closes menu when Calendar item is pressed', () => {
-        const { getByText, queryByText, getByTestId } = render(
+        const { getByText, getByTestId } = render(
             <TopRightMenu onPressCalendar={mockOnPressDirection} />
         );
         

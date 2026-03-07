@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import IndoorSideLeftBar from '../src/IndoorSideLeftBar';
+import IndoorSideLeftBar from '../../src/IndoorSideLeftBar';
 
 //mocking icons
-jest.mock('../assets/hugeicons--disability-02.png', () => 'disability-icon-1');
-jest.mock('../assets/hugeicons--disability-02-2.png', () => 'disability-icon-2');
-jest.mock('../assets/gis--poi-alt.png', () => 'poi-icon-1');
-jest.mock('../assets/gis--poi-alt-2.png', () => 'poi-icon-2');
+jest.mock('../../assets/hugeicons--disability-02.png', () => 'disability-icon-1');
+jest.mock('../../assets/hugeicons--disability-02-2.png', () => 'disability-icon-2');
+jest.mock('../../assets/gis--poi-alt.png', () => 'poi-icon-1');
+jest.mock('../../assets/gis--poi-alt-2.png', () => 'poi-icon-2');
 
 const defaultProps = {
     onPressBack: jest.fn(),

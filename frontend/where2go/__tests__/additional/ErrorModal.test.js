@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import ErrorModal from '../src/ErrorModal';
+import ErrorModal from '../../src/ErrorModal';
 
 describe('ErrorModal Component', () => {
   const defaultProps = {
