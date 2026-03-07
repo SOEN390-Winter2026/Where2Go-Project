@@ -173,4 +173,22 @@ describe('BuildingInfoModal', () => {
     fireEvent.press(getByText('Selected as Destination. Press again to cancel.'));
     expect(mockOnSetDestination).toHaveBeenCalledWith(null);
   });
+
+  test('calls onGoInside with building when Go inside button is pressed', () => {
+      const mockOnGoInside = jest.fn();
+      const { getByText } = render(
+          <BuildingInfoModal
+              building={mockBuilding}
+              visible={true}
+              onClose={mockOnClose}
+              onSetDeparture={mockOnSetDeparture}
+              onSetDestination={mockOnSetDestination}
+              onGoInside={mockOnGoInside}
+              selectedRole={null}
+          />
+      );
+      fireEvent.press(getByText(/Go inside/i));
+      expect(mockOnGoInside).toHaveBeenCalledWith(mockBuilding);
+  });
+
 });

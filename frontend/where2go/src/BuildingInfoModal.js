@@ -9,12 +9,15 @@ import {
   Linking,
   StyleSheet,
   Dimensions,
+  Platform,
 } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
 import PropTypes from 'prop-types';
 import { buildingImages } from './BuildingCallout';
 import { colors } from './theme/colors';
 
-const BuildingInfoModal = ({ building, visible, onClose, onSetDeparture, onSetDestination, selectedRole }) => {
+const BuildingInfoModal = ({ building, visible, onClose, onSetDeparture, onSetDestination, onGoInside, selectedRole }) => {
+  const bottomPadding = Platform.OS === 'android' ? 24 : 16;
 
   if (!building) return null;
 
@@ -74,34 +77,33 @@ const BuildingInfoModal = ({ building, visible, onClose, onSetDeparture, onSetDe
             </Text>
 
             {/* Select as destination or departure points */}
-            <View style={styles.modalBtns} >
-              { selectedRole ? (
-                <Pressable style={styles.cancelBtnDesign}
+            <View style={[styles.modalBtns, { paddingBottom: bottomPadding }]}>
+              {selectedRole ? (
+                <Pressable
+                  style={styles.cancelBtnDesign}
                   onPress={() => {
                     if (selectedRole === 'departure') onSetDeparture(null);
                     else onSetDestination(null);
                   }}
                 >
-                  <Text style={styles.cancelBtnText}>Selected as {selectedRole === 'departure' ? 'Departure' : 'Destination'}. Press again to cancel.</Text>
+                  <Text style={styles.cancelBtnText}>
+                    Selected as {selectedRole === 'departure' ? 'Departure' : 'Destination'}. Press again to cancel.
+                  </Text>
                 </Pressable>
               ) : (
-                <>
-                  <Pressable style={styles.btnDesign}
-                    onPress = { () => {
-                      onSetDeparture(building);
-                    }}
-                  >
+                <View style={styles.topBtnsRow}>
+                  <Pressable style={styles.btnDesign} onPress={() => onSetDeparture(building)}>
                     <Text style={styles.btnsText}>Set as Departure</Text>
                   </Pressable>
-                  <Pressable style={styles.btnDesign}
-                      onPress = { () => {
-                      onSetDestination(building);
-                    }}
-                  >
+                  <Pressable style={styles.btnDesign} onPress={() => onSetDestination(building)}>
                     <Text style={styles.btnsText}>Set as Destination</Text>
                   </Pressable>
-                </>
+                </View>
               )}
+
+              <Pressable style={styles.goInsideBtn} onPress={() => onGoInside(building)}>
+                <Text style={styles.goInsideBtnText}>Go inside <Ionicons size={20} name="log-in-outline"></Ionicons></Text>
+              </Pressable>
             </View>
           </ScrollView>
         </Pressable>
@@ -128,6 +130,7 @@ BuildingInfoModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSetDeparture: PropTypes.func.isRequired,
   onSetDestination: PropTypes.func.isRequired,
+  onGoInside: PropTypes.func.isRequired, // ✅ added to propTypes
   selectedRole: PropTypes.string
 };
 
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: SCREEN_HEIGHT * 0.6,
+    height: SCREEN_HEIGHT * 0.65,
     overflow: 'hidden',
   },
   closeButton: {
@@ -211,9 +214,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   modalBtns: {
+    flexDirection: 'column',
+    paddingVertical: 24,
+    gap: 12,
+  },
+  topBtnsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 24,
   },
   btnDesign: {
     backgroundColor: '#912338',
@@ -221,6 +228,20 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     minWidth: 120,
+  },
+  goInsideBtnText : {
+    color: '#912338',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  goInsideBtn: {
+    backgroundColor: 'white',
+    borderColor: '#912338',
+    borderWidth: 3,
+    borderRadius: 12,
+    paddingVertical: 12,
+    width: '100%',
   },
   btnsText: {
     color: 'white',
