@@ -1,0 +1,35 @@
+appId: host.exp.exponent
+---
+# Test: exercise the POI panel and slider
+
+- tapOn:
+    text: "Skip"
+    optional: true
+- waitForAnimationToEnd    
+
+- tapOn:
+    id: poiPress
+
+- waitForAnimationToEnd
+
+- tapOn: "gps"
+
+- tapOn:
+    text: "Only this time"
+    optional: true
+
+- waitForAnimationToEnd    
+
+# 87% is the height, 40% can be changed for different distances
+- tapOn:
+    point: 40%,87%
+
+- assertVisible:
+    text: "Radius Range: 400 m"
+
+# finally disable POI so panel disappears
+- tapOn:
+    id: poiPress
+
+- assertNotVisible:
+    id: poiSlider 

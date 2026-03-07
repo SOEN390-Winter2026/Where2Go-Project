@@ -77,23 +77,50 @@ function resolveLocationByName(name, buildings) {
   const q = name.toLowerCase().trim();
 
   if (buildings?.length) {
-    const b = buildings.find((b) => b.name?.toLowerCase() === q);
+
+    let b =
+      buildings.find((bld) => bld.name?.toLowerCase() === q) ||
+  
+      buildings.find((bld) => {
+        const bn = bld.name?.toLowerCase() || "";
+        return bn.includes(q) || q.includes(bn);
+      });
+
     if (b) {
+      const firstCoord = b.coordinates?.[0];
       return {
         label: b.name,
-        lat: b.coordinates?.[0]?.latitude ?? null,
-        lng: b.coordinates?.[0]?.longitude ?? null,
+        lat: firstCoord?.latitude ?? null,
+        lng: firstCoord?.longitude ?? null,
       };
     }
   }
 
-  const loc = SEARCHABLE_LOCATIONS.find(
-    (l) =>
-      getBuildingDisplayName(l.label)?.toLowerCase() === q ||
-      l.label?.toLowerCase() === q
-  );
-  if (loc) {
-    return { label: getBuildingDisplayName(loc.label), lat: loc.lat, lng: loc.lng };
+  const locExact = SEARCHABLE_LOCATIONS.find((l) => {
+    const display = getBuildingDisplayName(l.label)?.toLowerCase() || "";
+    return display === q || (l.label?.toLowerCase() || "") === q;
+  });
+
+  if (locExact) {
+    return {
+      label: getBuildingDisplayName(locExact.label),
+      lat: locExact.lat,
+      lng: locExact.lng,
+    };
+  }
+
+  const locFuzzy = SEARCHABLE_LOCATIONS.find((l) => {
+    const display = getBuildingDisplayName(l.label)?.toLowerCase() || "";
+    const raw = l.label?.toLowerCase() || "";
+    return display.includes(q) || q.includes(display) || raw.includes(q) || q.includes(raw);
+  });
+
+  if (locFuzzy) {
+    return {
+      label: getBuildingDisplayName(locFuzzy.label),
+      lat: locFuzzy.lat,
+      lng: locFuzzy.lng,
+    };
   }
 
   return { label: name, lat: null, lng: null };
