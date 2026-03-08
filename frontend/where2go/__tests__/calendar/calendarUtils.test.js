@@ -1,7 +1,7 @@
 import {
   getValidCalendarIds,
   fetchCalendarsIfPermitted,
-} from "../src/utils/calendarUtils";
+} from "../../src/utils/calendarUtils";
 import * as Calendar from "expo-calendar";
 
 jest.mock("expo-calendar");

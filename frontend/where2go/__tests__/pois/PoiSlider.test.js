@@ -23,7 +23,7 @@ const MOCK_RESULTS = [
 
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import PoiSlider from '../src/PoiSlider';
+import PoiSlider from '../../src/PoiSlider';
 
 
 describe('PoiSlider', () => {

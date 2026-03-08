@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { Linking } from 'react-native';
-import BuildingInfoModal from '../src/BuildingInfoModal';
+import BuildingInfoModal from '../../src/BuildingInfoModal';
 
 beforeAll(() => {
     jest.spyOn(Linking, 'openURL').mockImplementation(() => Promise.resolve());

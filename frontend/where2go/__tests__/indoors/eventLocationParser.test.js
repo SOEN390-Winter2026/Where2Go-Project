@@ -1,4 +1,4 @@
-import { parseEventLocation } from '../src/utils/eventLocationParser';
+import { parseEventLocation } from '../../src/utils/eventLocationParser';
 
 describe('parseEventLocation', () => {
   describe('invalid or empty input', () => {
@@ -75,7 +75,7 @@ describe('parseEventLocation', () => {
   });
 
   describe('multi-line or comma-separated', () => {
-    it('parses "Hall Building\\n1455 Boulevard de Maisonneuve Ouest"', () => {
+    it(String.raw`parses "Hall Building\n1455 Boulevard de Maisonneuve Ouest"`, () => {
       expect(parseEventLocation('Hall Building\n1455 Boulevard de Maisonneuve Ouest')).toEqual({
         building: 'H',
         room: null,

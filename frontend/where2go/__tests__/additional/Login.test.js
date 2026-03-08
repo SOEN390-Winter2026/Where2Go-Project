@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import LoginScreen from '../src/Login.js';
+import LoginScreen from '../../src/Login.js';
 
 describe('LoginScreen', () => {
     const mockOnSkip = jest.fn();

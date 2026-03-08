@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import polyline from "@mapbox/polyline";
 import { StyleSheet, View, Pressable } from "react-native";
-import React, { useState, useEffect, useRef, use } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -434,8 +434,8 @@ const styles = StyleSheet.create({
   mapPlaceholder: { ...StyleSheet.absoluteFillObject },
   cancelButton: {
     position: "absolute",
-    bottom: 30,
-    left: 20,
+    top: '12%',
+    right: '3%',
     backgroundColor: "#912338",
     width: 46,
     height: 46,

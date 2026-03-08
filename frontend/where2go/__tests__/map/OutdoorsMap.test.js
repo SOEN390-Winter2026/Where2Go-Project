@@ -1,6 +1,6 @@
 import { act, render, fireEvent } from '@testing-library/react-native';
-import SideLeftBar from '../src/SideLeftBar.js';
-import TopRightMenu from '../src/TopRightMenu.js';
+import SideLeftBar from '../../src/SideLeftBar.js';
+import TopRightMenu from '../../src/TopRightMenu.js';
 import { Pressable, Text } from 'react-native';
 import React, { useState } from 'react';
 
