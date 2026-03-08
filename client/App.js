@@ -5,7 +5,6 @@ import { StyleSheet, View, Pressable } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
-
 import CampusMap from "./src/Map";
 import SideLeftBar from "./src/SideLeftBar";
 import TopRightMenu from "./src/TopRightMenu";
@@ -115,7 +114,6 @@ export default function App() {
   setShowOutdoorDirection(false);
   requestAnimationFrame(() => fitRoute(coords));
 };
-
 
   const handleCancelRoute = () => {
     setActiveRouteCoords([]);
