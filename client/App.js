@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import polyline from "@mapbox/polyline";
+import { buildRouteFromResponse } from './src/services/routeServices';
+import { resolveEventDestination } from './src/services/eventServices';
 import { StyleSheet, View, Pressable } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
@@ -29,12 +30,6 @@ const colors = {
   buildingHighlightStroke: "rgba(107,15,26,0.85)",
   destinationHighlightFill: "rgba(30,136,229,0.25)",
 };
-
-function decodePolylineToCoords(encoded) {
-  if (!encoded) return [];
-  const pts = polyline.decode(encoded);
-  return pts.map(([latitude, longitude]) => ({ latitude, longitude }));
-}
 
 export default function App() {
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
@@ -112,26 +107,15 @@ export default function App() {
   })();
 
   const handleSelectRoute = ({ route, origin, destination }) => {
-    const coords = decodePolylineToCoords(route?.polyline);
+  const { coords, segments } = buildRouteFromResponse({ route });
+  setActiveRouteCoords(coords);
+  setActiveRouteMeta({ route, origin, destination });
+  setActiveSegments(segments);
+  setIsRouteActive(true);
+  setShowOutdoorDirection(false);
+  requestAnimationFrame(() => fitRoute(coords));
+};
 
-    setActiveRouteCoords(coords);
-    setActiveRouteMeta({ route, origin, destination });
-
-    const steps = Array.isArray(route?.steps) ? route.steps : [];
-    const segments = steps
-      .map((s) => {
-        const c = decodePolylineToCoords(s?.polyline);
-        if (!c.length) return null;
-        return { coords: c, isWalk: s?.type === "walk", vehicle: s?.vehicle };
-      })
-      .filter(Boolean);
-
-    setActiveSegments(segments);
-    setIsRouteActive(true);
-    setShowOutdoorDirection(false);
-
-    requestAnimationFrame(() => fitRoute(coords));
-  };
 
   const handleCancelRoute = () => {
     setActiveRouteCoords([]);
@@ -141,43 +125,20 @@ export default function App() {
   };
 
   const handleGenerateDirectionsFromEvent = ({ buildingCode, room, event }) => {
-    if (!buildingCode) {
-      console.log(
-        "Cannot generate directions: event location did not resolve to a building code.",
-        event?.location
-      );
-      return;
-    }
-
-    const dest = getDestinationFromBuildingCode(buildingCode, buildings);
-    if (!dest) {
-      console.log(
-        "Cannot generate directions: no building found for code or building has no coordinates.",
-        buildingCode
-      );
-      return;
-    }
-
-    const targetBuilding = buildings.find((b) => b.code === buildingCode);
-
-    let origin = null;
-    if (userLocation?.latitude != null && userLocation?.longitude != null) {
-      origin = {
-        label: "Your location",
-        lat: userLocation.latitude,
-        lng: userLocation.longitude,
-      };
-    }
-
-    setDirectionDestination(dest);
-    setDirectionOrigin(origin);
-
-    setDepartureBuilding(null);
-    setDestinationBuilding(targetBuilding);
-    setDestinationPoi(null);
-    setShowCalendar(false);
-    setShowOutdoorDirection(true);
-  };
+  const result = resolveEventDestination({ buildingCode, buildings, userLocation });
+  if (!result) {
+    console.log("Cannot generate directions for event.", event?.location);
+    return;
+  }
+  const { dest, targetBuilding, origin } = result;
+  setDirectionDestination(dest);
+  setDirectionOrigin(origin);
+  setDepartureBuilding(null);
+  setDestinationBuilding(targetBuilding);
+  setDestinationPoi(null);
+  setShowCalendar(false);
+  setShowOutdoorDirection(true);
+};
 
   const handleBuildingPress = (building) => {
     if (isPressedPOI) {
