@@ -42,7 +42,6 @@ Where2Go-Project/
 ├── server/         # Express backend
 ├── client/         # React Native / Expo frontend
 ├── .env            # Shared environment variables (not committed)
-└── .env.test       # Test environment variables (not committed)
 ```
 
 ## Installation
