@@ -1,0 +1,72 @@
+appId: host.exp.exponent
+---
+# US-3.1 Generate directions to my next class
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "menu-button"
+- tapOn: Calendar
+- waitForAnimationToEnd
+
+# connect to calendar
+- tapOn:
+    id: "openModalBtn"
+- waitForAnimationToEnd
+- tapOn:
+    id: "calBtn"
+- waitForAnimationToEnd
+
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "OK"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "saveBtn"
+    timeout: 15000
+
+# Select and save at least one calendar
+- tapOn:
+    id: "checkbox-.*"
+    index: 0
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "saveBtn"
+- waitForAnimationToEnd
+
+- extendedWaitUntil:
+    visible:
+      text: "Upcoming Events"
+    timeout: 10000
+
+# Tap event with Concordia location 
+- tapOn:
+    id: "event-item-.*"
+    index: 0
+- waitForAnimationToEnd
+
+# Assert directions screen appears with route options
+- assertVisible: "Plan Your Trip"
+- tapOn:
+    id: "inputStartLoc"
+- waitForAnimationToEnd
+- tapOn:
+    text: "Set to Your Location"
+    optional: true
+- waitForAnimationToEnd
+# Location permission 
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "While using the app"
+    optional: true
+- waitForAnimationToEnd
+
+- assertVisible:
+    text: "Walking"
+    
