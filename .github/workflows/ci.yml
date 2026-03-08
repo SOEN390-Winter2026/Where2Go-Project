@@ -21,21 +21,27 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Create .env file
+        run: |
+          echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> .env
+          echo "PORT=3000" >> .env
+          echo "API_URL=http://localhost:3000" >> .env
+
       # Backend
       - name: Setup backend dependencies
-        run: cd backend && npm install
+        run: cd server && npm install
 
       - name: Run backend tests with coverage
         timeout-minutes: 10
-        run: cd backend && npm test -- --coverage
+        run: cd server && npm test -- --coverage
 
       # Frontend  
       - name: Setup frontend dependencies
-        run: cd frontend/where2go && npm install
+        run: cd client && npm install
 
       - name: Run frontend tests with coverage
         timeout-minutes: 10
-        run: cd frontend/where2go && npm run test:ci -- --coverage --maxWorkers=2
+        run: cd client && npm run test:ci -- --coverage --maxWorkers=2
 
       # SonarQube
       - name: SonarQube Scan
@@ -47,7 +53,7 @@ jobs:
       # Backend smoke check
       - name: Start server (smoke check)
         run: |
-          cd backend
+          cd server
           node src/app.js &
           sleep 5
           pkill -f "node src/app.js" || true
