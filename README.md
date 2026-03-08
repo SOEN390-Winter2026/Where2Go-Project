@@ -37,7 +37,7 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 - SonarQube, used for code analysis and quality
 
 ## Project Structure
-```
+
 Where2Go-Project/
 ├── server/         # Express backend
 ├── client/         # React Native / Expo frontend
@@ -62,7 +62,6 @@ Go to WHERE2GO-PROJECT root directory:
 Create a file named - root level
 ``` .env ```
 
-Follow this template with your own IP Address and API_KEY
 ```
 API_URL=http:your_ip_address
 GOOGLE_MAPS_API_KEY=your_google_maps_key_here
@@ -103,7 +102,7 @@ Open path for server folder
 
 ```npm run test```
 
-For backend dev mode: ```npm run dev```
+For backend/server dev mode: ```npm run dev```
 
 For watch mode: ```npm run test:watch```
 
