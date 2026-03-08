@@ -36,13 +36,20 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 **Additional:**
 - SonarQube, used for code analysis and quality
 
+## Project Structure
+```
+Where2Go-Project/
+├── server/         # Express backend
+├── client/         # React Native / Expo frontend
+├── .env            # Shared environment variables (not committed)
+└── .env.test       # Test environment variables (not committed)
 
 ## Installation
 
 Before running anything, you must have the requirements:
 - Nodejs installed
 
-For both backend and frontend, open path for folders where ``\backend\src`` and ``\frontend\where2go``
+For both frontend and backend, open path for folders where ``\client`` and ``\server``
 
 Run ```npm install```
 
@@ -50,9 +57,9 @@ Run ```npm install```
 
 In order to generate the map and its components, users need the API_KEY. The API_URL will allow users to run their application in Expo Go.
 
-Go to where2go directory:
-``` cd frontend/where2go ```
-Create a file named
+Go to WHERE2GO-PROJECT root directory:
+``` cd client```
+Create a file named - root level
 ``` .env ```
 
 Follow this template with your own IP Address and API_KEY
@@ -63,17 +70,20 @@ GOOGLE_MAPS_API_KEY=your_google_maps_key_here
 
 ## How to run
 
-### Backend
+### Backend/Server
+
+
+``cd server``
 
 ``npm run dev``
 
 ``npm start``
 
-### Frontend
+### Frontend/Client
 
 To run your project, navigate to the directory and run one of the following npm commands.
 
-- cd where2go
+- cd client
 - npm run android
 - npm run ios # you need to use macOS to build the iOS project - use the Expo app if you need to do iOS development without a Mac     
 - npm run web
@@ -87,9 +97,9 @@ npx expo run:android
 
 ## Testing
 
-### Backend
+### Backend/Server
 
-Open path for backend folder
+Open path for server folder
 
 ```npm run test```
 
@@ -97,11 +107,15 @@ For backend dev mode: ```npm run dev```
 
 For watch mode: ```npm run test:watch```
 
-### Frontend
+For Coverage: ```npm test -- --coverage```
 
-Open path for frontend folder
+### Frontend/Client
+
+Open path for client folder
 
 ```npm run test```
+
+For Coverage: ```npm test -- --coverage```
 
 ## Packages & Dependencies
 
