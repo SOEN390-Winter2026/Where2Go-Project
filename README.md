@@ -37,12 +37,13 @@ Where2Go is a mobile navigation system designed to help students, faculty, and v
 - SonarQube, used for code analysis and quality
 
 ## Project Structure
-
+```
 Where2Go-Project/
 ├── server/         # Express backend
 ├── client/         # React Native / Expo frontend
 ├── .env            # Shared environment variables (not committed)
 └── .env.test       # Test environment variables (not committed)
+```
 
 ## Installation
 
