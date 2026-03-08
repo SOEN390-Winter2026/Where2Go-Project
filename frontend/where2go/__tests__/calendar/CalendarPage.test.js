@@ -1187,4 +1187,77 @@ describe('CalendarPage', () => {
             })
         );
     });
+
+    it("renders selectedCalendarsModalTitle when Selected Calendars modal is visible", async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+        Calendar.getEventsAsync.mockResolvedValue([]);
+
+        const { getByTestId, getByText, findByText, findByTestId, getByLabelText } = render(<CalendarPage />);
+
+        fireEvent.press(getByTestId("openModalBtn"));
+        fireEvent.press(getByTestId("calBtn"));
+        await findByText("Work");
+        fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+        fireEvent.press(getByText("Done"));
+
+        await findByTestId("mock-calendar");
+        fireEvent.press(getByLabelText("Selected calendars"));
+
+        expect(await findByTestId("selectedCalendarsModalTitle")).toBeTruthy();
+    });
+
+    it("Disconnect button clears saved calendars and resets to No Calendar Yet", async () => {
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+        Calendar.getEventsAsync.mockResolvedValue([]);
+
+        const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } =
+            render(<CalendarPage />);
+
+        fireEvent.press(getByTestId("openModalBtn"));
+        fireEvent.press(getByTestId("calBtn"));
+        await findByText("Work");
+        fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+        fireEvent.press(getByText("Done"));
+
+        await findByTestId("mock-calendar");
+        fireEvent.press(getByLabelText("Selected calendars"));
+        await findByText("Selected Calendars");
+
+        fireEvent.press(getByTestId("selectedCalsDisconnectBtn"));
+
+        await waitFor(() => {
+            expect(AsyncStorage.removeItem).toHaveBeenCalledWith("where2go_saved_calendar_ids");
+        });
+        await waitFor(() => {
+            expect(queryByText("No Calendar Yet")).toBeTruthy();
+        });
+    });
+
+    it("Disconnect button still resets state when AsyncStorage.removeItem throws", async () => {
+        AsyncStorage.removeItem.mockRejectedValueOnce(new Error("Storage error"));
+        Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+        Calendar.getEventsAsync.mockResolvedValue([]);
+
+        const { getByTestId, getByText, findByText, findByTestId, queryByText, getByLabelText } =
+            render(<CalendarPage />);
+
+        fireEvent.press(getByTestId("openModalBtn"));
+        fireEvent.press(getByTestId("calBtn"));
+        await findByText("Work");
+        fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+        fireEvent.press(getByText("Done"));
+
+        await findByTestId("mock-calendar");
+        fireEvent.press(getByLabelText("Selected calendars"));
+        await findByText("Selected Calendars");
+
+        fireEvent.press(getByTestId("selectedCalsDisconnectBtn"));
+
+        await waitFor(() => {
+            expect(queryByText("No Calendar Yet")).toBeTruthy();
+        });
+    });
 });
