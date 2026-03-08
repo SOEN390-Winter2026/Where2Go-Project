@@ -9,8 +9,9 @@ import { API_URL } from '@env';
  * - Physical devices: use your computer's IP in API_URL (e.g. http://192.168.1.5:3000).
  */
 
-// NOSONAR - HTTP allowed for local development
+
 export const API_BASE_URL = 
   (typeof API_URL === 'string' && API_URL.trim()?.replace(/\/$/, '')) ||
-  (Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000');
+  (Platform.OS === 'android' ? 'http://10.0.2.2:3000' : // NOSONAR - HTTP allowed for local development
+    'http://localhost:3000');// NOSONAR - HTTP allowed for local development
 
