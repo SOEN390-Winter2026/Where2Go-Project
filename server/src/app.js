@@ -1,0 +1,80 @@
+const dotenv = require("dotenv");
+dotenv.config({ path: require("path").resolve(__dirname, "../../.env") });
+
+const express = require("express");
+const cors = require("cors");
+const { getCampusCoordinates, getBuildings } = require("./services/map");
+const { getTransportOptionsResult } = require("./services/directions");
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+    res.json({ message: "Backend is running" });
+});
+
+// Endpoint to get campus coordinates (SGW or Loyola)
+app.get("/campus/:name", (req, res) => {
+    console.log("Backend received request for campus:", req.params.name);
+    const campus = getCampusCoordinates(req.params.name);
+    if (!campus) return res.status(404).json({ error: "Campus not found" });
+    res.json(campus);
+});
+
+// Endpoint to get building polygons for a campus (for map highlighting)
+app.get("/campus/:name/buildings", (req, res) => {
+    const buildings = getBuildings(req.params.name);
+    res.json(buildings);
+});
+
+// GET /directions?originLat=&originLng=&destLat=&destLng=&clientTime=
+// clientTime: optional ISO string from user's device for shuttle schedule (uses device time)
+// Returns walking, transit, and Concordia shuttle routes
+app.get("/directions", async (req, res) => {
+    const originLat = Number.parseFloat(req.query.originLat);
+    const originLng = Number.parseFloat(req.query.originLng);
+    const destLat = Number.parseFloat(req.query.destLat);
+    const destLng = Number.parseFloat(req.query.destLng);
+    const clientTime = req.query.clientTime && String(req.query.clientTime).trim();
+
+    if (Number.isNaN(originLat) || Number.isNaN(originLng) || Number.isNaN(destLat) || Number.isNaN(destLng)) {
+        return res.status(400).json({ error: "Invalid origin/destination coordinates" });
+    }
+
+    const origin = { lat: originLat, lng: originLng };
+    const destination = { lat: destLat, lng: destLng };
+    const opts = clientTime ? { clientTime } : {};
+
+    try {
+    const result = await getTransportOptionsResult(origin, destination, opts);
+
+    if (result.ok) {
+        return res.json({ routes: result.routes });
+    }
+
+    if (result.error?.code === "UPSTREAM_FAILED") {
+        return res.status(502).json({ routes: [], error: result.error });
+    }
+
+    return res.status(200).json({ routes: [], error: result.error });
+    } catch (err) {
+        console.error("Directions error:", err);
+        res.status(500).json({
+            routes: [],
+            error: { code: "UPSTREAM_FAILED", message: "Failed to fetch directions" },
+        });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0",() => {
+    console.log(`Backend server running on http://0.0.0.0:${PORT}`);
+
+// app.listen(3000, '0.0.0.0', () => {
+//     console.log(`Backend server running on http://localhost:${PORT}`);
+
+});
+
+module.exports = app;
