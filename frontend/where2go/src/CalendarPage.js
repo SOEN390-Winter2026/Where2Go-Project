@@ -63,7 +63,7 @@ function formatTimeRange(event) {
   return "Time not specified";
 }
 
-export default function CalendarPage({ onPressBack }) {
+export default function CalendarPage({ onPressBack, onGenerateDirections }) {
   const [visible, setVisible] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
 
@@ -343,7 +343,25 @@ export default function CalendarPage({ onPressBack }) {
                         key={event.id}
                         testID={`event-item-${event.id}`}
                         style={styles.eventRow}
-                        onPress={() => console.log("Selected event:", event.title)}
+                        onPress={() => {
+                          if (!onGenerateDirections) return;
+                          const parsed = parseEventLocation(event.location);
+                          if (!parsed || !parsed.building) {
+                            console.log("Event location is missing or not a Concordia building. Skipping directions.");
+                            Alert.alert(
+                              "Cannot Generate Directions",
+                              "This event has no location or the location is not a Concordia building.",
+                              [{ text: "OK" }]
+                            );
+                            return;
+                          }
+                          onGenerateDirections({
+                            event,
+                            buildingCode: parsed.building,
+                            room: parsed.room ?? null,
+                            rawLocation: event.location ?? null,
+                          });
+                        }}
                       >
                         <View style={styles.leftAccent} />
 
@@ -392,7 +410,7 @@ export default function CalendarPage({ onPressBack }) {
                   onPress={() => {}}
                 >
                   <View style={styles.selectedCalsHeader}>
-                    <Text style={styles.selectedCalsTitle}>Selected Calendars</Text>
+                    <Text style={styles.selectedCalsTitle} testID="selectedCalendarsModalTitle">Selected Calendars</Text>
 
                     <Pressable
                       testID="selectedCalsCloseBtn"
@@ -402,36 +420,61 @@ export default function CalendarPage({ onPressBack }) {
                     </Pressable>
                   </View>
 
-                  {chosenCalendars.length === 0 ? (
-                    <Text style={styles.selectedCalsEmpty}>
-                      No calendars selected. Tap "Change" to choose calendars.
-                    </Text>
-                  ) : (
-                    chosenCalendars.map((cal) => (
-                      <View key={cal.id} style={styles.calRow}>
-                        <View
-                          style={[
-                            styles.colorDot,
-                            { backgroundColor: cal.color || "#912338" },
-                          ]}
-                        />
-                        <Text style={styles.calName} numberOfLines={1}>
-                          {cal.title}
-                        </Text>
-                      </View>
-                    ))
-                  )}
-
-                  <Pressable
-                    testID="selectedCalsChangeBtn"
-                    style={styles.changeBtn}
-                    onPress={() => {
-                      setSelectedCalsModalVisible(false);
-                      setIsCalendarsChosen(false);
-                    }}
+                  <ScrollView
+                    style={styles.selectedCalsList}
+                    showsVerticalScrollIndicator={false}
                   >
-                    <Text style={styles.changeBtnTxt}>Change</Text>
-                  </Pressable>
+                    {chosenCalendars.length === 0 ? (
+                      <Text style={styles.selectedCalsEmpty}>
+                        No calendars selected. Tap "Change" to choose calendars.
+                      </Text>
+                    ) : (
+                      chosenCalendars.map((cal) => (
+                        <View key={cal.id} style={styles.calRow}>
+                          <View
+                            style={[
+                              styles.colorDot,
+                              { backgroundColor: cal.color || "#912338" },
+                            ]}
+                          />
+                          <Text style={styles.calName} numberOfLines={1}>
+                            {cal.title}
+                          </Text>
+                        </View>
+                      ))
+                    )}
+                  </ScrollView>
+
+                  <View style={styles.modalActions}>
+                    <Pressable
+                      testID="selectedCalsChangeBtn"
+                      style={styles.changeBtn}
+                      onPress={() => {
+                        setSelectedCalsModalVisible(false);
+                        setIsCalendarsChosen(false);
+                      }}
+                    >
+                      <Text style={styles.changeBtnTxt}>Change</Text>
+                    </Pressable>
+                    <Pressable
+                      testID="selectedCalsDisconnectBtn"
+                      style={styles.disconnectBtn}
+                      onPress={async () => {
+                        setSelectedCalsModalVisible(false);
+                        try {
+                          await AsyncStorage.removeItem(SAVED_CALENDAR_IDS_KEY);
+                        } catch (e) {
+                          // ignore
+                        }
+                        setCalendars([]);
+                        setSelectedCalendarIds([]);
+                        setIsCalendarConnected(false);
+                        setIsCalendarsChosen(false);
+                      }}
+                    >
+                      <Text style={styles.disconnectBtnTxt}>Disconnect</Text>
+                    </Pressable>
+                  </View>
                 </Pressable>
               </Pressable>
             </Modal>
@@ -462,7 +505,7 @@ export default function CalendarPage({ onPressBack }) {
                 onPress={async () => {
                   if (selectedCalendarIds.length > 0) {
                     try {
-                      const idsToSave = selectedCalendarIds.map((id) => String(id));
+                      const idsToSave = selectedCalendarIds.map(String);
                       await AsyncStorage.setItem(
                         SAVED_CALENDAR_IDS_KEY,
                         JSON.stringify(idsToSave)
@@ -532,6 +575,9 @@ export default function CalendarPage({ onPressBack }) {
 
 CalendarPage.propTypes = {
   onPressBack: PropTypes.func.isRequired,
+  onPressCalendar: PropTypes.func,
+  title: PropTypes.string,
+  onGenerateDirections: PropTypes.func,
 };
 
 /* Styles CSS*/
@@ -796,6 +842,9 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "#111",
   },
+  selectedCalsList: {
+    maxHeight: 220,
+  },
   selectedCalsEmpty: {
     color: "#666",
     fontWeight: "700",
@@ -817,9 +866,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#222",
   },
+  modalActions: {
+    flexDirection: "row",
+    marginTop: 14,
+    justifyContent: "flex-end",
+    gap: 10,
+  },
   changeBtn: {
-    marginTop: 10,
-    alignSelf: "flex-end",
     backgroundColor: "#912338",
     paddingVertical: 10,
     paddingHorizontal: 14,
@@ -828,6 +881,17 @@ const styles = StyleSheet.create({
   changeBtnTxt: {
     color: "#fff",
     fontWeight: "900",
+  },
+  disconnectBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  disconnectBtnTxt: {
+    color: "#666",
+    fontWeight: "600",
   },
 });
 

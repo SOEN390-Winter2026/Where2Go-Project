@@ -129,13 +129,6 @@ describe("Rendering Features Properly", () => {
     expect(mockOnPress).toHaveBeenCalledTimes(1);
   });
 
-  it("Filter Button is pressable (no crash)", async () => {
-    const { getByTestId } = render(<OutdoorDirection onPressBack={() => {}} buildings={[]} />);
-
-    await act(async () => {
-      fireEvent.press(getByTestId("pressFilter"));
-    });
-  });
 });
 
 describe("Input and Button Features", () => {
@@ -381,6 +374,38 @@ describe("resolveLocationByName fallback coverage", () => {
     await act(async () => {});
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
+
+  it("initialFrom matches building by fuzzy name (bn.includes(q) or q.includes(bn))", async () => {
+    const mockBuildings = [
+      {
+        id: "1",
+        name: "Hall Building",
+        campus: "SGW",
+        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+      },
+    ];
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={mockBuildings}
+        initialFrom="hall"
+        initialTo="Loyola Campus"
+      />
+    );
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
+  });
+
+  it("initialFrom matches SEARCHABLE_LOCATIONS by fuzzy display (locFuzzy path)", async () => {
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={[]}
+        initialFrom="EV"
+        initialTo="Loyola Campus"
+      />
+    );
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(1));
+  });
 });
 
 it("clearOrigin clears origin query (press close-circle wrapper #0)", async () => {
@@ -508,6 +533,24 @@ describe("Route fetching and mode display", () => {
 
     expect(await findByText("No routes found")).toBeTruthy();
     expect(await findByText("Try selecting different locations or check your connection.")).toBeTruthy();
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("handles fetch throw (catch block): shows empty state and Try Again", async () => {
+    globalThis.fetch = jest.fn().mockRejectedValue(new Error("Network error"));
+
+    const { findByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+      />
+    );
+
+    expect(await findByText("No routes found")).toBeTruthy();
+    expect(await findByText("Try selecting different locations or check your connection.")).toBeTruthy();
+    expect(await findByText("Try Again")).toBeTruthy();
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 

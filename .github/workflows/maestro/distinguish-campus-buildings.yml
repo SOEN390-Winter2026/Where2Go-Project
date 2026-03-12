@@ -1,0 +1,25 @@
+appId: host.exp.exponent
+---
+# US-1.2: Distinguish SGW and Loyola campus buildings from local/city buildings
+
+- tapOn: Skip
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: mapRef
+    timeout: 15000
+
+# Default campus is SGW
+- assertVisible: SGW
+
+# Toggle to Loyola
+- tapOn:
+    id: campusToggle
+- waitForAnimationToEnd
+- assertVisible: Loyola
+
+# Toggle back to SGW
+- tapOn:
+    id: campusToggle
+- waitForAnimationToEnd
+- assertVisible: SGW

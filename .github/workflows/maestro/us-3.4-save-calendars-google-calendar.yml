@@ -1,0 +1,61 @@
+appId: host.exp.exponent
+---
+# US-3.4 Save the calendars from Google Calendar
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "menu-button"
+- tapOn: Calendar
+- waitForAnimationToEnd
+
+# Connect
+- tapOn:
+    id: "openModalBtn"
+- waitForAnimationToEnd
+- tapOn:
+    id: "calBtn"
+- waitForAnimationToEnd
+
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "OK"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "saveBtn"
+    timeout: 15000
+
+# Select at least one calendar
+- tapOn:
+    id: "checkbox-.*"
+    index: 0
+- waitForAnimationToEnd
+
+# Save calendars
+- tapOn:
+    id: "saveBtn"
+- waitForAnimationToEnd
+
+# Verify we see the calendar view 
+- extendedWaitUntil:
+    visible:
+      text: "Upcoming Events"
+    timeout: 10000
+
+# Close calendar
+- tapOn:
+    id: "pressBack"
+- waitForAnimationToEnd
+
+# Reopen Calendar 
+- tapOn:
+    id: "menu-button"
+- tapOn: Calendar
+- waitForAnimationToEnd
+
+# Verify calendar view is shown with saved calendars 
+- assertNotVisible: "No Calendar Yet"
+- assertVisible: "Upcoming Events"

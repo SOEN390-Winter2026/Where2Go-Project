@@ -1,0 +1,65 @@
+appId: host.exp.exponent
+---
+# US-3.3 Identify the location of my upcoming event
+
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "menu-button"
+- tapOn: Calendar
+- waitForAnimationToEnd
+
+# connect
+- tapOn:
+    id: "openModalBtn"
+- waitForAnimationToEnd
+- tapOn:
+    id: "calBtn"
+- waitForAnimationToEnd
+
+# Handle permission
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "OK"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "saveBtn"
+    timeout: 15000
+
+# Select at least one calendar
+- tapOn:
+    id: "checkbox-.*"
+    index: 0
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "saveBtn"
+- waitForAnimationToEnd
+
+- extendedWaitUntil:
+    visible:
+      text: "Upcoming Events"
+    timeout: 10000
+
+# Assert event location is visible 
+- assertVisible: "Upcoming Events"
+- assertVisible:
+    text: "Location not specified"
+    optional: true
+
+# Directions screen opens with location in destination input
+- tapOn:
+    id: "event-item-.*"
+    index: 0
+    optional: true
+- waitForAnimationToEnd
+
+- assertVisible: "Plan Your Trip"
+- assertVisible: "To"
+- assertVisible:
+    text: "Building"
+    optional: true

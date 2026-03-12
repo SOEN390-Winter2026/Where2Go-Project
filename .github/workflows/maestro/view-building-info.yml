@@ -1,0 +1,38 @@
+appId: host.exp.exponent
+---
+# US-1.4: View detailed building information (Grey Nuns Building)
+
+- tapOn: Skip
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: mapRef
+    timeout: 150
+
+# Wait for the map to finish animating to SGW campus zoom level
+- waitForAnimationToEnd
+
+# Tap on Grey Nuns Building marker
+- tapOn:
+    point: "53%,75%"
+- waitForAnimationToEnd
+
+# Verify the BuildingInfoModal shows Grey Nuns Building details
+- assertVisible: "Grey Nuns Building"
+- assertVisible: "GN"
+- assertVisible: "Address"
+- assertVisible: "1190 Guy St, Montreal, QC"
+- assertVisible: "View on Concordia.ca"
+- assertVisible: "Services"
+- assertVisible: "Services info coming soon."
+- assertVisible: "Set as Departure"
+- assertVisible: "Set as Destination"
+
+# Close the modal
+- tapOn:
+    point: "50%,25%"
+- waitForAnimationToEnd
+
+# Verify we're back on the map
+- assertVisible:
+    id: mapRef

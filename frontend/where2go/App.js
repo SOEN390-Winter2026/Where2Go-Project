@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import polyline from "@mapbox/polyline";
 import { StyleSheet, View, Pressable } from "react-native";
-import React, { useState, useEffect, useRef, use } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -17,6 +17,7 @@ import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
 import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
+import { getDestinationFromBuildingCode } from './src/utils/eventDestinationResolver';
 
 const CAMPUS_COORDS = {
   SGW: { latitude: 45.4974, longitude: -73.5771 },
@@ -78,6 +79,8 @@ export default function App() {
   const [activeRouteMeta, setActiveRouteMeta] = useState(null);
   const [activeSegments, setActiveSegments] = useState([]);
   const [isRouteActive, setIsRouteActive] = useState(false);
+  const [directionOrigin, setDirectionOrigin] = useState(null);
+  const [directionDestination, setDirectionDestination] = useState(null);
 
   const handlePoisChange = (poisFromSlider) => {
     setSelectedPois(poisFromSlider);
@@ -135,6 +138,45 @@ export default function App() {
     setActiveSegments([]);
     setActiveRouteMeta(null);
     setIsRouteActive(false);
+  };
+
+  const handleGenerateDirectionsFromEvent = ({ buildingCode, room, event }) => {
+    if (!buildingCode) {
+      console.log(
+        "Cannot generate directions: event location did not resolve to a building code.",
+        event?.location
+      );
+      return;
+    }
+
+    const dest = getDestinationFromBuildingCode(buildingCode, buildings);
+    if (!dest) {
+      console.log(
+        "Cannot generate directions: no building found for code or building has no coordinates.",
+        buildingCode
+      );
+      return;
+    }
+
+    const targetBuilding = buildings.find((b) => b.code === buildingCode);
+
+    let origin = null;
+    if (userLocation?.latitude != null && userLocation?.longitude != null) {
+      origin = {
+        label: "Your location",
+        lat: userLocation.latitude,
+        lng: userLocation.longitude,
+      };
+    }
+
+    setDirectionDestination(dest);
+    setDirectionOrigin(origin);
+
+    setDepartureBuilding(null);
+    setDestinationBuilding(targetBuilding);
+    setDestinationPoi(null);
+    setShowCalendar(false);
+    setShowOutdoorDirection(true);
   };
 
   const handleBuildingPress = (building) => {
@@ -239,18 +281,28 @@ export default function App() {
   if (showOutdoorDirection) {
     return (
       <OutdoorDirection
-        onPressBack={() => setShowOutdoorDirection(false)}
+        onPressBack={() => {
+          setShowOutdoorDirection(false);
+          setDirectionOrigin(null);
+          setDirectionDestination(null);
+        }}
         buildings={buildings}
+        origin={directionOrigin}
+        destination={directionDestination ?? destinationPoi}
         initialFrom={departureBuilding ? departureBuilding.name : ""}
         initialTo={destinationBuilding ? destinationBuilding.name : ""}
-        destination={destinationPoi}
         onSelectRoute={handleSelectRoute}
       />
     );
   }
 
   if (showCalendar) {
-    return <CalendarPage onPressBack={() => setShowCalendar(false)} />;
+    return (
+      <CalendarPage
+        onPressBack={() => setShowCalendar(false)}
+        onGenerateDirections={handleGenerateDirectionsFromEvent}
+      />
+    );
   }
 
   return (
@@ -382,8 +434,8 @@ const styles = StyleSheet.create({
   mapPlaceholder: { ...StyleSheet.absoluteFillObject },
   cancelButton: {
     position: "absolute",
-    bottom: 30,
-    left: 20,
+    top: '12%',
+    right: '3%',
     backgroundColor: "#912338",
     width: 46,
     height: 46,
