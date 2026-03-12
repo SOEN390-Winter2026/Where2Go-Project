@@ -1,0 +1,65 @@
+appId: host.exp.exponent
+---
+# US-3.2 View upcoming events from multiple calendars
+
+- tapOn: Skip
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "menu-button"
+- tapOn: Calendar
+- waitForAnimationToEnd
+
+# connect
+- tapOn:
+    id: "openModalBtn"
+- waitForAnimationToEnd
+- tapOn:
+    id: "calBtn"
+- waitForAnimationToEnd
+
+# Handle permission
+- tapOn:
+    text: "Allow"
+    optional: true
+- tapOn:
+    text: "OK"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "saveBtn"
+    timeout: 15000
+
+# Select multiple calendars (2 here))
+- tapOn:
+    id: "checkbox-.*"
+    index: 0
+- waitForAnimationToEnd
+- tapOn:
+    id: "checkbox-.*"
+    index: 1
+    optional: true
+- waitForAnimationToEnd
+
+# Save calendars
+- tapOn:
+    id: "saveBtn"
+- waitForAnimationToEnd
+
+# Verify calendar view with upcoming events 
+- extendedWaitUntil:
+    visible:
+      text: "Upcoming Events"
+    timeout: 10000
+
+# Open Selected calendars modal to verify multiple calendars are shown
+- tapOn:
+    text: "Selected calendars"
+- waitForAnimationToEnd
+
+# Assert modal content
+- extendedWaitUntil:
+    visible:
+      id: "selectedCalendarsModalTitle"
+    timeout: 5000
+

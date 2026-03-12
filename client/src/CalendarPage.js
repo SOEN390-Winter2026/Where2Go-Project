@@ -401,7 +401,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                   onPress={() => {}}
                 >
                   <View style={styles.selectedCalsHeader}>
-                    <Text style={styles.selectedCalsTitle}>Selected Calendars</Text>
+                    <Text style={styles.selectedCalsTitle} testID="selectedCalendarsModalTitle">Selected Calendars</Text>
 
                     <Pressable
                       testID="selectedCalsCloseBtn"
@@ -411,36 +411,61 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                     </Pressable>
                   </View>
 
-                  {chosenCalendars.length === 0 ? (
-                    <Text style={styles.selectedCalsEmpty}>
-                      No calendars selected. Tap "Change" to choose calendars.
-                    </Text>
-                  ) : (
-                    chosenCalendars.map((cal) => (
-                      <View key={cal.id} style={styles.calRow}>
-                        <View
-                          style={[
-                            styles.colorDot,
-                            { backgroundColor: cal.color || "#912338" },
-                          ]}
-                        />
-                        <Text style={styles.calName} numberOfLines={1}>
-                          {cal.title}
-                        </Text>
-                      </View>
-                    ))
-                  )}
-
-                  <Pressable
-                    testID="selectedCalsChangeBtn"
-                    style={styles.changeBtn}
-                    onPress={() => {
-                      setSelectedCalsModalVisible(false);
-                      setIsCalendarsChosen(false);
-                    }}
+                  <ScrollView
+                    style={styles.selectedCalsList}
+                    showsVerticalScrollIndicator={false}
                   >
-                    <Text style={styles.changeBtnTxt}>Change</Text>
-                  </Pressable>
+                    {chosenCalendars.length === 0 ? (
+                      <Text style={styles.selectedCalsEmpty}>
+                        No calendars selected. Tap "Change" to choose calendars.
+                      </Text>
+                    ) : (
+                      chosenCalendars.map((cal) => (
+                        <View key={cal.id} style={styles.calRow}>
+                          <View
+                            style={[
+                              styles.colorDot,
+                              { backgroundColor: cal.color || "#912338" },
+                            ]}
+                          />
+                          <Text style={styles.calName} numberOfLines={1}>
+                            {cal.title}
+                          </Text>
+                        </View>
+                      ))
+                    )}
+                  </ScrollView>
+
+                  <View style={styles.modalActions}>
+                    <Pressable
+                      testID="selectedCalsChangeBtn"
+                      style={styles.changeBtn}
+                      onPress={() => {
+                        setSelectedCalsModalVisible(false);
+                        setIsCalendarsChosen(false);
+                      }}
+                    >
+                      <Text style={styles.changeBtnTxt}>Change</Text>
+                    </Pressable>
+                    <Pressable
+                      testID="selectedCalsDisconnectBtn"
+                      style={styles.disconnectBtn}
+                      onPress={async () => {
+                        setSelectedCalsModalVisible(false);
+                        try {
+                          await AsyncStorage.removeItem(SAVED_CALENDAR_IDS_KEY);
+                        } catch (e) {
+                          // ignore
+                        }
+                        setCalendars([]);
+                        setSelectedCalendarIds([]);
+                        setIsCalendarConnected(false);
+                        setIsCalendarsChosen(false);
+                      }}
+                    >
+                      <Text style={styles.disconnectBtnTxt}>Disconnect</Text>
+                    </Pressable>
+                  </View>
                 </Pressable>
               </Pressable>
             </Modal>
@@ -795,6 +820,9 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "#111",
   },
+  selectedCalsList: {
+    maxHeight: 220,
+  },
   selectedCalsEmpty: {
     color: "#666",
     fontWeight: "700",
@@ -816,9 +844,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#222",
   },
+  modalActions: {
+    flexDirection: "row",
+    marginTop: 14,
+    justifyContent: "flex-end",
+    gap: 10,
+  },
   changeBtn: {
-    marginTop: 10,
-    alignSelf: "flex-end",
     backgroundColor: "#912338",
     paddingVertical: 10,
     paddingHorizontal: 14,
@@ -827,6 +859,17 @@ const styles = StyleSheet.create({
   changeBtnTxt: {
     color: "#fff",
     fontWeight: "900",
+  },
+  disconnectBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  disconnectBtnTxt: {
+    color: "#666",
+    fontWeight: "600",
   },
 });
 
