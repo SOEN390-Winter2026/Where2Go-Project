@@ -45,7 +45,7 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [userDraggedMap, setUserDraggedMap] = useState(false);
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
-  
+
   //indoors stuff
   const [showIndoorMaps, setShowIndoorMaps] = useState(false);
 
@@ -106,14 +106,14 @@ export default function App() {
   })();
 
   const handleSelectRoute = ({ route, origin, destination }) => {
-  const { coords, segments } = buildRouteFromResponse({ route });
-  setActiveRouteCoords(coords);
-  setActiveRouteMeta({ route, origin, destination });
-  setActiveSegments(segments);
-  setIsRouteActive(true);
-  setShowOutdoorDirection(false);
-  requestAnimationFrame(() => fitRoute(coords));
-};
+    const { coords, segments } = buildRouteFromResponse({ route });
+    setActiveRouteCoords(coords);
+    setActiveRouteMeta({ route, origin, destination });
+    setActiveSegments(segments);
+    setIsRouteActive(true);
+    setShowOutdoorDirection(false);
+    requestAnimationFrame(() => fitRoute(coords));
+  };
 
   const handleCancelRoute = () => {
     setActiveRouteCoords([]);
@@ -123,20 +123,20 @@ export default function App() {
   };
 
   const handleGenerateDirectionsFromEvent = ({ buildingCode, room, event }) => {
-  const result = resolveEventDestination({ buildingCode, buildings, userLocation });
-  if (!result) {
-    console.log("Cannot generate directions for event.", event?.location);
-    return;
-  }
-  const { dest, targetBuilding, origin } = result;
-  setDirectionDestination(dest);
-  setDirectionOrigin(origin);
-  setDepartureBuilding(null);
-  setDestinationBuilding(targetBuilding);
-  setDestinationPoi(null);
-  setShowCalendar(false);
-  setShowOutdoorDirection(true);
-};
+    const result = resolveEventDestination({ buildingCode, buildings, userLocation });
+    if (!result) {
+      console.log("Cannot generate directions for event.", event?.location);
+      return;
+    }
+    const { dest, targetBuilding, origin } = result;
+    setDirectionDestination(dest);
+    setDirectionOrigin(origin);
+    setDepartureBuilding(null);
+    setDestinationBuilding(targetBuilding);
+    setDestinationPoi(null);
+    setShowCalendar(false);
+    setShowOutdoorDirection(true);
+  };
 
   const handleBuildingPress = (building) => {
     if (isPressedPOI) {
@@ -193,8 +193,10 @@ export default function App() {
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
           setUserLocation({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
+            /*latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,*/
+            latitude: 45.49728435,
+            longitude: -73.5789607,
           });
         }
       );
@@ -321,7 +323,7 @@ export default function App() {
           })
         }
         onPressPOI={() => {
-          setIsPressedPOI( prev => {
+          setIsPressedPOI(prev => {
             if (prev) {
               setPoiOriginBuilding(null);
               setSelectedPois([]);
@@ -345,7 +347,7 @@ export default function App() {
           setDestinationBuilding(b);
           setDestinationPoi(null);
         }}
-        selectedRole={ getBuildingRole(selectedBuilding) }
+        selectedRole={getBuildingRole(selectedBuilding)}
         onGoInside={() => {
           setModalVisible(false);
           setShowIndoorMaps(true);
@@ -418,8 +420,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
-    elevation: 8,   
-    zIndex: 12,    
+    elevation: 8,
+    zIndex: 12,
     borderColor: "#912338",
     borderWidth: 1.5,
   }
