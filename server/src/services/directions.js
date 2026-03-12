@@ -42,6 +42,11 @@ const SHUTTLE_SCHEDULE = {
     lastDeparture: 1095,
   },
 };
+
+const SHUTTLE_STOPS = {
+  SGW: { lat: 45.4971, lng: -73.5785 }, 
+  Loyola: { lat: 45.458379, lng: -73.638374 }
+};
 /**
  * Get time in Montreal for a given date (minutes since midnight, 0–1439).
  * Uses user's device time when clientTime ISO string is provided.
@@ -345,18 +350,59 @@ function getNearestCampus(point) {
 async function getShuttleRouteIfApplicable(origin, destination, refDate = new Date()) {
   const fromCampus = getNearestCampus(origin);
   const toCampus = getNearestCampus(destination);
+  
   if (!fromCampus || !toCampus || fromCampus === toCampus) return null;
   if (!isShuttleOperatingNow(refDate)) return null;
 
-  const drivingRes = await fetchDirections(origin, destination, "driving");
-  const polyline = drivingRes?.json?.routes?.[0]?.overview_polyline?.points || null;
+  const startStop = SHUTTLE_STOPS[fromCampus];
+  const endStop = SHUTTLE_STOPS[toCampus];
+
+  // Fetch segments: Walk to Stop -> Shuttle Ride -> Walk to Destination
+  const [walkToRes, shuttleRes, walkFromRes] = await Promise.all([
+    fetchDirections(origin, startStop, "walking"),
+    fetchDirections(startStop, endStop, "driving"),
+    fetchDirections(endStop, destination, "walking")
+  ]);
+
+  if (!walkToRes.ok || !shuttleRes.ok || !walkFromRes.ok) return null;
+
+  const walkTo = normalizeRoute(walkToRes.json.routes[0], "walking");
+  const shuttleRide = normalizeRoute(shuttleRes.json.routes[0], "transit"); // driving polyline
+  const walkFrom = normalizeRoute(walkFromRes.json.routes[0], "walking");
+
+  // Compute total duration and distance
+  const totalSeconds =
+    (walkTo.duration?.value ?? 0) + 1800 + (walkFrom.duration?.value ?? 0);
+  const totalMeters =
+    (walkTo.distance?.value ?? 0) +
+    (shuttleRide.distance?.value ?? 0) +
+    (walkFrom.distance?.value ?? 0);
+
+  // Merge polylines: walking to stop + shuttle + walking from stop
+  const combinedPolyline = [
+    walkTo.polyline,
+    shuttleRide.polyline,
+    walkFrom.polyline
+  ].filter(Boolean).join("|"); 
+
   const nextDeparture = getNextDeparture(fromCampus, refDate);
 
   return {
     mode: "concordia_shuttle",
-    duration: { value: 1800, text: "30 min" },
-    distance: { value: 11000, text: "11 km" },
-    polyline,
+    duration: { value: totalSeconds, text: `${Math.round(totalSeconds / 60)} min` },
+    distance: { value: totalMeters, text: `${Math.round(totalMeters / 1000)} km` },
+    polyline: combinedPolyline,
+    steps: [
+      ...(walkTo.steps || []),
+      {
+        type: "concordia_shuttle",
+        duration: { value: 1800, text: "30 min" },
+        distance: shuttleRide.distance,
+        instruction: "Ride the Concordia Shuttle",
+        polyline: shuttleRide.polyline,
+      },
+      ...(walkFrom.steps || []),
+    ],
     nextDeparture,
     scheduleNote: nextDeparture
       ? `Next departure: ${nextDeparture}`
