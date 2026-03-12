@@ -3,10 +3,10 @@ module.exports = function(api) {
   api.cache.using(() => isTest);
   return {
     presets: ['babel-preset-expo'],
-    plugins: [
+    plugins: isTest ? [] : [
       ['module:react-native-dotenv', {
         moduleName: '@env',
-        path: isTest ? '.env.test' : '.env',
+        path: '../.env',
       }]
     ],
   };

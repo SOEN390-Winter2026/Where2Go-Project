@@ -39,6 +39,9 @@
   "jest": {
     "preset": "jest-expo",
     "silent": true,
+    "moduleNameMapper": {
+      "^@env$": "<rootDir>/__mocks__/@env.js"
+    },
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.test.{js,jsx,ts,tsx}",
