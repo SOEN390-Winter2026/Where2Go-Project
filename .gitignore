@@ -29,3 +29,21 @@ node_modules
 .expo/
 .vscode/
 /Where2Go/
+
+# Environment files
+.env.test
+server/.env
+client/.env
+client/.env.test
+
+# Dependencies
+server/node_modules/
+client/node_modules/
+
+# Coverage
+server/coverage/
+client/coverage/
+
+# Expo
+client/.expo/
+frontend/
