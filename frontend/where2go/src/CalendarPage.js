@@ -22,6 +22,7 @@ import PropTypes from "prop-types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { parseEventLocation } from './utils/eventLocationParser'; // location string → { building, room }
 import { getValidCalendarIds, fetchCalendarsIfPermitted } from './utils/calendarUtils';
+import CalendarManuallyAdd from "./CalendarManuallyAdd";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -111,6 +112,10 @@ export default function CalendarPage({ onPressBack }) {
   const [selectedCalsModalVisible, setSelectedCalsModalVisible] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(todayString());
+
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualEvents, setManualEvents] = useState([]);
+  const allEvents = [...events, ...manualEvents];
 
   const getCalendars = async () => {
     const { status } = await Calendar.requestCalendarPermissionsAsync();
@@ -247,6 +252,10 @@ export default function CalendarPage({ onPressBack }) {
     </View>
   );
 
+  useEffect(() => {
+    console.log("manualEvents:", manualEvents);
+  }, [manualEvents]);
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -319,13 +328,13 @@ export default function CalendarPage({ onPressBack }) {
 
             <View style={styles.upcomingBox}>
               <ScrollView showsVerticalScrollIndicator={false}>
-                {events.length === 0 ? (
+                {allEvents.length === 0 ? (
                   <View style={styles.emptyWrap}>
                     <Text style={styles.emptyTitle}>No events for this day</Text>
                     <Text style={styles.emptySub}>Select another date to view events.</Text>
                   </View>
                 ) : (
-                  events.map((event) => {
+                  allEvents.map((event) => {
                     const { day, mon } = getDatePartsFromEvent(event);
                     const timeRange = formatTimeRange(event);
 
@@ -498,12 +507,25 @@ export default function CalendarPage({ onPressBack }) {
             </Pressable>
 
             {/* not implemented yet*/}
-            <Pressable style={styles.manualBtn}>
+            <Pressable
+              style={styles.manualBtn}
+              onPress={() => {
+                close();
+                setShowManualModal(true);
+              }}
+            >
               <Text style={styles.btnTxt}>Manually Add Events</Text>
             </Pressable>
           </Animated.View>
         </View>
       </Modal>
+      <CalendarManuallyAdd
+            visible={showManualModal}
+            onClose={() => setShowManualModal(false)}
+            onSave={(event) => {
+              setManualEvents((prev) => [...prev, event]);
+            }}
+          />
     </View>
   );
 }
