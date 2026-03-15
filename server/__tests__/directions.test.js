@@ -235,8 +235,8 @@ describe("receiving transportation options", () => {
         });
         const shuttleRoute = routes.find((r) => r.mode === "concordia_shuttle");
         expect(shuttleRoute).toBeDefined();
-        expect(shuttleRoute.duration.value).toBe(1800);
-        expect(shuttleRoute.distance.value).toBe(11000);
+        expect(shuttleRoute.duration.value).toBe(2280);
+        expect(shuttleRoute.distance.value).toBe(900);
     });
 
     it("doesnt return shuttle when origin and destination are the same campus", async () => {

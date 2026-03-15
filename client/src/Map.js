@@ -1,4 +1,4 @@
-import { View,} from 'react-native';
+import { View, } from 'react-native';
 import React, { useEffect, useCallback, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import MapView, { Marker, Polygon, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import PropTypes from 'prop-types';
@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import BuildingCallout from './BuildingCallout';
 import { colors } from './theme/colors';
 import { styles, BURGUNDY, BURGUNDY_LIGHT } from './styles/Map_styles';
+import { isPointInPolygon } from './utils/geo';
 
 const POI_ICONS = {
   restaurant: require("../assets/poi-icons/poi-marker-restaurant.png"),
@@ -175,7 +176,7 @@ const CampusMap = forwardRef((props, ref) => {
     if (!userLocation || !liveLocationEnabled || !region) return;
 
     const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
-    const { latitude: uLat, longitude: uLng } = userLocation; 
+    const { latitude: uLat, longitude: uLng } = userLocation;
 
     const northBound = latitude + latitudeDelta / 2;
     const southBound = latitude - latitudeDelta / 2;
@@ -184,7 +185,7 @@ const CampusMap = forwardRef((props, ref) => {
 
     const isVisible = uLat <= northBound && uLat >= southBound && uLng <= eastBound && uLng >= westBound;
 
-    
+
     if (isVisible !== isMarkerCurrentlyVisible) {
       setIsMarkerCurrentlyVisible(isVisible);
       if (!isVisible) {
@@ -240,15 +241,20 @@ const CampusMap = forwardRef((props, ref) => {
       >
         <BuildingCallout buildings={buildings} onBuildingPress={onBuildingPress} />
 
-        {buildings.map((building) => (
-          <Polygon
-            key={building.id}
-            coordinates={building.coordinates}
-            fillColor={colors.buildingHighlightFill}
-            strokeColor={colors.buildingHighlightStroke}
-            strokeWidth={2}
-          />
-        ))}
+        {buildings.map((building) => {
+          
+          const isInside = userLocation && isPointInPolygon(userLocation, building.coordinates);
+
+          return (
+            <Polygon
+              key={building.id}
+              coordinates={building.coordinates}
+              fillColor={isInside ? colors.buildingInsideFill : colors.buildingHighlightFill}
+              strokeColor={isInside ? colors.buildingInsideStroke : colors.buildingHighlightStroke}
+              strokeWidth={1}
+            />
+          );
+        })}
 
         {hasSegments && <WalkPolylines segments={activeSegments} />}
         {hasSegments && <TransitPolylines segments={activeSegments} />}
