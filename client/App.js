@@ -193,10 +193,10 @@ export default function App() {
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
           setUserLocation({
-            /*latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,*/
-            latitude: 45.49728435,
-            longitude: -73.5789607,
+            
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude, 
+          
           });
         }
       );
