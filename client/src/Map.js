@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import BuildingCallout from './BuildingCallout';
 import { colors } from './theme/colors';
 import { styles, BURGUNDY, BURGUNDY_LIGHT } from './styles/Map_styles';
+import { isPointInPolygon } from './utils/geo';
 
 const POI_ICONS = {
   restaurant: require("../assets/poi-icons/poi-marker-restaurant.png"),
@@ -196,19 +197,6 @@ const CampusMap = forwardRef((props, ref) => {
   };
 
   useImperativeHandle(ref, () => mapRef.current);
-
-  const isPointInPolygon = (point, polygon) => {
-    const { latitude: x, longitude: y } = point;
-    let inside = false;
-
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].latitude, yi = polygon[i].longitude;
-      const xj = polygon[j].latitude, yj = polygon[j].longitude;
-      const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-      if (intersect) inside = !inside;
-    }
-    return inside;
-  }
 
   const snapBackToUser = useCallback(() => {
     if (!mapRef.current || !userLocation) return;

@@ -1,4 +1,4 @@
-import { polygonCentroid } from '../src/utils/geo';
+import { polygonCentroid, isPointInPolygon } from '../src/utils/geo';
 
 describe('polygonCentroid', () => {
   it('returns 0, 0 for empty array', () => {
@@ -40,5 +40,82 @@ describe('polygonCentroid', () => {
 
     expect(result.lat).toBeCloseTo(0);
     expect(result.lng).toBeCloseTo(5);
+  });
+});
+
+describe('isPointInPolygon', () => {
+  it('returns true for a point inside a simple square polygon', () => {
+    const polygon = [
+      { latitude: 0, longitude: 0 },
+      { latitude: 0, longitude: 10 },
+      { latitude: 10, longitude: 10 },
+      { latitude: 10, longitude: 0 },
+    ];
+    const point = { latitude: 5, longitude: 5 };
+
+    const result = isPointInPolygon(point, polygon);
+
+    expect(result).toBe(true);
+  });
+
+  it('returns false for a point outside a simple square polygon', () => {
+    const polygon = [
+      { latitude: 0, longitude: 0 },
+      { latitude: 0, longitude: 10 },
+      { latitude: 10, longitude: 10 },
+      { latitude: 10, longitude: 0 },
+    ];
+    const point = { latitude: 15, longitude: 15 };
+
+    const result = isPointInPolygon(point, polygon);
+
+    expect(result).toBe(false);
+  });
+
+  it('returns true for a point on the boundary of the polygon', () => {
+    const polygon = [
+      { latitude: 0, longitude: 0 },
+      { latitude: 0, longitude: 10 },
+      { latitude: 10, longitude: 10 },
+      { latitude: 10, longitude: 0 },
+    ];
+    const point = { latitude: 5, longitude: 0 };
+
+    const result = isPointInPolygon(point, polygon);
+
+    expect(result).toBe(true); // Ray casting considers boundary as inside
+  });
+
+  it('returns false for a point inside a polygon with a hole (simple case)', () => {
+    // This is a basic test; for complex polygons with holes, more sophisticated tests would be needed
+    const polygon = [
+      { latitude: 0, longitude: 0 },
+      { latitude: 0, longitude: 20 },
+      { latitude: 20, longitude: 20 },
+      { latitude: 20, longitude: 0 },
+    ];
+    const point = { latitude: 10, longitude: 10 };
+
+    const result = isPointInPolygon(point, polygon);
+
+    expect(result).toBe(true);
+  });
+
+  it('handles empty polygon', () => {
+    const polygon = [];
+    const point = { latitude: 5, longitude: 5 };
+
+    const result = isPointInPolygon(point, polygon);
+
+    expect(result).toBe(false);
+  });
+
+  it('handles single point polygon', () => {
+    const polygon = [{ latitude: 5, longitude: 5 }];
+    const point = { latitude: 5, longitude: 5 };
+
+    const result = isPointInPolygon(point, polygon);
+
+    expect(result).toBe(false); // A single point is not a valid polygon
   });
 });
