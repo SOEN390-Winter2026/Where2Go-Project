@@ -22,14 +22,27 @@ export function polygonCentroid(coordinates) {
  * @returns {boolean} True if the point is inside the polygon
  */
 export function isPointInPolygon(point, polygon) {
-  const { latitude: x, longitude: y } = point;
+  const x = point.longitude;
+  const y = point.latitude;
+
   let inside = false;
 
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].latitude, yi = polygon[i].longitude;
-    const xj = polygon[j].latitude, yj = polygon[j].longitude;
-    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
+    const xi = polygon[i].longitude;
+    const yi = polygon[i].latitude;
+    const xj = polygon[j].longitude;
+    const yj = polygon[j].latitude;
+
+    const crossesYAxis = (yi > y) !== (yj > y);
+
+    if (crossesYAxis) {
+      const intersectionX = ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+
+      if (x < intersectionX) {
+        inside = !inside;
+      }
+    }
   }
+
   return inside;
 }
