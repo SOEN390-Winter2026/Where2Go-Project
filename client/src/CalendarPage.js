@@ -154,7 +154,13 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
     try {
       const dayEvents = await Calendar.getEventsAsync(selectedCalendarIds, start, end);
       dayEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-      setEvents(dayEvents);
+      const now = new Date();
+      const nextIndex = dayEvents.findIndex((e) => new Date(e.endDate) > now);
+      const ordered =
+        nextIndex >= 0
+          ? [dayEvents[nextIndex], ...dayEvents.filter((_, i) => i !== nextIndex)]
+          : dayEvents;
+      setEvents(ordered);
     } catch (e) {
       console.error(e);
       setEvents([]);
@@ -325,9 +331,11 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                     <Text style={styles.emptySub}>Select another date to view events.</Text>
                   </View>
                 ) : (
-                  events.map((event) => {
+                  events.map((event, index) => {
                     const { day, mon } = getDatePartsFromEvent(event);
                     const timeRange = formatTimeRange(event);
+                    const now = new Date();
+                    const isNextEvent = index === 0 && new Date(event.endDate) > now;
 
                     return (
                       <Pressable
@@ -369,7 +377,11 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                           {/* show timing */}
                           <Text style={styles.eventTime}>{timeRange}</Text>
 
-                          <Text style={styles.eventMeta}>Next class</Text>
+                          {isNextEvent ? (
+                            <View style={styles.nextEventTag}>
+                              <Text style={styles.nextEventTagText}>Coming up</Text>
+                            </View>
+                          ) : null}
                           <Text numberOfLines={1} style={styles.eventLoc}>
                             {getLocation(event)}
                           </Text>
@@ -783,6 +795,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     fontWeight: "700",
+  },
+  nextEventTag: {
+    alignSelf: "flex-start",
+    backgroundColor: "#912338",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginTop: 6,
+  },
+  nextEventTagText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   eventLoc: {
     marginTop: 2,
