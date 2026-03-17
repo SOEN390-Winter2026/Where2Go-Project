@@ -154,8 +154,9 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
     try {
       const dayEvents = await Calendar.getEventsAsync(selectedCalendarIds, start, end);
       dayEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      const isToday = selectedDateString === todayString();
       const now = new Date();
-      const nextIndex = dayEvents.findIndex((e) => new Date(e.endDate) > now);
+      const nextIndex = isToday ? dayEvents.findIndex((e) => new Date(e.endDate) > now) : -1;
       const ordered =
         nextIndex >= 0
           ? [dayEvents[nextIndex], ...dayEvents.filter((_, i) => i !== nextIndex)]
@@ -335,7 +336,8 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                     const { day, mon } = getDatePartsFromEvent(event);
                     const timeRange = formatTimeRange(event);
                     const now = new Date();
-                    const isNextEvent = index === 0 && new Date(event.endDate) > now;
+                    const isViewingToday = selectedDate === todayString();
+                    const isNextEvent = isViewingToday && index === 0 && new Date(event.endDate) > now;
 
                     return (
                       <Pressable
