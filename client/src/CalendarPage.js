@@ -234,6 +234,14 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
     }
   }, [isCalendarConnected, isCalendarsChosen, selectedCalendarIds]);
 
+  const handleMonthChange = (month) => {
+    const monthStr = month.dateString.slice(0, 7);
+    const todayStr = todayString();
+    if (todayStr.startsWith(monthStr)) {
+      getEventsForDay(todayStr);
+    }
+  };
+
   const chosenCalendars = calendars.filter((c) => selectedCalendarIds.includes(c.id));
   const markedDates = {
     [selectedDate]: { selected: true, selectedColor: "#912338" },
@@ -303,6 +311,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                   scrollEnabled
                   showScrollIndicator={false}
                   onDayPress={(day) => getEventsForDay(day.dateString)}
+                  onVisibleMonthsChange={(months) => { if (months?.[0]) handleMonthChange(months[0]); }}
                   markedDates={markedDates}
                   theme={{
                     arrowColor: "#18A0FB",
@@ -313,6 +322,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                 <CalendarUI
                   testID="mock-calendar"
                   onDayPress={(day) => getEventsForDay(day.dateString)}
+                  onMonthChange={handleMonthChange}
                   markedDates={markedDates}
                   theme={{
                     arrowColor: "#18A0FB",
