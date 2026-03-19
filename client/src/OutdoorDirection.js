@@ -7,6 +7,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import PropTypes from "prop-types";
 import * as Location from "expo-location";
 import ErrorModal from "./ErrorModal";
+import AutocompleteDropdown from "./AutocompleteDropdown";
 import { SEARCHABLE_LOCATIONS } from "./data/locations";
 import polyline from "@mapbox/polyline";
 
@@ -14,28 +15,8 @@ import NavigationContext from "./navigation/NavigationContext";
 
 import { styles } from "./styles/OutdoorDirection_styles";
 
-export { KNOWN_LOCATIONS } from "./data/locations";
-
 const MAX_RESULTS = 8;
 
-const RetryButton = ({ onPress, loading }) => (
-  <Pressable
-    style={[styles.retryButton, loading && { opacity: 0.6 }]}
-    onPress={onPress}
-    disabled={loading}
-  >
-    <Text style={styles.retryButtonText}>Try Again</Text>
-  </Pressable>
-);
-
-RetryButton.propTypes = {
-  onPress: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-};
-
-RetryButton.defaultProps = {
-  loading: false,
-};
 function getBuildingDisplayName(label) {
   if (!label) return label;
   const parenIndex = label.indexOf("(");
@@ -156,6 +137,25 @@ function stepsToSegments(route) {
     })
     .filter(Boolean);
 }
+
+const RetryButton = ({ onPress, loading }) => (
+  <Pressable
+    style={[styles.retryButton, loading && { opacity: 0.6 }]}
+    onPress={onPress}
+    disabled={loading}
+  >
+    <Text style={styles.retryButtonText}>Try Again</Text>
+  </Pressable>
+);
+
+RetryButton.propTypes = {
+  onPress: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+};
+
+RetryButton.defaultProps = {
+  loading: false,
+};
 export default function OutdoorDirection({
   origin: originProp,
   destination: destProp,
@@ -395,6 +395,7 @@ export default function OutdoorDirection({
       style={styles.background}
       resizeMode="cover"
     >
+{/*top left back button*/}
       <View style={styles.header}>
         <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
           <Ionicons name="arrow-back" size={26} color="white" />
@@ -403,6 +404,7 @@ export default function OutdoorDirection({
         <Text style={styles.headerTitle}>Plan Your Trip</Text>
         <Text style={styles.headerSubtitle}>Find the best route between locations</Text>
 
+{/*text box input start*/}
         <View style={[styles.input, { zIndex: activeField === "origin" ? 20 : 1 }]}>
           <Text style={styles.inputLabel}>From</Text>
           <View style={styles.inputRow}>
@@ -425,23 +427,16 @@ export default function OutdoorDirection({
             )}
           </View>
           {activeField === "origin" && originResults.length > 0 && (
-            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {originResults.map((loc) => (
-                <Pressable
-                  key={`origin-${loc.label}`}
-                  style={styles.dropdownItem}
-                  onPress={() => pickOrigin(loc)}
-                >
-                  <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>
-                    {getBuildingDisplayName(loc.label)}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            <AutocompleteDropdown
+              results={originResults}
+              visible={true}
+              onSelect={pickOrigin}
+              formatLabel={getBuildingDisplayName}
+            />
           )}
         </View>
 
+{/*text box input end*/}
         <View style={[styles.input, { zIndex: activeField === "dest" ? 20 : 1 }]}>
           <Text style={styles.inputLabel}>To</Text>
           <View style={styles.inputRow}>
@@ -464,25 +459,18 @@ export default function OutdoorDirection({
             )}
           </View>
           {activeField === "dest" && destResults.length > 0 && (
-            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {destResults.map((loc) => (
-                <Pressable
-                  key={`dest-${loc.label}`}
-                  style={styles.dropdownItem}
-                  onPress={() => pickDestination(loc)}
-                >
-                  <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>
-                    {getBuildingDisplayName(loc.label)}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            <AutocompleteDropdown
+              results={destResults}
+              visible={true}
+              onSelect={pickDestination}
+              formatLabel={getBuildingDisplayName}
+            />
           )}
         </View>
       </View>
 
       <View style={styles.bottomPart}>
+{/*live location setting button*/}
         {activeField === "origin" && (
           <Pressable onPress={getCurrentLocation} style={styles.liveLoc}>
             <Ionicons name="location" size={26} color="#912338" />
@@ -490,12 +478,14 @@ export default function OutdoorDirection({
           </Pressable>
         )}
 
+{/*routes count*/}
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
             {routes.length} routes{"\n"}available
           </Text>
         </View>
 
+{/*show routes options or fails*/}
         <ScrollView
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.routesContent}
