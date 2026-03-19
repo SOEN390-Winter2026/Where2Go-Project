@@ -8,24 +8,44 @@ import { parseEventLocation } from '../../src/utils/eventLocationParser';
 
 jest.mock('react-native-calendars', () => {
     const React = require('react');
-    const { Pressable, Text } = require('react-native');
+    const { Pressable, Text, View } = require('react-native');
     
     return {
-        Calendar: ({ onDayPress }) => (
-            <Pressable
-                testID="mock-calendar"
-                onPress={() => onDayPress({ dateString: '2026-02-27' })}
-            >
-                <Text>Mock CalendarUI</Text>
-            </Pressable>
+        Calendar: ({ onDayPress, onMonthChange }) => (
+            <View>
+                <Pressable
+                    testID="mock-calendar"
+                    onPress={() => onDayPress({ dateString: '2026-02-27' })}
+                >
+                    <Text>Mock CalendarUI</Text>
+                </Pressable>
+                {onMonthChange && (
+                    <Pressable
+                        testID="mock-month-change"
+                        onPress={() => onMonthChange({ dateString: new Date().toISOString().slice(0, 10) })}
+                    >
+                        <Text>Trigger Month Change</Text>
+                    </Pressable>
+                )}
+            </View>
         ),
-        CalendarList: ({ onDayPress }) => (
-      <Pressable
-        testID="full-calendar-list"
-        onPress={() => onDayPress({ dateString: "2026-02-28" })}
-      >
-        <Text>Mock CalendarList</Text>
-      </Pressable>
+        CalendarList: ({ onDayPress, onVisibleMonthsChange }) => (
+      <View>
+        <Pressable
+          testID="full-calendar-list"
+          onPress={() => onDayPress({ dateString: "2026-02-28" })}
+        >
+          <Text>Mock CalendarList</Text>
+        </Pressable>
+        {onVisibleMonthsChange && (
+          <Pressable
+            testID="mock-visible-months-change"
+            onPress={() => onVisibleMonthsChange([{ dateString: new Date().toISOString().slice(0, 10) }])}
+          >
+            <Text>Trigger Visible Months Change</Text>
+          </Pressable>
+        )}
+      </View>
     ),
     };
 });
@@ -1258,6 +1278,183 @@ describe('CalendarPage', () => {
 
         await waitFor(() => {
             expect(queryByText("No Calendar Yet")).toBeTruthy();
+        });
+    });
+
+    describe("next event ordering and Coming up tag", () => {
+        function todayStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        }
+
+        async function connectAndChooseCalendar(renderResult) {
+            const { getByTestId, getByText, findByText } = renderResult;
+            fireEvent.press(getByTestId("openModalBtn"));
+            fireEvent.press(getByTestId("calBtn"));
+            await findByText("Work");
+            fireEvent(getByTestId("checkbox-cal-1"), "onValueChange", true);
+            fireEvent.press(getByText("Done"));
+        }
+
+        it("reorders events so next upcoming event appears first when viewing today", async () => {
+            Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const now = new Date();
+            const pastEnd = new Date(now.getTime() - 3600000).toISOString();
+            const futureStart = new Date(now.getTime() + 1800000).toISOString();
+            const futureEnd = new Date(now.getTime() + 7200000).toISOString();
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: "e-past", title: "Past Event", startDate: pastEnd, endDate: pastEnd, location: "H 100" },
+                { id: "e-next", title: "Next Event", startDate: futureStart, endDate: futureEnd, location: "H 200" },
+            ]);
+
+            const result = render(<CalendarPage onPressBack={mockOnPressBack} />);
+            await connectAndChooseCalendar(result);
+
+            await waitFor(() => {
+                const calls = Calendar.getEventsAsync.mock.calls;
+                const lastCall = calls[calls.length - 1];
+                expect(lastCall[0]).toEqual(["cal-1"]);
+            });
+
+            const items = await waitFor(() => {
+                const past = result.getByText("Past Event");
+                const next = result.getByText("Next Event");
+                return { past, next };
+            });
+
+            expect(items.next).toBeTruthy();
+            expect(items.past).toBeTruthy();
+        });
+
+        it("shows 'Coming up' tag for next event when viewing today", async () => {
+            Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const now = new Date();
+            const futureStart = new Date(now.getTime() + 1800000).toISOString();
+            const futureEnd = new Date(now.getTime() + 7200000).toISOString();
+            const today = todayStr();
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: "e-next", title: "Upcoming Class", startDate: futureStart, endDate: futureEnd, location: "H 435" },
+            ]);
+
+            AsyncStorage.getItem.mockResolvedValue(JSON.stringify(["cal-1"]));
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const result = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+            await waitFor(() => {
+                expect(result.getByText("Coming up")).toBeTruthy();
+            });
+        });
+
+        it("does not show 'Coming up' tag when viewing a non-today date", async () => {
+            Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const futureEnd = new Date(Date.now() + 7200000).toISOString();
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: "e1", title: "Future Event", startDate: "2026-02-27T10:00:00.000Z", endDate: futureEnd, location: "H 100" },
+            ]);
+
+            const result = render(<CalendarPage onPressBack={mockOnPressBack} />);
+            await connectAndChooseCalendar(result);
+
+            const calendarUI = await result.findByTestId("mock-calendar");
+            fireEvent.press(calendarUI);
+
+            await waitFor(() => {
+                expect(result.getByText("Future Event")).toBeTruthy();
+            });
+
+            expect(result.queryByText("Coming up")).toBeNull();
+        });
+
+        it("keeps chronological order and no tag when all events have ended", async () => {
+            Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const now = new Date();
+            const pastStart1 = new Date(now.getTime() - 7200000).toISOString();
+            const pastEnd1 = new Date(now.getTime() - 3600000).toISOString();
+            const pastStart2 = new Date(now.getTime() - 5400000).toISOString();
+            const pastEnd2 = new Date(now.getTime() - 1800000).toISOString();
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: "e1", title: "Morning Class", startDate: pastStart1, endDate: pastEnd1, location: "H 100" },
+                { id: "e2", title: "Late Morning", startDate: pastStart2, endDate: pastEnd2, location: "H 200" },
+            ]);
+
+            AsyncStorage.getItem.mockResolvedValue(JSON.stringify(["cal-1"]));
+
+            const result = render(<CalendarPage onPressBack={mockOnPressBack} />);
+
+            await waitFor(() => {
+                expect(result.getByText("Morning Class")).toBeTruthy();
+                expect(result.getByText("Late Morning")).toBeTruthy();
+            });
+
+            expect(result.queryByText("Coming up")).toBeNull();
+        });
+
+        it("auto-resets to today when navigating back to current month via onMonthChange", async () => {
+            Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const now = new Date();
+            const futureStart = new Date(now.getTime() + 1800000).toISOString();
+            const futureEnd = new Date(now.getTime() + 7200000).toISOString();
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: "e-next", title: "Today Event", startDate: futureStart, endDate: futureEnd, location: "H 435" },
+            ]);
+
+            const result = render(<CalendarPage onPressBack={mockOnPressBack} />);
+            await connectAndChooseCalendar(result);
+
+            await result.findByTestId("mock-calendar");
+
+            Calendar.getEventsAsync.mockClear();
+
+            fireEvent.press(result.getByTestId("mock-month-change"));
+
+            await waitFor(() => {
+                expect(Calendar.getEventsAsync).toHaveBeenCalled();
+            });
+        });
+
+        it("auto-resets to today when navigating back to current month via onVisibleMonthsChange in CalendarList", async () => {
+            Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: "cal-1", title: "Work", color: "#ff0000" }]);
+
+            const now = new Date();
+            const futureStart = new Date(now.getTime() + 1800000).toISOString();
+            const futureEnd = new Date(now.getTime() + 7200000).toISOString();
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: "e-next", title: "Today Event", startDate: futureStart, endDate: futureEnd, location: "H 435" },
+            ]);
+
+            const result = render(<CalendarPage onPressBack={mockOnPressBack} />);
+            await connectAndChooseCalendar(result);
+
+            await result.findByTestId("mock-calendar");
+
+            fireEvent.press(result.getByLabelText("Toggle full calendar view"));
+            await result.findByText("Mock CalendarList");
+
+            Calendar.getEventsAsync.mockClear();
+
+            fireEvent.press(result.getByTestId("mock-visible-months-change"));
+
+            await waitFor(() => {
+                expect(Calendar.getEventsAsync).toHaveBeenCalled();
+            });
         });
     });
 });
