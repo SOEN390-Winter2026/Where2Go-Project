@@ -18,11 +18,7 @@ import LoadingPage from './src/LoadingPage';
 import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
 import { getDestinationFromBuildingCode } from './src/utils/eventDestinationResolver';
-
-const CAMPUS_COORDS = {
-  SGW: { latitude: 45.4974, longitude: -73.5771 },
-  Loyola: { latitude: 45.4587, longitude: -73.6409 },
-};
+import { CAMPUS_COORDS } from "./src/data/locations";
 
 const colors = {
   buildingHighlightFill: "rgba(107,15,26,0.20)",
