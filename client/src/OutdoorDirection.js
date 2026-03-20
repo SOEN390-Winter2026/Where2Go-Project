@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import * as Location from "expo-location";
 import ErrorModal from "./ErrorModal";
 import AutocompleteDropdown from "./AutocompleteDropdown";
-import { SEARCHABLE_LOCATIONS } from "./data/locations";
+import { getBuildingDisplayName, filterLocations, resolveLocationByName } from "./utils/locationSearch";
 import polyline from "@mapbox/polyline";
 
 import NavigationContext from "./navigation/NavigationContext";
@@ -16,96 +16,6 @@ import NavigationContext from "./navigation/NavigationContext";
 import { styles } from "./styles/OutdoorDirection_styles";
 
 const MAX_RESULTS = 8;
-
-function getBuildingDisplayName(label) {
-  if (!label) return label;
-  const parenIndex = label.indexOf("(");
-  return parenIndex > 0 ? label.slice(0, parenIndex).trimEnd() : label;
-}
-
-function filterLocations(query, buildings) {
-  if (!query || query.trim().length === 0) return [];
-  const q = query.toLowerCase().trim();
-
-  const searchableResults = SEARCHABLE_LOCATIONS.filter((loc) => loc.searchText.includes(q));
-
-  let buildingResults = [];
-  if (buildings && buildings.length > 0) {
-    buildingResults = buildings
-      .filter((building) => (building.name?.toLowerCase() || "").includes(q))
-      .map((building) => ({
-        label: building.name,
-        lat: building.coordinates?.[0]?.latitude || null,
-        lng: building.coordinates?.[0]?.longitude || null,
-        searchText: building.name?.toLowerCase() || "",
-      }));
-  }
-
-  const combined = [...buildingResults, ...searchableResults];
-  const seen = new Set();
-  return combined
-    .filter((loc) => {
-      const displayName = getBuildingDisplayName(loc.label);
-      if (seen.has(displayName)) return false;
-      seen.add(displayName);
-      return true;
-    })
-    .slice(0, MAX_RESULTS);
-}
-
-function resolveLocationByName(name, buildings) {
-  if (!name) return null;
-  const q = name.toLowerCase().trim();
-
-  if (buildings?.length) {
-
-    let b =
-      buildings.find((bld) => bld.name?.toLowerCase() === q) ||
-  
-      buildings.find((bld) => {
-        const bn = bld.name?.toLowerCase() || "";
-        return bn.includes(q) || q.includes(bn);
-      });
-
-    if (b) {
-      const firstCoord = b.coordinates?.[0];
-      return {
-        label: b.name,
-        lat: firstCoord?.latitude ?? null,
-        lng: firstCoord?.longitude ?? null,
-      };
-    }
-  }
-
-  const locExact = SEARCHABLE_LOCATIONS.find((l) => {
-    const display = getBuildingDisplayName(l.label)?.toLowerCase() || "";
-    return display === q || (l.label?.toLowerCase() || "") === q;
-  });
-
-  if (locExact) {
-    return {
-      label: getBuildingDisplayName(locExact.label),
-      lat: locExact.lat,
-      lng: locExact.lng,
-    };
-  }
-
-  const locFuzzy = SEARCHABLE_LOCATIONS.find((l) => {
-    const display = getBuildingDisplayName(l.label)?.toLowerCase() || "";
-    const raw = l.label?.toLowerCase() || "";
-    return display.includes(q) || q.includes(display) || raw.includes(q) || q.includes(raw);
-  });
-
-  if (locFuzzy) {
-    return {
-      label: getBuildingDisplayName(locFuzzy.label),
-      lat: locFuzzy.lat,
-      lng: locFuzzy.lng,
-    };
-  }
-
-  return { label: name, lat: null, lng: null };
-}
 
 function getModeDisplay(mode) {
   if (mode === "concordia_shuttle") return { label: "Concordia Shuttle", icon: "bus" };
@@ -603,6 +513,7 @@ OutdoorDirection.propTypes = {
 export const __test__ = {
   getBuildingDisplayName,
   filterLocations,
+  resolveLocationByName,
   getModeDisplay,
   decodePolylineToCoords,
   stepsToSegments,
