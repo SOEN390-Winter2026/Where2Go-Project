@@ -7,124 +7,15 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import PropTypes from "prop-types";
 import * as Location from "expo-location";
 import ErrorModal from "./ErrorModal";
-import { SEARCHABLE_LOCATIONS } from "./data/locations";
+import AutocompleteDropdown from "./AutocompleteDropdown";
+import { getBuildingDisplayName, filterLocations, resolveLocationByName } from "./utils/locationSearch";
 import polyline from "@mapbox/polyline";
 
 import NavigationContext from "./navigation/NavigationContext";
 
 import { styles } from "./styles/OutdoorDirection_styles";
 
-export { KNOWN_LOCATIONS } from "./data/locations";
-
 const MAX_RESULTS = 8;
-
-const RetryButton = ({ onPress, loading }) => (
-  <Pressable
-    style={[styles.retryButton, loading && { opacity: 0.6 }]}
-    onPress={onPress}
-    disabled={loading}
-  >
-    <Text style={styles.retryButtonText}>Try Again</Text>
-  </Pressable>
-);
-
-RetryButton.propTypes = {
-  onPress: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-};
-
-RetryButton.defaultProps = {
-  loading: false,
-};
-function getBuildingDisplayName(label) {
-  if (!label) return label;
-  const parenIndex = label.indexOf("(");
-  return parenIndex > 0 ? label.slice(0, parenIndex).trimEnd() : label;
-}
-
-function filterLocations(query, buildings) {
-  if (!query || query.trim().length === 0) return [];
-  const q = query.toLowerCase().trim();
-
-  const searchableResults = SEARCHABLE_LOCATIONS.filter((loc) => loc.searchText.includes(q));
-
-  let buildingResults = [];
-  if (buildings && buildings.length > 0) {
-    buildingResults = buildings
-      .filter((building) => (building.name?.toLowerCase() || "").includes(q))
-      .map((building) => ({
-        label: building.name,
-        lat: building.coordinates?.[0]?.latitude || null,
-        lng: building.coordinates?.[0]?.longitude || null,
-        searchText: building.name?.toLowerCase() || "",
-      }));
-  }
-
-  const combined = [...buildingResults, ...searchableResults];
-  const seen = new Set();
-  return combined
-    .filter((loc) => {
-      const displayName = getBuildingDisplayName(loc.label);
-      if (seen.has(displayName)) return false;
-      seen.add(displayName);
-      return true;
-    })
-    .slice(0, MAX_RESULTS);
-}
-
-function resolveLocationByName(name, buildings) {
-  if (!name) return null;
-  const q = name.toLowerCase().trim();
-
-  if (buildings?.length) {
-
-    let b =
-      buildings.find((bld) => bld.name?.toLowerCase() === q) ||
-  
-      buildings.find((bld) => {
-        const bn = bld.name?.toLowerCase() || "";
-        return bn.includes(q) || q.includes(bn);
-      });
-
-    if (b) {
-      const firstCoord = b.coordinates?.[0];
-      return {
-        label: b.name,
-        lat: firstCoord?.latitude ?? null,
-        lng: firstCoord?.longitude ?? null,
-      };
-    }
-  }
-
-  const locExact = SEARCHABLE_LOCATIONS.find((l) => {
-    const display = getBuildingDisplayName(l.label)?.toLowerCase() || "";
-    return display === q || (l.label?.toLowerCase() || "") === q;
-  });
-
-  if (locExact) {
-    return {
-      label: getBuildingDisplayName(locExact.label),
-      lat: locExact.lat,
-      lng: locExact.lng,
-    };
-  }
-
-  const locFuzzy = SEARCHABLE_LOCATIONS.find((l) => {
-    const display = getBuildingDisplayName(l.label)?.toLowerCase() || "";
-    const raw = l.label?.toLowerCase() || "";
-    return display.includes(q) || q.includes(display) || raw.includes(q) || q.includes(raw);
-  });
-
-  if (locFuzzy) {
-    return {
-      label: getBuildingDisplayName(locFuzzy.label),
-      lat: locFuzzy.lat,
-      lng: locFuzzy.lng,
-    };
-  }
-
-  return { label: name, lat: null, lng: null };
-}
 
 function getModeDisplay(mode) {
   if (mode === "concordia_shuttle") return { label: "Concordia Shuttle", icon: "bus" };
@@ -156,6 +47,25 @@ function stepsToSegments(route) {
     })
     .filter(Boolean);
 }
+
+const RetryButton = ({ onPress, loading }) => (
+  <Pressable
+    style={[styles.retryButton, loading && { opacity: 0.6 }]}
+    onPress={onPress}
+    disabled={loading}
+  >
+    <Text style={styles.retryButtonText}>Try Again</Text>
+  </Pressable>
+);
+
+RetryButton.propTypes = {
+  onPress: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+};
+
+RetryButton.defaultProps = {
+  loading: false,
+};
 export default function OutdoorDirection({
   origin: originProp,
   destination: destProp,
@@ -185,12 +95,14 @@ export default function OutdoorDirection({
   // Strategy pattern: default strategy fetches all modes
   const navContext = useRef(new NavigationContext("all"));
 
+  // for testing
   useEffect(() => {
     if (__testMapRef && mapRef) {
       mapRef.current = __testMapRef;
     }
   }, [__testMapRef]);
 
+  // update origin (start location) whenever something changes. User typed/typing, dropdown choice, clearing search box 
   useEffect(() => {
     if (originProp) {
       setOrigin(originProp);
@@ -198,6 +110,7 @@ export default function OutdoorDirection({
     }
   }, [originProp]);
 
+  // update dest (end location) whenever something changes. User typed/typing, dropdown choice, clearing search box
   useEffect(() => {
     if (destProp) {
       setDestination(destProp);
@@ -205,6 +118,7 @@ export default function OutdoorDirection({
     }
   }, [destProp]);
 
+  // set start location after user selected on map
   useEffect(() => {
     if (!initialFrom) return;
     const resolved = resolveLocationByName(initialFrom, buildings);
@@ -212,6 +126,7 @@ export default function OutdoorDirection({
     setOrigin(resolved);
   }, [initialFrom, buildings]);
 
+  // set end location after user selected on map
   useEffect(() => {
     if (!initialTo) return;
     const resolved = resolveLocationByName(initialTo, buildings);
@@ -260,6 +175,7 @@ export default function OutdoorDirection({
     }
   }, [origin, destination]);
 
+  // fetches routes whenever fetchroute changes. Since the user can decide to change either start or end or both inputs anytime, this keeps it up
   useEffect(() => {
     fetchRoutes();
   }, [fetchRoutes]);
@@ -283,6 +199,7 @@ export default function OutdoorDirection({
     });
   }, []);
 
+  // rezoom map to fit in the screen when routes/directions lines are shown
   useEffect(() => {
     if (selectedRouteCoords.length > 0) {
       fitRouteOnMap(selectedRouteCoords);
@@ -395,6 +312,7 @@ export default function OutdoorDirection({
       style={styles.background}
       resizeMode="cover"
     >
+{/*top left back button*/}
       <View style={styles.header}>
         <Pressable testID="pressBack" style={styles.backBtn} onPress={onPressBack}>
           <Ionicons name="arrow-back" size={26} color="white" />
@@ -403,6 +321,7 @@ export default function OutdoorDirection({
         <Text style={styles.headerTitle}>Plan Your Trip</Text>
         <Text style={styles.headerSubtitle}>Find the best route between locations</Text>
 
+{/*text box input start*/}
         <View style={[styles.input, { zIndex: activeField === "origin" ? 20 : 1 }]}>
           <Text style={styles.inputLabel}>From</Text>
           <View style={styles.inputRow}>
@@ -425,23 +344,16 @@ export default function OutdoorDirection({
             )}
           </View>
           {activeField === "origin" && originResults.length > 0 && (
-            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {originResults.map((loc) => (
-                <Pressable
-                  key={`origin-${loc.label}`}
-                  style={styles.dropdownItem}
-                  onPress={() => pickOrigin(loc)}
-                >
-                  <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>
-                    {getBuildingDisplayName(loc.label)}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            <AutocompleteDropdown
+              results={originResults}
+              visible={true}
+              onSelect={pickOrigin}
+              formatLabel={getBuildingDisplayName}
+            />
           )}
         </View>
 
+{/*text box input end*/}
         <View style={[styles.input, { zIndex: activeField === "dest" ? 20 : 1 }]}>
           <Text style={styles.inputLabel}>To</Text>
           <View style={styles.inputRow}>
@@ -464,25 +376,18 @@ export default function OutdoorDirection({
             )}
           </View>
           {activeField === "dest" && destResults.length > 0 && (
-            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {destResults.map((loc) => (
-                <Pressable
-                  key={`dest-${loc.label}`}
-                  style={styles.dropdownItem}
-                  onPress={() => pickDestination(loc)}
-                >
-                  <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
-                  <Text style={styles.dropdownText} numberOfLines={1}>
-                    {getBuildingDisplayName(loc.label)}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            <AutocompleteDropdown
+              results={destResults}
+              visible={true}
+              onSelect={pickDestination}
+              formatLabel={getBuildingDisplayName}
+            />
           )}
         </View>
       </View>
 
       <View style={styles.bottomPart}>
+{/*live location setting button*/}
         {activeField === "origin" && (
           <Pressable onPress={getCurrentLocation} style={styles.liveLoc}>
             <Ionicons name="location" size={26} color="#912338" />
@@ -490,12 +395,14 @@ export default function OutdoorDirection({
           </Pressable>
         )}
 
+{/*routes count*/}
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
             {routes.length} routes{"\n"}available
           </Text>
         </View>
 
+{/*show routes options or fails*/}
         <ScrollView
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.routesContent}
@@ -613,6 +520,7 @@ OutdoorDirection.propTypes = {
 export const __test__ = {
   getBuildingDisplayName,
   filterLocations,
+  resolveLocationByName,
   getModeDisplay,
   decodePolylineToCoords,
   stepsToSegments,
