@@ -95,12 +95,14 @@ export default function OutdoorDirection({
   // Strategy pattern: default strategy fetches all modes
   const navContext = useRef(new NavigationContext("all"));
 
+  // for testing
   useEffect(() => {
     if (__testMapRef && mapRef) {
       mapRef.current = __testMapRef;
     }
   }, [__testMapRef]);
 
+  // update origin (start location) whenever something changes. User typed/typing, dropdown choice, clearing search box 
   useEffect(() => {
     if (originProp) {
       setOrigin(originProp);
@@ -108,6 +110,7 @@ export default function OutdoorDirection({
     }
   }, [originProp]);
 
+  // update dest (end location) whenever something changes. User typed/typing, dropdown choice, clearing search box
   useEffect(() => {
     if (destProp) {
       setDestination(destProp);
@@ -115,6 +118,7 @@ export default function OutdoorDirection({
     }
   }, [destProp]);
 
+  // set start location after user selected on map
   useEffect(() => {
     if (!initialFrom) return;
     const resolved = resolveLocationByName(initialFrom, buildings);
@@ -122,6 +126,7 @@ export default function OutdoorDirection({
     setOrigin(resolved);
   }, [initialFrom, buildings]);
 
+  // set end location after user selected on map
   useEffect(() => {
     if (!initialTo) return;
     const resolved = resolveLocationByName(initialTo, buildings);
@@ -170,6 +175,7 @@ export default function OutdoorDirection({
     }
   }, [origin, destination]);
 
+  // fetches routes whenever fetchroute changes. Since the user can decide to change either start or end or both inputs anytime, this keeps it up
   useEffect(() => {
     fetchRoutes();
   }, [fetchRoutes]);
@@ -193,6 +199,7 @@ export default function OutdoorDirection({
     });
   }, []);
 
+  // rezoom map to fit in the screen when routes/directions lines are shown
   useEffect(() => {
     if (selectedRouteCoords.length > 0) {
       fitRouteOnMap(selectedRouteCoords);

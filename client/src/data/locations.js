@@ -10,7 +10,7 @@
  */
 
 // ── Campus coordinates ──────────────────────────────────────────────────────
-export const KNOWN_LOCATIONS = {
+export const CAMPUS_COORDS = {
   SGW: { label: "SGW Campus", lat: 45.4974, lng: -73.5771 },
   Loyola: { label: "Loyola Campus", lat: 45.4587, lng: -73.6409 },
 };
