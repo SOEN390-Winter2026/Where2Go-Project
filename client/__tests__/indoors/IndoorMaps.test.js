@@ -4,11 +4,18 @@ import IndoorMaps from '../../src/IndoorMaps';
 
 jest.mock('../../src/IndoorSideLeftBar', () => {
     const { Pressable, Text } = require('react-native');
-    return ({ onPressBack }) => (
+    const PropTypes = require('prop-types');
+
+    const MockIndoorSideLeftBar = ({ onPressBack }) => (
         <Pressable testID="mock-back-btn" onPress={onPressBack}>
             <Text>Back</Text>
         </Pressable>
     );
+
+    MockIndoorSideLeftBar.propTypes = {
+        onPressBack: PropTypes.func.isRequired,
+    };
+    return MockIndoorSideLeftBar;
 });
 
 //mock for the drag
@@ -311,6 +318,87 @@ describe('IndoorMaps', () => {
         const { getAllByText } = render(<IndoorMaps {...defaultProps} />);
         expect(getAllByText('H').length).toBeGreaterThan(0);
         Platform.OS = original;
+    });
+
+    //stuff for get room directions
+    it('shows Get Room Directions button in default (info) view', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+        expect(getByText('Get Room Directions')).toBeTruthy();
+    });
+
+    it('pressing Get Room Directions opens the directions tab', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByTestId('swap-directions')).toBeTruthy();
+    });
+
+    it('directions tab shows From and To labels', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByText('From')).toBeTruthy();
+        expect(getByText('To')).toBeTruthy();
+    });
+
+    it('directions tab shows Directions section title', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByText('Directions')).toBeTruthy();
+    });
+
+    it('directions tab shows Generate Directions button', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByTestId('generate-directions-btn')).toBeTruthy();
+    });
+
+    it('pressing Generate Directions button does not throw', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(() => fireEvent.press(getByTestId('generate-directions-btn'))).not.toThrow();
+    });
+
+    it('swap directions button is pressable and does not throw', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(() => fireEvent.press(getByTestId('swap-directions'))).not.toThrow();
+    });
+
+    it('directions tab is accessible via tab-floors then directions', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        fireEvent.press(getByTestId('swap-directions'));
+        expect(getByTestId('generate-directions-btn')).toBeTruthy();
+    });
+
+    it('from-building dropdown renders in directions tab', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByTestId('from-building')).toBeTruthy();
+    });
+
+    it('to-building dropdown renders in directions tab', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByTestId('to-building')).toBeTruthy();
+    });
+
+    it('from-floor dropdown is present and shows placeholder when no building selected', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByTestId('from-floor')).toBeTruthy();
+    });
+
+    it('to-floor dropdown is present and shows placeholder when no building selected', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        expect(getByTestId('to-floor')).toBeTruthy();
+    });
+
+    it('switching from directions tab back to floors tab works', () => {
+        const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        fireEvent.press(getByTestId('tab-floors'));
+        expect(getByTestId('classroom-input')).toBeTruthy();
     });
 
 });

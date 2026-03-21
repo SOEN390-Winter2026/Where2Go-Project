@@ -3,7 +3,7 @@ import { View, Image, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 
-export default function IndoorSideLeftBar({ onPressBack }) {
+export default function IndoorSideLeftBar({ onPressBack, onOpenDirections }) {
 
     const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
     const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -27,6 +27,11 @@ export default function IndoorSideLeftBar({ onPressBack }) {
             return activePOI === name ? secondPOIIcon : firstPOIIcon;
     };
 
+    const handleSearchPress = () => {
+        setActiveSearch((prev) => !prev);
+        onOpenDirections?.();
+    };
+
     return (
         <View style={styles.floatLeftBar}>
             {/* Back btn */}
@@ -39,10 +44,14 @@ export default function IndoorSideLeftBar({ onPressBack }) {
 
             {/* Directions or search (?) to be changed if needed */}
             <Pressable testID="search-btn" //btw this should lead to another page once implemented for indoors directions
-                style={[styles.barItem, { backgroundColor:  "#ccc" }]}
-                onPress={() => setActiveSearch((prev) => !prev)}
+                style={[styles.barItem, { backgroundColor: activeSearch ? "#912338" : "#ccc" }]}
+                onPress={handleSearchPress}
             >
-                <Ionicons name="search" size={24} color="#912338"   source={iconSource("search")}/>
+                <Ionicons
+                    name="search"
+                    size={24}
+                    color={activeSearch ? "#fff" : "#912338"}
+                />
             </Pressable>
 
             {/* Disability btn */}
@@ -70,6 +79,7 @@ export default function IndoorSideLeftBar({ onPressBack }) {
 
 IndoorSideLeftBar.propTypes = {
     onPressBack: PropTypes.func.isRequired,
+    onOpenDirections: PropTypes.func
 };
 
 const styles = StyleSheet.create({
