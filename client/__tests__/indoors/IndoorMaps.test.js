@@ -4,11 +4,18 @@ import IndoorMaps from '../../src/IndoorMaps';
 
 jest.mock('../../src/IndoorSideLeftBar', () => {
     const { Pressable, Text } = require('react-native');
-    return ({ onPressBack }) => (
+    const PropTypes = require('prop-types');
+
+    const MockIndoorSideLeftBar = ({ onPressBack }) => (
         <Pressable testID="mock-back-btn" onPress={onPressBack}>
             <Text>Back</Text>
         </Pressable>
     );
+
+    MockIndoorSideLeftBar.propTypes = {
+        onPressBack: PropTypes.func.isRequired,
+    };
+    return MockIndoorSideLeftBar;
 });
 
 //mock for the drag
@@ -311,6 +318,72 @@ describe('IndoorMaps', () => {
         const { getAllByText } = render(<IndoorMaps {...defaultProps} />);
         expect(getAllByText('H').length).toBeGreaterThan(0);
         Platform.OS = original;
+    });
+
+    //stuff for get room directions
+    it('shows Get Room Directions button in default (info) view', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+        expect(getByText('Get Room Directions')).toBeTruthy();
+    });
+
+    describe('directions tab', () => {
+        let getByText, getByTestId;
+
+        beforeEach(() => {
+            ({ getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />));
+            fireEvent.press(getByText('Get Room Directions'));
+        });
+
+        it('opens showing swap button', () => {
+            expect(getByTestId('swap-directions')).toBeTruthy();
+        });
+
+        it('shows From and To labels', () => {
+            expect(getByText('From')).toBeTruthy();
+            expect(getByText('To')).toBeTruthy();
+        });
+
+        it('shows Directions section title', () => {
+            expect(getByText('Directions')).toBeTruthy();
+        });
+
+        it('shows Generate Directions button', () => {
+            expect(getByTestId('generate-directions-btn')).toBeTruthy();
+        });
+
+        it('pressing Generate Directions button does not throw', () => {
+            expect(() => fireEvent.press(getByTestId('generate-directions-btn'))).not.toThrow();
+        });
+
+        it('swap button is pressable and does not throw', () => {
+            expect(() => fireEvent.press(getByTestId('swap-directions'))).not.toThrow();
+        });
+
+        it('remains on directions tab after pressing swap', () => {
+            fireEvent.press(getByTestId('swap-directions'));
+            expect(getByTestId('generate-directions-btn')).toBeTruthy();
+        });
+
+        it('renders from-building dropdown', () => {
+            expect(getByTestId('from-building')).toBeTruthy();
+        });
+
+        it('renders to-building dropdown', () => {
+            expect(getByTestId('to-building')).toBeTruthy();
+        });
+
+        it('renders from-floor dropdown', () => {
+            expect(getByTestId('from-floor')).toBeTruthy();
+        });
+
+        it('renders to-floor dropdown', () => {
+            expect(getByTestId('to-floor')).toBeTruthy();
+        });
+
+        it('switching to floors tab works', () => {
+            fireEvent.press(getByTestId('tab-floors'));
+            expect(getByTestId('classroom-input')).toBeTruthy();
+        });
     });
 
 });
