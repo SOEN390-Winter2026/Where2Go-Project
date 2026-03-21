@@ -83,6 +83,12 @@ const styles = StyleSheet.create({
         padding: 16,
         gap: 6,
     },
+    sheetScrollView: {
+        flex: 1,
+    },
+    sheetScrollContent: {
+        paddingBottom: 16,
+    },
     classroomRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -132,6 +138,156 @@ const styles = StyleSheet.create({
     infoValue: {
         color: '#333',
         fontWeight: '500',
+    },
+    takeToDirectionsBtn: {
+        marginHorizontal: 16,
+        marginTop: 10,
+        marginBottom: 14,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        borderColor: '#912338',
+        borderRadius: 12,
+        paddingVertical: 11,
+        alignItems: 'center',
+    },
+    takeToDirectionsBtnText: {
+        color: '#912338',
+        fontWeight: '700',
+        letterSpacing: 0.4,
+    },
+
+    directionsSectionTitle: {
+        fontWeight: '800',
+        color: '#912338',
+        textAlign: 'center',
+        marginBottom: 4,
+    },
+    directionsGroupLabel: {
+        fontWeight: '700',
+        color: '#333',
+        marginTop: 6,
+        marginBottom: 4,
+    },
+    directionsRow: {
+        flexDirection: 'row',
+        gap: 8,
+        justifyContent: 'space-between',
+    },
+
+    swapRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+        gap: 8,
+    },
+    swapLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#e0e0e0',
+    },
+    swapBtn: {
+        backgroundColor: '#912338',
+        borderRadius: 20,
+        padding: 8,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 3,
+    },
+
+    generateDirectionsBtn: {
+        marginTop: 14,
+        backgroundColor: '#912338',
+        borderRadius: 12,
+        paddingVertical: 13,
+        alignItems: 'center',
+    },
+    generateDirectionsBtnText: {
+        color: '#fff',
+        fontWeight: '700',
+        letterSpacing: 0.4,
+    },
+
+    dropdownWrapper: {
+        flex: 1,
+        gap: 4,
+    },
+    dropdownLabel: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#888',
+        textTransform: 'uppercase',
+        letterSpacing: 0.4,
+    },
+    dropdownBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderWidth: 1.5,
+        borderColor: '#912338',
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 7,
+        backgroundColor: '#fff',
+    },
+    dropdownBtnDisabled: {
+        borderColor: '#ddd',
+        backgroundColor: '#f7f7f7',
+    },
+    dropdownBtnText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#912338',
+    },
+    dropdownBtnPlaceholder: {
+        color: '#bbb',
+        fontWeight: '400',
+    },
+    // Modal overlay
+    dropdownOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 32,
+    },
+    dropdownModal: {
+        backgroundColor: '#fff',
+        borderRadius: 14,
+        padding: 16,
+        width: '80%',
+        maxHeight: 280,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 4 },
+        shadowRadius: 8,
+    },
+    dropdownModalTitle: {
+        fontWeight: '700',
+        fontSize: 14,
+        color: '#912338',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    dropdownOption: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        marginBottom: 2,
+    },
+    dropdownOptionActive: {
+        backgroundColor: '#912338',
+    },
+    dropdownOptionText: {
+        fontSize: 14,
+        color: '#333',
+        fontWeight: '500',
+    },
+    dropdownOptionActiveText: {
+        color: '#fff',
+        fontWeight: '700',
     },
 });
 
