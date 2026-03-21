@@ -103,6 +103,88 @@ const locationShape = PropTypes.shape({
     room: PropTypes.string,
 });
 
+const buildingShape = PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    code: PropTypes.string,
+    address: PropTypes.string,
+});
+
+// Extracted to eliminate the repeated label+value pattern in the info tab
+function InfoRow({ label, value, FONT_SM, FONT_MD }) {
+    return (
+        <>
+            <Text style={[styles.infoLabel, { fontSize: FONT_SM }]}>{label}</Text>
+            <Text style={[styles.infoValue, { fontSize: FONT_MD }]}>{value ?? '—'}</Text>
+        </>
+    );
+}
+
+InfoRow.propTypes = {
+    label: PropTypes.string.isRequired,
+    value: PropTypes.string,
+    FONT_SM: PropTypes.number.isRequired,
+    FONT_MD: PropTypes.number.isRequired,
+};
+
+InfoRow.defaultProps = {
+    value: null,
+};
+
+function makeLocationHandlers(setter) {
+    return {
+        onSelectBuilding: (v) => setter({ building: v, floor: null, room: null }),
+        onSelectFloor: (v) => setter(p => ({ ...p, floor: v, room: null })),
+        onSelectRoom: (v) => setter(p => ({ ...p, room: v })),
+    };
+}
+
+function LocationSelector({ label, location, onSelectBuilding, onSelectFloor, onSelectRoom, BUILDINGS_LIST, getFloors, getRooms, testIDPrefix, FONT_SM }) {
+    return (
+        <>
+            <Text style={[styles.directionsGroupLabel, { fontSize: FONT_SM + 2 }]}>{label}</Text>
+            <View style={styles.directionsRow}>
+                <DropdownSelect
+                    testID={`${testIDPrefix}-building`}
+                    label="Building"
+                    options={BUILDINGS_LIST}
+                    value={location.building}
+                    onSelect={onSelectBuilding}
+                />
+                <DropdownSelect
+                    testID={`${testIDPrefix}-floor`}
+                    label="Floor"
+                    options={getFloors(location.building)}
+                    value={location.floor}
+                    onSelect={onSelectFloor}
+                    disabled={!location.building}
+                />
+                <DropdownSelect
+                    testID={`${testIDPrefix}-room`}
+                    label="Room"
+                    options={getRooms(location.building, location.floor)}
+                    value={location.room}
+                    onSelect={onSelectRoom}
+                    disabled={!location.floor}
+                />
+            </View>
+        </>
+    );
+}
+
+LocationSelector.propTypes = {
+    label: PropTypes.string.isRequired,
+    location: locationShape.isRequired,
+    onSelectBuilding: PropTypes.func.isRequired,
+    onSelectFloor: PropTypes.func.isRequired,
+    onSelectRoom: PropTypes.func.isRequired,
+    BUILDINGS_LIST: PropTypes.arrayOf(PropTypes.string).isRequired,
+    getFloors: PropTypes.func.isRequired,
+    getRooms: PropTypes.func.isRequired,
+    testIDPrefix: PropTypes.string.isRequired,
+    FONT_SM: PropTypes.number.isRequired,
+};
+
 function SheetContent({
     activeTab,
     building,
@@ -122,7 +204,7 @@ function SheetContent({
     setDirectionsTo,
     handleSwapDirections,
     handleTabPress,
-}) { //below, each if statement is for different tabs, base off of their names to know what they do
+}) {
     if (activeTab === 'floors') {
         return (
             <View style={styles.sheetContent}>
@@ -137,7 +219,6 @@ function SheetContent({
                     />
                 </View>
                 <View style={styles.floorBtnsWrap}>
-                    {/* LOADING THE FLOORS IN FLOORS TAB */}
                     {getFloors(building?.code).map((floor) => (
                         <Pressable
                             key={floor}
@@ -171,35 +252,17 @@ function SheetContent({
                         Directions
                     </Text>
 
-                    {/*From */}
-                    <Text style={[styles.directionsGroupLabel, { fontSize: FONT_SM + 2 }]}>From</Text>
-                    <View style={styles.directionsRow}>
-                        <DropdownSelect
-                            testID="from-building"
-                            label="Building"
-                            options={BUILDINGS_LIST}
-                            value={directionsFrom.building}
-                            onSelect={(v) => setDirectionsFrom({ building: v, floor: null, room: null })}
-                        />
-                        <DropdownSelect
-                            testID="from-floor"
-                            label="Floor"
-                            options={getFloors(directionsFrom.building)}
-                            value={directionsFrom.floor}
-                            onSelect={(v) => setDirectionsFrom(p => ({ ...p, floor: v, room: null }))}
-                            disabled={!directionsFrom.building}
-                        />
-                        <DropdownSelect
-                            testID="from-room"
-                            label="Room"
-                            options={getRooms(directionsFrom.building, directionsFrom.floor)}
-                            value={directionsFrom.room}
-                            onSelect={(v) => setDirectionsFrom(p => ({ ...p, room: v }))}
-                            disabled={!directionsFrom.floor}
-                        />
-                    </View>
+                    <LocationSelector
+                        label="From"
+                        location={directionsFrom}
+                        {...makeLocationHandlers(setDirectionsFrom)}
+                        BUILDINGS_LIST={BUILDINGS_LIST}
+                        getFloors={getFloors}
+                        getRooms={getRooms}
+                        testIDPrefix="from"
+                        FONT_SM={FONT_SM}
+                    />
 
-                    {/* Swap btn */}
                     <View style={styles.swapRow}>
                         <View style={styles.swapLine} />
                         <Pressable
@@ -212,33 +275,16 @@ function SheetContent({
                         <View style={styles.swapLine} />
                     </View>
 
-                    {/*To*/}
-                    <Text style={[styles.directionsGroupLabel, { fontSize: FONT_SM + 2 }]}>To</Text>
-                    <View style={styles.directionsRow}>
-                        <DropdownSelect
-                            testID="to-building"
-                            label="Building"
-                            options={BUILDINGS_LIST}
-                            value={directionsTo.building}
-                            onSelect={(v) => setDirectionsTo({ building: v, floor: null, room: null })}
-                        />
-                        <DropdownSelect
-                            testID="to-floor"
-                            label="Floor"
-                            options={getFloors(directionsTo.building)}
-                            value={directionsTo.floor}
-                            onSelect={(v) => setDirectionsTo(p => ({ ...p, floor: v, room: null }))}
-                            disabled={!directionsTo.building}
-                        />
-                        <DropdownSelect
-                            testID="to-room"
-                            label="Room"
-                            options={getRooms(directionsTo.building, directionsTo.floor)}
-                            value={directionsTo.room}
-                            onSelect={(v) => setDirectionsTo(p => ({ ...p, room: v }))}
-                            disabled={!directionsTo.floor}
-                        />
-                    </View>
+                    <LocationSelector
+                        label="To"
+                        location={directionsTo}
+                        {...makeLocationHandlers(setDirectionsTo)}
+                        BUILDINGS_LIST={BUILDINGS_LIST}
+                        getFloors={getFloors}
+                        getRooms={getRooms}
+                        testIDPrefix="to"
+                        FONT_SM={FONT_SM}
+                    />
 
                     {/* GENERATE DIRECTIONS BTN -- TO IMPLEMENT AFTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
                     <Pressable
@@ -258,12 +304,9 @@ function SheetContent({
     return (
         <>
             <View style={styles.sheetContent}>
-                <Text style={[styles.infoLabel, { fontSize: FONT_SM }]}>Building</Text>
-                <Text style={[styles.infoValue, { fontSize: FONT_MD }]}>{building?.name ?? '—'}</Text>
-                <Text style={[styles.infoLabel, { fontSize: FONT_SM }]}>Code</Text>
-                <Text style={[styles.infoValue, { fontSize: FONT_MD }]}>{building?.code ?? '—'}</Text>
-                <Text style={[styles.infoLabel, { fontSize: FONT_SM }]}>Address</Text>
-                <Text style={[styles.infoValue, { fontSize: FONT_MD }]}>{building?.address ?? '—'}</Text>
+                <InfoRow label="Building" value={building?.name} FONT_SM={FONT_SM} FONT_MD={FONT_MD} />
+                <InfoRow label="Code"     value={building?.code} FONT_SM={FONT_SM} FONT_MD={FONT_MD} />
+                <InfoRow label="Address"  value={building?.address} FONT_SM={FONT_SM} FONT_MD={FONT_MD} />
             </View>
             <View>
                 <Pressable
@@ -279,14 +322,7 @@ function SheetContent({
     );
 }
 
-SheetContent.propTypes = {
-    activeTab: PropTypes.string,
-    building: PropTypes.shape({
-        id: PropTypes.string,
-        name: PropTypes.string,
-        code: PropTypes.string,
-        address: PropTypes.string,
-    }),
+const sharedSheetPropTypes = {
     FONT_SM: PropTypes.number.isRequired,
     FONT_MD: PropTypes.number.isRequired,
     FLOOR_BTN: PropTypes.number.isRequired,
@@ -302,13 +338,18 @@ SheetContent.propTypes = {
     directionsTo: locationShape.isRequired,
     setDirectionsTo: PropTypes.func.isRequired,
     handleSwapDirections: PropTypes.func.isRequired,
+};
+
+SheetContent.propTypes = {
+    ...sharedSheetPropTypes,
+    activeTab: PropTypes.string,
+    building: buildingShape,
     handleTabPress: PropTypes.func.isRequired,
 };
 
 SheetContent.defaultProps = {
     activeTab: null,
     building: null,
-    selectedFloor: null,
 };
 
 export default function IndoorMapsBottomSheet({
@@ -323,12 +364,10 @@ export default function IndoorMapsBottomSheet({
     FONT_SM,
     FONT_MD,
     FLOOR_BTN,
-    // floors tab
     classroomInput,
     setClassroomInput,
     selectedFloor,
     setSelectedFloor,
-    // directions tab
     BUILDINGS_LIST,
     getFloors,
     getRooms,
@@ -339,13 +378,10 @@ export default function IndoorMapsBottomSheet({
     handleSwapDirections,
 }) {
     return (
-        // Bottom menu
         <Animated.View style={[styles.sheet, { height: sheetHeight }]}>
-            {/* part of the bottom menu that pops up and is draggable*/}
             <View {...panResponder.panHandlers} style={styles.dragArea}>
                 <View style={styles.dragHandle} />
 
-                {/*separating into three icons*/}
                 <View style={styles.barRow}>
                     <View style={styles.barSide}>
                         <Pressable testID="tab-info" style={styles.tabBtn} onPress={() => handleTabPress('info')}>
@@ -406,39 +442,19 @@ export default function IndoorMapsBottomSheet({
 }
 
 IndoorMapsBottomSheet.propTypes = {
+    ...sharedSheetPropTypes,
     sheetHeight: PropTypes.object.isRequired,
     panResponder: PropTypes.object.isRequired,
     activeTab: PropTypes.string,
     handleTabPress: PropTypes.func.isRequired,
     campus: PropTypes.string,
-    building: PropTypes.shape({
-        id: PropTypes.string,
-        name: PropTypes.string,
-        code: PropTypes.string,
-        address: PropTypes.string,
-    }),
+    building: buildingShape,
     ICON_SIZE: PropTypes.number.isRequired,
     FONT_LG: PropTypes.number.isRequired,
-    FONT_SM: PropTypes.number.isRequired,
-    FONT_MD: PropTypes.number.isRequired,
-    FLOOR_BTN: PropTypes.number.isRequired,
-    classroomInput: PropTypes.string.isRequired,
-    setClassroomInput: PropTypes.func.isRequired,
-    selectedFloor: PropTypes.string,
-    setSelectedFloor: PropTypes.func.isRequired,
-    BUILDINGS_LIST: PropTypes.arrayOf(PropTypes.string).isRequired,
-    getFloors: PropTypes.func.isRequired,
-    getRooms: PropTypes.func.isRequired,
-    directionsFrom: locationShape.isRequired,
-    setDirectionsFrom: PropTypes.func.isRequired,
-    directionsTo: locationShape.isRequired,
-    setDirectionsTo: PropTypes.func.isRequired,
-    handleSwapDirections: PropTypes.func.isRequired,
 };
 
 IndoorMapsBottomSheet.defaultProps = {
     activeTab: null,
     campus: null,
     building: null,
-    selectedFloor: null,
 };
