@@ -1,0 +1,37 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@expo/ngrok": "^4.1.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "expo": "^55.0.6",
+    "express": "^5.2.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "forceExit": true,
+    "silent": true,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.test.js"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2"
+  }
+}
