@@ -393,6 +393,7 @@ export default function OutdoorDirection({
     <ImageBackground
       source={require("../assets/background.png")}
       style={styles.background}
+      imageStyle={styles.backgroundImage}
       resizeMode="cover"
     >
       <View style={styles.header}>
@@ -425,11 +426,13 @@ export default function OutdoorDirection({
             )}
           </View>
           {activeField === "origin" && originResults.length > 0 && (
-            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
+            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="always" nestedScrollEnabled>
               {originResults.map((loc) => (
                 <Pressable
                   key={`origin-${loc.label}`}
                   style={styles.dropdownItem}
+                  onPressIn={() => pickOrigin(loc)}
+                  onMouseDown={() => pickOrigin(loc)}
                   onPress={() => pickOrigin(loc)}
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
@@ -464,11 +467,13 @@ export default function OutdoorDirection({
             )}
           </View>
           {activeField === "dest" && destResults.length > 0 && (
-            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
+            <ScrollView style={styles.dropdown} keyboardShouldPersistTaps="always" nestedScrollEnabled>
               {destResults.map((loc) => (
                 <Pressable
                   key={`dest-${loc.label}`}
                   style={styles.dropdownItem}
+                  onPressIn={() => pickDestination(loc)}
+                  onMouseDown={() => pickDestination(loc)}
                   onPress={() => pickDestination(loc)}
                 >
                   <Ionicons name="location-outline" size={16} color="#7C2B38" style={{ marginRight: 8 }} />
@@ -499,7 +504,7 @@ export default function OutdoorDirection({
         <ScrollView
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.routesContent}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="always"
         >
           {loading && (
             <View style={styles.loadingRow}>

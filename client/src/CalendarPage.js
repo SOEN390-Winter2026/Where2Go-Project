@@ -12,6 +12,7 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
@@ -30,6 +31,32 @@ const { height, width } = Dimensions.get("window");
 
 const SHEET_HEIGHT = height * 0.6;
 
+const IS_WEB = Platform.OS === "web";
+
+const MOCK_WEB_CALENDARS = [
+  {
+    id: "mock-cal-1",
+    title: "Concordia Courses",
+    color: "#912338",
+  },
+];
+
+const MOCK_WEB_EVENTS = [
+  {
+    id: "mock-event-1",
+    title: "SOEN 390 Lecture",
+    startDate: new Date(2026, 3, 8, 11, 45).toISOString(),
+    endDate: new Date(2026, 3, 8, 13, 0).toISOString(),
+    location: "Hall Building",
+  },
+  {
+    id: "mock-event-2",
+    title: "Team Meeting",
+    startDate: new Date(2026, 3, 8, 15, 0).toISOString(),
+    endDate: new Date(2026, 3, 8, 16, 0).toISOString(),
+    location: "JMSB",
+  },
+];
 function pad2(n) {
   return String(n).padStart(2, "0");
 }
@@ -98,14 +125,16 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
     })
   ).current;
 
-  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+  const [isCalendarConnected, setIsCalendarConnected] = useState(IS_WEB);
+  const [calendars, setCalendars] = useState(IS_WEB ? MOCK_WEB_CALENDARS : []);
+  const [isCalendarsChosen, setIsCalendarsChosen] = useState(IS_WEB);
+  const [selectedCalendarIds, setSelectedCalendarIds] = useState(
+    IS_WEB ? ["mock-cal-1"] : []
+  );
 
-  const [calendars, setCalendars] = useState([]);
-  const [selectedCalendarIds, setSelectedCalendarIds] = useState([]);
-  const [isCalendarsChosen, setIsCalendarsChosen] = useState(false);
-  const [isRestoring, setIsRestoring] = useState(true);
+  const [isRestoring, setIsRestoring] = useState(!IS_WEB);
 
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState(IS_WEB ? MOCK_WEB_EVENTS : []);
 
   const [isFullCalendarView, setIsFullCalendarView] = useState(false);
   const [selectedCalsModalVisible, setSelectedCalsModalVisible] = useState(false);
@@ -140,6 +169,11 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
   };
 
   const getEventsForDay = async (selectedDateString) => {
+    if (IS_WEB) {
+      setSelectedDate(selectedDateString);
+      setEvents(MOCK_WEB_EVENTS);
+      return;
+    }
     setSelectedDate(selectedDateString);
 
     if (!selectedCalendarIds.length) {
@@ -169,6 +203,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
   };
 
   useEffect(() => {
+    if (IS_WEB) return;
     let cancelled = false;
 
     async function restoreSavedCalendars() {
@@ -272,12 +307,19 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
       </View>
 
       {/* Arrow-up bottom sheet button */}
-      <Pressable testID="openModalBtn" style={styles.buttonModalUp} onPress={open}>
-        <Ionicons name="arrow-up" size={26} color="white" />
-      </Pressable>
+      {!IS_WEB && (
+        <Pressable testID="openModalBtn" style={styles.buttonModalUp} onPress={open}>
+          <Ionicons name="arrow-up" size={26} color="white" />
+        </Pressable>
+      )}
 
       {isCalendarConnected ? (
         isCalendarsChosen ? (
+          <ScrollView
+            style = {styles.pageWrap}
+            contentContainerStyle={styles.pageWrapContent}
+            showsVerticalScrollIndicator = {false}
+            >
           <View style={styles.pageWrap}>
             <View style={styles.calendarCard}>
               <View style={styles.calendarTopRow}>
@@ -494,6 +536,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
               </Pressable>
             </Modal>
           </View>
+          </ScrollView>
         ) : (
           <>
             <View style={styles.titleView}>
@@ -543,7 +586,8 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
         notConnectedView
       )}
 
-      <Modal transparent visible={visible} animationType="none">
+      {!IS_WEB && (
+        <Modal transparent visible={visible} animationType="none">
         <View style={styles.overlay}>
           <Animated.View
             testID="bottom-sheet-view"
@@ -571,6 +615,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
           </Animated.View>
         </View>
       </Modal>
+    )}
     </View>
   );
 }
@@ -720,6 +765,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 12,
     paddingHorizontal: 18,
+  },
+  pageWrapContent:{
+    paddingBottom: 32,
+    flexGrow: 1,
   },
   calendarCard: {
     borderWidth: 1,

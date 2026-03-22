@@ -1,3 +1,4 @@
+import IndoorMaps from './src/IndoorMaps';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Platform} from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
@@ -68,6 +69,11 @@ export default function AppCore() {
   const [currentCampus, setCurrentCampus] = useState('SGW');
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
 
+  const [showIndoorMaps, setShowIndoorMaps] = useState(false);
+  const [indoorBuilding, setIndoorBuilding] = useState(null);
+  const [indoorTab, setIndoorTab] = useState("info");
+
+
   const [buildings, setBuildings] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -114,32 +120,32 @@ export default function AppCore() {
   // whenever currentCampus changes, update coordinates locally and fetch building polygons from the backend
   // Also set that map loaded
   useEffect(() => {
-    const isDirections = showOutdoorDirection;
-
     updateURL({
       campus: currentCampus?.toLowerCase(),
-      panel: isDirections
+      panel: showIndoorMaps
+        ? "indoor"
+        : showOutdoorDirection
         ? "directions"
         : showCalendar
         ? "calendar"
         : null,
       poi: isPressedPOI ? "open" : null,
       calendar: showCalendar && isGoogleCalendarConnected ? "connected" : null,
-
-      from: isDirections ? directionFromLabel : null,
-      to: isDirections ? directionToLabel : null,
-      mode: isDirections ? directionMode : null,
+      building: modalVisible ? "open" : null,
+      indoorTab: showIndoorMaps ? indoorTab : null,
     });
   }, [
     currentCampus,
+    showIndoorMaps,
+    indoorTab,
+    indoorBuilding,
     showOutdoorDirection,
     showCalendar,
     isPressedPOI,
     isGoogleCalendarConnected,
-    directionFromLabel,
-    directionToLabel,
-    directionMode,
+    modalVisible,
   ]);
+
 
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
@@ -273,6 +279,22 @@ export default function AppCore() {
     );
   }
 
+  if(showIndoorMaps){
+    return(
+      <IndoorMaps
+        building={indoorBuilding}
+        campus={currentCampus}
+        activeTab={indoorTab}
+        onTabChange={setIndoorTab}
+        onPressBack={()=>{
+          setShowIndoorMaps(false);
+          setIndoorBuilding(null);
+          setIndoorTab("info");
+        }}
+      />
+    );
+  }
+
 
   return (
     <View style={styles.container}>
@@ -330,30 +352,31 @@ export default function AppCore() {
         visible={modalVisible}
         onClose={() => {
           setModalVisible(false);
-          updateURL({ building: null });}}
-        onSetDeparture={(buildingCommute) => setDepartureBuilding(buildingCommute)}
-        onSetAsDestination={() => {
-          const loc = selectedPoi?.geometry?.location;
-
-          const lat = typeof loc?.lat === "function" ? loc.lat() : loc?.lat;
-          const lng = typeof loc?.lng === "function" ? loc.lng() : loc?.lng;
-
-          if (typeof lat !== "number" || typeof lng !== "number") {
-            console.error("POI missing coords:", selectedPoi);
-            return;
-          }
-
-          setDestinationPoi({
-            label: selectedPoi?.name ?? "POI",
-            lat,
-            lng,
-          });
-
-          setDestinationBuilding(null);
-          setPoiModalVisible(false);
-          setShowOutdoorDirection(true);
+          updateURL({ building: null });
         }}
-        selectedRole={ getBuildingRole(selectedBuilding) }
+        onSetDeparture={(buildingCommute) => {
+          setDepartureBuilding(buildingCommute);
+          setDestinationPoi(null);
+          setModalVisible(false);
+          updateURL({ building: null });
+        }}
+        onSetDestination={(buildingCommute) => {
+          setDestinationBuilding(buildingCommute);
+          setDestinationPoi(null);
+          setModalVisible(false);
+          updateURL({ building: null });
+
+          if (departureBuilding) {
+            setShowOutdoorDirection(true);
+          }
+        }}
+        onGoInside={(buildingCommute) => {
+          setIndoorBuilding(buildingCommute);
+          setModalVisible(false);
+          setShowIndoorMaps(true);
+          setModalVisible(false);
+        }}
+        selectedRole={getBuildingRole(selectedBuilding)}
       />
       <PoiInfoModal
         poi={selectedPoi}

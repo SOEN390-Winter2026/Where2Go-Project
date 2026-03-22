@@ -7,6 +7,12 @@ const MAX_RADIUS = 1000;
 
 const POI_TYPES = ["restaurant", "cafe", "bar", "pharmacy", "gym"];
 
+function resolveOriginLabel(selectedBuilding, userLocation) {
+  if (selectedBuilding) return `From: ${selectedBuilding.name ?? "Selected building"}`;
+  if (userLocation) return "From: Your location";
+  return "No location. Enable GPS or tap a building";
+}
+
 export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding }) {
   const [displayRadius, setDisplayRadius] = useState(MIN_RADIUS);
   const [loading, setLoading] = useState(false);
@@ -78,6 +84,7 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
   };
 
   const hasOrigin = !!resolveOrigin();
+  const originLabel = resolveOriginLabel(selectedBuilding, userLocation);
 
   return (
     <View style={styles.poiSliderView}>
@@ -98,19 +105,32 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
       />
 
       <View style={styles.bottomRow}>
+        <View
+          style={[
+            styles.originPill,
+            selectedBuilding ? styles.originPillBuilding : styles.originPillLocation,
+          ]}
+        >
+          <Text style={styles.originText}>
+            {error || originLabel}
+          </Text>
+        </View>
+
         <Pressable
           style={[styles.loadButton, !hasOrigin && styles.loadButtonDisabled]}
           onPress={handleLoad}
           disabled={!hasOrigin || loading}
         >
           <Text style={styles.loadButtonText}>
-            {loading ? "..." : error ? error : "Load"}
+            {loading ? "..." : "Load"}
           </Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const CONTAINER_WIDTH = 340;
 
 const styles = StyleSheet.create({
   poiSliderView: {
@@ -123,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     margin: 20,
-    width: 340,
+    width: CONTAINER_WIDTH,
     alignItems: "center",
     alignSelf: "center",
   },
@@ -132,14 +152,40 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   bottomRow: {
-    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 4,
     width: "100%",
+  },
+  originPill: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#912338",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "white",
+  },
+  originPillLocation: {
+    backgroundColor: "white",
+  },
+  originPillBuilding: {
+    backgroundColor: "white",
+  },
+  originText: {
+    color: "#912338",
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 13,
+    flexWrap: "wrap",
   },
   loadButton: {
     backgroundColor: "#912338",
     borderRadius: 20,
-    paddingVertical: 10,
-    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    flexShrink: 0,
   },
   loadButtonDisabled: {
     backgroundColor: "#ccc",

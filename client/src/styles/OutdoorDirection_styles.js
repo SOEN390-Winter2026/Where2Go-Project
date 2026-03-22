@@ -22,7 +22,13 @@ export const styles = StyleSheet.create({
   routeSubTextSelected: {
     color: "rgba(255,255,255,0.8)",
   },
-  background: { flex: 1 },
+  background: {
+    flex: 1,
+    overflow: "hidden",
+  },
+  backgroundImage: {
+    width: "100%",
+  },
   header: {
     width: "100%",
     paddingTop: 35,
