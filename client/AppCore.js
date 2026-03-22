@@ -47,16 +47,51 @@ function updateURL(params) {
   if (!isWeb) return;
 
   const url = new URL(window.location.href);
-  const q = url.searchParams;
+  const current = new URLSearchParams(url.search);
 
+  // merge params
   Object.entries(params).forEach(([key, value]) => {
-    if (value === null || value === undefined || value === "") q.delete(key);
-    else q.set(key, String(value));
+    if (value === null || value === undefined || value === "") {
+      current.delete(key);
+    } else {
+      current.set(key, String(value));
+    }
   });
 
-  const newUrl = `${url.pathname}?${q.toString()}`;
+  // ALWAYS keep lwt=true
+  current.set("lwt", "true");
+
+  // ---- keep order stable (important for Maze) ----
+  const orderedKeys = [
+    "lwt",
+    "campus",
+    "panel",
+    "building",
+    "indoorTab",
+    "calendar",
+  ];
+
+  const ordered = new URLSearchParams();
+
+  // add known keys first
+  orderedKeys.forEach((key) => {
+    if (current.has(key)) {
+      ordered.set(key, current.get(key));
+    }
+  });
+
+  // add remaining keys after
+  current.forEach((value, key) => {
+    if (!orderedKeys.includes(key)) {
+      ordered.set(key, value);
+    }
+  });
+
+  const newUrl = `${url.pathname}?${ordered.toString()}`;
+
   window.history.replaceState({}, "", newUrl);
 }
+
 
 export default function AppCore() {
   console.log(API_BASE_URL);
