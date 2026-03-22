@@ -15,8 +15,6 @@ import NavigationContext from "./navigation/NavigationContext";
 
 import { styles } from "./styles/OutdoorDirection_styles";
 
-const MAX_RESULTS = 8;
-
 function getModeDisplay(mode) {
   if (mode === "concordia_shuttle") return { label: "Concordia Shuttle", icon: "bus" };
   if (mode === "walking") return { label: "Walking", icon: "walk" };
