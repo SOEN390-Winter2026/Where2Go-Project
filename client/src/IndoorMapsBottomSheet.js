@@ -110,7 +110,6 @@ const buildingShape = PropTypes.shape({
     address: PropTypes.string,
 });
 
-// Extracted to eliminate the repeated label+value pattern in the info tab
 function InfoRow({ label, value, FONT_SM, FONT_MD }) {
     return (
         <>
@@ -230,9 +229,13 @@ function SheetContent({
                             ]}
                             onPress={() => setSelectedFloor(prev => prev === floor ? null : floor)}
                         >
-                            <Text style={[styles.floorBtnText, { fontSize: FONT_MD }]}>
+                        <Text style={[
+                                styles.floorBtnText,
+                                { fontSize: FONT_MD },
+                                selectedFloor === floor && styles.floorBtnTextActive,
+                            ]}>
                                 {floor}
-                            </Text>
+                        </Text>
                         </Pressable>
                     ))}
                 </View>

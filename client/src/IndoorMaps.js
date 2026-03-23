@@ -128,6 +128,12 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width }) {
 
     return (
         <View style={styles.floorLayersContainer}>
+            <View style={styles.selectedFloorLabel}>
+                <Text style={styles.selectedFloorLabelText}>
+                    {`Floor ${selectedFloor}`}
+                </Text>
+            </View>
+
             {Object.entries(buildingData).map(([floor, entry]) => {
                 const isActive = selectedFloor === floor
                               || Number(selectedFloor) === Number(floor);
