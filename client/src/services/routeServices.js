@@ -11,8 +11,14 @@ export function buildRouteFromResponse({ route }) {
   const segments = steps
     .map((s) => {
       const c = decodePolylineToCoords(s?.polyline);
-      if (!c.length) return null;
-      return { coords: c, isWalk: s?.type === "walk", vehicle: s?.vehicle };
+      if (!c.length && s?.type !== "transition") return null;
+      return {
+        coords: c,
+        isWalk: s?.type === "walk" || s?.type === "transition",
+        isTransition: s?.type === "transition",
+        vehicle: s?.vehicle,
+        instruction: s?.instruction || ""
+      };
     })
     .filter(Boolean);
   return { coords, segments };

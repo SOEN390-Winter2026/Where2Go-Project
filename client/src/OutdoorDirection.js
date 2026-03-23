@@ -33,14 +33,16 @@ function stepsToSegments(route) {
   return steps
     .map((s) => {
       const coords = decodePolylineToCoords(s.polyline);
-      if (!coords.length) return null;
+      if (!coords.length && s.type !== "transition") return null;
       return {
         coords,
-        isWalk: s.type === "walk",
+        isWalk: s.type === "walk" || s.type === "transition",
+        isTransition: s.type === "transition",
         vehicle: s.vehicle || null,
         line: s.line || "",
         from: s.from || "",
         to: s.to || "",
+        instruction: s.instruction || "",
       };
     })
     .filter(Boolean);

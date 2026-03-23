@@ -4,6 +4,7 @@
  * CAMPUS_COORDS  – campus-level coordinates (used by App.js, OutdoorDirection props, etc.)
  * SEARCHABLE_LOCATIONS – flat list of every campus + building with a searchText field
  *                        for case-insensitive autocomplete in the route planner.
+ * BUILDING_ENTRANCES – entrance coordinates for buildings to enable indoor-outdoor transitions
  *
  * Building centroids were computed from the polygon data in backend/src/services/map.js.
  * If a building is added/removed there, update this file to match.
@@ -13,6 +14,44 @@
 export const CAMPUS_COORDS = {
   SGW: { latitude: 45.4974, longitude: -73.5771 },
   Loyola: { latitude: 45.4587, longitude: -73.6409 },
+};
+
+// ── Building entrances for indoor-outdoor transitions ──────────────────────
+// Each building can have multiple entrances with coordinates and descriptions
+export const BUILDING_ENTRANCES = {
+  // SGW Buildings
+  hall: [
+    { lat: 45.4975, lng: -73.5788, description: "Main entrance on De Maisonneuve Blvd" },
+    { lat: 45.4970, lng: -73.5785, description: "Side entrance" }
+  ],
+  jw: [
+    { lat: 45.4970, lng: -73.5778, description: "Main entrance" }
+  ],
+  va: [
+    { lat: 45.4959, lng: -73.5738, description: "Main entrance on René-Lévesque Blvd" }
+  ],
+  ev: [
+    { lat: 45.4957, lng: -73.5782, description: "Main entrance" }
+  ],
+  gn: [
+    { lat: 45.4939, lng: -73.5765, description: "Main entrance on Guy St" }
+  ],
+  fg: [
+    { lat: 45.4945, lng: -73.5780, description: "Main entrance" }
+  ],
+  mb: [
+    { lat: 45.4955, lng: -73.5790, description: "Main entrance" }
+  ],
+  // Loyola Buildings
+  cc: [
+    { lat: 45.4584, lng: -73.6402, description: "Main entrance" }
+  ],
+  vl: [
+    { lat: 45.4590, lng: -73.6385, description: "Main entrance" }
+  ],
+  py: [
+    { lat: 45.4590, lng: -73.6404, description: "Main entrance" }
+  ]
 };
 
 // ── Searchable catalogue (campuses + all buildings) ─────────────────────────
@@ -88,3 +127,99 @@ export const SEARCHABLE_LOCATIONS = [
   { label: "Future Buildings Laboratory (Loyola)", lat: 45.45927, lng: -73.64253, searchText: "future buildings laboratory sh loyola" },
   { label: "Terrebone Building (Loyola)", lat: 45.45999, lng: -73.64084, searchText: "terrebone building ta loyola" },
 ];
+
+// ── Utility functions for indoor-outdoor transitions ────────────────────────
+
+/**
+ * Calculate distance between two coordinates using Haversine formula
+ */
+function haversineDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000; // Earth's radius in meters
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const lat1Rad = (lat1 * Math.PI) / 180;
+  const lat2Rad = (lat2 * Math.PI) / 180;
+
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Check if a location is inside a building by checking proximity to building centroids
+ * @param {number} lat - Latitude
+ * @param {number} lng - Longitude
+ * @param {number} radiusMeters - Radius in meters to consider "inside" (default: 50m)
+ * @returns {Object|null} Building info if inside, null if outside
+ */
+export function getBuildingForLocation(lat, lng, radiusMeters = 50) {
+  for (const location of SEARCHABLE_LOCATIONS) {
+    if (!location.label.includes('(')) continue; // Skip campus entries
+
+    const distance = haversineDistance(lat, lng, location.lat, location.lng);
+    if (distance <= radiusMeters) {
+      // Extract building code from label (e.g., "Hall Building (SGW)" -> "hall")
+      const match = location.label.match(/^(.+?)\s+\((.+?)\)$/);
+      if (match) {
+        const [, buildingName, campus] = match;
+        const buildingCode = buildingName.toLowerCase()
+          .replace(/\s+building$/, '')
+          .replace(/\s+/g, '')
+          .replace(/[^a-z0-9]/g, '');
+
+        return {
+          code: buildingCode,
+          name: buildingName,
+          campus: campus.toLowerCase(),
+          centroid: { lat: location.lat, lng: location.lng },
+          distance
+        };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Get the nearest entrance for a building
+ * @param {string} buildingCode - Building code (e.g., 'hall', 'jw')
+ * @param {number} userLat - User's current latitude
+ * @param {number} userLng - User's current longitude
+ * @returns {Object|null} Nearest entrance coordinates and description
+ */
+export function getNearestEntrance(buildingCode, userLat, userLng) {
+  const entrances = BUILDING_ENTRANCES[buildingCode];
+  if (!entrances || entrances.length === 0) return null;
+
+  let nearest = null;
+  let minDistance = Infinity;
+
+  for (const entrance of entrances) {
+    const distance = haversineDistance(userLat, userLng, entrance.lat, entrance.lng);
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearest = { ...entrance, distance };
+    }
+  }
+
+  return nearest;
+}
+
+/**
+ * Determine if a route requires indoor-outdoor transition
+ * @param {Object} origin - Origin location {lat, lng, label?}
+ * @param {Object} destination - Destination location {lat, lng, label?}
+ * @returns {Object} Transition info
+ */
+export function analyzeRouteTransition(origin, destination) {
+  const originBuilding = getBuildingForLocation(origin.lat, origin.lng);
+  const destBuilding = getBuildingForLocation(destination.lat, destination.lng);
+
+  return {
+    originIndoor: !!originBuilding,
+    destinationIndoor: !!destBuilding,
+    originBuilding: originBuilding,
+    destBuilding: destBuilding,
+    requiresTransition: !!(originBuilding || destBuilding)
+  };
+}

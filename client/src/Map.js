@@ -24,7 +24,9 @@ const coordShape = PropTypes.shape({
 const segmentShape = PropTypes.shape({
   coords: PropTypes.arrayOf(coordShape).isRequired,
   isWalk: PropTypes.bool.isRequired,
+  isTransition: PropTypes.bool,
   vehicle: PropTypes.string,
+  instruction: PropTypes.string,
 });
 
 function getPoiIcon(types = []) {
@@ -78,15 +80,18 @@ function EndMarker() {
 function WalkPolylines({ segments }) {
   return segments
     .filter((s) => s.isWalk)
-    .map((seg) => (
-      <Polyline
-        key={`walk-${segKey(seg)}`}
-        coordinates={seg.coords}
-        strokeColor={BURGUNDY_LIGHT}
-        strokeWidth={3}
-        lineDashPattern={[6, 6]}
-      />
-    ));
+    .map((seg) => {
+      const isTransition = seg.isTransition;
+      return (
+        <Polyline
+          key={`walk-${segKey(seg)}`}
+          coordinates={seg.coords}
+          strokeColor={isTransition ? "#FFA500" : BURGUNDY_LIGHT} // Orange for transitions
+          strokeWidth={isTransition ? 4 : 3}
+          lineDashPattern={isTransition ? [8, 4] : [6, 6]} // Different dash pattern for transitions
+        />
+      );
+    });
 }
 
 WalkPolylines.propTypes = { segments: PropTypes.arrayOf(segmentShape).isRequired };
