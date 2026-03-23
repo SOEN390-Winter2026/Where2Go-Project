@@ -1,28 +1,27 @@
-import { KNOWN_LOCATIONS, SEARCHABLE_LOCATIONS } from "../../src/data/locations";
+import { CAMPUS_COORDS, SEARCHABLE_LOCATIONS } from "../../src/data/locations";
 
-describe("KNOWN_LOCATIONS", () => {
+describe("CAMPUS_COORDS", () => {
   it("contains SGW and Loyola", () => {
-    expect(KNOWN_LOCATIONS).toHaveProperty("SGW");
-    expect(KNOWN_LOCATIONS).toHaveProperty("Loyola");
+    expect(CAMPUS_COORDS).toHaveProperty("SGW");
+    expect(CAMPUS_COORDS).toHaveProperty("Loyola");
   });
 
-  it("has label, lat, and lng for each campus", () => {
-    Object.values(KNOWN_LOCATIONS).forEach((campus) => {
-      expect(campus).toHaveProperty("label");
-      expect(campus).toHaveProperty("lat");
-      expect(campus).toHaveProperty("lng");
+  it("has latitude and longitude for each campus", () => {
+    Object.values(CAMPUS_COORDS).forEach((campus) => {
+      expect(campus).toHaveProperty("latitude");
+      expect(campus).toHaveProperty("longitude");
 
-      expect(typeof campus.lat).toBe("number");
-      expect(typeof campus.lng).toBe("number");
+      expect(typeof campus.latitude).toBe("number");
+      expect(typeof campus.longitude).toBe("number");
     });
   });
 
   it("coordinates are within valid ranges", () => {
-    Object.values(KNOWN_LOCATIONS).forEach(({ lat, lng }) => {
-      expect(lat).toBeGreaterThanOrEqual(-90);
-      expect(lat).toBeLessThanOrEqual(90);
-      expect(lng).toBeGreaterThanOrEqual(-180);
-      expect(lng).toBeLessThanOrEqual(180);
+    Object.values(CAMPUS_COORDS).forEach(({ latitude, longitude }) => {
+      expect(latitude).toBeGreaterThanOrEqual(-90);
+      expect(latitude).toBeLessThanOrEqual(90);
+      expect(longitude).toBeGreaterThanOrEqual(-180);
+      expect(longitude).toBeLessThanOrEqual(180);
     });
   });
 });

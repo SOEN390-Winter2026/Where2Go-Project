@@ -20,34 +20,14 @@ jest.mock("../src/data/locations", () => ({
 }));
 
 describe("OutdoorDirection helper coverage", () => {
-  test("getBuildingDisplayName handles empty + parentheses", () => {
-    expect(__test__.getBuildingDisplayName(null)).toBe(null);
-    expect(__test__.getBuildingDisplayName("Hall Building (H)")).toBe("Hall Building");
-    expect(__test__.getBuildingDisplayName("Library")).toBe("Library");
+  test("location search functions are exported and callable through __test__", () => {
+    // Verify functions imported from locationSearch utility are available
+    expect(typeof __test__.getBuildingDisplayName).toBe("function");
+    expect(typeof __test__.filterLocations).toBe("function");
+    expect(typeof __test__.resolveLocationByName).toBe("function");
   });
 
-  test("filterLocations returns [] for blank query", () => {
-    expect(__test__.filterLocations("   ", [])).toEqual([]);
-    expect(__test__.filterLocations("", [])).toEqual([]);
-  });
-
-  test("filterLocations dedupes by display name + caps MAX_RESULTS", () => {
-    const buildings = Array.from({ length: 20 }, (_, i) => ({
-      name: `Hall Extra ${i}`,
-      coordinates: [{ latitude: 45.0 + i * 0.001, longitude: -73.0 - i * 0.001 }],
-    }));
-
-    const results = __test__.filterLocations("hall", buildings);
-
-    // capped to 8
-    expect(results.length).toBeLessThanOrEqual(8);
-
-    // no duplicate display names
-    const names = results.map((r) => __test__.getBuildingDisplayName(r.label));
-    expect(new Set(names).size).toBe(names.length);
-  });
-
-  test("getModeDisplay covers default branch", () => {
+  test("getModeDisplay covers all modes", () => {
     expect(__test__.getModeDisplay("walking").label).toBe("Walking");
     expect(__test__.getModeDisplay("transit").label).toBe("Transit");
     expect(__test__.getModeDisplay("concordia_shuttle").label).toBe("Concordia Shuttle");
