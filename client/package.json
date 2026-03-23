@@ -42,7 +42,8 @@
     "silent": true,
     "moduleNameMapper": {
       "^@env$": "<rootDir>/__mocks__/@env.js",
-      "^.*indoorData$": "<rootDir>/indoorData.js"
+      "^.*indoorData$": "<rootDir>/indoorData.js",
+      "\\.(png|jpg|jpeg|webp)$": "<rootDir>/__mocks__/fileMock.js"
     },
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",

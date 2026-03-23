@@ -177,13 +177,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     floorBtnActive: {
-        backgroundColor: '#6b0f1a',
+        backgroundColor: '#fff',
         borderWidth: 2,
-        borderColor: '#fff',
+        borderColor: '#912338',
     },
     floorBtnText: {
         fontWeight: '700',
         color: '#fff',
+    },
+    floorBtnTextActive: {
+        color: '#912338',
     },
 
     infoLabel: {

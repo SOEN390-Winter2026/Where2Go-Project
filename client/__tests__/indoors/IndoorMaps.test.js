@@ -2,6 +2,47 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import IndoorMaps from '../../src/IndoorMaps';
 
+// ✅ Mock indoorData so Jest never loads the real PNG/JSON requires
+jest.mock('indoorData', () => ({
+    indoorMaps: {
+        SGW: {
+            H: {
+                2:  { image: 1, data: { rooms: [], waypoints: [] } },
+                4:  { image: 2, data: { rooms: [], waypoints: [] } },
+                5:  { image: 3, data: { rooms: [], waypoints: [] } },
+                6:  { image: 4, data: { rooms: [], waypoints: [] } },
+                7:  { image: 5, data: { rooms: [], waypoints: [] } },
+                8:  { image: 6, data: { rooms: [], waypoints: [] } },
+                9:  { image: 7, data: { rooms: [], waypoints: [] } },
+                10: { image: 8, data: { rooms: [], waypoints: [] } },
+                11: { image: 9, data: { rooms: [], waypoints: [] } },
+                12: { image: 10, data: { rooms: [], waypoints: [] } },
+            },
+            MB: {
+                6:  { image: null, data: null },
+                7:  { image: null, data: null },
+                8:  { image: null, data: null },
+                9:  { image: null, data: null },
+                S1: { image: null, data: null },
+                S2: { image: null, data: null },
+            },
+        },
+        Loyola: {
+            CC: {
+                1: { image: 11, data: { rooms: [], waypoints: [] } },
+                2: { image: 12, data: { rooms: [], waypoints: [] } },
+                3: { image: 13, data: { rooms: [], waypoints: [] } },
+                4: { image: 14, data: { rooms: [], waypoints: [] } },
+            },
+            VE: {
+                1: { image: 15, data: { rooms: [], waypoints: [] } },
+                2: { image: 16, data: { rooms: [], waypoints: [] } },
+                3: { image: 17, data: null },
+            },
+        },
+    },
+}));
+
 jest.mock('../../src/IndoorSideLeftBar', () => {
     const { Pressable, Text } = require('react-native');
     const PropTypes = require('prop-types');
@@ -18,7 +59,6 @@ jest.mock('../../src/IndoorSideLeftBar', () => {
     return MockIndoorSideLeftBar;
 });
 
-//mock for the drag
 let panHandlers = {};
 jest.mock('react-native', () => {
     const RN = jest.requireActual('react-native');
@@ -48,10 +88,7 @@ const defaultProps = {
     campus: 'SGW',
 };
 
-// Hall building floors in indoorData: 2, 4, 5, 6, 7, 8, 9, 10, 11, 12
-// First floor auto-selected by useIndoorMaps is "2"
 const FIRST_FLOOR = '2';
-const SECOND_FLOOR = '4';
 const ANOTHER_FLOOR = '5';
 
 describe('IndoorMaps', () => {
@@ -104,7 +141,6 @@ describe('IndoorMaps', () => {
     });
 
     it('shows "Select a floor" placeholder when no campus is provided', () => {
-        // Without campus, indoorMaps lookup fails → no auto-select → placeholder shown
         const { getByText } = render(
             <IndoorMaps {...defaultProps} campus={undefined} />
         );
@@ -166,7 +202,6 @@ describe('IndoorMaps', () => {
     it('opens floors tab and shows floor buttons for Hall building', () => {
         const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        // Hall building floors: 2, 4, 5, 6, 7, 8, 9, 10, 11, 12
         expect(getByTestId('floor-btn-2')).toBeTruthy();
         expect(getByTestId('floor-btn-4')).toBeTruthy();
         expect(getByTestId('floor-btn-5')).toBeTruthy();
@@ -225,14 +260,12 @@ describe('IndoorMaps', () => {
         const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-info'));
         fireEvent.press(getByTestId('tab-floors'));
-        // First available floor for Hall is 2
         expect(getByTestId('floor-btn-2')).toBeTruthy();
     });
 
     it('selects a floor and updates the floor label', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        // floor-btn-4 is the second available floor for Hall
         fireEvent.press(getByTestId('floor-btn-4'));
         expect(getByText('Floor 4')).toBeTruthy();
     });
@@ -240,7 +273,6 @@ describe('IndoorMaps', () => {
     it('deselects the active floor when pressed again and restores placeholder', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        // Floor 2 is already auto-selected — pressing it once deselects it
         fireEvent.press(getByTestId(`floor-btn-${FIRST_FLOOR}`));
         expect(getByText('Select a floor')).toBeTruthy();
     });
@@ -248,7 +280,6 @@ describe('IndoorMaps', () => {
     it('switches selected floor correctly', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        // Start on floor 2 (auto-selected), switch to floor 4
         fireEvent.press(getByTestId('floor-btn-4'));
         expect(getByText('Floor 4')).toBeTruthy();
     });
