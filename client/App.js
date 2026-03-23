@@ -17,7 +17,7 @@ import CalendarPage from "./src/CalendarPage";
 import LoadingPage from './src/LoadingPage';
 import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
-import { getDestinationFromBuildingCode } from './src/utils/eventDestinationResolver';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { CAMPUS_COORDS } from "./src/data/locations";
 
 const colors = {
@@ -42,7 +42,6 @@ export default function App() {
   const [userDraggedMap, setUserDraggedMap] = useState(false);
   const [liveLocationEnabled, setLiveLocationEnabled] = useState(false);
 
-  //indoors stuff
   const [showIndoorMaps, setShowIndoorMaps] = useState(false);
 
   const [isPressedPOI, setIsPressedPOI] = useState(false);
@@ -51,16 +50,14 @@ export default function App() {
   const [selectedPoi, setSelectedPoi] = useState(null);
   const [poiModalVisible, setPoiModalVisible] = useState(false);
 
-  const [dataLoaded, setDataLoaded] = useState(false); // for loading check
-  const [hasInitialized, setHasInitialized] = useState(false); // only load the first time
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
-  //Live Loc
   const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
 
   const watchRef = useRef(null);
   const mapRef = useRef(null);
 
-  //for selecting buildings as departure or destination on map
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
   const [destinationPoi, setDestinationPoi] = useState(null);
@@ -189,10 +186,8 @@ export default function App() {
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
           setUserLocation({
-            
             latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude, 
-          
+            longitude: loc.coords.longitude,
           });
         }
       );
@@ -224,14 +219,16 @@ export default function App() {
   if (!hasInitialized) {
     return <LoadingPage />;
   }
-
+  
   if (showIndoorMaps) {
     return (
-      <IndoorMaps
-        building={selectedBuilding}
-        onPressBack={() => setShowIndoorMaps(false)}
-        campus={currentCampus}
-      />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <IndoorMaps
+          building={selectedBuilding}
+          onPressBack={() => setShowIndoorMaps(false)}
+          campus={currentCampus}
+        />
+      </GestureHandlerRootView>
     );
   }
 
@@ -263,125 +260,128 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.mapPlaceholder} pointerEvents="none" />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.mapPlaceholder} pointerEvents="none" />
 
-      <CampusMap
-        ref={mapRef}
-        campusCoords={campusCoords}
-        buildings={buildings}
-        onBuildingPress={handleBuildingPress}
-        liveLocationEnabled={liveLocationEnabled}
-        userLocation={userLocation}
-        userDraggedMap={userDraggedMap}
-        setUserDraggedMap={setUserDraggedMap}
-        selectedPois={selectedPois}
-        onPoiPress={(poi) => {
-          setSelectedPoi(poi);
-          setPoiModalVisible(true);
-        }}
-        activeSegments={activeSegments}
-        activeRouteCoords={activeRouteCoords}
-        routeStart={routeStart}
-        routeEnd={routeEnd}
-        onLiveLocDisappear={() => setIsLiveLocVisible(false)}
-        onLiveLocAppear={() => setIsLiveLocVisible(true)}
-      />
-      {liveLocationEnabled && !isLiveLocVisible && userLocation && (
-        <Pressable
-          style={styles.recenterButton}
-          onPress={() => {
-            mapRef.current?.animateToRegion(
-              {
-                ...userLocation,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-              },
-              400
-            );
-            setUserDraggedMap(false);
-          }}
-        >
-          <Ionicons name="compass" size={30} color="#912338" />
-        </Pressable>
-      )}
-
-      <SideLeftBar
-        currentCampus={currentCampus}
-        isPressedPOI={isPressedPOI}
-        onToggleCampus={() =>
-          setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
-        }
-        onToggleLiveLocation={() =>
-          setLiveLocationEnabled((prev) => {
-            if (prev) setUserLocation(null);
-            return !prev;
-          })
-        }
-        onPressPOI={() => {
-          setIsPressedPOI(prev => {
-            if (prev) {
-              setPoiOriginBuilding(null);
-              setSelectedPois([]);
-            }
-            return !prev;
-          });
-        }}
-      />
-
-      <TopRightMenu
-        onPressDirection={() => setShowOutdoorDirection(true)}
-        onPressCalendar={() => setShowCalendar(true)}
-      />
-
-      <BuildingInfoModal
-        building={selectedBuilding}
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSetDeparture={(b) => setDepartureBuilding(b)}
-        onSetDestination={(b) => {
-          setDestinationBuilding(b);
-          setDestinationPoi(null);
-        }}
-        selectedRole={getBuildingRole(selectedBuilding)}
-        onGoInside={() => {
-          setModalVisible(false);
-          setShowIndoorMaps(true);
-        }}
-      />
-
-      <PoiInfoModal
-        poi={selectedPoi}
-        visible={poiModalVisible}
-        onClose={() => setPoiModalVisible(false)}
-        onSetAsDestination={() => {
-          setDestinationPoi({
-            label: selectedPoi?.name,
-            lat: selectedPoi?.geometry?.location?.lat,
-            lng: selectedPoi?.geometry?.location?.lng,
-          });
-          setDestinationBuilding(null);
-          setPoiModalVisible(false);
-          setShowOutdoorDirection(true);
-        }}
-      />
-
-      {isPressedPOI && (
-        <PoiSlider
-          onPoisChange={handlePoisChange}
+        <CampusMap
+          ref={mapRef}
+          campusCoords={campusCoords}
+          buildings={buildings}
+          onBuildingPress={handleBuildingPress}
+          liveLocationEnabled={liveLocationEnabled}
           userLocation={userLocation}
-          selectedBuilding={poiOriginBuilding}
+          userDraggedMap={userDraggedMap}
+          setUserDraggedMap={setUserDraggedMap}
+          selectedPois={selectedPois}
+          onPoiPress={(poi) => {
+            setSelectedPoi(poi);
+            setPoiModalVisible(true);
+          }}
+          activeSegments={activeSegments}
+          activeRouteCoords={activeRouteCoords}
+          routeStart={routeStart}
+          routeEnd={routeEnd}
+          onLiveLocDisappear={() => setIsLiveLocVisible(false)}
+          onLiveLocAppear={() => setIsLiveLocVisible(true)}
         />
-      )}
 
-      {isRouteActive && (
-        <Pressable style={styles.cancelButton} onPress={handleCancelRoute}>
-          <Ionicons name="close" size={22} color="white" />
-        </Pressable>
-      )}
+        {liveLocationEnabled && !isLiveLocVisible && userLocation && (
+          <Pressable
+            style={styles.recenterButton}
+            onPress={() => {
+              mapRef.current?.animateToRegion(
+                {
+                  ...userLocation,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                },
+                400
+              );
+              setUserDraggedMap(false);
+            }}
+          >
+            <Ionicons name="compass" size={30} color="#912338" />
+          </Pressable>
+        )}
 
-      <StatusBar style="auto" />
-    </View>
+        <SideLeftBar
+          currentCampus={currentCampus}
+          isPressedPOI={isPressedPOI}
+          onToggleCampus={() =>
+            setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
+          }
+          onToggleLiveLocation={() =>
+            setLiveLocationEnabled((prev) => {
+              if (prev) setUserLocation(null);
+              return !prev;
+            })
+          }
+          onPressPOI={() => {
+            setIsPressedPOI(prev => {
+              if (prev) {
+                setPoiOriginBuilding(null);
+                setSelectedPois([]);
+              }
+              return !prev;
+            });
+          }}
+        />
+
+        <TopRightMenu
+          onPressDirection={() => setShowOutdoorDirection(true)}
+          onPressCalendar={() => setShowCalendar(true)}
+        />
+
+        <BuildingInfoModal
+          building={selectedBuilding}
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSetDeparture={(b) => setDepartureBuilding(b)}
+          onSetDestination={(b) => {
+            setDestinationBuilding(b);
+            setDestinationPoi(null);
+          }}
+          selectedRole={getBuildingRole(selectedBuilding)}
+          onGoInside={() => {
+            setModalVisible(false);
+            setShowIndoorMaps(true);
+          }}
+        />
+
+        <PoiInfoModal
+          poi={selectedPoi}
+          visible={poiModalVisible}
+          onClose={() => setPoiModalVisible(false)}
+          onSetAsDestination={() => {
+            setDestinationPoi({
+              label: selectedPoi?.name,
+              lat: selectedPoi?.geometry?.location?.lat,
+              lng: selectedPoi?.geometry?.location?.lng,
+            });
+            setDestinationBuilding(null);
+            setPoiModalVisible(false);
+            setShowOutdoorDirection(true);
+          }}
+        />
+
+        {isPressedPOI && (
+          <PoiSlider
+            onPoisChange={handlePoisChange}
+            userLocation={userLocation}
+            selectedBuilding={poiOriginBuilding}
+          />
+        )}
+
+        {isRouteActive && (
+          <Pressable style={styles.cancelButton} onPress={handleCancelRoute}>
+            <Ionicons name="close" size={22} color="white" />
+          </Pressable>
+        )}
+
+        <StatusBar style="auto" />
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -420,5 +420,5 @@ const styles = StyleSheet.create({
     zIndex: 12,
     borderColor: "#912338",
     borderWidth: 1.5,
-  }
+  },
 });

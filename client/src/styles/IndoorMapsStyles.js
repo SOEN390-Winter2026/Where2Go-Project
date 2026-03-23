@@ -15,16 +15,69 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#912338',
     },
+
     mapArea: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
     },
     mapPlaceholderSub: {
         color: '#aaa',
         fontStyle: 'italic',
     },
+
+    placeholderContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    placeholderText: {
+        color: '#ccc',
+        marginTop: 8,
+    },
+
+    floorLayersContainer: {
+        flex: 1,
+        width: '100%',
+    },
+
+    zoomableContainer: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+    },
+    zoomableAnimatedView: {
+        flex: 1,
+        overflow: 'hidden',
+    },
+    mapImage: {
+        width: '100%',
+        height: '100%',
+    },
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1,
+    },
+
+    navUnavailableBadge: {
+        position: 'absolute',
+        bottom: 12,
+        right: 12,
+        backgroundColor: '#f0ad4e',
+        borderRadius: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+    },
+    navUnavailableText: {
+        fontSize: 11,
+        color: '#fff',
+        fontWeight: '600',
+    },
+
     sheet: {
         position: 'absolute',
         bottom: 0,
@@ -34,6 +87,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         overflow: 'hidden',
+        zIndex: 10,
+        elevation: 10,
     },
     dragArea: {
         alignItems: 'center',
@@ -89,6 +144,7 @@ const styles = StyleSheet.create({
     sheetScrollContent: {
         paddingBottom: 16,
     },
+
     classroomRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -108,6 +164,7 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         backgroundColor: '#f5f5f5',
     },
+
     floorBtnsWrap: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -128,6 +185,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#fff',
     },
+
     infoLabel: {
         color: '#999',
         fontWeight: '600',
@@ -139,6 +197,7 @@ const styles = StyleSheet.create({
         color: '#333',
         fontWeight: '500',
     },
+
     takeToDirectionsBtn: {
         marginHorizontal: 16,
         marginTop: 10,
@@ -155,7 +214,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         letterSpacing: 0.4,
     },
-
     directionsSectionTitle: {
         fontWeight: '800',
         color: '#912338',
@@ -173,7 +231,6 @@ const styles = StyleSheet.create({
         gap: 8,
         justifyContent: 'space-between',
     },
-
     swapRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -195,7 +252,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowRadius: 3,
     },
-
     generateDirectionsBtn: {
         marginTop: 14,
         backgroundColor: '#912338',
@@ -244,7 +300,6 @@ const styles = StyleSheet.create({
         color: '#bbb',
         fontWeight: '400',
     },
-    // Modal overlay
     dropdownOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.35)',
