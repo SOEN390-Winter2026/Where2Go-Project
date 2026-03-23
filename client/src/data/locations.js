@@ -1,7 +1,7 @@
 /**
  * Concordia campus and building location data.
  *
- * KNOWN_LOCATIONS  – campus-level coordinates (used by App.js, OutdoorDirection props, etc.)
+ * CAMPUS_COORDS  – campus-level coordinates (used by App.js, OutdoorDirection props, etc.)
  * SEARCHABLE_LOCATIONS – flat list of every campus + building with a searchText field
  *                        for case-insensitive autocomplete in the route planner.
  *
@@ -10,9 +10,9 @@
  */
 
 // ── Campus coordinates ──────────────────────────────────────────────────────
-export const KNOWN_LOCATIONS = {
-  SGW: { label: "SGW Campus", lat: 45.4974, lng: -73.5771 },
-  Loyola: { label: "Loyola Campus", lat: 45.4587, lng: -73.6409 },
+export const CAMPUS_COORDS = {
+  SGW: { latitude: 45.4974, longitude: -73.5771 },
+  Loyola: { latitude: 45.4587, longitude: -73.6409 },
 };
 
 // ── Searchable catalogue (campuses + all buildings) ─────────────────────────
