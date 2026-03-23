@@ -47,7 +47,7 @@ function getDatePartsFromEvent(event) {
 }
 function getLocation(event) {
   const loc = event?.location && String(event.location).trim();
-  return loc ? loc : "Location not specified";
+  return loc || "Location not specified";
 }
 function formatTime(d) {
   if (!d) return "";
@@ -357,7 +357,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                         onPress={() => {
                           if (!onGenerateDirections) return;
                           const parsed = parseEventLocation(event.location);
-                          if (!parsed || !parsed.building) {
+                          if (!parsed?.building) {
                             console.log("Event location is missing or not a Concordia building. Skipping directions.");
                             Alert.alert(
                               "Cannot Generate Directions",

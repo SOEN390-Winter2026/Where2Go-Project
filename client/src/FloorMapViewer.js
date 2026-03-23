@@ -3,12 +3,20 @@ import {
   View, Image, Text, TouchableOpacity,
   StyleSheet, Dimensions, ScrollView
 } from 'react-native';
+import PropTypes from 'prop-types';
 import { indoorMaps } from '../../indoorData';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+FloorMapViewer.propTypes = {
+  building: PropTypes.object.isRequired,
+  campus: PropTypes.string.isRequired
+};
+
 export default function FloorMapViewer({ building, campus }) {
   const buildingData = indoorMaps[campus]?.[building];
+  const floors = buildingData ? Object.keys(buildingData) : [];
+  const [selectedFloor, setSelectedFloor] = useState(floors[0]);
 
   if (!buildingData) {
     return (
@@ -18,8 +26,6 @@ export default function FloorMapViewer({ building, campus }) {
     );
   }
 
-  const floors = Object.keys(buildingData);
-  const [selectedFloor, setSelectedFloor] = useState(floors[0]);
   const floorEntry = buildingData[selectedFloor];
 
   return (

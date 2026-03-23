@@ -186,10 +186,10 @@ const CampusMap = forwardRef((props, ref) => {
 
     if (isVisible !== isMarkerCurrentlyVisible) {
       setIsMarkerCurrentlyVisible(isVisible);
-      if (!isVisible) {
-        onLiveLocDisappear();
-      } else {
+      if (isVisible) {
         onLiveLocAppear();
+      } else {
+        onLiveLocDisappear();
       }
     }
   };

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 TopRightMenu.propTypes = {
   onPressDirection: PropTypes.func.isRequired,
+  onPressCalendar: PropTypes.func.isRequired
 };
 
 export default function TopRightMenu({onPressDirection, onPressCalendar}) {
