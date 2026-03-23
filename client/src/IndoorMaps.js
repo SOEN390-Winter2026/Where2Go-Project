@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -9,6 +9,7 @@ import {
     Animated,
     ActivityIndicator,
     StyleSheet,
+    Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -19,6 +20,41 @@ import styles from './styles/IndoorMapsStyles';
 import useIndoorMaps from './utils/useIndoorMaps';
 import { indoorMaps } from '../indoorData';
 
+const MIN_SCALE = 1;
+const MAX_SCALE = 4;
+const ZOOM_STEP = 0.75;
+
+const clamp = (value, max) => Math.min(Math.max(value, -max), max);
+
+const getMaxTranslate = (containerSize, s) => ({
+    x: (containerSize.width  * (s - 1)) / 2,
+    y: (containerSize.height * (s - 1)) / 2,
+});
+
+const clampTranslation = (containerSize, tx, ty, s) => {
+    const { x: maxX, y: maxY } = getMaxTranslate(containerSize, s);
+    return { x: clamp(tx, maxX), y: clamp(ty, maxY) };
+};
+
+function ZoomButton({ iconName, onPress, accessibilityLabel }) {
+    return (
+        <Pressable
+            style={({ pressed }) => [styles.zoomBtn, pressed && styles.zoomBtnPressed]}
+            onPress={onPress}
+            accessibilityLabel={accessibilityLabel}
+            accessibilityRole="button"
+        >
+            <Ionicons name={iconName} size={22} color="#912338" />
+        </Pressable>
+    );
+}
+
+ZoomButton.propTypes = {
+    iconName: PropTypes.string.isRequired,
+    onPress: PropTypes.func.isRequired,
+    accessibilityLabel: PropTypes.string.isRequired,
+};
+
 function ZoomableImage({ source }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
@@ -27,29 +63,88 @@ function ZoomableImage({ source }) {
     const lastTranslateX = useRef(0);
     const lastTranslateY = useRef(0);
     const isPinching = useRef(false);
+    const containerSize = useRef({ width: 0, height: 0 });
 
     const [isZoomed, setIsZoomed] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    useEffect(() => {
+        return () => {
+            scale.stopAnimation();
+            translateX.stopAnimation();
+            translateY.stopAnimation();
+        };
+    }, [scale, translateX, translateY]);
+
+    const commitTranslation = (tx, ty, s, animated = false) => {
+        const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
+        lastTranslateX.current = x;
+        lastTranslateY.current = y;
+        if (animated) {
+            Animated.spring(translateX, { toValue: x, useNativeDriver: true }).start();
+            Animated.spring(translateY, { toValue: y, useNativeDriver: true }).start();
+        } else {
+            translateX.setValue(x);
+            translateY.setValue(y);
+        }
+    };
+
+    const previewTranslation = (tx, ty, s) => {
+        const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
+        translateX.setValue(x);
+        translateY.setValue(y);
+    };
+
+    const resetToOrigin = (animated = false) => {
+        lastTranslateX.current = 0;
+        lastTranslateY.current = 0;
+        if (animated) {
+            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }).start();
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
+        } else {
+            translateX.setValue(0);
+            translateY.setValue(0);
+        }
+    };
+
+    const applyScale = (next, animated = false) => {
+        lastScale.current = next;
+        if (animated) {
+            Animated.spring(scale, { toValue: next, useNativeDriver: true }).start();
+        } else {
+            scale.setValue(next);
+        }
+        if (next <= MIN_SCALE) {
+            resetToOrigin(animated);
+            setIsZoomed(false);
+        } else {
+            commitTranslation(lastTranslateX.current, lastTranslateY.current, next, animated);
+            setIsZoomed(true);
+        }
+    };
+
+    const handleZoomIn = () => applyScale(Math.min(lastScale.current + ZOOM_STEP, MAX_SCALE), true);
+    const handleZoomOut  = () => applyScale(Math.max(lastScale.current - ZOOM_STEP, MIN_SCALE), true);
+    const handleRecenter = () => {
+        lastScale.current = MIN_SCALE;
+        lastTranslateX.current = 0;
+        lastTranslateY.current = 0;
+        Animated.parallel([
+            Animated.spring(scale, { toValue: MIN_SCALE, useNativeDriver: true }),
+            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+        ]).start();
+        setIsZoomed(false);
+    };
+
     const pinchGesture = Gesture.Pinch()
         .onStart(() => { isPinching.current = true; })
         .onUpdate((e) => {
-            const next = Math.min(Math.max(lastScale.current * e.scale, 1), 4);
-            scale.setValue(next);
+            scale.setValue(Math.min(Math.max(lastScale.current * e.scale, MIN_SCALE), MAX_SCALE));
         })
         .onEnd((e) => {
-            const next = Math.min(Math.max(lastScale.current * e.scale, 1), 4);
-            lastScale.current = next;
-            scale.setValue(next);
-            if (next <= 1) {
-                lastTranslateX.current = 0;
-                lastTranslateY.current = 0;
-                translateX.setValue(0);
-                translateY.setValue(0);
-                setIsZoomed(false);
-            } else {
-                setIsZoomed(true);
-            }
+            const next = Math.min(Math.max(lastScale.current * e.scale, MIN_SCALE), MAX_SCALE);
+            applyScale(next);
             isPinching.current = false;
         })
         .runOnJS(true);
@@ -58,22 +153,31 @@ function ZoomableImage({ source }) {
         .enabled(isZoomed)
         .onUpdate((e) => {
             if (isPinching.current) return;
-            translateX.setValue(lastTranslateX.current + e.translationX);
-            translateY.setValue(lastTranslateY.current + e.translationY);
+            previewTranslation(
+                lastTranslateX.current + e.translationX,
+                lastTranslateY.current + e.translationY,
+                lastScale.current
+            );
         })
         .onEnd((e) => {
             if (isPinching.current) return;
-            lastTranslateX.current += e.translationX;
-            lastTranslateY.current += e.translationY;
-            translateX.setValue(lastTranslateX.current);
-            translateY.setValue(lastTranslateY.current);
+            commitTranslation(
+                lastTranslateX.current + e.translationX,
+                lastTranslateY.current + e.translationY,
+                lastScale.current
+            );
         })
         .runOnJS(true);
 
     const composed = Gesture.Simultaneous(pinchGesture, panGesture);
 
     return (
-        <View style={styles.zoomableContainer}>
+        <View
+            style={styles.zoomableContainer}
+            onLayout={({ nativeEvent: { layout } }) => {
+                containerSize.current = { width: layout.width, height: layout.height };
+            }}
+        >
             {isLoading && (
                 <View style={styles.loadingOverlay}>
                     <ActivityIndicator size="large" color="#912338" />
@@ -93,6 +197,13 @@ function ZoomableImage({ source }) {
                     />
                 </Animated.View>
             </GestureDetector>
+            <View style={styles.zoomControls}>
+                <ZoomButton iconName="add" onPress={handleZoomIn}   accessibilityLabel="Zoom in" />
+                <View style={styles.divider} />
+                <ZoomButton iconName="remove" onPress={handleZoomOut}  accessibilityLabel="Zoom out" />
+                <View style={styles.divider} />
+                <ZoomButton iconName="locate-outline" onPress={handleRecenter} accessibilityLabel="Recenter map"/>
+            </View>
         </View>
     );
 }
@@ -118,32 +229,22 @@ Placeholder.propTypes = {
 function FloorMapImage({ campus, buildingCode, selectedFloor, width }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
 
-    if (!selectedFloor) {
-        return <Placeholder width={width} text="Select a floor" />;
-    }
-
-    if (!buildingData) {
-        return <Placeholder width={width} text="No map available." />;
-    }
+    if (!selectedFloor) return <Placeholder width={width} text="Select a floor" />;
+    if (!buildingData)  return <Placeholder width={width} text="No map available." />;
 
     return (
         <View style={styles.floorLayersContainer}>
-            <View style={styles.selectedFloorLabel}>
-                <Text style={styles.selectedFloorLabelText}>
-                    {`Floor ${selectedFloor}`}
-                </Text>
+            {/*Floor label */}
+            <View style={styles.badge} pointerEvents="none">
+                <Text style={styles.floorLabelText}>{`Floor ${selectedFloor}`}</Text>
             </View>
 
             {Object.entries(buildingData).map(([floor, entry]) => {
-                const isActive = selectedFloor === floor
-                              || Number(selectedFloor) === Number(floor);
+                const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
                 return (
                     <View
                         key={floor}
-                        style={[
-                            StyleSheet.absoluteFill,
-                            { opacity: isActive ? 1 : 0, zIndex: isActive ? 1 : 0 },
-                        ]}
+                        style={[StyleSheet.absoluteFill, { opacity: isActive ? 1 : 0, zIndex: isActive ? 1 : 0 }]}
                         pointerEvents={isActive ? 'auto' : 'none'}
                     >
                         {entry.image ? (
@@ -151,9 +252,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width }) {
                                 <ZoomableImage source={entry.image} />
                                 {!entry.data && (
                                     <View style={styles.navUnavailableBadge}>
-                                        <Text style={styles.navUnavailableText}>
-                                            Navigation unavailable
-                                        </Text>
+                                        <Text style={styles.navUnavailableText}>Navigation unavailable</Text>
                                     </View>
                                 )}
                             </>
@@ -176,47 +275,33 @@ FloorMapImage.propTypes = {
 
 export default function IndoorMaps({ building, onPressBack, campus }) {
     const { width, height } = useWindowDimensions();
-
     const SHEET_COLLAPSED = height * 0.11;
 
     const {
-        sheetHeight,
-        panResponder,
-        handleTabPress,
-        activeTab,
-        selectedFloor,
-        setSelectedFloor,
-        classroomInput,
-        setClassroomInput,
-        BUILDINGS_LIST,
-        getFloors,
-        getRooms,
-        directionsFrom,
-        setDirectionsFrom,
-        directionsTo,
-        setDirectionsTo,
+        sheetHeight, panResponder, handleTabPress, activeTab,
+        selectedFloor, setSelectedFloor,
+        classroomInput, setClassroomInput,
+        BUILDINGS_LIST, getFloors, getRooms,
+        directionsFrom, setDirectionsFrom,
+        directionsTo, setDirectionsTo,
         handleSwapDirections,
     } = useIndoorMaps(height, campus, building?.code);
 
-    //format android vs ios
     const topPadding = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) + 8 : height * 0.06;
 
     const ICON_SIZE = Math.round(width * 0.085);
     const FLOOR_BTN = Math.round(width * 0.11);
-    const FONT_LG   = Math.round(width * 0.065);
-    const FONT_SM   = Math.round(width * 0.03);
-    const FONT_MD   = Math.round(width * 0.038);
+    const FONT_LG = Math.round(width * 0.065);
+    const FONT_SM = Math.round(width * 0.03);
+    const FONT_MD = Math.round(width * 0.038);
 
     return (
         <View style={[styles.container, { paddingTop: topPadding }]}>
-
-            {/* Left sidebar menu */}
             <IndoorSideLeftBar
                 onPressBack={onPressBack}
                 onOpenDirections={() => handleTabPress('directions')}
             />
 
-            {/* indoor map */}
             <View style={[styles.mapArea, { paddingBottom: SHEET_COLLAPSED }]}>
                 <FloorMapImage
                     campus={campus}
@@ -226,7 +311,6 @@ export default function IndoorMaps({ building, onPressBack, campus }) {
                 />
             </View>
 
-            {/* Bottom menu */}
             <IndoorMapsBottomSheet
                 sheetHeight={sheetHeight}
                 panResponder={panResponder}

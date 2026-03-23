@@ -347,6 +347,57 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: '700',
     },
+
+    zoomControls: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        backgroundColor: 'rgb(255, 255, 255)',
+        borderRadius: 10,
+        outlineWidth: 2,
+        outlineColor: '#912338',
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    zoomBtn: {
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    zoomBtnPressed: {
+        backgroundColor: 'rgba(145,35,56,0.08)',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        marginHorizontal: 6,
+    },
+    badge: {
+        position: 'absolute',
+        top: 12,
+        alignSelf: 'center',
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 10,
+        pointerEvents: 'none',
+    },
+    floorLabelText: {
+        backgroundColor: '#912338',
+        color: '#ffff',
+        fontSize: 13,
+        fontWeight: '600',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 20,
+        overflow: 'hidden',
+    },
+
 });
 
 export default styles;

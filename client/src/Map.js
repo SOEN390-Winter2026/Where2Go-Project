@@ -150,11 +150,11 @@ BoardingPins.propTypes = { segments: PropTypes.arrayOf(segmentShape).isRequired 
 const CampusMap = forwardRef((props, ref) => {
   const {
     campusCoords,
+    initialRegion,
     buildings,
     onBuildingPress,
     liveLocationEnabled,
     userLocation = null,
-    userDraggedMap,
     setUserDraggedMap,
     selectedPois = [],
     onPoiPress,
@@ -164,11 +164,10 @@ const CampusMap = forwardRef((props, ref) => {
     activeRouteCoords = [],
     routeStart = null,
     routeEnd = null,
+    onRegionSave,
   } = props;
 
   const mapRef = useRef(null);
-  const [isLiveLocVisible, setIsLiveLocVisible] = useState(true);
-  const [currentRegion, setCurrentRegion] = useState(null);
 
   const [isMarkerCurrentlyVisible, setIsMarkerCurrentlyVisible] = useState(true);
 
@@ -184,7 +183,6 @@ const CampusMap = forwardRef((props, ref) => {
     const westBound = longitude - longitudeDelta / 2;
 
     const isVisible = uLat <= northBound && uLat >= southBound && uLng <= eastBound && uLng >= westBound;
-
 
     if (isVisible !== isMarkerCurrentlyVisible) {
       setIsMarkerCurrentlyVisible(isVisible);
@@ -216,6 +214,12 @@ const CampusMap = forwardRef((props, ref) => {
   const hasSegments = activeSegments.length > 0;
   const showFallbackRoute = !hasSegments && activeRouteCoords.length > 0;
 
+  const mapInitialRegion = initialRegion ?? {
+    ...campusCoords,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
+
   return (
     <>
       <View style={styles.mapPlaceholder} pointerEvents="none" />
@@ -224,14 +228,14 @@ const CampusMap = forwardRef((props, ref) => {
         accessible={true}
         provider={PROVIDER_GOOGLE}
         ref={mapRef}
-        initialRegion={{ ...campusCoords, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
+        initialRegion={mapInitialRegion}
         style={styles.map}
         onRegionChange={() => {
           if (liveLocationEnabled) setUserDraggedMap(true);
         }}
         onRegionChangeComplete={(region) => {
-          // Check if user is out of view every time they stop moving the map
           checkLiveLocationVisibility(region);
+          onRegionSave?.(region);
         }}
         onPoiClick={(event) => {
           const { placeId, name } = event.nativeEvent;
@@ -242,9 +246,7 @@ const CampusMap = forwardRef((props, ref) => {
         <BuildingCallout buildings={buildings} onBuildingPress={onBuildingPress} />
 
         {buildings.map((building) => {
-          
           const isInside = userLocation && isPointInPolygon(userLocation, building.coordinates);
-
           return (
             <Polygon
               key={building.id}

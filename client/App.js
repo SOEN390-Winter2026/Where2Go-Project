@@ -57,6 +57,7 @@ export default function App() {
 
   const watchRef = useRef(null);
   const mapRef = useRef(null);
+  const lastMapRegion = useRef(null);
 
   const [departureBuilding, setDepartureBuilding] = useState(null);
   const [destinationBuilding, setDestinationBuilding] = useState(null);
@@ -68,6 +69,15 @@ export default function App() {
   const [isRouteActive, setIsRouteActive] = useState(false);
   const [directionOrigin, setDirectionOrigin] = useState(null);
   const [directionDestination, setDirectionDestination] = useState(null);
+
+  useEffect(() => {
+    if (!showIndoorMaps && lastMapRegion.current) {
+      const t = setTimeout(() => {
+        mapRef.current?.animateToRegion(lastMapRegion.current, 0);
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [showIndoorMaps]);
 
   const handlePoisChange = (poisFromSlider) => {
     setSelectedPois(poisFromSlider);
@@ -219,7 +229,7 @@ export default function App() {
   if (!hasInitialized) {
     return <LoadingPage />;
   }
-  
+
   if (showIndoorMaps) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -267,6 +277,7 @@ export default function App() {
         <CampusMap
           ref={mapRef}
           campusCoords={campusCoords}
+          initialRegion={lastMapRegion.current}
           buildings={buildings}
           onBuildingPress={handleBuildingPress}
           liveLocationEnabled={liveLocationEnabled}
@@ -284,6 +295,7 @@ export default function App() {
           routeEnd={routeEnd}
           onLiveLocDisappear={() => setIsLiveLocVisible(false)}
           onLiveLocAppear={() => setIsLiveLocVisible(true)}
+          onRegionSave={(region) => { lastMapRegion.current = region; }}
         />
 
         {liveLocationEnabled && !isLiveLocVisible && userLocation && (
@@ -291,11 +303,7 @@ export default function App() {
             style={styles.recenterButton}
             onPress={() => {
               mapRef.current?.animateToRegion(
-                {
-                  ...userLocation,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
-                },
+                { ...userLocation, latitudeDelta: 0.005, longitudeDelta: 0.005 },
                 400
               );
               setUserDraggedMap(false);
