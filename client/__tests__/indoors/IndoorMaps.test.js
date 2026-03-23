@@ -48,6 +48,12 @@ const defaultProps = {
     campus: 'SGW',
 };
 
+// Hall building floors in indoorData: 2, 4, 5, 6, 7, 8, 9, 10, 11, 12
+// First floor auto-selected by useIndoorMaps is "2"
+const FIRST_FLOOR = '2';
+const SECOND_FLOOR = '4';
+const ANOTHER_FLOOR = '5';
+
 describe('IndoorMaps', () => {
 
     beforeEach(() => {
@@ -97,9 +103,17 @@ describe('IndoorMaps', () => {
         expect(getAllByText('H').length).toBeGreaterThan(0);
     });
 
-    it('shows "Select a floor" placeholder initially', () => {
-        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+    it('shows "Select a floor" placeholder when no campus is provided', () => {
+        // Without campus, indoorMaps lookup fails → no auto-select → placeholder shown
+        const { getByText } = render(
+            <IndoorMaps {...defaultProps} campus={undefined} />
+        );
         expect(getByText('Select a floor')).toBeTruthy();
+    });
+
+    it('auto-selects the first floor on mount and shows floor label', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+        expect(getByText(`Floor ${FIRST_FLOOR}`)).toBeTruthy();
     });
 
     it('always shows building info in the default sheet content', () => {
@@ -149,14 +163,15 @@ describe('IndoorMaps', () => {
         expect(getByTestId('tab-floors')).toBeTruthy();
     });
 
-    it('opens floors tab and shows all floor buttons', () => {
+    it('opens floors tab and shows floor buttons for Hall building', () => {
         const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        expect(getByTestId('floor-btn-1')).toBeTruthy();
+        // Hall building floors: 2, 4, 5, 6, 7, 8, 9, 10, 11, 12
         expect(getByTestId('floor-btn-2')).toBeTruthy();
-        expect(getByTestId('floor-btn-3')).toBeTruthy();
         expect(getByTestId('floor-btn-4')).toBeTruthy();
         expect(getByTestId('floor-btn-5')).toBeTruthy();
+        expect(getByTestId('floor-btn-6')).toBeTruthy();
+        expect(getByTestId('floor-btn-7')).toBeTruthy();
     });
 
     it('shows classroom label when floors tab is open', () => {
@@ -210,28 +225,30 @@ describe('IndoorMaps', () => {
         const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-info'));
         fireEvent.press(getByTestId('tab-floors'));
-        expect(getByTestId('floor-btn-1')).toBeTruthy();
+        // First available floor for Hall is 2
+        expect(getByTestId('floor-btn-2')).toBeTruthy();
     });
 
-    it('selects a floor and updates the map placeholder text', () => {
+    it('selects a floor and updates the floor label', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-3'));
-        expect(getByText('Floor 3')).toBeTruthy();
+        // floor-btn-4 is the second available floor for Hall
+        fireEvent.press(getByTestId('floor-btn-4'));
+        expect(getByText('Floor 4')).toBeTruthy();
     });
 
-    it('deselects a floor when pressed again and restores placeholder', () => {
+    it('deselects the active floor when pressed again and restores placeholder', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-2'));
-        fireEvent.press(getByTestId('floor-btn-2'));
+        // Floor 2 is already auto-selected — pressing it once deselects it
+        fireEvent.press(getByTestId(`floor-btn-${FIRST_FLOOR}`));
         expect(getByText('Select a floor')).toBeTruthy();
     });
 
     it('switches selected floor correctly', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-1'));
+        // Start on floor 2 (auto-selected), switch to floor 4
         fireEvent.press(getByTestId('floor-btn-4'));
         expect(getByText('Floor 4')).toBeTruthy();
     });
@@ -239,9 +256,9 @@ describe('IndoorMaps', () => {
     it('selected floor persists after switching tabs', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-5'));
+        fireEvent.press(getByTestId(`floor-btn-${ANOTHER_FLOOR}`));
         fireEvent.press(getByTestId('tab-info'));
-        expect(getByText('Floor 5')).toBeTruthy();
+        expect(getByText(`Floor ${ANOTHER_FLOOR}`)).toBeTruthy();
     });
 
     it('expandSheet is triggered when a tab is opened', () => {
@@ -310,7 +327,6 @@ describe('IndoorMaps', () => {
         expect(queryByTestId('classroom-input')).toBeNull();
     });
 
-    //#35: android branch of topPadding
     it('renders correctly on Android and applies android top padding', () => {
         const Platform = require('react-native').Platform;
         const original = Platform.OS;
@@ -320,7 +336,6 @@ describe('IndoorMaps', () => {
         Platform.OS = original;
     });
 
-    //stuff for get room directions
     it('shows Get Room Directions button in default (info) view', () => {
         const { getByText } = render(<IndoorMaps {...defaultProps} />);
         expect(getByText('Get Room Directions')).toBeTruthy();
