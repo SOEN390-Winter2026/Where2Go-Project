@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../../indoorData';
 
@@ -32,13 +32,13 @@ export default function useIndoorMaps(height, campus, buildingCode) {
     };
 
     // return room id from the floor's json data
-    const getRooms = (bCode, floor) => {
+    const getRooms = useCallback((bCode, floor) => {
         if (!bCode || !floor) return [];
         const floorEntry = indoorMaps?.[campus]?.[bCode]?.[floor]
                         ?? indoorMaps?.[campus]?.[bCode]?.[Number(floor)];
         if (!floorEntry?.data?.rooms) return [];
         return floorEntry.data.rooms.map(r => r.id);
-    };
+    }, [campus]);
 
     const handleSwapDirections = () => {
         setDirectionsFrom(directionsTo);
