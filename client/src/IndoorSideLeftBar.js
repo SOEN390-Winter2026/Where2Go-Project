@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Image, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { leftBarIconSource, leftBarIconState } from "./utils/leftBarItemActive";
 
 export default function IndoorSideLeftBar({
     onPressBack,
@@ -17,18 +18,10 @@ export default function IndoorSideLeftBar({
     const [activePOI, setActivePOI] = useState(null);
     const [activeSearch, setActiveSearch] = useState(false);
 
-    const iconState = (name) => {
-        if (name === "disability")
-            return { backgroundColor: isAccessibilityEnabled ? "#912338" : "#ccc" };
-        if (name === "poi")
-            return { backgroundColor: activePOI === name ? "#912338" : "#ccc" };
-    };
-
-    const iconSource = (name) => {
-        if (name === "disability")
-            return isAccessibilityEnabled ? secondDisabilityIcon : firstDisabilityIcon;
-        if (name === "poi")
-            return activePOI === name ? secondPOIIcon : firstPOIIcon;
+    const leftBarActiveInputs = { isAccessibilityEnabled, activePOI };
+    const iconPairs = {
+        disability: [firstDisabilityIcon, secondDisabilityIcon],
+        poi: [firstPOIIcon, secondPOIIcon],
     };
 
     const handleSearchPress = () => {
@@ -60,20 +53,20 @@ export default function IndoorSideLeftBar({
 
             {/* Disability btn */}
             <Pressable testID="disability-btn"
-                style={[styles.barItem, iconState("disability")]}
+                style={[styles.barItem, leftBarIconState("disability", leftBarActiveInputs)]}
                 onPress={onToggleAccessibility}
             >
-                <Image source={iconSource("disability")} style={styles.icon} />
+                <Image source={leftBarIconSource("disability", leftBarActiveInputs, iconPairs)} style={styles.icon} />
             </Pressable>
 
             {/* POIs */}
             <Pressable testID="poi-btn"
-                style={[styles.barItem, iconState("poi")]}
+                style={[styles.barItem, leftBarIconState("poi", leftBarActiveInputs)]}
                 onPress={() =>
                     setActivePOI((prev) => (prev === "poi" ? null : "poi"))
                 }
             >
-                <Image source={iconSource("poi")} style={styles.icon} />
+                <Image source={leftBarIconSource("poi", leftBarActiveInputs, iconPairs)} style={styles.icon} />
             </Pressable>
         </View>
     );

@@ -8,6 +8,7 @@ import {
   Animated,
 } from "react-native";
 import PropTypes from 'prop-types';
+import { leftBarIconSource, leftBarIconState } from "./utils/leftBarItemActive";
 
 export default function SideLeftBar({
   currentCampus,
@@ -48,24 +49,11 @@ export default function SideLeftBar({
     onToggleCampus?.();
   };
 
-  /* ---------- Icons ---------- */
-  const iconState = (name) => {
-  if (name === "disability")
-    return { backgroundColor: isAccessibilityEnabled ? "#912338" : "#ccc" };
-  if (name === "poi")
-    return { backgroundColor: activePOI === name ? "#912338" : "#ccc" };
-  if (name === "gps")
-    return { backgroundColor: activeGPS === name ? "#912338" : "#ccc" };
-};
-
-
-  const iconSource = (name) => {
-    if (name === "disability")
-      return isAccessibilityEnabled ? secondDisabilityIcon : firstDisabilityIcon;
-    if (name === "poi")
-      return activePOI === name ? secondPOIIcon : firstPOIIcon;
-    if (name === "gps")
-      return activeGPS === name ? secondGPSIcon : firstGPSIcon;
+  const leftBarActiveInputs = { isAccessibilityEnabled, activePOI, activeGPS };
+  const iconPairs = {
+    disability: [firstDisabilityIcon, secondDisabilityIcon],
+    poi: [firstPOIIcon, secondPOIIcon],
+    gps: [firstGPSIcon, secondGPSIcon],
   };
 
   return (
@@ -104,23 +92,23 @@ export default function SideLeftBar({
      {/* -------- Disability -------- */}
 <Pressable
   testID="disPress"
-  style={[styles.barItem, iconState("disability")]}
+  style={[styles.barItem, leftBarIconState("disability", leftBarActiveInputs)]}
   onPress={onToggleAccessibility}
 >
-  <Image source={iconSource("disability")} style={styles.icon} />
+  <Image source={leftBarIconSource("disability", leftBarActiveInputs, iconPairs)} style={styles.icon} />
 </Pressable>
 
 {/* -------- POI -------- */}
 <Pressable
   testID="poiPress"
-  style={[styles.barItem, iconState("poi")]}
+  style={[styles.barItem, leftBarIconState("poi", leftBarActiveInputs)]}
   onPress={() =>
     {setActivePOI((prev) => (prev === "poi" ? null : "poi"));
       onPressPOI();
     }
   }
 >
-  <Image source={iconSource("poi")} style={styles.icon} />
+  <Image source={leftBarIconSource("poi", leftBarActiveInputs, iconPairs)} style={styles.icon} />
 </Pressable>
 
 {/* -------- GPS -------- */}
@@ -128,13 +116,13 @@ export default function SideLeftBar({
   testID="gps"
   accessible={true}
   accessibilityLabel="gps"
-  style={[styles.barItem, iconState("gps")]}
+  style={[styles.barItem, leftBarIconState("gps", leftBarActiveInputs)]}
   onPress={() => {
     setActiveGPS((prev) => (prev === "gps" ? null : "gps"));
     onToggleLiveLocation();
   }}
 >
-  <Image source={iconSource("gps")} style={styles.icon} />
+  <Image source={leftBarIconSource("gps", leftBarActiveInputs, iconPairs)} style={styles.icon} />
 </Pressable>
 
     </View>
