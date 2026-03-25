@@ -24,6 +24,30 @@ function dist(a, b) {
   return Math.hypot(dx, dy);
 }
 
+function getTrailingDigits(value) {
+  const text = String(value ?? "");
+  let end = text.length;
+  while (end > 0) {
+    const code = text.charCodeAt(end - 1);
+    if (code < 48 || code > 57) break; // not 0-9
+    end -= 1;
+  }
+  const digits = text.slice(end);
+  return digits.length ? digits : "";
+}
+
+function normalizeFloorAlias(value) {
+  const text = String(value ?? "").toLowerCase();
+  let out = "";
+  for (let i = 0; i < text.length; i += 1) {
+    const code = text.charCodeAt(i);
+    const isDigit = code >= 48 && code <= 57;
+    const isLowerAlpha = code >= 97 && code <= 122;
+    if (isDigit || isLowerAlpha) out += text[i];
+  }
+  return out;
+}
+
 /**
  * GRAPH BUILDING
  */
@@ -69,9 +93,9 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
 
   // Additional normalized aliases, e.g. "H-10" -> "10", "CC3" -> "3".
   for (const [alias, canonicalFloorId] of Array.from(floorAliases.entries())) {
-    const compactAlias = alias.replace(/[^a-z0-9]/gi, "");
+    const compactAlias = normalizeFloorAlias(alias);
     floorAliases.set(compactAlias, canonicalFloorId);
-    const trailingNumber = alias.match(/(\d+)$/)?.[1];
+    const trailingNumber = getTrailingDigits(alias);
     if (trailingNumber) floorAliases.set(trailingNumber, canonicalFloorId);
   }
 
@@ -80,8 +104,8 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
     const raw = String(value).toLowerCase();
     return (
       floorAliases.get(raw) ??
-      floorAliases.get(raw.replace(/[^a-z0-9]/gi, "")) ??
-      floorAliases.get(raw.match(/(\d+)$/)?.[1] ?? "") ??
+      floorAliases.get(normalizeFloorAlias(raw)) ??
+      floorAliases.get(getTrailingDigits(raw)) ??
       null
     );
   };
