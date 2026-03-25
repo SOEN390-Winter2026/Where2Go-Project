@@ -26,6 +26,7 @@ const BuildingInfoModal = ({ building, visible, onClose, onSetDeparture, onSetDe
       visible={visible}
       animationType="slide"
       transparent={true}
+      statusBarTranslucent={true}
       onRequestClose={onClose}
     >
       <Pressable style={styles.overlay} onPress={onClose} testID="overlay">

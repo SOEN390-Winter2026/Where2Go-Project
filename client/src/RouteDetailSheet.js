@@ -133,8 +133,8 @@ export default function RouteDetailsSheet({ route, onClose }) {
 
       {steps.length > 0 && (
         <View style={styles.stepList}>
-          {steps.map((s, idx) => (
-            <StepRow key={`step-${idx}`} step={s} />
+          {steps.map((s) => (
+            <StepRow key={s.id} step={s} />
           ))}
         </View>
       )}
