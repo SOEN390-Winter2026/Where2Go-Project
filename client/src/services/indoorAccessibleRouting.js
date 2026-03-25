@@ -64,6 +64,82 @@ function addEdge(adjacencyList, fromKey, toKey, weight) {
   adjacencyList.get(fromKey).push({ to: toKey, w: weight });
 }
 
+function addFloorAliases(floorAliases, floorId, floorPlan) {
+  const addAlias = (value) => {
+    if (value == null) return;
+    floorAliases.set(String(value).toLowerCase(), floorId);
+  };
+  addAlias(floorId);
+  addAlias(floorPlan?.floor);
+}
+
+function enrichFloorAliases(floorAliases) {
+  for (const [alias, canonicalFloorId] of Array.from(floorAliases.entries())) {
+    const compactAlias = normalizeFloorAlias(alias);
+    floorAliases.set(compactAlias, canonicalFloorId);
+    const trailingNumber = getTrailingDigits(alias);
+    if (trailingNumber) floorAliases.set(trailingNumber, canonicalFloorId);
+  }
+}
+
+function createFloorResolver(floorAliases) {
+  return (value) => {
+    if (value == null) return null;
+    const raw = String(value).toLowerCase();
+    return (
+      floorAliases.get(raw) ??
+      floorAliases.get(normalizeFloorAlias(raw)) ??
+      floorAliases.get(getTrailingDigits(raw)) ??
+      null
+    );
+  };
+}
+
+function connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules) {
+  (Array.isArray(waypoint.connections) ? waypoint.connections : []).forEach((toId) => {
+    const toWaypointId = String(toId);
+    const toWaypoint = waypointById.get(toWaypointId);
+    if (!toWaypoint) return;
+
+    const edgeWeight =
+      dist(waypoint.position, toWaypoint.position) + nodePenalty(toWaypoint.type, rules);
+    addEdge(adjacencyList, `${floorId}::${waypoint.id}`, `${floorId}::${toWaypointId}`, edgeWeight);
+  });
+}
+
+function pickClosestTransferWaypoint(waypoint, candidates) {
+  return candidates.reduce((prev, curr) =>
+    dist(waypoint.position, curr.position) < dist(waypoint.position, prev.position) ? curr : prev
+  );
+}
+
+function connectTransferWaypoints({
+  adjacencyList,
+  floorId,
+  waypoint,
+  pointType,
+  floorGraphs,
+  resolveFloorId,
+  rules,
+}) {
+  if (pointType === "staircase" && rules.avoidStairs) return;
+
+  (waypoint.floorsReachable || []).forEach((targetFloorId) => {
+    const targetStr = resolveFloorId(targetFloorId);
+    if (!targetStr || targetStr === floorId || !floorGraphs.has(targetStr)) return;
+
+    const targetFloorGraph = floorGraphs.get(targetStr);
+    const candidates = targetFloorGraph.floorPlan.waypoints.filter(
+      (w) => w?.id && String(w.type).toLowerCase() === pointType
+    );
+    if (candidates.length === 0) return;
+
+    const sameShaftMatch = pickClosestTransferWaypoint(waypoint, candidates);
+    const edgeWeight = rules.floorTransferCost + nodePenalty(pointType, rules);
+    addEdge(adjacencyList, `${floorId}::${waypoint.id}`, `${targetStr}::${sameShaftMatch.id}`, edgeWeight);
+  });
+}
+
 function buildMultiFloorGraph({ campus, buildingCode, rules }) {
   const buildingData = indoorMaps?.[campus]?.[buildingCode];
   if (!buildingData) return null;
@@ -81,78 +157,29 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
       floorPlan.waypoints.filter(w => w?.id).map(w => [String(w.id), w])
     );
     floorGraphs.set(floorId, { floorPlan, waypointById });
-
-    // Build aliases so we can resolve "10" and "H-10" to the same floor.
-    const addAlias = (value) => {
-      if (value == null) return;
-      floorAliases.set(String(value).toLowerCase(), floorId);
-    };
-    addAlias(floorId);
-    addAlias(floorPlan?.floor);
+    addFloorAliases(floorAliases, floorId, floorPlan);
   }
 
-  // Additional normalized aliases, e.g. "H-10" -> "10", "CC3" -> "3".
-  for (const [alias, canonicalFloorId] of Array.from(floorAliases.entries())) {
-    const compactAlias = normalizeFloorAlias(alias);
-    floorAliases.set(compactAlias, canonicalFloorId);
-    const trailingNumber = getTrailingDigits(alias);
-    if (trailingNumber) floorAliases.set(trailingNumber, canonicalFloorId);
-  }
-
-  const resolveFloorId = (value) => {
-    if (value == null) return null;
-    const raw = String(value).toLowerCase();
-    return (
-      floorAliases.get(raw) ??
-      floorAliases.get(normalizeFloorAlias(raw)) ??
-      floorAliases.get(getTrailingDigits(raw)) ??
-      null
-    );
-  };
+  enrichFloorAliases(floorAliases);
+  const resolveFloorId = createFloorResolver(floorAliases);
 
   // 2. Link all points (Horizontal and Vertical)
   for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
     for (const waypoint of floorPlan.waypoints) {
       if (!waypoint?.id) continue;
-      const fromKey = `${floorId}::${waypoint.id}`;
       const pointType = String(waypoint.type || "").toLowerCase();
 
-      // Horizontal: Same-floor connections
-      (Array.isArray(waypoint.connections) ? waypoint.connections : []).forEach((toId) => {
-        const toWaypointId = String(toId);
-        const toWaypoint = waypointById.get(toWaypointId);
-        if (toWaypoint) {
-          const weight =
-            dist(waypoint.position, toWaypoint.position) + nodePenalty(toWaypoint.type, rules);
-          addEdge(adjacencyList, fromKey, `${floorId}::${toWaypointId}`, weight);
-        }
-      });
-
-      // Vertical: Transfer points (Elevators/Stairs)
+      connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules);
       const isTransferPoint = pointType === "elevator" || pointType === "staircase";
       if (isTransferPoint) {
-        if (pointType === "staircase" && rules.avoidStairs) continue;
-
-        (waypoint.floorsReachable || []).forEach(targetFloorId => {
-          const targetStr = resolveFloorId(targetFloorId);
-          if (!targetStr || targetStr === floorId || !floorGraphs.has(targetStr)) return;
-
-          const targetFloorGraph = floorGraphs.get(targetStr);
-          const candidates = targetFloorGraph.floorPlan.waypoints.filter(
-            (w) => w?.id && String(w.type).toLowerCase() === pointType
-          );
-
-          if (candidates.length === 0) return;
-
-          // Find the matching transfer point in the same vertical shaft
-          const sameShaftMatch = candidates.reduce((prev, curr) =>
-            dist(waypoint.position, curr.position) < dist(waypoint.position, prev.position)
-              ? curr
-              : prev
-          );
-
-          const weight = rules.floorTransferCost + nodePenalty(pointType, rules);
-          addEdge(adjacencyList, fromKey, `${targetStr}::${sameShaftMatch.id}`, weight);
+        connectTransferWaypoints({
+          adjacencyList,
+          floorId,
+          waypoint,
+          pointType,
+          floorGraphs,
+          resolveFloorId,
+          rules,
         });
       }
     }
