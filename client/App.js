@@ -70,6 +70,8 @@ export default function App() {
   const [directionOrigin, setDirectionOrigin] = useState(null);
   const [directionDestination, setDirectionDestination] = useState(null);
 
+  const [isAccessibilityEnabled, setIsAccessibilityEnabled] = useState(false);
+
   useEffect(() => {
     if (!showIndoorMaps && lastMapRegion.current) {
       const t = setTimeout(() => {
@@ -237,6 +239,8 @@ export default function App() {
           building={selectedBuilding}
           onPressBack={() => setShowIndoorMaps(false)}
           campus={currentCampus}
+          isAccessibilityEnabled={isAccessibilityEnabled}
+          onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
         />
       </GestureHandlerRootView>
     );
@@ -316,6 +320,8 @@ export default function App() {
         <SideLeftBar
           currentCampus={currentCampus}
           isPressedPOI={isPressedPOI}
+          isAccessibilityEnabled={isAccessibilityEnabled}
+          onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
           onToggleCampus={() =>
             setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
           }

@@ -9,7 +9,15 @@ import {
 } from "react-native";
 import PropTypes from 'prop-types';
 
-export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation, onPressPOI, isPressedPOI }) {
+export default function SideLeftBar({
+  currentCampus,
+  onToggleCampus,
+  onToggleLiveLocation,
+  onPressPOI,
+  isPressedPOI,
+  isAccessibilityEnabled = false,
+  onToggleAccessibility = () => {},
+}) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -24,7 +32,6 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   const isSGW = currentCampus === "SGW";
   const slideAnim = useRef(new Animated.Value(isSGW ? 0 : -26)).current;
 
-  const [activeDis, setActiveDis] = useState(null);
   const [activePOI, setActivePOI] = useState(isPressedPOI ? "poi" : null);
   const [activeGPS, setActiveGPS] = useState(null);
 
@@ -44,7 +51,7 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   /* ---------- Icons ---------- */
   const iconState = (name) => {
   if (name === "disability")
-    return { backgroundColor: activeDis === name ? "#912338" : "#ccc" };
+    return { backgroundColor: isAccessibilityEnabled ? "#912338" : "#ccc" };
   if (name === "poi")
     return { backgroundColor: activePOI === name ? "#912338" : "#ccc" };
   if (name === "gps")
@@ -54,7 +61,7 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 
   const iconSource = (name) => {
     if (name === "disability")
-      return activeDis === name ? secondDisabilityIcon : firstDisabilityIcon;
+      return isAccessibilityEnabled ? secondDisabilityIcon : firstDisabilityIcon;
     if (name === "poi")
       return activePOI === name ? secondPOIIcon : firstPOIIcon;
     if (name === "gps")
@@ -98,9 +105,7 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
 <Pressable
   testID="disPress"
   style={[styles.barItem, iconState("disability")]}
-  onPress={() =>
-    setActiveDis((prev) => (prev === "disability" ? null : "disability"))
-  }
+  onPress={onToggleAccessibility}
 >
   <Image source={iconSource("disability")} style={styles.icon} />
 </Pressable>
@@ -141,7 +146,9 @@ SideLeftBar.propTypes = {
   onToggleCampus: PropTypes.func.isRequired,
   onToggleLiveLocation: PropTypes.func.isRequired,
   onPressPOI: PropTypes.func.isRequired,
-  isPressedPOI: PropTypes.bool
+  isPressedPOI: PropTypes.bool,
+  isAccessibilityEnabled: PropTypes.bool,
+  onToggleAccessibility: PropTypes.func,
 };
 
 /* ---------- Styles ---------- */

@@ -3,26 +3,30 @@ import { View, Image, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 
-export default function IndoorSideLeftBar({ onPressBack, onOpenDirections }) {
+export default function IndoorSideLeftBar({
+    onPressBack,
+    onOpenDirections,
+    isAccessibilityEnabled = false,
+    onToggleAccessibility = () => {},
+}) {
 
     const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
     const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
     const firstPOIIcon = require("../assets/gis--poi-alt.png");
     const secondPOIIcon = require("../assets/gis--poi-alt-2.png");
-    const [activeDis, setActiveDis] = useState(null);
     const [activePOI, setActivePOI] = useState(null);
     const [activeSearch, setActiveSearch] = useState(false);
 
     const iconState = (name) => {
         if (name === "disability")
-            return { backgroundColor: activeDis === name ? "#912338" : "#ccc" };
+            return { backgroundColor: isAccessibilityEnabled ? "#912338" : "#ccc" };
         if (name === "poi")
             return { backgroundColor: activePOI === name ? "#912338" : "#ccc" };
     };
 
     const iconSource = (name) => {
         if (name === "disability")
-            return activeDis === name ? secondDisabilityIcon : firstDisabilityIcon;
+            return isAccessibilityEnabled ? secondDisabilityIcon : firstDisabilityIcon;
         if (name === "poi")
             return activePOI === name ? secondPOIIcon : firstPOIIcon;
     };
@@ -57,9 +61,7 @@ export default function IndoorSideLeftBar({ onPressBack, onOpenDirections }) {
             {/* Disability btn */}
             <Pressable testID="disability-btn"
                 style={[styles.barItem, iconState("disability")]}
-                onPress={() =>
-                    setActiveDis((prev) => (prev === "disability" ? null : "disability"))
-                }
+                onPress={onToggleAccessibility}
             >
                 <Image source={iconSource("disability")} style={styles.icon} />
             </Pressable>
@@ -79,7 +81,9 @@ export default function IndoorSideLeftBar({ onPressBack, onOpenDirections }) {
 
 IndoorSideLeftBar.propTypes = {
     onPressBack: PropTypes.func.isRequired,
-    onOpenDirections: PropTypes.func
+    onOpenDirections: PropTypes.func,
+    isAccessibilityEnabled: PropTypes.bool,
+    onToggleAccessibility: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

@@ -195,6 +195,38 @@ describe(" Buttons Test", () => {
             expect.arrayContaining([expect.objectContaining({ backgroundColor: "#ccc" })])
         );
     });
+
+    it("disability button shows active when isAccessibilityEnabled is true", () => {
+        const { getByTestId } = render(
+            <SideLeftBar
+                currentCampus="SGW"
+                onToggleCampus={jest.fn()}
+                onToggleLiveLocation={jest.fn()}
+                onPressPOI={jest.fn()}
+                isAccessibilityEnabled
+                onToggleAccessibility={jest.fn()}
+            />
+        );
+        const dis = getByTestId("disPress");
+        const bg = [dis.props.style].flat().find((s) => s?.backgroundColor)?.backgroundColor;
+        expect(bg).toBe("#912338");
+    });
+
+    it("disability button calls onToggleAccessibility when pressed", () => {
+        const onToggleAccessibility = jest.fn();
+        const { getByTestId } = render(
+            <SideLeftBar
+                currentCampus="SGW"
+                onToggleCampus={jest.fn()}
+                onToggleLiveLocation={jest.fn()}
+                onPressPOI={jest.fn()}
+                isAccessibilityEnabled={false}
+                onToggleAccessibility={onToggleAccessibility}
+            />
+        );
+        fireEvent.press(getByTestId("disPress"));
+        expect(onToggleAccessibility).toHaveBeenCalledTimes(1);
+    });
 })
 
 describe("Backend Functions", () => {
