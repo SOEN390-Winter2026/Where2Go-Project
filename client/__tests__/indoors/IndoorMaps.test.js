@@ -2,23 +2,90 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import IndoorMaps from '../../src/IndoorMaps';
 
+jest.mock('indoorData', () => ({
+    indoorMaps: {
+        SGW: {
+            H: {
+                2:  { image: 1, data: { rooms: [{ id: '201' }], waypoints: [] } },
+                4:  { image: 2, data: { rooms: [], waypoints: [] } },
+                5:  { image: 3, data: { rooms: [], waypoints: [] } },
+                6:  { image: 4, data: { rooms: [], waypoints: [] } },
+                7:  { image: 5, data: { rooms: [], waypoints: [] } },
+                8:  { image: 6, data: { rooms: [], waypoints: [] } },
+                9:  { image: 7, data: { rooms: [], waypoints: [] } },
+                10: { image: 8, data: { rooms: [], waypoints: [] } },
+                11: { image: 9, data: { rooms: [], waypoints: [] } },
+                12: { image: 10, data: null },
+            },
+            MB: {
+                6:  { image: null, data: null },
+                7:  { image: null, data: null },
+                8:  { image: null, data: null },
+                9:  { image: null, data: null },
+                S1: { image: null, data: null },
+                S2: { image: null, data: null },
+            },
+        },
+        Loyola: {
+            CC: {
+                1: { image: 11, data: { rooms: [], waypoints: [] } },
+                2: { image: 12, data: { rooms: [], waypoints: [] } },
+                3: { image: 13, data: { rooms: [], waypoints: [] } },
+                4: { image: 14, data: { rooms: [], waypoints: [] } },
+            },
+            VE: {
+                1: { image: 15, data: { rooms: [], waypoints: [] } },
+                2: { image: 16, data: { rooms: [], waypoints: [] } },
+                3: { image: 17, data: null },
+            },
+        },
+    },
+}));
+
+jest.mock('react-native-gesture-handler', () => {
+    const makeGesture = (name) => {
+        const store = {};
+        if (!globalThis.__gestureCallbacks__) globalThis.__gestureCallbacks__ = {};
+        globalThis.__gestureCallbacks__[name] = store;
+        const chain = {
+            onStart:  (fn) => { store.onStart  = fn; return chain; },
+            onUpdate: (fn) => { store.onUpdate = fn; return chain; },
+            onEnd:    (fn) => { store.onEnd    = fn; return chain; },
+            enabled:  ()   => chain,
+            runOnJS:  ()   => chain,
+        };
+        return chain;
+    };
+    return {
+        Gesture: {
+            Pinch: () => makeGesture('pinch'),
+            Pan:   () => makeGesture('pan'),
+            Simultaneous: () => ({}),
+        },
+        GestureDetector: ({ children }) => children,
+    };
+});
+
 jest.mock('../../src/IndoorSideLeftBar', () => {
     const { Pressable, Text } = require('react-native');
     const PropTypes = require('prop-types');
-
-    const MockIndoorSideLeftBar = ({ onPressBack }) => (
-        <Pressable testID="mock-back-btn" onPress={onPressBack}>
-            <Text>Back</Text>
-        </Pressable>
+    const MockIndoorSideLeftBar = ({ onPressBack, onOpenDirections }) => (
+        <>
+            <Pressable testID="mock-back-btn" onPress={onPressBack}>
+                <Text>Back</Text>
+            </Pressable>
+            <Pressable testID="mock-open-directions-btn" onPress={onOpenDirections}>
+                <Text>OpenDirections</Text>
+            </Pressable>
+        </>
     );
-
     MockIndoorSideLeftBar.propTypes = {
         onPressBack: PropTypes.func.isRequired,
+        onOpenDirections: PropTypes.func,
     };
     return MockIndoorSideLeftBar;
 });
 
-//mock for the drag
 let panHandlers = {};
 jest.mock('react-native', () => {
     const RN = jest.requireActual('react-native');
@@ -47,6 +114,9 @@ const defaultProps = {
     onPressBack: jest.fn(),
     campus: 'SGW',
 };
+
+const FIRST_FLOOR = '2';
+const ANOTHER_FLOOR = '5';
 
 describe('IndoorMaps', () => {
 
@@ -97,9 +167,16 @@ describe('IndoorMaps', () => {
         expect(getAllByText('H').length).toBeGreaterThan(0);
     });
 
-    it('shows "Select a floor" placeholder initially', () => {
-        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+    it('shows "Select a floor" placeholder when no campus is provided', () => {
+        const { getByText } = render(
+            <IndoorMaps {...defaultProps} campus={undefined} />
+        );
         expect(getByText('Select a floor')).toBeTruthy();
+    });
+
+    it('auto-selects the first floor on mount and shows floor label', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} />);
+        expect(getByText(`Floor ${FIRST_FLOOR}`)).toBeTruthy();
     });
 
     it('always shows building info in the default sheet content', () => {
@@ -149,14 +226,14 @@ describe('IndoorMaps', () => {
         expect(getByTestId('tab-floors')).toBeTruthy();
     });
 
-    it('opens floors tab and shows all floor buttons', () => {
+    it('opens floors tab and shows floor buttons for Hall building', () => {
         const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        expect(getByTestId('floor-btn-1')).toBeTruthy();
         expect(getByTestId('floor-btn-2')).toBeTruthy();
-        expect(getByTestId('floor-btn-3')).toBeTruthy();
         expect(getByTestId('floor-btn-4')).toBeTruthy();
         expect(getByTestId('floor-btn-5')).toBeTruthy();
+        expect(getByTestId('floor-btn-6')).toBeTruthy();
+        expect(getByTestId('floor-btn-7')).toBeTruthy();
     });
 
     it('shows classroom label when floors tab is open', () => {
@@ -210,28 +287,26 @@ describe('IndoorMaps', () => {
         const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-info'));
         fireEvent.press(getByTestId('tab-floors'));
-        expect(getByTestId('floor-btn-1')).toBeTruthy();
+        expect(getByTestId('floor-btn-2')).toBeTruthy();
     });
 
-    it('selects a floor and updates the map placeholder text', () => {
+    it('selects a floor and updates the floor label', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-3'));
-        expect(getByText('Floor 3')).toBeTruthy();
+        fireEvent.press(getByTestId('floor-btn-4'));
+        expect(getByText('Floor 4')).toBeTruthy();
     });
 
-    it('deselects a floor when pressed again and restores placeholder', () => {
+    it('deselects the active floor when pressed again and restores placeholder', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-2'));
-        fireEvent.press(getByTestId('floor-btn-2'));
+        fireEvent.press(getByTestId(`floor-btn-${FIRST_FLOOR}`));
         expect(getByText('Select a floor')).toBeTruthy();
     });
 
     it('switches selected floor correctly', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-1'));
         fireEvent.press(getByTestId('floor-btn-4'));
         expect(getByText('Floor 4')).toBeTruthy();
     });
@@ -239,9 +314,9 @@ describe('IndoorMaps', () => {
     it('selected floor persists after switching tabs', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-5'));
+        fireEvent.press(getByTestId(`floor-btn-${ANOTHER_FLOOR}`));
         fireEvent.press(getByTestId('tab-info'));
-        expect(getByText('Floor 5')).toBeTruthy();
+        expect(getByText(`Floor ${ANOTHER_FLOOR}`)).toBeTruthy();
     });
 
     it('expandSheet is triggered when a tab is opened', () => {
@@ -310,7 +385,6 @@ describe('IndoorMaps', () => {
         expect(queryByTestId('classroom-input')).toBeNull();
     });
 
-    //#35: android branch of topPadding
     it('renders correctly on Android and applies android top padding', () => {
         const Platform = require('react-native').Platform;
         const original = Platform.OS;
@@ -320,10 +394,46 @@ describe('IndoorMaps', () => {
         Platform.OS = original;
     });
 
-    //stuff for get room directions
     it('shows Get Room Directions button in default (info) view', () => {
         const { getByText } = render(<IndoorMaps {...defaultProps} />);
         expect(getByText('Get Room Directions')).toBeTruthy();
+    });
+
+    it('onOpenDirections from sidebar opens the directions tab', () => {
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('mock-open-directions-btn'));
+        expect(getByTestId('swap-directions')).toBeTruthy();
+    });
+
+    it('Image onLoadStart and onLoadEnd fire without throwing', () => {
+        const { UNSAFE_getAllByType } = render(<IndoorMaps {...defaultProps} />);
+        const { Image } = require('react-native');
+        const images = UNSAFE_getAllByType(Image);
+        expect(() => fireEvent(images[0], 'loadStart')).not.toThrow();
+        expect(() => fireEvent(images[0], 'loadEnd')).not.toThrow();
+    });
+
+    it('pinch gesture callbacks execute without throwing', () => {
+        render(<IndoorMaps {...defaultProps} />);
+        const { pinch } = globalThis.__gestureCallbacks__;
+        expect(() => pinch.onStart()).not.toThrow();
+        expect(() => pinch.onUpdate({ scale: 2 })).not.toThrow();
+        expect(() => pinch.onEnd({ scale: 2 })).not.toThrow();
+        expect(() => pinch.onEnd({ scale: 0.5 })).not.toThrow();
+    });
+
+    it('pan gesture callbacks execute without throwing', () => {
+        render(<IndoorMaps {...defaultProps} />);
+        const { pan } = globalThis.__gestureCallbacks__;
+        expect(() => pan.onUpdate({ translationX: 10, translationY: 5 })).not.toThrow();
+        expect(() => pan.onEnd({ translationX: 10, translationY: 5 })).not.toThrow();
+    });
+
+    it('shows Navigation unavailable badge for floor with no JSON data', () => {
+        const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        fireEvent.press(getByTestId('floor-btn-12'));
+        expect(getByText('Navigation unavailable')).toBeTruthy();
     });
 
     describe('directions tab', () => {
@@ -383,6 +493,17 @@ describe('IndoorMaps', () => {
         it('switching to floors tab works', () => {
             fireEvent.press(getByTestId('tab-floors'));
             expect(getByTestId('classroom-input')).toBeTruthy();
+        });
+
+        it('opens from-building dropdown modal and shows building options', () => {
+            fireEvent.press(getByTestId('from-building'));
+            expect(getByText('MB')).toBeTruthy();
+        });
+
+        it('selects a building from the dropdown', () => {
+            fireEvent.press(getByTestId('from-building'));
+            fireEvent.press(getByText('MB'));
+            expect(getByTestId('from-floor')).toBeTruthy();
         });
     });
 

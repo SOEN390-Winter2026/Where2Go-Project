@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Animated, PanResponder } from 'react-native';
+import { indoorMaps } from '../../indoorData';
 
-export default function useIndoorMaps(height) {
+export default function useIndoorMaps(height, campus, buildingCode) {
     const SHEET_COLLAPSED  = height * 0.11;
     const SHEET_EXPANDED   = height * 0.45;
     const SHEET_DIRECTIONS = height * 0.6;
@@ -9,24 +10,35 @@ export default function useIndoorMaps(height) {
     const [selectedFloor, setSelectedFloor] = useState(null);
     const [activeTab, setActiveTab] = useState(null);
     const [classroomInput, setClassroomInput] = useState('');
-
-    const [buildingData, setBuildingData] = useState({});
     const [directionsFrom, setDirectionsFrom] = useState({ building: null, floor: null, room: null });
     const [directionsTo,   setDirectionsTo]   = useState({ building: null, floor: null, room: null });
 
-    // TO FETCH DATA FROM BACKEND !!!!!!!!!!!!!!!!!!!!!!!!!!1
+    //first available floor is selected
     useEffect(() => {
-        // MOCK INFO (here we replace with proper API call after)
-        const mockData = {
-            H:  { floors: ['1','2','3','4','5','6','7','8','9', '10', '11', '12'], rooms: { '1':['101','102','110'],'2':['201','202','210'],'3':['301','302'],'4':['401','410'],'5':['501'],'6':['601'],'7':['701'],'8':['801'],'9':['901'] } },
-            MB: { floors: ['1','2','S1','S2'], rooms: { '1':['1.100','1.200'],'2':['2.100','2.200'],'S1':['S1.01'],'S2':['S2.01'] } },
-        };
-        setBuildingData(mockData);
-    }, []);
+        if (!campus || !buildingCode) return;
+        const buildingData = indoorMaps?.[campus]?.[buildingCode];
+        if (!buildingData) return;
+        const firstFloor = Object.keys(buildingData)[0];
+        setSelectedFloor(firstFloor);
+    }, [campus, buildingCode]);
 
-    const BUILDINGS_LIST = Object.keys(buildingData);
-    const getFloors = (b)    => (buildingData[b]?.floors ?? []);
-    const getRooms  = (b, f) => (buildingData[b]?.rooms?.[f] ?? []);
+    const BUILDINGS_LIST = Object.keys(indoorMaps?.[campus] ?? {});
+
+    //retunr floor keys as strings
+    const getFloors = (bCode) => {
+        if (!bCode) return [];
+        const data = indoorMaps?.[campus]?.[bCode];
+        return data ? Object.keys(data) : [];
+    };
+
+    // return room id from the floor's json data
+    const getRooms = useCallback((bCode, floor) => {
+        if (!bCode || !floor) return [];
+        const floorEntry = indoorMaps?.[campus]?.[bCode]?.[floor]
+                        ?? indoorMaps?.[campus]?.[bCode]?.[Number(floor)];
+        if (!floorEntry?.data?.rooms) return [];
+        return floorEntry.data.rooms.map(r => r.id);
+    }, [campus]);
 
     const handleSwapDirections = () => {
         setDirectionsFrom(directionsTo);
@@ -83,13 +95,10 @@ export default function useIndoorMaps(height) {
     };
 
     return {
-        //sheet for consistency
         sheetHeight,
         panResponder,
         handleTabPress,
-        //tabs
         activeTab,
-        //floors tab
         selectedFloor,
         setSelectedFloor,
         classroomInput,
@@ -97,7 +106,6 @@ export default function useIndoorMaps(height) {
         BUILDINGS_LIST,
         getFloors,
         getRooms,
-        // directions handling
         directionsFrom,
         setDirectionsFrom,
         directionsTo,
