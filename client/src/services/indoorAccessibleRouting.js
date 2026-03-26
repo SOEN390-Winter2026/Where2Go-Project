@@ -1,4 +1,5 @@
 import { indoorMaps } from "../../indoorData";
+import { MinCostHeap } from "../utils/MinCostHeap";
 
 /**
  * UTILITIES
@@ -12,6 +13,7 @@ function getFloorPlanData(floorEntry, floorId) {
   return floorPlanModule[floorId] ?? floorPlanModule[Object.keys(floorPlanModule)[0]] ?? null;
 }
 
+// Center of a room rectangle (normalized 0–1 coords), for “nearest waypoint” fallback.
 function roomCenter(room) {
   const { x, y, w, h } = room?.bounds || {};
   if (x == null || y == null || w == null || h == null) return null;
@@ -24,6 +26,8 @@ function dist(a, b) {
   return Math.hypot(dx, dy);
 }
 
+// Extract trailing digits from a string: e.g. "H-7" -> "7".
+// This lets us treat "7" and "H-7" as aliases for the same graph floor key.
 function getTrailingDigits(value) {
   const text = String(value ?? "");
   let end = text.length;
@@ -36,6 +40,7 @@ function getTrailingDigits(value) {
   return digits.length ? digits : "";
 }
 
+// Lowercase letters+digits only (strips spaces/dashes for loose matching).
 function normalizeFloorAlias(value) {
   const text = String(value ?? "").toLowerCase();
   let out = "";
@@ -49,7 +54,7 @@ function normalizeFloorAlias(value) {
 }
 
 /**
- * GRAPH BUILDING
+ * GRAPH BUILDING — nodes are "floorId::waypointId"; edges are Euclidean distance + penalties below.
  */
 function nodePenalty(nodeType, rules) {
   const type = String(nodeType || "").toLowerCase();
@@ -64,6 +69,12 @@ function addEdge(adjacencyList, fromKey, toKey, weight) {
   adjacencyList.get(fromKey).push({ to: toKey, w: weight });
 }
 
+// Map user-facing floor strings to the graph floor key (the object key in `indoorMaps`).
+//
+// Example:
+// - `indoorMaps` stores floors under keys like "7" and "8"
+// - the floor plan may also have a `floor` string like "H-7"
+// - both "7" and "H-7" resolve to the same graph floor key "7"
 function addFloorAliases(floorAliases, floorId, floorPlan) {
   const addAlias = (value) => {
     if (value == null) return;
@@ -73,6 +84,9 @@ function addFloorAliases(floorAliases, floorId, floorPlan) {
   addAlias(floorPlan?.floor);
 }
 
+// Extra lookup keys for the same graph floor key:
+// - compact form: normalize "H-7" -> "h7" (strip spaces/dashes, lowercase)
+// - trailing digit: getTrailingDigits("H-7") -> "7"
 function enrichFloorAliases(floorAliases) {
   for (const [alias, canonicalFloorId] of Array.from(floorAliases.entries())) {
     const compactAlias = normalizeFloorAlias(alias);
@@ -82,6 +96,7 @@ function enrichFloorAliases(floorAliases) {
   }
 }
 
+// Turn user input (e.g. "H-7", "7", "h7") into the graph floor key used by the routing graph.
 function createFloorResolver(floorAliases) {
   return (value) => {
     if (value == null) return null;
@@ -95,6 +110,7 @@ function createFloorResolver(floorAliases) {
   };
 }
 
+// Walkable edges from waypoint.connections on one floor.
 function connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules) {
   (Array.isArray(waypoint.connections) ? waypoint.connections : []).forEach((toId) => {
     const toWaypointId = String(toId);
@@ -113,6 +129,7 @@ function pickClosestTransferWaypoint(waypoint, candidates) {
   );
 }
 
+// Elevator/stair links between floors: match the nearest same-type waypoint on the target floor
 function connectTransferWaypoints({
   adjacencyList,
   floorId,
@@ -122,6 +139,7 @@ function connectTransferWaypoints({
   resolveFloorId,
   rules,
 }) {
+  // No stair edges at all when accessibility mode avoids stairs.
   if (pointType === "staircase" && rules.avoidStairs) return;
 
   (waypoint.floorsReachable || []).forEach((targetFloorId) => {
@@ -146,7 +164,7 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
 
   const floorGraphs = new Map();
   const adjacencyList = new Map();
-  const floorAliases = new Map(); // normalized alias -> canonical floorId
+  const floorAliases = new Map(); // normalized alias -> graph floor key ("7", "8", ...)
 
   // 1. Process all floors to ensure transit floors are available
   for (const floorId of Object.keys(buildingData)) {
@@ -187,32 +205,31 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
   return { adjacencyList, floorGraphs, resolveFloorId };
 }
 
-/**
- * PATHFINDING (Optimized Dijkstra)
- */
 function dijkstra(startNode, goalNode, adjacencyList) {
   const distances = new Map([[startNode, 0]]);
   const previous = new Map();
-  const openSet = [{ nodeKey: startNode, cost: 0 }];
+  const open = new MinCostHeap();
+  open.push({ nodeKey: startNode, cost: 0 });
 
-  while (openSet.length > 0) {
-    openSet.sort((a, b) => a.cost - b.cost);
-    const { nodeKey: curr, cost: d } = openSet.shift();
+  while (open.length > 0) {
+    const { nodeKey: curr, cost: d } = open.pop();
 
     if (curr === goalNode) break;
+    // Stale entry: we already found a shorter path to curr (lazy heap — no decrease-key).
     if (d > (distances.get(curr) ?? Infinity)) continue;
 
-    for (const { to, w } of (adjacencyList.get(curr) || [])) {
+    for (const { to, w } of adjacencyList.get(curr) || []) {
       const newCost = d + w;
       if (newCost < (distances.get(to) ?? Infinity)) {
         distances.set(to, newCost);
         previous.set(to, curr);
-        openSet.push({ nodeKey: to, cost: newCost });
+        open.push({ nodeKey: to, cost: newCost });
       }
     }
   }
 
   if (!distances.has(goalNode)) return { success: false };
+  // Walk predecessors from goal back to start, then reverse.
   const path = [];
   let step = goalNode;
   while (step) {
@@ -226,11 +243,13 @@ function dijkstra(startNode, goalNode, adjacencyList) {
  * MAIN EXPORT
  */
 export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } = {}) {
+  // avoidStairs: block stair vertical edges. elevatorBonus / stairsPenalty tweak relative edge costs.
   const rules = { avoidStairs: true, stairsPenalty: 2.0, elevatorBonus: -0.1, floorTransferCost: 1.0 };
 
   const graph = buildMultiFloorGraph({ campus, buildingCode, rules });
   if (!graph) return { success: false, meta: { reason: "INVALID_BUILDING" } };
 
+  // Resolve room -> graph start/end: explicit waypoint id, or room.nearestWaypoint, or closest waypoint to room center.
   const findNearestWaypointId = (floorId, roomId, waypointId) => {
     const floorGraph = graph.floorGraphs.get(floorId);
     if (!floorGraph) return null;
@@ -268,6 +287,7 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
 
   if (!result.success) return { success: false, meta: { reason: "NO_PATH" } };
 
+  // Turn raw node keys back into waypoint objects for the caller / UI.
   const path = result.path
     .map((nodeKey) => {
       const [floorId, waypointId] = nodeKey.split("::");
