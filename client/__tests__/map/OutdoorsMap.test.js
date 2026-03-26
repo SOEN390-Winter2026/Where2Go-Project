@@ -56,6 +56,16 @@ describe("Rendering Features Properly", () => {
 
 
 describe(" Buttons Test", () => {
+    const renderSideLeftBar = (props = {}) =>
+        render(
+            <SideLeftBar
+                currentCampus="SGW"
+                onToggleCampus={jest.fn()}
+                onToggleLiveLocation={jest.fn()}
+                onPressPOI={jest.fn()}
+                {...props}
+            />
+        );
 
     function TestWrapper() {
         const [currentCampus, setCurrentCampus] = useState('SGW');
@@ -197,16 +207,10 @@ describe(" Buttons Test", () => {
     });
 
     it("disability button shows active when isAccessibilityEnabled is true", () => {
-        const { getByTestId } = render(
-            <SideLeftBar
-                currentCampus="SGW"
-                onToggleCampus={jest.fn()}
-                onToggleLiveLocation={jest.fn()}
-                onPressPOI={jest.fn()}
-                isAccessibilityEnabled
-                onToggleAccessibility={jest.fn()}
-            />
-        );
+        const { getByTestId } = renderSideLeftBar({
+            isAccessibilityEnabled: true,
+            onToggleAccessibility: jest.fn(),
+        });
         const dis = getByTestId("disPress");
         const bg = [dis.props.style].flat().find((s) => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe("#912338");
@@ -214,16 +218,10 @@ describe(" Buttons Test", () => {
 
     it("disability button calls onToggleAccessibility when pressed", () => {
         const onToggleAccessibility = jest.fn();
-        const { getByTestId } = render(
-            <SideLeftBar
-                currentCampus="SGW"
-                onToggleCampus={jest.fn()}
-                onToggleLiveLocation={jest.fn()}
-                onPressPOI={jest.fn()}
-                isAccessibilityEnabled={false}
-                onToggleAccessibility={onToggleAccessibility}
-            />
-        );
+        const { getByTestId } = renderSideLeftBar({
+            isAccessibilityEnabled: false,
+            onToggleAccessibility,
+        });
         fireEvent.press(getByTestId("disPress"));
         expect(onToggleAccessibility).toHaveBeenCalledTimes(1);
     });

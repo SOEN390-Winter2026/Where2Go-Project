@@ -1,12 +1,7 @@
 import { StyleSheet } from "react-native";
-import PropTypes from "prop-types";
-import { LEFT_BAR_BURGUNDY } from "./leftBarItemActive";
+import { LEFT_BAR_BURGUNDY } from "../utils/leftBarItemActive";
 
-export const sideLeftBarAccessibilityPropTypes = {
-  isAccessibilityEnabled: PropTypes.bool,
-  onToggleAccessibility: PropTypes.func,
-};
-
+// Shared visual styles used by both outdoor and indoor left sidebars.
 export const sideLeftBarSharedStyles = StyleSheet.create({
   floatLeftBar: {
     position: "absolute",

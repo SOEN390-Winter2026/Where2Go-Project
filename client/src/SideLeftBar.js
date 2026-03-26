@@ -9,10 +9,7 @@ import {
 } from "react-native";
 import PropTypes from 'prop-types';
 import { leftBarIconSource, leftBarIconState } from "./utils/leftBarItemActive";
-import {
-  sideLeftBarAccessibilityPropTypes,
-  sideLeftBarSharedStyles,
-} from "./utils/sideLeftBarShared";
+import { sideLeftBarSharedStyles } from "./styles/sideLeftBarStyles";
 
 export default function SideLeftBar({
   currentCampus,
@@ -126,7 +123,7 @@ export default function SideLeftBar({
     onToggleLiveLocation();
   }}
 >
-  <Image source={leftBarIconSource("gps", leftBarActiveInputs, iconPairs)} style={styles.icon} />
+  <Image source={leftBarIconSource("gps", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
 </Pressable>
 
     </View>
@@ -139,7 +136,8 @@ SideLeftBar.propTypes = {
   onToggleLiveLocation: PropTypes.func.isRequired,
   onPressPOI: PropTypes.func.isRequired,
   isPressedPOI: PropTypes.bool,
-  ...sideLeftBarAccessibilityPropTypes,
+  isAccessibilityEnabled: PropTypes.bool,
+  onToggleAccessibility: PropTypes.func,
 };
 
 /* ---------- Styles ---------- */

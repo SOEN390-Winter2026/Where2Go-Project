@@ -8,10 +8,7 @@ import {
     leftBarIconSource,
     leftBarIconState,
 } from "./utils/leftBarItemActive";
-import {
-    sideLeftBarAccessibilityPropTypes,
-    sideLeftBarSharedStyles,
-} from "./utils/sideLeftBarShared";
+import { sideLeftBarSharedStyles } from "./styles/sideLeftBarStyles";
 
 export default function IndoorSideLeftBar({
     onPressBack,
@@ -84,5 +81,6 @@ export default function IndoorSideLeftBar({
 IndoorSideLeftBar.propTypes = {
     onPressBack: PropTypes.func.isRequired,
     onOpenDirections: PropTypes.func,
-    ...sideLeftBarAccessibilityPropTypes,
+    isAccessibilityEnabled: PropTypes.bool,
+    onToggleAccessibility: PropTypes.func,
 };
