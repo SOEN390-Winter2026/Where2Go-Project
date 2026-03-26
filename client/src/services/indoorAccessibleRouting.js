@@ -154,6 +154,39 @@ function pickClosestTransferWaypoint(waypoint, candidates) {
   );
 }
 
+function indexFloorWaypoints(floorPlan) {
+  const waypointById = new Map();
+  // Map: waypointTypeLower -> waypoints[]
+  const waypointsByType = new Map();
+
+  for (const w of floorPlan.waypoints) {
+    if (!w?.id) continue;
+
+    waypointById.set(String(w.id), w);
+
+    const t = String(w.type || "").toLowerCase();
+    if (!waypointsByType.has(t)) waypointsByType.set(t, []);
+    waypointsByType.get(t).push(w);
+  }
+
+  return { waypointById, waypointsByType };
+}
+
+function buildFloorGraphsAndAliases(buildingData, floorAliases) {
+  const floorGraphs = new Map();
+
+  for (const floorId of Object.keys(buildingData)) {
+    const floorPlan = getFloorPlanData(buildingData[floorId], floorId);
+    if (!Array.isArray(floorPlan?.waypoints)) continue;
+
+    const { waypointById, waypointsByType } = indexFloorWaypoints(floorPlan);
+    floorGraphs.set(floorId, { floorPlan, waypointById, waypointsByType });
+    addFloorAliases(floorAliases, floorId, floorPlan);
+  }
+
+  return floorGraphs;
+}
+
 // Elevator/stair links between floors: match the nearest same-type waypoint on the target floor
 function connectTransferWaypoints({
   adjacencyList,
@@ -182,41 +215,7 @@ function connectTransferWaypoints({
   });
 }
 
-function buildMultiFloorGraph({ campus, buildingCode, rules }) {
-  const buildingData = indoorMaps?.[campus]?.[buildingCode];
-  if (!buildingData) return null;
-
-  const floorGraphs = new Map();
-  const adjacencyList = new Map();
-  const floorAliases = new Map(); // normalized alias -> graph floor key ("7", "8", ...)
-
-  // 1. Process all floors to ensure transit floors are available
-  for (const floorId of Object.keys(buildingData)) {
-    const floorPlan = getFloorPlanData(buildingData[floorId], floorId);
-    if (!Array.isArray(floorPlan?.waypoints)) continue;
-
-    const waypointById = new Map();
-    // Precompute lookups so we don't scan all waypoints per transfer edge.
-    // Map: waypointTypeLower -> waypoints[]
-    const waypointsByType = new Map();
-    for (const w of floorPlan.waypoints) {
-      if (!w?.id) continue;
-
-      waypointById.set(String(w.id), w);
-
-      const t = String(w.type || "").toLowerCase();
-      if (!waypointsByType.has(t)) waypointsByType.set(t, []);
-      waypointsByType.get(t).push(w);
-    }
-
-    floorGraphs.set(floorId, { floorPlan, waypointById, waypointsByType });
-    addFloorAliases(floorAliases, floorId, floorPlan);
-  }
-
-  enrichFloorAliases(floorAliases);
-  const resolveFloorId = createFloorResolver(floorAliases);
-
-  // 2. Link all points (Horizontal and Vertical)
+function linkAllFloorWaypoints({ floorGraphs, adjacencyList, resolveFloorId, rules }) {
   for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
     for (const waypoint of floorPlan.waypoints) {
       if (!waypoint?.id) continue;
@@ -224,19 +223,34 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
 
       connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules);
       const isTransferPoint = pointType === "elevator" || pointType === "staircase";
-      if (isTransferPoint) {
-        connectTransferWaypoints({
-          adjacencyList,
-          floorId,
-          waypoint,
-          pointType,
-          floorGraphs,
-          resolveFloorId,
-          rules,
-        });
-      }
+      if (!isTransferPoint) continue;
+
+      connectTransferWaypoints({
+        adjacencyList,
+        floorId,
+        waypoint,
+        pointType,
+        floorGraphs,
+        resolveFloorId,
+        rules,
+      });
     }
   }
+}
+
+function buildMultiFloorGraph({ campus, buildingCode, rules }) {
+  const buildingData = indoorMaps?.[campus]?.[buildingCode];
+  if (!buildingData) return null;
+
+  const adjacencyList = new Map();
+  const floorAliases = new Map(); // normalized alias -> graph floor key ("7", "8", ...)
+
+  const floorGraphs = buildFloorGraphsAndAliases(buildingData, floorAliases);
+
+  enrichFloorAliases(floorAliases);
+  const resolveFloorId = createFloorResolver(floorAliases);
+
+  linkAllFloorWaypoints({ floorGraphs, adjacencyList, resolveFloorId, rules });
   return { adjacencyList, floorGraphs, resolveFloorId };
 }
 
