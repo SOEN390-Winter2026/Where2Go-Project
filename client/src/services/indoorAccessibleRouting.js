@@ -26,6 +26,31 @@ function dist(a, b) {
   return Math.hypot(dx, dy);
 }
 
+// Resolve room -> graph waypoint id: explicit waypoint id, or room.nearestWaypoint,
+// or closest waypoint to the room's bounds center.
+export function findNearestWaypointId(floorGraphs, floorId, roomId, waypointId) {
+  const floorGraph = floorGraphs?.get?.(floorId);
+  if (!floorGraph) return null;
+  if (waypointId) return String(waypointId);
+
+  const rooms = Array.isArray(floorGraph.floorPlan.rooms) ? floorGraph.floorPlan.rooms : [];
+  const matchedRoom = rooms.find(
+    (r) => String(r?.id).toLowerCase() === String(roomId).toLowerCase()
+  );
+  if (matchedRoom?.nearestWaypoint) return String(matchedRoom.nearestWaypoint);
+
+  const roomBoundsCenter = roomCenter(matchedRoom);
+  const waypoints = Array.isArray(floorGraph.floorPlan.waypoints)
+    ? floorGraph.floorPlan.waypoints
+    : [];
+  if (!roomBoundsCenter || waypoints.length === 0) return null;
+
+  const closestWaypoint = waypoints.reduce((prev, curr) =>
+    dist(roomBoundsCenter, curr.position) < dist(roomBoundsCenter, prev.position) ? curr : prev
+  );
+  return closestWaypoint?.id ? String(closestWaypoint.id) : null;
+}
+
 // Extract trailing digits from a string: e.g. "H-7" -> "7".
 // This lets us treat "7" and "H-7" as aliases for the same graph floor key.
 function getTrailingDigits(value) {
@@ -147,9 +172,8 @@ function connectTransferWaypoints({
     if (!targetStr || targetStr === floorId || !floorGraphs.has(targetStr)) return;
 
     const targetFloorGraph = floorGraphs.get(targetStr);
-    const candidates = targetFloorGraph.floorPlan.waypoints.filter(
-      (w) => w?.id && String(w.type).toLowerCase() === pointType
-    );
+    // Precomputed lookup: avoid scanning all waypoints for every transfer edge.
+    const candidates = targetFloorGraph.waypointsByType?.get(pointType) ?? [];
     if (candidates.length === 0) return;
 
     const sameShaftMatch = pickClosestTransferWaypoint(waypoint, candidates);
@@ -171,10 +195,21 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
     const floorPlan = getFloorPlanData(buildingData[floorId], floorId);
     if (!Array.isArray(floorPlan?.waypoints)) continue;
 
-    const waypointById = new Map(
-      floorPlan.waypoints.filter(w => w?.id).map(w => [String(w.id), w])
-    );
-    floorGraphs.set(floorId, { floorPlan, waypointById });
+    const waypointById = new Map();
+    // Precompute lookups so we don't scan all waypoints per transfer edge.
+    // Map: waypointTypeLower -> waypoints[]
+    const waypointsByType = new Map();
+    for (const w of floorPlan.waypoints) {
+      if (!w?.id) continue;
+
+      waypointById.set(String(w.id), w);
+
+      const t = String(w.type || "").toLowerCase();
+      if (!waypointsByType.has(t)) waypointsByType.set(t, []);
+      waypointsByType.get(t).push(w);
+    }
+
+    floorGraphs.set(floorId, { floorPlan, waypointById, waypointsByType });
     addFloorAliases(floorAliases, floorId, floorPlan);
   }
 
@@ -249,32 +284,20 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
   const graph = buildMultiFloorGraph({ campus, buildingCode, rules });
   if (!graph) return { success: false, meta: { reason: "INVALID_BUILDING" } };
 
-  // Resolve room -> graph start/end: explicit waypoint id, or room.nearestWaypoint, or closest waypoint to room center.
-  const findNearestWaypointId = (floorId, roomId, waypointId) => {
-    const floorGraph = graph.floorGraphs.get(floorId);
-    if (!floorGraph) return null;
-    if (waypointId) return String(waypointId);
-
-    const rooms = Array.isArray(floorGraph.floorPlan.rooms) ? floorGraph.floorPlan.rooms : [];
-    const matchedRoom = rooms.find(
-      (r) => String(r?.id).toLowerCase() === String(roomId).toLowerCase()
-    );
-    if (matchedRoom?.nearestWaypoint) return String(matchedRoom.nearestWaypoint);
-
-    const roomBoundsCenter = roomCenter(matchedRoom);
-    const waypoints = Array.isArray(floorGraph.floorPlan.waypoints) ? floorGraph.floorPlan.waypoints : [];
-    if (!roomBoundsCenter || waypoints.length === 0) return null;
-
-    const closestWaypoint = waypoints.reduce((prev, curr) =>
-      dist(roomBoundsCenter, curr.position) < dist(roomBoundsCenter, prev.position) ? curr : prev
-    );
-    return closestWaypoint?.id ? String(closestWaypoint.id) : null;
-  };
-
   const fromFloorId = graph.resolveFloorId(from?.floor) ?? floorKeyToString(from?.floor);
   const toFloorId = graph.resolveFloorId(to?.floor) ?? floorKeyToString(to?.floor);
-  const startWaypointId = findNearestWaypointId(fromFloorId, from?.room, from?.waypointId);
-  const goalWaypointId = findNearestWaypointId(toFloorId, to?.room, to?.waypointId);
+  const startWaypointId = findNearestWaypointId(
+    graph.floorGraphs,
+    fromFloorId,
+    from?.room,
+    from?.waypointId
+  );
+  const goalWaypointId = findNearestWaypointId(
+    graph.floorGraphs,
+    toFloorId,
+    to?.room,
+    to?.waypointId
+  );
 
   if (!startWaypointId || !goalWaypointId) {
     return { success: false, meta: { reason: "LOCATION_NOT_FOUND" } };
