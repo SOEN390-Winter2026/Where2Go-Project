@@ -23,7 +23,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.4977303, longitude: -73.5790279 },
         { latitude: 45.4973808, longitude: -73.5783087 },
         { latitude: 45.4968633, longitude: -73.57891 },
-        { latitude: 45.4971630, longitude: -73.5795962 },
+        { latitude: 45.497163, longitude: -73.5795962 },
       ],
     },
     {
@@ -33,10 +33,10 @@ const CAMPUS_BUILDINGS = {
       address: '1400 De Maisonneuve Blvd W, Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/jw.html',
       coordinates: [
-        { latitude: 45.4973400, longitude: -73.5780630 },
+        { latitude: 45.49734, longitude: -73.578063 },
         { latitude: 45.4968756, longitude: -73.5770947 },
         { latitude: 45.4962439, longitude: -73.5777203 },
-        { latitude: 45.4966840, longitude: -73.5786444 },
+        { latitude: 45.496684, longitude: -73.5786444 },
       ],
     },
     {
@@ -62,7 +62,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.4958829, longitude: -73.5784841 },
         { latitude: 45.4954551, longitude: -73.5775882 },
         { latitude: 45.49522074, longitude: -73.5778903 },
-        { latitude: 45.4956030, longitude: -73.5787664},
+        { latitude: 45.495603, longitude: -73.5787664},
       ],
     },
     {
@@ -74,7 +74,7 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.49457, longitude: -73.57699 },
         { latitude: 45.49383, longitude: -73.57528 },
-        { latitude: 45.49240, longitude: -73.57666 },
+        { latitude: 45.4924, longitude: -73.57666 },
         { latitude: 45.49335, longitude: -73.57842 },
       ],
     },
@@ -101,7 +101,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.49448, longitude: -73.57933 },
         { latitude: 45.49423, longitude: -73.57889 },
         { latitude: 45.49391, longitude: -73.57931 },
-        { latitude: 45.49414, longitude: -73.57970 },
+        { latitude: 45.49414, longitude: -73.5797 },
       ],
     },
     {
@@ -112,7 +112,7 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/td.html',
       coordinates: [
         { latitude: 45.49521, longitude: -73.57841 },
-        { latitude: 45.49503, longitude: -73.57800 },
+        { latitude: 45.49503, longitude: -73.578 },
         { latitude: 45.49451, longitude: -73.57858 },
         { latitude: 45.49472, longitude: -73.57895 },
       ],
@@ -124,8 +124,8 @@ const CAMPUS_BUILDINGS = {
       address: '1450 Guy St, Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/mb.html',
       coordinates: [
-        { latitude: 45.49560, longitude: -73.57926},
-        { latitude: 45.49525, longitude: -73.57850 },
+        { latitude: 45.4956, longitude: -73.57926},
+        { latitude: 45.49525, longitude: -73.5785 },
         { latitude: 45.49499, longitude: -73.57878 },
         { latitude: 45.49538, longitude: -73.57954 },
       ],
@@ -139,7 +139,7 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.49614, longitude: -73.57882 },
         { latitude: 45.49594, longitude: -73.57843 },
-        { latitude: 45.49560, longitude: -73.57878 },
+        { latitude: 45.4956, longitude: -73.57878 },
         { latitude: 45.49578, longitude: -73.57918 },
       ],
     },
@@ -153,7 +153,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.49654, longitude: -73.57958 },
         { latitude: 45.49638, longitude: -73.57923 },
         { latitude: 45.49616, longitude: -73.57944 },
-        { latitude: 45.49630, longitude: -73.57978 },
+        { latitude: 45.4963, longitude: -73.57978 },
       ],
     },
     {
@@ -165,8 +165,8 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.49669, longitude: -73.58014 },
         { latitude: 45.49653, longitude: -73.57966 },
-        { latitude: 45.49612, longitude: -73.58000 },
-        { latitude: 45.49627, longitude: -73.58040 },
+        { latitude: 45.49612, longitude: -73.58 },
+        { latitude: 45.49627, longitude: -73.5804 },
       ],
     },
     {
@@ -179,7 +179,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.49675, longitude: -73.58137 },
         { latitude: 45.49655, longitude: -73.58078 },
         { latitude: 45.49641, longitude: -73.58087 },
-        { latitude: 45.49660, longitude: -73.58147 },
+        { latitude: 45.4966, longitude: -73.58147 },
       ],
     },
     {
@@ -215,9 +215,9 @@ const CAMPUS_BUILDINGS = {
       address: '2020 Mackay St, Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/p.html',
       coordinates: [
-        { latitude: 45.49670, longitude: -73.57913 },
+        { latitude: 45.4967, longitude: -73.57913 },
         { latitude: 45.49668, longitude: -73.57909 },
-        { latitude: 45.49659, longitude: -73.57920 },
+        { latitude: 45.49659, longitude: -73.5792 },
         { latitude: 45.49661, longitude: -73.57924 },
       ],
     },
@@ -230,7 +230,7 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.49674, longitude: -73.57925 },
         { latitude: 45.49673, longitude: -73.57922 },
-        { latitude: 45.49664, longitude: -73.57930 },
+        { latitude: 45.49664, longitude: -73.5793 },
         { latitude: 45.49666, longitude: -73.57934 },
       ],
     },
@@ -241,9 +241,9 @@ const CAMPUS_BUILDINGS = {
       address: '2040 Mackay St, Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/rr.html',
       coordinates: [
-        { latitude: 45.49680, longitude: -73.57933 },
+        { latitude: 45.4968, longitude: -73.57933 },
         { latitude: 45.49676, longitude: -73.57925 },
-        { latitude: 45.49661, longitude: -73.57940 },
+        { latitude: 45.49661, longitude: -73.5794 },
         { latitude: 45.49665, longitude: -73.57948 },
       ],
     },
@@ -254,10 +254,10 @@ const CAMPUS_BUILDINGS = {
       address: '2050 Mackay St, Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/r.html',
       coordinates: [
-        { latitude: 45.49683, longitude: -73.57940 },
-        { latitude: 45.49680, longitude: -73.57934 },
+        { latitude: 45.49683, longitude: -73.5794 },
+        { latitude: 45.4968, longitude: -73.57934 },
         { latitude: 45.49667, longitude: -73.57947 },
-        { latitude: 45.49670, longitude: -73.57952 },
+        { latitude: 45.4967, longitude: -73.57952 },
       ],
     },
     {
@@ -268,8 +268,8 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/fa.html',
       coordinates: [
         { latitude: 45.49684, longitude: -73.57944 },
-        { latitude: 45.49683, longitude: -73.57940 },
-        { latitude: 45.49670, longitude: -73.57952 },
+        { latitude: 45.49683, longitude: -73.5794 },
+        { latitude: 45.4967, longitude: -73.57952 },
         { latitude: 45.49672, longitude: -73.57956 },
       ],
     },
@@ -283,7 +283,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.49693, longitude: -73.57955 },
         { latitude: 45.49689, longitude: -73.57947 },
         { latitude: 45.49667, longitude: -73.57971 },
-        { latitude: 45.49670, longitude: -73.57978 },
+        { latitude: 45.4967, longitude: -73.57978 },
       ],
     },
     {
@@ -346,7 +346,7 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/m.html',
       coordinates: [
         { latitude: 45.49777, longitude: -73.57998 },
-        { latitude: 45.49770, longitude: -73.57982 },
+        { latitude: 45.4977, longitude: -73.57982 },
         { latitude: 45.49744, longitude: -73.58006 },
         { latitude: 45.49752, longitude: -73.58023 },
       ],
@@ -374,7 +374,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.49788, longitude: -73.58021 },
         { latitude: 45.49782, longitude: -73.58009 },
         { latitude: 45.49755, longitude: -73.58037 },
-        { latitude: 45.49760, longitude: -73.58048 },
+        { latitude: 45.4976, longitude: -73.58048 },
       ],
     },
     {
@@ -387,7 +387,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.49781, longitude: -73.57923 },
         { latitude: 45.49778, longitude: -73.57917 },
         { latitude: 45.49762, longitude: -73.57934 },
-        { latitude: 45.49765, longitude: -73.57940 },
+        { latitude: 45.49765, longitude: -73.5794 },
       ],
     },
     {
@@ -410,10 +410,10 @@ const CAMPUS_BUILDINGS = {
       address: '2160 Bishop St, Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/b.html',
       coordinates: [
-        { latitude: 45.49790, longitude: -73.57943 },
+        { latitude: 45.4979, longitude: -73.57943 },
         { latitude: 45.49788, longitude: -73.57939 },
         { latitude: 45.49771, longitude: -73.57956 },
-        { latitude: 45.49773, longitude: -73.57960 },
+        { latitude: 45.49773, longitude: -73.5796 },
       ],
     },
     {
@@ -424,8 +424,8 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/k.html',
       coordinates: [
         { latitude: 45.49792, longitude: -73.57946 },
-        { latitude: 45.49790, longitude: -73.57943 },
-        { latitude: 45.49773, longitude: -73.57960 },
+        { latitude: 45.4979, longitude: -73.57943 },
+        { latitude: 45.49773, longitude: -73.5796 },
         { latitude: 45.49774, longitude: -73.57963 },
       ],
     },
@@ -437,9 +437,9 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/mu.html',
       coordinates: [
         { latitude: 45.49796, longitude: -73.57954 },
-        { latitude: 45.49794, longitude: -73.57950 },
+        { latitude: 45.49794, longitude: -73.5795 },
         { latitude: 45.49777, longitude: -73.57966 },
-        { latitude: 45.49778, longitude: -73.57970 },
+        { latitude: 45.49778, longitude: -73.5797 },
       ],
     },
   ],
@@ -492,7 +492,7 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.45717, longitude: -73.64057 },
         { latitude: 45.45704, longitude: -73.64016 },
-        { latitude: 45.45680, longitude: -73.64034 },
+        { latitude: 45.4568, longitude: -73.64034 },
         { latitude: 45.45695, longitude: -73.64074 },
       ],
     },
@@ -531,7 +531,7 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.45838, longitude: -73.63976 },
         { latitude: 45.45826, longitude: -73.63944 },
-        { latitude: 45.45780, longitude: -73.63983 },
+        { latitude: 45.4578, longitude: -73.63983 },
         { latitude: 45.45791, longitude: -73.64013 },
       ],
     },
@@ -543,7 +543,7 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/cc.html',
       coordinates: [
         { latitude: 45.45852, longitude: -73.64068 },
-        { latitude: 45.45822, longitude: -73.63990 },
+        { latitude: 45.45822, longitude: -73.6399 },
         { latitude: 45.45808, longitude: -73.64001 },
         { latitude: 45.45838, longitude: -73.64079 },
       ],
@@ -558,7 +558,7 @@ const CAMPUS_BUILDINGS = {
         { latitude: 45.45882, longitude: -73.64113 },
         { latitude: 45.45864, longitude: -73.64067 },
         { latitude: 45.45834, longitude: -73.64094 },
-        { latitude: 45.45850, longitude: -73.64137 },
+        { latitude: 45.4585, longitude: -73.64137 },
       ],
     },
     {
@@ -568,10 +568,10 @@ const CAMPUS_BUILDINGS = {
       address: '7141 Sherbrooke St. W., Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/fc.html',
       coordinates: [
-        { latitude: 45.45881, longitude: -73.63960 },
+        { latitude: 45.45881, longitude: -73.6396 },
         { latitude: 45.45857, longitude: -73.63889 },
         { latitude: 45.45835, longitude: -73.63906 },
-        { latitude: 45.45860, longitude: -73.63976 },
+        { latitude: 45.4586, longitude: -73.63976 },
       ],
     },
     {
@@ -594,7 +594,7 @@ const CAMPUS_BUILDINGS = {
       address: '7141 Sherbrooke St. W., Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/py.html',
       coordinates: [
-        { latitude: 45.45920, longitude: -73.64052 },
+        { latitude: 45.4592, longitude: -73.64052 },
         { latitude: 45.45905, longitude: -73.64014 },
         { latitude: 45.45867, longitude: -73.64046 },
         { latitude: 45.45881, longitude: -73.64084 },
@@ -634,7 +634,7 @@ const CAMPUS_BUILDINGS = {
       link: 'https://www.concordia.ca/maps/buildings/pt.html',
       coordinates: [
         { latitude: 45.45948, longitude: -73.63913 },
-        { latitude: 45.45930, longitude: -73.63867 },
+        { latitude: 45.4593, longitude: -73.63867 },
         { latitude: 45.45916, longitude: -73.63878 },
         { latitude: 45.45934, longitude: -73.63924 },
       ],
@@ -646,7 +646,7 @@ const CAMPUS_BUILDINGS = {
       address: '7141 Sherbrooke St. W., Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/sc.html',
       coordinates: [
-        { latitude: 45.45930, longitude: -73.63932 },
+        { latitude: 45.4593, longitude: -73.63932 },
         { latitude: 45.45917, longitude: -73.63897 },
         { latitude: 45.45899, longitude: -73.63912 },
         { latitude: 45.45913, longitude: -73.63946 },
@@ -713,8 +713,8 @@ const CAMPUS_BUILDINGS = {
       coordinates: [
         { latitude: 45.45863, longitude: -73.64331 },
         { latitude: 45.45854, longitude: -73.64305 },
-        { latitude: 45.45840, longitude: -73.64316 },
-        { latitude: 45.45849, longitude: -73.64340 },
+        { latitude: 45.4584, longitude: -73.64316 },
+        { latitude: 45.45849, longitude: -73.6434 },
       ],
     },
     {
@@ -724,8 +724,8 @@ const CAMPUS_BUILDINGS = {
       address: '7141 Sherbrooke St. W., Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/hu.html',
       coordinates: [
-        { latitude: 45.45872, longitude: -73.64190 },
-        { latitude: 45.45858, longitude: -73.64150 },
+        { latitude: 45.45872, longitude: -73.6419 },
+        { latitude: 45.45858, longitude: -73.6415 },
         { latitude: 45.45829, longitude: -73.64172 },
         { latitude: 45.45844, longitude: -73.64212 },
       ],
@@ -789,7 +789,7 @@ const CAMPUS_BUILDINGS = {
       address: '7079 Terrebonne St., Montreal, QC',
       link: 'https://www.concordia.ca/maps/buildings/ta.html',
       coordinates: [
-        { latitude: 45.46008, longitude: -73.64090 },
+        { latitude: 45.46008, longitude: -73.6409 },
         { latitude: 45.46001, longitude: -73.64072 },
         { latitude: 45.45991, longitude: -73.64078 },
         { latitude: 45.45998, longitude: -73.64098 },

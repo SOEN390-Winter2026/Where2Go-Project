@@ -15,6 +15,11 @@ exports.getRoutes = async (req, res) => {
     }));
     res.json(formattedRoutes);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch routes" });
+    console.error("Failed to fetch routes:", error);
+
+    res.status(500).json({
+      error: "Failed to fetch routes",
+      message: error.message 
+    });
   }
 };
