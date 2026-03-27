@@ -1,19 +1,48 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../../indoorData';
+import { API_URL } from '@env';
+
+// Extract floor plan from the nested JSON structure
+function extractFloorPlan(dataField, floorKey) {
+    if (!dataField || typeof dataField !== 'object') return null;
+    return (
+        dataField[floorKey] ??
+        dataField[Object.keys(dataField)[0]] ??
+        null
+    );
+}
 
 export default function useIndoorMaps(height, campus, buildingCode) {
     const SHEET_COLLAPSED  = height * 0.11;
     const SHEET_EXPANDED   = height * 0.45;
     const SHEET_DIRECTIONS = height * 0.6;
 
-    const [selectedFloor, setSelectedFloor] = useState(null);
-    const [activeTab, setActiveTab] = useState(null);
+    const [selectedFloor,  setSelectedFloor]  = useState(null);
+    const [activeTab,      setActiveTab]      = useState(null);
     const [classroomInput, setClassroomInput] = useState('');
     const [directionsFrom, setDirectionsFrom] = useState({ building: null, floor: null, room: null });
     const [directionsTo,   setDirectionsTo]   = useState({ building: null, floor: null, room: null });
 
-    //first available floor is selected
+    //all buildings for this campus fetched from the server to be displayed after
+    const [allBuildings, setAllBuildings] = useState([]);
+
+    useEffect(() => {
+        if (!campus) return;
+        fetch(`${API_URL}/campus/${campus}/buildings`)
+            .then(res => res.json())
+            .then(data => {
+                // The server returns { buildings: [...] }
+                const list = Array.isArray(data) ? data : (data.buildings ?? []);
+                setAllBuildings(list.map(b => b.code).filter(Boolean));
+            })
+            .catch(() => {
+                // Fallback to indoorData keys if the fetch fails
+                setAllBuildings(Object.keys(indoorMaps?.[campus] ?? {}));
+            });
+    }, [campus]);
+
+    // Auto-select first available floor when building or campus changes
     useEffect(() => {
         if (!campus || !buildingCode) return;
         const buildingData = indoorMaps?.[campus]?.[buildingCode];
@@ -22,23 +51,33 @@ export default function useIndoorMaps(height, campus, buildingCode) {
         setSelectedFloor(firstFloor);
     }, [campus, buildingCode]);
 
-    const BUILDINGS_LIST = Object.keys(indoorMaps?.[campus] ?? {});
+    // All campus buildings from the server
+    const BUILDINGS_LIST = allBuildings.length > 0
+        ? allBuildings
+        : Object.keys(indoorMaps?.[campus] ?? {});
 
-    //retunr floor keys as strings
+    // Returns floors only when the building has JSON data in indoorData
     const getFloors = (bCode) => {
         if (!bCode) return [];
         const data = indoorMaps?.[campus]?.[bCode];
-        return data ? Object.keys(data) : [];
+        if (!data) return [];
+        return Object.keys(data).filter(floor => data[floor]?.data != null);
     };
 
-    // return room id from the floor's json data
-    const getRooms = useCallback((bCode, floor) => {
+    // Extract classroom room IDs from the floor's JSON data
+    const getRooms = (bCode, floor) => {
         if (!bCode || !floor) return [];
         const floorEntry = indoorMaps?.[campus]?.[bCode]?.[floor]
                         ?? indoorMaps?.[campus]?.[bCode]?.[Number(floor)];
-        if (!floorEntry?.data?.rooms) return [];
-        return floorEntry.data.rooms.map(r => r.id);
-    }, [campus]);
+        if (!floorEntry?.data) return [];
+        const floorPlan = extractFloorPlan(floorEntry.data, floor);
+        if (!floorPlan?.rooms) return [];
+        return [...new Set(
+            floorPlan.rooms
+                .filter(r => r.type === 'classroom')
+                .map(r => String(r.id))
+        )];
+    };
 
     const handleSwapDirections = () => {
         setDirectionsFrom(directionsTo);
