@@ -41,11 +41,17 @@ const clampTranslation = (containerSize, tx, ty, s) => {
 //Extracting floor plan from JSON
 function extractFloorPlan(dataField, floorKey) {
     if (!dataField || typeof dataField !== 'object') return null;
-    return (
-        dataField[floorKey] ??
-        dataField[Object.keys(dataField)[0]] ??
-        null
-    );
+    const key = String(floorKey);
+
+    // 1. Exact match
+    if (dataField[key] !== undefined) return dataField[key];
+
+    // 2. Find a JSON key that ends with the numeric floor key
+    const suffixMatch = Object.keys(dataField).find(k => k.endsWith(key));
+    if (suffixMatch) return dataField[suffixMatch];
+
+    // 3. return first entry
+    return dataField[Object.keys(dataField)[0]] ?? null;
 }
 
 //Compute rendered image rect inside a contain-mode container
