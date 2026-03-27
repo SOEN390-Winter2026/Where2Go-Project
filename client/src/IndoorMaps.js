@@ -405,8 +405,15 @@ RoomActionModal.propTypes = {
 
 RoomActionModal.defaultProps = { roomId: '' };
 
-// buildings: full array of building objects for this campus fetched from the server
-export default function IndoorMaps({ building, onPressBack, campus, buildings }) {
+
+export default function IndoorMaps({     
+        building,
+        onPressBack,
+        campus,
+        buildings,
+        isAccessibilityEnabled = false,
+        onToggleAccessibility = () => {}, 
+    }) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -452,6 +459,8 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings })
             <IndoorSideLeftBar
                 onPressBack={onPressBack}
                 onOpenDirections={() => handleTabPress('directions')}
+                isAccessibilityEnabled={isAccessibilityEnabled}
+                onToggleAccessibility={onToggleAccessibility}
             />
 
             <View style={[styles.mapArea, { paddingBottom: SHEET_COLLAPSED }]}>
@@ -519,4 +528,6 @@ IndoorMaps.propTypes = {
 
 IndoorMaps.defaultProps = {
     buildings: [],
+    isAccessibilityEnabled: PropTypes.bool,
+    onToggleAccessibility: PropTypes.func,
 };
