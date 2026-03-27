@@ -322,7 +322,9 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
 
             {Object.entries(buildingData).map(([floor, entry]) => {
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
-                const floorPlan = extractFloorPlan(entry?.data, floor);
+
+                // only compute rooms for the active floor to avoid unnecessary work
+                const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
                 const classrooms = (floorPlan?.rooms ?? []).filter(
                     r => r.type === 'classroom' && r.bounds
                 );
@@ -333,7 +335,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                         style={[StyleSheet.absoluteFill, { opacity: isActive ? 1 : 0, zIndex: isActive ? 1 : 0 }]}
                         pointerEvents={isActive ? 'auto' : 'none'}
                     >
-                        {entry.image ? (
+                        {isActive && (entry.image ? (
                             <>
                                 <ZoomableImage
                                     source={entry.image}
@@ -348,7 +350,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                             </>
                         ) : (
                             <Placeholder width={width} text={`No map for floor ${floor}`} />
-                        )}
+                        ))}
                     </View>
                 );
             })}
@@ -405,15 +407,9 @@ RoomActionModal.propTypes = {
 
 RoomActionModal.defaultProps = { roomId: '' };
 
-
-export default function IndoorMaps({     
-        building,
-        onPressBack,
-        campus,
-        buildings,
-        isAccessibilityEnabled = false,
-        onToggleAccessibility = () => {}, 
-    }) {
+// buildings: full array of building objects for this campus fetched from the server
+export default function IndoorMaps({ building, onPressBack, campus, buildings, isAccessibilityEnabled = false,
+    onToggleAccessibility = () => {}}) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -459,8 +455,6 @@ export default function IndoorMaps({
             <IndoorSideLeftBar
                 onPressBack={onPressBack}
                 onOpenDirections={() => handleTabPress('directions')}
-                isAccessibilityEnabled={isAccessibilityEnabled}
-                onToggleAccessibility={onToggleAccessibility}
             />
 
             <View style={[styles.mapArea, { paddingBottom: SHEET_COLLAPSED }]}>
@@ -524,10 +518,12 @@ IndoorMaps.propTypes = {
         code: PropTypes.string,
         name: PropTypes.string,
     })),
+    isAccessibilityEnabled: PropTypes.bool,
+    onToggleAccessibility: PropTypes.func,
 };
 
 IndoorMaps.defaultProps = {
     buildings: [],
-    isAccessibilityEnabled: PropTypes.bool,
-    onToggleAccessibility: PropTypes.func,
+    isAccessibilityEnabled: false,
+    onToggleAccessibility: () => {},
 };
