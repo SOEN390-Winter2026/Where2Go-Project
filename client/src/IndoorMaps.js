@@ -222,6 +222,7 @@ function ZoomableImage({ source, rooms, onRoomPress }) {
 
     return (
         <View
+            testID="zoomable-container"
             style={styles.zoomableContainer}
             onLayout={({ nativeEvent: { layout } }) => {
                 containerSize.current = { width: layout.width, height: layout.height };
@@ -256,6 +257,7 @@ function ZoomableImage({ source, rooms, onRoomPress }) {
                                 return (
                                     <TouchableOpacity
                                         key={`${room.id}-${idx}`}
+                                        testID={`room-label-${room.id}`}
                                         style={[styles.roomLabel, { left: cx, top: cy }]}
                                         onPress={() => onRoomPress?.(room.id)}
                                         activeOpacity={0.7}
@@ -524,6 +526,4 @@ IndoorMaps.propTypes = {
 
 IndoorMaps.defaultProps = {
     buildings: [],
-    isAccessibilityEnabled: false,
-    onToggleAccessibility: () => {},
 };
