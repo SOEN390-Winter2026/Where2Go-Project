@@ -6,6 +6,65 @@ const {
 } = require("../../__mocks__/indoorAccessibleRoutingMocks");
 
 describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
+  test("returns INVALID_INPUT when campus or buildingCode is missing", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+    const noCampus = generateAccessibleIndoorPath({
+      buildingCode: "H",
+      from: { floor: "7", room: "H-701" },
+      to: { floor: "8", room: "H-801" },
+    });
+    expect(noCampus.success).toBe(false);
+    expect(noCampus.meta).toEqual(
+      expect.objectContaining({
+        reason: "INVALID_INPUT",
+        details: expect.objectContaining({ missingFields: expect.arrayContaining(["campus"]) }),
+      })
+    );
+
+    const noBuilding = generateAccessibleIndoorPath({
+      campus: "SGW",
+      from: { floor: "7", room: "H-701" },
+      to: { floor: "8", room: "H-801" },
+    });
+    expect(noBuilding.meta?.details?.missingFields).toContain("buildingCode");
+  });
+
+  test("returns INVALID_INPUT when from/to floor or room is missing", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+    const noFromFloor = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { room: "H-701" },
+      to: { floor: "8", room: "H-801" },
+    });
+    expect(noFromFloor.meta).toEqual(
+      expect.objectContaining({
+        reason: "INVALID_INPUT",
+        details: expect.objectContaining({ from: { missingFields: ["floor"] } }),
+      })
+    );
+
+    const noRoom = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "7" },
+      to: { floor: "8", room: "H-801" },
+    });
+    expect(noRoom.meta?.reason).toBe("INVALID_INPUT");
+    expect(noRoom.meta?.details?.from?.missingFields).toContain("room");
+  });
+
+  test("accepts start endpoint with waypointId and no room id", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "7", waypointId: "wpStart" },
+      to: { floor: "8", room: "H-801" },
+    });
+    expect(result.success).toBe(true);
+  });
+
   test("finds a path across floors using elevator (stairs avoided by default)", () => {
     const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
     const result = generateAccessibleIndoorPath({
@@ -158,7 +217,12 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     expect(result).toEqual(
       expect.objectContaining({
         success: false,
-        meta: expect.objectContaining({ reason: "LOCATION_NOT_FOUND" }),
+        meta: expect.objectContaining({
+          reason: "LOCATION_NOT_FOUND",
+          details: expect.objectContaining({
+            from: expect.objectContaining({ room: "BROKEN_ROOM", resolvedFloorId: "7" }),
+          }),
+        }),
       })
     );
   });

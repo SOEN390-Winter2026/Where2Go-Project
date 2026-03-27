@@ -288,6 +288,27 @@ function dijkstra(startNode, goalNode, adjacencyList) {
   return { success: true, path: path.reverse(), cost: distances.get(goalNode) };
 }
 
+function isBlank(value) {
+  if (value == null) return true;
+  if (typeof value === "string" && value.trim() === "") return true;
+  return false;
+}
+
+/** Which required fields are missing on an endpoint (`room` satisfied by `waypointId`). */
+function missingEndpointFields(endpoint) {
+  if (endpoint == null || typeof endpoint !== "object") {
+    return ["floor", "room"];
+  }
+  const missing = [];
+  if (isBlank(endpoint.floor)) missing.push("floor");
+  if (isBlank(endpoint.room) && isBlank(endpoint.waypointId)) missing.push("room");
+  return missing;
+}
+
+function buildInvalidInputMeta(details) {
+  return { success: false, meta: { reason: "INVALID_INPUT", details } };
+}
+
 /**
  * MAIN EXPORT
  */
@@ -295,26 +316,57 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
   // avoidStairs: block stair vertical edges. elevatorBonus / stairsPenalty tweak relative edge costs.
   const rules = { avoidStairs: true, stairsPenalty: 2.0, elevatorBonus: -0.1, floorTransferCost: 1.0 };
 
+  const rootMissing = [];
+  if (isBlank(campus)) rootMissing.push("campus");
+  if (isBlank(buildingCode)) rootMissing.push("buildingCode");
+  const fromMissing = missingEndpointFields(from);
+  const toMissing = missingEndpointFields(to);
+
+  if (rootMissing.length || fromMissing.length || toMissing.length) {
+    const details = {};
+    if (rootMissing.length) details.missingFields = rootMissing;
+    if (fromMissing.length) details.from = { missingFields: fromMissing };
+    if (toMissing.length) details.to = { missingFields: toMissing };
+    return buildInvalidInputMeta(details);
+  }
+
   const graph = buildMultiFloorGraph({ campus, buildingCode, rules });
   if (!graph) return { success: false, meta: { reason: "INVALID_BUILDING" } };
 
-  const fromFloorId = graph.resolveFloorId(from?.floor) ?? floorKeyToString(from?.floor);
-  const toFloorId = graph.resolveFloorId(to?.floor) ?? floorKeyToString(to?.floor);
+  const fromFloorId = graph.resolveFloorId(from.floor) ?? floorKeyToString(from.floor);
+  const toFloorId = graph.resolveFloorId(to.floor) ?? floorKeyToString(to.floor);
   const startWaypointId = findNearestWaypointId(
     graph.floorGraphs,
     fromFloorId,
-    from?.room,
-    from?.waypointId
+    from.room,
+    from.waypointId
   );
   const goalWaypointId = findNearestWaypointId(
     graph.floorGraphs,
     toFloorId,
-    to?.room,
-    to?.waypointId
+    to.room,
+    to.waypointId
   );
 
   if (!startWaypointId || !goalWaypointId) {
-    return { success: false, meta: { reason: "LOCATION_NOT_FOUND" } };
+    const details = {};
+    if (!startWaypointId) {
+      details.from = {
+        floor: from.floor,
+        room: from.room ?? null,
+        waypointId: from.waypointId ?? null,
+        resolvedFloorId: fromFloorId,
+      };
+    }
+    if (!goalWaypointId) {
+      details.to = {
+        floor: to.floor,
+        room: to.room ?? null,
+        waypointId: to.waypointId ?? null,
+        resolvedFloorId: toFloorId,
+      };
+    }
+    return { success: false, meta: { reason: "LOCATION_NOT_FOUND", details } };
   }
 
   // Use the normalized floor IDs for node keys to match the graph keys exactly.
