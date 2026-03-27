@@ -74,13 +74,13 @@ export default function useIndoorMaps(height, campus, buildingCode) {
         if (!bCode) return [];
         const data = findBuildingData(bCode);
         if (!data) return [];
-        return Object.keys(data).filter(floor => data[floor]?.data != null);
+        return Object.keys(data).filter(floor => data[floor]?.image != null);
     };
 
     // Extract classroom room IDs from the floor's JSON data
     const getRooms = (bCode, floor) => {
         if (!bCode || !floor) return [];
-        const bData = findBuildingData(bCode);
+        const bData     = findBuildingData(bCode);
         const floorEntry = bData?.[floor] ?? bData?.[Number(floor)];
         if (!floorEntry?.data) return [];
         const floorPlan = extractFloorPlan(floorEntry.data, floor);

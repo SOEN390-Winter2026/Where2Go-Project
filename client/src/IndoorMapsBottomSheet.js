@@ -163,7 +163,7 @@ function LocationSelector({ label, location, onSelectBuilding, onSelectFloor, on
                     value={location.floor}
                     onSelect={onSelectFloor}
                     disabled={!location.building}
-                    placeholder="No floors available"
+                    placeholder="No floor maps available"
                 />
                 <DropdownSelect
                     testID={`${testIDPrefix}-room`}
