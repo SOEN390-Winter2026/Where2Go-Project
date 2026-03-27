@@ -8,8 +8,18 @@ import {
   Animated,
 } from "react-native";
 import PropTypes from 'prop-types';
+import { leftBarIconSource, leftBarIconState } from "./utils/leftBarItemActive";
+import { sideLeftBarSharedStyles } from "./styles/sideLeftBarStyles";
 
-export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiveLocation, onPressPOI, isPressedPOI }) {
+export default function SideLeftBar({
+  currentCampus,
+  onToggleCampus,
+  onToggleLiveLocation,
+  onPressPOI,
+  isPressedPOI,
+  isAccessibilityEnabled = false,
+  onToggleAccessibility = () => {},
+}) {
   /* ---------- Assets ---------- */
   const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
   const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
@@ -24,7 +34,6 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   const isSGW = currentCampus === "SGW";
   const slideAnim = useRef(new Animated.Value(isSGW ? 0 : -26)).current;
 
-  const [activeDis, setActiveDis] = useState(null);
   const [activePOI, setActivePOI] = useState(isPressedPOI ? "poi" : null);
   const [activeGPS, setActiveGPS] = useState(null);
 
@@ -41,34 +50,21 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
     onToggleCampus?.();
   };
 
-  /* ---------- Icons ---------- */
-  const iconState = (name) => {
-  if (name === "disability")
-    return { backgroundColor: activeDis === name ? "#912338" : "#ccc" };
-  if (name === "poi")
-    return { backgroundColor: activePOI === name ? "#912338" : "#ccc" };
-  if (name === "gps")
-    return { backgroundColor: activeGPS === name ? "#912338" : "#ccc" };
-};
-
-
-  const iconSource = (name) => {
-    if (name === "disability")
-      return activeDis === name ? secondDisabilityIcon : firstDisabilityIcon;
-    if (name === "poi")
-      return activePOI === name ? secondPOIIcon : firstPOIIcon;
-    if (name === "gps")
-      return activeGPS === name ? secondGPSIcon : firstGPSIcon;
+  const leftBarActiveInputs = { isAccessibilityEnabled, activePOI, activeGPS };
+  const iconPairs = {
+    disability: [firstDisabilityIcon, secondDisabilityIcon],
+    poi: [firstPOIIcon, secondPOIIcon],
+    gps: [firstGPSIcon, secondGPSIcon],
   };
 
   return (
-    <View style={styles.floatLeftBar}>
+    <View style={sideLeftBarSharedStyles.floatLeftBar}>
       {/* -------- Custom Switch -------- */}
       <Pressable 
         testID="campusToggle"
         accessible={true}
         accessibilityLabel="campus-switch"
-        style={styles.barItem} 
+        style={sideLeftBarSharedStyles.barItem} 
         onPress={toggleCampus}
       >
         <View style={styles.switch}>
@@ -97,25 +93,23 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
      {/* -------- Disability -------- */}
 <Pressable
   testID="disPress"
-  style={[styles.barItem, iconState("disability")]}
-  onPress={() =>
-    setActiveDis((prev) => (prev === "disability" ? null : "disability"))
-  }
+  style={[sideLeftBarSharedStyles.barItem, leftBarIconState("disability", leftBarActiveInputs)]}
+  onPress={onToggleAccessibility}
 >
-  <Image source={iconSource("disability")} style={styles.icon} />
+  <Image source={leftBarIconSource("disability", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
 </Pressable>
 
 {/* -------- POI -------- */}
 <Pressable
   testID="poiPress"
-  style={[styles.barItem, iconState("poi")]}
+  style={[sideLeftBarSharedStyles.barItem, leftBarIconState("poi", leftBarActiveInputs)]}
   onPress={() =>
     {setActivePOI((prev) => (prev === "poi" ? null : "poi"));
       onPressPOI();
     }
   }
 >
-  <Image source={iconSource("poi")} style={styles.icon} />
+  <Image source={leftBarIconSource("poi", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
 </Pressable>
 
 {/* -------- GPS -------- */}
@@ -123,13 +117,13 @@ export default function SideLeftBar({ currentCampus, onToggleCampus, onToggleLiv
   testID="gps"
   accessible={true}
   accessibilityLabel="gps"
-  style={[styles.barItem, iconState("gps")]}
+  style={[sideLeftBarSharedStyles.barItem, leftBarIconState("gps", leftBarActiveInputs)]}
   onPress={() => {
     setActiveGPS((prev) => (prev === "gps" ? null : "gps"));
     onToggleLiveLocation();
   }}
 >
-  <Image source={iconSource("gps")} style={styles.icon} />
+  <Image source={leftBarIconSource("gps", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
 </Pressable>
 
     </View>
@@ -141,35 +135,13 @@ SideLeftBar.propTypes = {
   onToggleCampus: PropTypes.func.isRequired,
   onToggleLiveLocation: PropTypes.func.isRequired,
   onPressPOI: PropTypes.func.isRequired,
-  isPressedPOI: PropTypes.bool
+  isPressedPOI: PropTypes.bool,
+  isAccessibilityEnabled: PropTypes.bool,
+  onToggleAccessibility: PropTypes.func,
 };
 
 /* ---------- Styles ---------- */
 const styles = StyleSheet.create({
-  floatLeftBar: {
-    position: "absolute",
-    padding: 5,
-    borderWidth: 2,
-    borderColor: "#912338",
-    borderRadius: 20,
-    left: "3%",
-    top: "5%",
-    alignItems: "center",
-    backgroundColor: "white",
-    zIndex: 20,
-    elevation: 20,
-  },
-
-  barItem: {
-    borderWidth: 2,
-    borderColor: "#912338",
-    borderRadius: 50,
-    padding: 5,
-    margin: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
   /* ----- Switch ----- */
   switch: {
     width: 34,
@@ -209,10 +181,5 @@ const styles = StyleSheet.create({
     left: 2,
     top: 35,
     zIndex: 0,
-  },
-
-  icon: {
-    width: 20,
-    height: 20,
   },
 });

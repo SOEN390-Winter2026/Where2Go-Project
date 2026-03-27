@@ -70,6 +70,29 @@ describe('IndoorSideLeftBar', () => {
         expect(onPressBack).not.toHaveBeenCalled();
     });
 
+    it('disability button follows isAccessibilityEnabled when controlled', () => {
+        const { getByTestId, rerender } = render(
+            <IndoorSideLeftBar
+                {...defaultProps}
+                isAccessibilityEnabled={false}
+                onToggleAccessibility={jest.fn()}
+            />
+        );
+        let btn = getByTestId('disability-btn');
+        let bg = [btn.props.style].flat().find((s) => s?.backgroundColor)?.backgroundColor;
+        expect(bg).toBe('#ccc');
+        rerender(
+            <IndoorSideLeftBar
+                {...defaultProps}
+                isAccessibilityEnabled
+                onToggleAccessibility={jest.fn()}
+            />
+        );
+        btn = getByTestId('disability-btn');
+        bg = [btn.props.style].flat().find((s) => s?.backgroundColor)?.backgroundColor;
+        expect(bg).toBe('#912338');
+    });
+
     it('disability button starts with grey background', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
         const btn = getByTestId('disability-btn');
@@ -78,23 +101,17 @@ describe('IndoorSideLeftBar', () => {
         expect(bg).toBe('#ccc');
     });
 
-    it('disability button turns maroon when pressed', () => {
-        const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
+    it('disability button calls onToggleAccessibility when pressed', () => {
+        const onToggleAccessibility = jest.fn();
+        const { getByTestId } = render(
+            <IndoorSideLeftBar
+                {...defaultProps}
+                isAccessibilityEnabled={false}
+                onToggleAccessibility={onToggleAccessibility}
+            />
+        );
         fireEvent.press(getByTestId('disability-btn'));
-        const btn = getByTestId('disability-btn');
-        const styles = [btn.props.style].flat();
-        const bg = styles.find(s => s?.backgroundColor)?.backgroundColor;
-        expect(bg).toBe('#912338');
-    });
-
-    it('disability button deactivates when pressed again', () => {
-        const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('disability-btn'));
-        fireEvent.press(getByTestId('disability-btn'));
-        const btn = getByTestId('disability-btn');
-        const styles = [btn.props.style].flat();
-        const bg = styles.find(s => s?.backgroundColor)?.backgroundColor;
-        expect(bg).toBe('#ccc');
+        expect(onToggleAccessibility).toHaveBeenCalledTimes(1);
     });
 
     it('does not call onPressBack when disability button is pressed', () => {
@@ -143,8 +160,13 @@ describe('IndoorSideLeftBar', () => {
     });
 
     it('disability and POI buttons toggle independently', () => {
-        const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('disability-btn'));
+        const { getByTestId } = render(
+            <IndoorSideLeftBar
+                {...defaultProps}
+                isAccessibilityEnabled
+                onToggleAccessibility={jest.fn()}
+            />
+        );
         fireEvent.press(getByTestId('poi-btn'));
 
         const disBg = [getByTestId('disability-btn').props.style].flat()
@@ -156,9 +178,14 @@ describe('IndoorSideLeftBar', () => {
         expect(poiBg).toBe('#912338');
     });
 
-    it('activating disability does not affect POI state', () => {
-        const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('disability-btn'));
+    it('accessibility from parent does not activate POI', () => {
+        const { getByTestId } = render(
+            <IndoorSideLeftBar
+                {...defaultProps}
+                isAccessibilityEnabled
+                onToggleAccessibility={jest.fn()}
+            />
+        );
 
         const poiBg = [getByTestId('poi-btn').props.style].flat()
             .find(s => s?.backgroundColor)?.backgroundColor;
