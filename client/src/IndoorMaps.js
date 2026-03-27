@@ -273,7 +273,13 @@ FloorMapImage.propTypes = {
     width: PropTypes.number.isRequired,
 };
 
-export default function IndoorMaps({ building, onPressBack, campus }) {
+export default function IndoorMaps({
+    building,
+    onPressBack,
+    campus,
+    isAccessibilityEnabled = false,
+    onToggleAccessibility = () => {},
+}) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -300,6 +306,8 @@ export default function IndoorMaps({ building, onPressBack, campus }) {
             <IndoorSideLeftBar
                 onPressBack={onPressBack}
                 onOpenDirections={() => handleTabPress('directions')}
+                isAccessibilityEnabled={isAccessibilityEnabled}
+                onToggleAccessibility={onToggleAccessibility}
             />
 
             <View style={[styles.mapArea, { paddingBottom: SHEET_COLLAPSED }]}>
@@ -349,4 +357,6 @@ IndoorMaps.propTypes = {
     }),
     onPressBack: PropTypes.func.isRequired,
     campus: PropTypes.string,
+    isAccessibilityEnabled: PropTypes.bool,
+    onToggleAccessibility: PropTypes.func,
 };
