@@ -1,4 +1,5 @@
 import { indoorMaps } from '../../../indoorData';
+import { extractFloorPlan } from './floorPlanUtils';
 
 /**
  * Extracts all exit waypoints from a building's floor plans.
@@ -59,6 +60,8 @@ export function exitPositionToLatLng(exitWaypoint, buildings) {
     const minLng = Math.min(...lngs);
     const maxLng = Math.max(...lngs);
 
+    // The floor plan image has y=0 at the top, lat increases going north (up),
+    //so we invert the y axis when mapping to latitude.
     const latitude  = maxLat - exitWaypoint.position.y * (maxLat - minLat);
     const longitude = minLng + exitWaypoint.position.x * (maxLng - minLng);
 
@@ -98,17 +101,9 @@ export function findClosestExitPair(fromBuildingCode, fromCampus, toBuildingCode
 }
 
 //helpers
-function extractFloorPlan(dataField, floorKey) {
-    if (!dataField || typeof dataField !== 'object') return null;
-    const key = String(floorKey);
-    if (dataField[key] !== undefined) return dataField[key];
-    const suffixMatch = Object.keys(dataField).find(k => k.endsWith(key));
-    if (suffixMatch) return dataField[suffixMatch];
-    return dataField[Object.keys(dataField)[0]] ?? null;
-}
 
 // Approximate straight-line distance between two lat/lng points in metres.
-function haversineMeters( a, b ) {
+function haversineMeters(a, b) {
     const R = 6371000;
     const dLat = toRad(b.latitude - a.latitude);
     const dLng = toRad(b.longitude - a.longitude);

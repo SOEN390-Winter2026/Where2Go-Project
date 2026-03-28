@@ -21,6 +21,7 @@ import IndoorMapsBottomSheet from './IndoorMapsBottomSheet';
 import styles from './styles/IndoorMapsStyles';
 import useIndoorMaps from './utils/useIndoorMaps';
 import { indoorMaps } from '../indoorData';
+import { extractFloorPlan } from './utils/floorPlanUtils';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -37,22 +38,6 @@ const clampTranslation = (containerSize, tx, ty, s) => {
     const { x: maxX, y: maxY } = getMaxTranslate(containerSize, s);
     return { x: clamp(tx, maxX), y: clamp(ty, maxY) };
 };
-
-//Extracting floor plan from JSON
-function extractFloorPlan(dataField, floorKey) {
-    if (!dataField || typeof dataField !== 'object') return null;
-    const key = String(floorKey);
-
-    // 1. Exact match
-    if (dataField[key] !== undefined) return dataField[key];
-
-    // 2. Find a JSON key that ends with the numeric floor key
-    const suffixMatch = Object.keys(dataField).find(k => k.endsWith(key));
-    if (suffixMatch) return dataField[suffixMatch];
-
-    // 3. return first entry
-    return dataField[Object.keys(dataField)[0]] ?? null;
-}
 
 //Compute rendered image rect inside a contain-mode container
 function getContainBounds(containerW, containerH, imageAspect) {

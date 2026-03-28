@@ -2,16 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../../indoorData';
 import { API_URL } from '@env';
-
-// Extract floor plan from the nested JSON structure
-function extractFloorPlan(dataField, floorKey) {
-    if (!dataField || typeof dataField !== 'object') return null;
-    const key = String(floorKey);
-    if (dataField[key] !== undefined) return dataField[key];
-    const suffixMatch = Object.keys(dataField).find(k => k.endsWith(key));
-    if (suffixMatch) return dataField[suffixMatch];
-    return dataField[Object.keys(dataField)[0]] ?? null;
-}
+import { extractFloorPlan } from './floorPlanUtils';
 
 // looks up a building's data across both campuse
 function findBuildingData(bCode) {
