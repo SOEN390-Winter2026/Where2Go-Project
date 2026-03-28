@@ -38,21 +38,22 @@ DropdownOption.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-function DropdownSelect({ label, options, value, onSelect, disabled, testID }) {
+function DropdownSelect({ label, options, value, onSelect, disabled, testID, placeholder }) {
     const [visible, setVisible] = React.useState(false);
+    const isEmpty = options.length === 0;
     return (
         <View style={styles.dropdownWrapper}>
             <Text style={styles.dropdownLabel}>{label}</Text>
             <Pressable
                 testID={testID}
-                style={[styles.dropdownBtn, disabled && styles.dropdownBtnDisabled]}
-                onPress={() => !disabled && setVisible(true)}
-                disabled={disabled}
+                style={[styles.dropdownBtn, (disabled || isEmpty) && styles.dropdownBtnDisabled]}
+                onPress={() => !disabled && !isEmpty && setVisible(true)}
+                disabled={disabled || isEmpty}
             >
-                <Text style={[styles.dropdownBtnText, !value && styles.dropdownBtnPlaceholder]}>
-                    {value || '—'}
+                <Text style={[styles.dropdownBtnText, (!value || isEmpty) && styles.dropdownBtnPlaceholder]}>
+                    {value || (isEmpty && !disabled ? placeholder : '—')}
                 </Text>
-                <Ionicons name="chevron-down" size={12} color={disabled ? '#ccc' : '#912338'} />
+                <Ionicons name="chevron-down" size={12} color={(disabled || isEmpty) ? '#ccc' : '#912338'} />
             </Pressable>
 
             <Modal
@@ -89,12 +90,14 @@ DropdownSelect.propTypes = {
     onSelect: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
     testID: PropTypes.string,
+    placeholder: PropTypes.string,
 };
 
 DropdownSelect.defaultProps = {
     value: null,
     disabled: false,
     testID: undefined,
+    placeholder: '—',
 };
 
 const locationShape = PropTypes.shape({
@@ -110,6 +113,7 @@ const buildingShape = PropTypes.shape({
     address: PropTypes.string,
 });
 
+// Extracted to eliminate the repeated label+value pattern in the info tab
 function InfoRow({ label, value, FONT_SM, FONT_MD }) {
     return (
         <>
@@ -139,6 +143,8 @@ function makeLocationHandlers(setter) {
 }
 
 function LocationSelector({ label, location, onSelectBuilding, onSelectFloor, onSelectRoom, BUILDINGS_LIST, getFloors, getRooms, testIDPrefix, FONT_SM }) {
+    const floors = getFloors(location.building);
+    const rooms  = getRooms(location.building, location.floor);
     return (
         <>
             <Text style={[styles.directionsGroupLabel, { fontSize: FONT_SM + 2 }]}>{label}</Text>
@@ -153,15 +159,16 @@ function LocationSelector({ label, location, onSelectBuilding, onSelectFloor, on
                 <DropdownSelect
                     testID={`${testIDPrefix}-floor`}
                     label="Floor"
-                    options={getFloors(location.building)}
+                    options={floors}
                     value={location.floor}
                     onSelect={onSelectFloor}
                     disabled={!location.building}
+                    placeholder="No floor maps available"
                 />
                 <DropdownSelect
                     testID={`${testIDPrefix}-room`}
                     label="Room"
-                    options={getRooms(location.building, location.floor)}
+                    options={rooms}
                     value={location.room}
                     onSelect={onSelectRoom}
                     disabled={!location.floor}

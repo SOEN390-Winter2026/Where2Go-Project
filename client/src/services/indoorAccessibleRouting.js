@@ -1,19 +1,13 @@
 import { indoorMaps } from "../../indoorData";
 import { MinCostHeap } from "../utils/MinCostHeap";
+import { extractFloorPlan } from "../utils/floorPlanUtils";
 
 /**
  * UTILITIES
  */
-const floorKeyToString = (floor) => String(floor);
+const floorKeyToString = String;
 
-function getFloorPlanData(floorEntry, floorId) {
-  const floorPlanModule = floorEntry?.data;
-  if (!floorPlanModule || typeof floorPlanModule !== "object") return null;
-  // Try exact floor key (e.g., "H-1"), then fall back to the first available object
-  return floorPlanModule[floorId] ?? floorPlanModule[Object.keys(floorPlanModule)[0]] ?? null;
-}
-
-// Center of a room rectangle (normalized 0–1 coords), for “nearest waypoint” fallback.
+// Center of a room rectangle (normalized 0–1 coords), for "nearest waypoint" fallback.
 function roomCenter(room) {
   const { x, y, w, h } = room?.bounds || {};
   if (x == null || y == null || w == null || h == null) return null;
@@ -57,7 +51,7 @@ function getTrailingDigits(value) {
   const text = String(value ?? "");
   let end = text.length;
   while (end > 0) {
-    const code = text.charCodeAt(end - 1);
+    const code = text.codePointAt(end - 1);
     if (code < 48 || code > 57) break; // not 0-9
     end -= 1;
   }
@@ -70,7 +64,7 @@ function normalizeFloorAlias(value) {
   const text = String(value ?? "").toLowerCase();
   let out = "";
   for (let i = 0; i < text.length; i += 1) {
-    const code = text.charCodeAt(i);
+    const code = text.codePointAt(i);
     const isDigit = code >= 48 && code <= 57;
     const isLowerAlpha = code >= 97 && code <= 122;
     if (isDigit || isLowerAlpha) out += text[i];
@@ -176,7 +170,8 @@ function buildFloorGraphsAndAliases(buildingData, floorAliases) {
   const floorGraphs = new Map();
 
   for (const floorId of Object.keys(buildingData)) {
-    const floorPlan = getFloorPlanData(buildingData[floorId], floorId);
+    // use extractFloorPlan
+    const floorPlan = extractFloorPlan(buildingData[floorId]?.data, floorId);
     if (!Array.isArray(floorPlan?.waypoints)) continue;
 
     const { waypointById, waypointsByType } = indexFloorWaypoints(floorPlan);
@@ -285,7 +280,7 @@ function dijkstra(startNode, goalNode, adjacencyList) {
     path.push(step);
     step = previous.get(step);
   }
-  return { success: true, path: path.reverse(), cost: distances.get(goalNode) };
+  return { success: true, path: path.toReversed(), cost: distances.get(goalNode) };
 }
 
 function isBlank(value) {
@@ -309,12 +304,34 @@ function buildInvalidInputMeta(details) {
   return { success: false, meta: { reason: "INVALID_INPUT", details } };
 }
 
+//builds the LOCATION_NOT_FOUND error detail object
+function buildLocationNotFoundMeta(startWaypointId, goalWaypointId, from, to, fromFloorId, toFloorId) {
+  const details = {};
+  if (!startWaypointId) {
+    details.from = {
+      floor: from.floor,
+      room: from.room ?? null,
+      waypointId: from.waypointId ?? null,
+      resolvedFloorId: fromFloorId,
+    };
+  }
+  if (!goalWaypointId) {
+    details.to = {
+      floor: to.floor,
+      room: to.room ?? null,
+      waypointId: to.waypointId ?? null,
+      resolvedFloorId: toFloorId,
+    };
+  }
+  return { success: false, meta: { reason: "LOCATION_NOT_FOUND", details } };
+}
+
 /**
  * MAIN EXPORT
  */
 export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } = {}) {
   // avoidStairs: block stair vertical edges. elevatorBonus / stairsPenalty tweak relative edge costs.
-  const rules = { avoidStairs: true, stairsPenalty: 2.0, elevatorBonus: -0.1, floorTransferCost: 1.0 };
+  const rules = { avoidStairs: true, stairsPenalty: 2, elevatorBonus: -0.1, floorTransferCost: 1 };
 
   const rootMissing = [];
   if (isBlank(campus)) rootMissing.push("campus");
@@ -349,24 +366,7 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
   );
 
   if (!startWaypointId || !goalWaypointId) {
-    const details = {};
-    if (!startWaypointId) {
-      details.from = {
-        floor: from.floor,
-        room: from.room ?? null,
-        waypointId: from.waypointId ?? null,
-        resolvedFloorId: fromFloorId,
-      };
-    }
-    if (!goalWaypointId) {
-      details.to = {
-        floor: to.floor,
-        room: to.room ?? null,
-        waypointId: to.waypointId ?? null,
-        resolvedFloorId: toFloorId,
-      };
-    }
-    return { success: false, meta: { reason: "LOCATION_NOT_FOUND", details } };
+    return buildLocationNotFoundMeta(startWaypointId, goalWaypointId, from, to, fromFloorId, toFloorId);
   }
 
   // Use the normalized floor IDs for node keys to match the graph keys exactly.
@@ -394,4 +394,3 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
 
   return { success: true, path, cost: result.cost };
 }
-

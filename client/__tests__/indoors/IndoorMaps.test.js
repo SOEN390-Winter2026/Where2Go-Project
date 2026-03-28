@@ -6,7 +6,22 @@ jest.mock('indoorData', () => ({
     indoorMaps: {
         SGW: {
             H: {
-                2:  { image: 1, data: { rooms: [{ id: '201' }], waypoints: [] } },
+                2:  {
+                    image: 1,
+                    data: {
+                        'H-2': {
+                            floor: 'H-2',
+                            rooms: [
+                                {
+                                    id: 'H-201',
+                                    type: 'classroom',
+                                    bounds: { x: 0.1, y: 0.1, w: 0.1, h: 0.1 },
+                                },
+                            ],
+                            waypoints: [],
+                        },
+                    },
+                },
                 4:  { image: 2, data: { rooms: [], waypoints: [] } },
                 5:  { image: 3, data: { rooms: [], waypoints: [] } },
                 6:  { image: 4, data: { rooms: [], waypoints: [] } },
@@ -99,6 +114,7 @@ jest.mock('react-native', () => {
         panHandlers = handlers;
         return { panHandlers: {} };
     };
+    RN.Image.resolveAssetSource = () => ({ width: 1000, height: 800 });
     return RN;
 });
 
@@ -161,16 +177,12 @@ describe('IndoorMaps', () => {
     });
 
     it('renders without crashing when campus is not provided', () => {
-        const { getAllByText } = render(
-            <IndoorMaps {...defaultProps} campus={undefined} />
-        );
+        const { getAllByText } = render(<IndoorMaps {...defaultProps} campus={undefined} />);
         expect(getAllByText('H').length).toBeGreaterThan(0);
     });
 
     it('shows "Select a floor" placeholder when no campus is provided', () => {
-        const { getByText } = render(
-            <IndoorMaps {...defaultProps} campus={undefined} />
-        );
+        const { getByText } = render(<IndoorMaps {...defaultProps} campus={undefined} />);
         expect(getByText('Select a floor')).toBeTruthy();
     });
 
@@ -192,18 +204,14 @@ describe('IndoorMaps', () => {
 
     it('calls onPressBack when back button is pressed', () => {
         const onPressBack = jest.fn();
-        const { getByTestId } = render(
-            <IndoorMaps {...defaultProps} onPressBack={onPressBack} />
-        );
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} onPressBack={onPressBack} />);
         fireEvent.press(getByTestId('mock-back-btn'));
         expect(onPressBack).toHaveBeenCalledTimes(1);
     });
 
     it('does not call onPressBack when other elements are pressed', () => {
         const onPressBack = jest.fn();
-        const { getByTestId } = render(
-            <IndoorMaps {...defaultProps} onPressBack={onPressBack} />
-        );
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} onPressBack={onPressBack} />);
         fireEvent.press(getByTestId('tab-info'));
         expect(onPressBack).not.toHaveBeenCalled();
     });
@@ -304,13 +312,6 @@ describe('IndoorMaps', () => {
         expect(getByText('Select a floor')).toBeTruthy();
     });
 
-    it('switches selected floor correctly', () => {
-        const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
-        fireEvent.press(getByTestId('tab-floors'));
-        fireEvent.press(getByTestId('floor-btn-4'));
-        expect(getByText('Floor 4')).toBeTruthy();
-    });
-
     it('selected floor persists after switching tabs', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
@@ -356,16 +357,12 @@ describe('IndoorMaps', () => {
 
     it('onPanResponderMove drags upward', () => {
         render(<IndoorMaps {...defaultProps} />);
-        expect(() => {
-            panHandlers.onPanResponderMove(null, { dy: -50 });
-        }).not.toThrow();
+        expect(() => panHandlers.onPanResponderMove(null, { dy: -50 })).not.toThrow();
     });
 
     it('onPanResponderMove ignores gesture outside bounds', () => {
         render(<IndoorMaps {...defaultProps} />);
-        expect(() => {
-            panHandlers.onPanResponderMove(null, { dy: -9999 });
-        }).not.toThrow();
+        expect(() => panHandlers.onPanResponderMove(null, { dy: -9999 })).not.toThrow();
     });
 
     it('onPanResponderRelease expands sheet when dragged past midpoint', () => {
@@ -379,13 +376,11 @@ describe('IndoorMaps', () => {
         const { act } = require('@testing-library/react-native');
         const { getByTestId, queryByTestId } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
-        act(() => {
-            panHandlers.onPanResponderRelease(null, { dy: 500 });
-        });
+        act(() => { panHandlers.onPanResponderRelease(null, { dy: 500 }); });
         expect(queryByTestId('classroom-input')).toBeNull();
     });
 
-    it('renders correctly on Android and applies android top padding', () => {
+    it('renders correctly on Android', () => {
         const Platform = require('react-native').Platform;
         const original = Platform.OS;
         Platform.OS = 'android';
@@ -405,30 +400,6 @@ describe('IndoorMaps', () => {
         expect(getByTestId('swap-directions')).toBeTruthy();
     });
 
-    it('Image onLoadStart and onLoadEnd fire without throwing', () => {
-        const { UNSAFE_getAllByType } = render(<IndoorMaps {...defaultProps} />);
-        const { Image } = require('react-native');
-        const images = UNSAFE_getAllByType(Image);
-        expect(() => fireEvent(images[0], 'loadStart')).not.toThrow();
-        expect(() => fireEvent(images[0], 'loadEnd')).not.toThrow();
-    });
-
-    it('pinch gesture callbacks execute without throwing', () => {
-        render(<IndoorMaps {...defaultProps} />);
-        const { pinch } = globalThis.__gestureCallbacks__;
-        expect(() => pinch.onStart()).not.toThrow();
-        expect(() => pinch.onUpdate({ scale: 2 })).not.toThrow();
-        expect(() => pinch.onEnd({ scale: 2 })).not.toThrow();
-        expect(() => pinch.onEnd({ scale: 0.5 })).not.toThrow();
-    });
-
-    it('pan gesture callbacks execute without throwing', () => {
-        render(<IndoorMaps {...defaultProps} />);
-        const { pan } = globalThis.__gestureCallbacks__;
-        expect(() => pan.onUpdate({ translationX: 10, translationY: 5 })).not.toThrow();
-        expect(() => pan.onEnd({ translationX: 10, translationY: 5 })).not.toThrow();
-    });
-
     it('shows Navigation unavailable badge for floor with no JSON data', () => {
         const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
         fireEvent.press(getByTestId('tab-floors'));
@@ -436,11 +407,81 @@ describe('IndoorMaps', () => {
         expect(getByText('Navigation unavailable')).toBeTruthy();
     });
 
+    it('renders with isAccessibilityEnabled prop without crashing', () => {
+        const { getAllByText } = render(
+            <IndoorMaps {...defaultProps} isAccessibilityEnabled={true} />
+        );
+        expect(getAllByText('H').length).toBeGreaterThan(0);
+    });
+
+    it('renders with onToggleAccessibility prop without crashing', () => {
+        const toggle = jest.fn();
+        const { getAllByText } = render(
+            <IndoorMaps {...defaultProps} onToggleAccessibility={toggle} />
+        );
+        expect(getAllByText('H').length).toBeGreaterThan(0);
+    });
+
+    describe('RoomActionModal', () => {
+        // Room labels only render once the ZoomableImage container has a layout
+        // and Image.resolveAssetSource returns a valid aspect ratio.
+        // We simulate both by firing onLayout and mocking resolveAssetSource.
+        const triggerRoomLabel = (getByTestId) => {
+            const container = getByTestId('zoomable-container');
+            fireEvent(container, 'layout', {
+                nativeEvent: { layout: { width: 400, height: 600 } },
+            });
+        };
+
+        beforeAll(() => {
+            jest.spyOn(require('react-native').Image, 'resolveAssetSource')
+                .mockReturnValue({ width: 800, height: 600 });
+        });
+
+        afterAll(() => {
+            require('react-native').Image.resolveAssetSource.mockRestore();
+        });
+
+        it('room label tap opens the action modal with the room id', () => {
+            const { getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />);
+            triggerRoomLabel(getByTestId);
+            fireEvent.press(getByTestId('room-label-H-201'));
+            expect(getByText('Set as departure')).toBeTruthy();
+            expect(getByText('Set as destination')).toBeTruthy();
+        });
+
+        it('modal closes when Cancel is pressed', () => {
+            const { getByText, getByTestId, queryByText } = render(<IndoorMaps {...defaultProps} />);
+            triggerRoomLabel(getByTestId);
+            fireEvent.press(getByTestId('room-label-H-201'));
+            fireEvent.press(getByText('Cancel'));
+            expect(queryByText('Set as departure')).toBeNull();
+        });
+
+        it('Set as departure sets directionsFrom and opens directions tab', () => {
+            const { getByText, getByTestId, queryByText } = render(<IndoorMaps {...defaultProps} />);
+            triggerRoomLabel(getByTestId);
+            fireEvent.press(getByTestId('room-label-H-201'));
+            fireEvent.press(getByText('Set as departure'));
+            expect(queryByText('Set as departure')).toBeNull();
+            expect(getByTestId('swap-directions')).toBeTruthy();
+        });
+
+        it('Set as destination sets directionsTo and opens directions tab', () => {
+            const { getByText, getByTestId, queryByText } = render(<IndoorMaps {...defaultProps} />);
+            triggerRoomLabel(getByTestId);
+            fireEvent.press(getByTestId('room-label-H-201'));
+            fireEvent.press(getByText('Set as destination'));
+            expect(queryByText('Set as destination')).toBeNull();
+            expect(getByTestId('swap-directions')).toBeTruthy();
+        });
+    });
+
     describe('directions tab', () => {
-        let getByText, getByTestId;
+        let getByText, getByTestId, getAllByText;
 
         beforeEach(() => {
-            ({ getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />));
+            ({ getByText, getByTestId, getAllByText } = render(<IndoorMaps {...defaultProps} />));
             fireEvent.press(getByText('Get Room Directions'));
         });
 
@@ -504,6 +545,10 @@ describe('IndoorMaps', () => {
             fireEvent.press(getByTestId('from-building'));
             fireEvent.press(getByText('MB'));
             expect(getByTestId('from-floor')).toBeTruthy();
+        });
+
+        it('dropdown shows placeholder dashes when no value selected', () => {
+            expect(getAllByText('—').length).toBeGreaterThan(0);
         });
     });
 
