@@ -27,6 +27,7 @@ function equivalentCodes(campus, code) {
     if (c === 'VE' || c === 'VL') return ['VE', 'VL'];
     return [resolved];
 }
+import { extractFloorPlan } from './floorPlanUtils';
 
 /**
  * Extracts all exit waypoints from a building's floor plans.
