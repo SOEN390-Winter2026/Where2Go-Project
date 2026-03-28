@@ -13,6 +13,7 @@ function findBuildingData(bCode) {
 async function fetchCampusBuildings(campus) {
     try {
         const res  = await fetch(`${API_URL}/campus/${campus}/buildings`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const list = Array.isArray(data) ? data : (data.buildings ?? []);
         return list.map(b => b.code).filter(Boolean);
