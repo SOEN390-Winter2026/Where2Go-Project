@@ -48,6 +48,7 @@ const clampTranslation = (containerSize, tx, ty, s) => {
     return { x: clamp(tx, maxX), y: clamp(ty, maxY) };
 };
 
+//Compute rendered image rect inside a contain-mode container
 function getContainBounds(containerW, containerH, imageAspect) {
     if (!containerW || !containerH || !imageAspect) return null;
     const containerAspect = containerW / containerH;

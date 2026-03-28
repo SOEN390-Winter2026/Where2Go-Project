@@ -361,6 +361,7 @@ function buildFloorGraphsAndAliases(buildingData, floorAliases) {
   const floorGraphs = new Map();
 
   for (const floorId of Object.keys(buildingData)) {
+    // use extractFloorPlan
     const srcFloorPlan = extractFloorPlan(buildingData[floorId]?.data, floorId);
     if (!Array.isArray(srcFloorPlan?.waypoints)) continue;
 
