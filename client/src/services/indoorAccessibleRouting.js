@@ -1,6 +1,7 @@
 import { indoorMaps } from "../data/indoorData";
 import { MinCostHeap } from "../utils/MinCostHeap";
 import { extractFloorPlan } from "../utils/floorPlanUtils";
+import { trailingAsciiDigitSuffix } from "../utils/trailingDigits";
 
 // Cache graph build per building+rules
 const GRAPH_CACHE = new Map();
@@ -57,15 +58,7 @@ export function findNearestWaypointId(floorGraphs, floorId, roomId, waypointId) 
 // Extract trailing digits from a string: e.g. "H-7" -> "7".
 // This lets us treat "7" and "H-7" as aliases for the same graph floor key.
 function getTrailingDigits(value) {
-  const text = String(value ?? "");
-  let end = text.length;
-  while (end > 0) {
-    const code = text.codePointAt(end - 1);
-    if (code < 48 || code > 57) break; // not 0-9
-    end -= 1;
-  }
-  const digits = text.slice(end);
-  return digits.length ? digits : "";
+  return trailingAsciiDigitSuffix(value);
 }
 
 // Lowercase letters+digits only (strips spaces/dashes for loose matching).

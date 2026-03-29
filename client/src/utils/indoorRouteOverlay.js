@@ -3,6 +3,8 @@
  * for the active building so we can draw route lines on the floor plan.
  */
 
+import { trailingAsciiDigitSuffix } from "./trailingDigits";
+
 /**
  * @param {Array<{ floor?: string|number, position?: { x?: number, y?: number } }>} path
  * @returns {Array<{ floor: string, points: Array<{ x: number, y: number }> }>}
@@ -73,8 +75,7 @@ export function getPolylinesForFloor(routeByFloor, selectedFloor) {
   if (!routeByFloor || selectedFloor == null) return [];
   const key = String(selectedFloor).trim();
   const compact = key.toLowerCase().replace(/[^a-z0-9]/g, "");
-  const trailingDigitsMatch = compact.match(/(\d+)$/);
-  const trailingDigits = trailingDigitsMatch ? trailingDigitsMatch[1] : "";
+  const trailingDigits = trailingAsciiDigitSuffix(compact);
 
   const candidateKeys = [key, compact, trailingDigits].filter(Boolean);
   for (const k of candidateKeys) {
@@ -86,7 +87,7 @@ export function getPolylinesForFloor(routeByFloor, selectedFloor) {
   const entries = Object.entries(routeByFloor);
   for (const [k, lines] of entries) {
     const kCompact = String(k).toLowerCase().replace(/[^a-z0-9]/g, "");
-    const kTrailing = (kCompact.match(/(\d+)$/) || [])[1] || "";
+    const kTrailing = trailingAsciiDigitSuffix(kCompact);
     if (
       kCompact === compact ||
       (trailingDigits && kTrailing === trailingDigits)

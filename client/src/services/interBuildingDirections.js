@@ -3,6 +3,7 @@ import { indoorMaps } from "../../indoorData";
 import { generateAccessibleIndoorPath } from "./indoorAccessibleRouting";
 import { findClosestExitPair, exitPositionToLatLng, getExitWaypoints } from "../utils/Buildingexits";
 import { decodePolylineToCoords } from "./routeServices";
+import { trailingAsciiDigitSuffix } from "../utils/trailingDigits";
 
 function normalizeCode(code) {
   return String(code ?? "").trim().toUpperCase();
@@ -202,8 +203,8 @@ function floorDistancePenalty(roomFloor, exitFloor) {
   const ef = String(exitFloor ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (!rf || !ef) return 2;
   if (rf === ef) return 0;
-  const rd = (rf.match(/(\d+)$/) || [])[1];
-  const ed = (ef.match(/(\d+)$/) || [])[1];
+  const rd = trailingAsciiDigitSuffix(rf);
+  const ed = trailingAsciiDigitSuffix(ef);
   if (rd && ed && rd === ed) return 0;
   return 1;
 }
