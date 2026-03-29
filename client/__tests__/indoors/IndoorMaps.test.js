@@ -2,6 +2,21 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import IndoorMaps from '../../src/IndoorMaps';
 
+jest.mock('react-native-svg', () => {
+    const React = require('react');
+    const { View } = require('react-native');
+    const Mock = ({ children, testID, ...rest }) => (
+        <View testID={testID} {...rest}>{children}</View>
+    );
+    return {
+        __esModule: true,
+        default: Mock,
+        Svg: Mock,
+        Polyline: Mock,
+        Circle: Mock,
+    };
+});
+
 jest.mock('indoorData', () => ({
     indoorMaps: {
         SGW: {
