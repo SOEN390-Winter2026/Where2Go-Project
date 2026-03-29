@@ -1,28 +1,33 @@
 import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../data/indoorData';
-import { API_URL } from '@env';
 import { extractFloorPlan } from './floorPlanUtils';
+import { API_BASE_URL } from '../config';
 
-// looks up a building's data across both campuse
-function findBuildingData(bCode) {
-    return indoorMaps?.['SGW']?.[bCode] ?? indoorMaps?.['Loyola']?.[bCode] ?? null;
+// Indoor JSON for this campus only (avoids mixing Loyola/SGW when the directions list includes all API codes)
+function getBuildingIndoorData(campus, bCode) {
+    if (!campus || !bCode) return null;
+    return indoorMaps?.[campus]?.[bCode] ?? null;
 }
 
 // Fetches building codes for one campus, falls back to indoorData keys on failure.
 async function fetchCampusBuildings(campus) {
     try {
-        const res  = await fetch(`${API_URL}/campus/${campus}/buildings`);
+        const res  = await fetch(`${API_BASE_URL}/campus/${campus}/buildings`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const list = Array.isArray(data) ? data : (data.buildings ?? []);
-        return list.map(b => b.code).filter(Boolean);
+        return list.map(b => String(b?.code ?? "").trim()).filter(Boolean);
     } catch {
         return Object.keys(indoorMaps?.[campus] ?? {});
     }
 }
 
-export default function useIndoorMaps(height, campus, buildingCode) {
+function normalizeCode(code) {
+    return String(code ?? "").trim().toUpperCase();
+}
+
+export default function useIndoorMaps(height, campus, buildingCode, _buildings = []) {
     const SHEET_COLLAPSED  = height * 0.11;
     const SHEET_EXPANDED   = height * 0.45;
     const SHEET_DIRECTIONS = height * 0.6;
@@ -37,15 +42,18 @@ export default function useIndoorMaps(height, campus, buildingCode) {
     const [allBuildings, setAllBuildings] = useState([]);
 
     useEffect(() => {
-        async function loadAllBuildings() {
-            const [sgw, loyola] = await Promise.all([
-                fetchCampusBuildings('SGW'),
-                fetchCampusBuildings('Loyola'),
-            ]);
-            setAllBuildings([...sgw, ...loyola]);
+        let cancelled = false;
+        async function loadForCampus() {
+            if (!campus) {
+                setAllBuildings([]);
+                return;
+            }
+            const codes = await fetchCampusBuildings(campus);
+            if (!cancelled) setAllBuildings(codes);
         }
-        loadAllBuildings();
-    }, []);  // runs once cuz building list shouldnt change with campus
+        loadForCampus();
+        return () => { cancelled = true; };
+    }, [campus]);
 
     // Auto-select first available floor when building or campus changes
     useEffect(() => {
@@ -56,23 +64,39 @@ export default function useIndoorMaps(height, campus, buildingCode) {
         setSelectedFloor(firstFloor);
     }, [campus, buildingCode]);
 
-    // All campus buildings from the server
-    const BUILDINGS_LIST = allBuildings.length > 0
-        ? allBuildings
-        : Object.keys(indoorMaps?.[campus] ?? {});
+    // Keep directions defaults anchored to the building/floor currently open in IndoorMaps.
+    useEffect(() => {
+        if (!buildingCode || !selectedFloor) return;
+        setDirectionsFrom((prev) => (
+            prev?.building ? prev : { building: String(buildingCode).toUpperCase(), floor: selectedFloor, room: null }
+        ));
+        setDirectionsTo((prev) => (
+            prev?.building ? prev : { building: String(buildingCode).toUpperCase(), floor: selectedFloor, room: null }
+        ));
+    }, [buildingCode, selectedFloor]);
 
-    // Returns floors only when the building has JSON data in indoorData
+    // Show only buildings that have indoor floor plans on this campus; this guarantees selection is routable.
+    const indoorCodes = Object.keys(indoorMaps?.[campus] ?? {}).map(normalizeCode).filter(Boolean);
+    const currentCode = normalizeCode(buildingCode);
+    const mergedCodes = [...indoorCodes, currentCode].filter(Boolean);
+    const BUILDINGS_LIST = [...new Set(mergedCodes)].sort((a, b) =>
+        String(a).localeCompare(String(b), undefined, { numeric: true })
+    );
+
+    // Returns floors only when the building has JSON data in indoorData (numeric order, e.g. 2,4,…,12)
     const getFloors = (bCode) => {
         if (!bCode) return [];
-        const data = findBuildingData(bCode);
+        const data = getBuildingIndoorData(campus, bCode);
         if (!data) return [];
-        return Object.keys(data).filter(floor => data[floor]?.image != null);
+        return Object.keys(data)
+            .filter((floor) => data[floor]?.image != null)
+            .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
     };
 
     // Extract classroom room IDs from the floor's JSON data
     const getRooms = (bCode, floor) => {
         if (!bCode || !floor) return [];
-        const bData     = findBuildingData(bCode);
+        const bData = getBuildingIndoorData(campus, bCode);
         const floorEntry = bData?.[floor] ?? bData?.[Number(floor)];
         if (!floorEntry?.data) return [];
         const floorPlan = extractFloorPlan(floorEntry.data, floor);
