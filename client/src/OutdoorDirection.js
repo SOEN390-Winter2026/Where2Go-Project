@@ -3,7 +3,7 @@ import {
   ImageBackground, ScrollView, ActivityIndicator, Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import * as Location from "expo-location";
 import ErrorModal from "./ErrorModal";

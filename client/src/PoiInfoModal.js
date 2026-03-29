@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Modal,
   View,
@@ -6,7 +5,6 @@ import {
   Image,
   ScrollView,
   Pressable,
-  StyleSheet,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { Ionicons } from '@expo/vector-icons';
