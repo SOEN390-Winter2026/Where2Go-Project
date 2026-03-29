@@ -159,9 +159,12 @@ export function getBuildingForLocation(lat, lng, radiusMeters = 50) {
     const distance = haversineDistance(lat, lng, location.lat, location.lng);
     if (distance <= radiusMeters) {
       // Extract building code from label (e.g., "Hall Building (SGW)" -> "hall")
-      const match = location.label.match(/^([^()]+)\s+\(([^()]+)\)$/);
-      if (match) {
-        const [, buildingName, campus] = match;
+      const label = location.label;
+      const openParen = label.lastIndexOf('(');
+      const closeParen = label.lastIndexOf(')');
+      if (openParen !== -1 && closeParen !== -1 && closeParen > openParen) {
+        const buildingName = label.substring(0, openParen).trim();
+        const campus = label.substring(openParen + 1, closeParen);
         const buildingCode = buildingName.toLowerCase()
           .replace(/ building$/i, '')
           .replace(/\s+/g, '')
