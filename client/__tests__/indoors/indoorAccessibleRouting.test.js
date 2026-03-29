@@ -355,4 +355,104 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     expect(a.success && b.success).toBe(true);
     expect(b.cost).toBe(a.cost);
   });
+
+  test("bridges disconnected waypoint clusters on the same floor", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+      SGW: {
+        H: {
+          1: {
+            image: null,
+            data: {
+              F1: {
+                waypoints: [
+                  { id: "a", type: "door", position: { x: 0.05, y: 0.05 }, connections: ["b"] },
+                  { id: "b", type: "door", position: { x: 0.06, y: 0.06 }, connections: ["a"] },
+                  { id: "c", type: "door", position: { x: 0.95, y: 0.95 }, connections: ["d"] },
+                  { id: "d", type: "door", position: { x: 0.96, y: 0.96 }, connections: ["c"] },
+                ],
+                rooms: [
+                  { id: "R_START", bounds: { x: 0, y: 0, w: 0.04, h: 0.04 }, nearestWaypoint: "a" },
+                  { id: "R_END", bounds: { x: 0.94, y: 0.94, w: 0.04, h: 0.04 }, nearestWaypoint: "c" },
+                ],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "1", room: "R_START" },
+      to: { floor: "1", room: "R_END" },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.path.map((p) => p.id)).toEqual(expect.arrayContaining(["a", "c"]));
+  });
+
+  test("synthetic doorway is added when room has bounds but no nearestWaypoint", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+      SGW: {
+        H: {
+          1: {
+            image: null,
+            data: {
+              F1: {
+                waypoints: [
+                  { id: "hub", type: "door", position: { x: 0.5, y: 0.5 }, connections: [] },
+                ],
+                rooms: [{ id: "R_ORPHAN", bounds: { x: 0.48, y: 0.48, w: 0.02, h: 0.02 } }],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "1", room: "R_ORPHAN" },
+      to: { floor: "1", room: "R_ORPHAN" },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test("returns NO_PATH when floors are not connected by elevator or stairs", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+      SGW: {
+        H: {
+          1: {
+            image: null,
+            data: {
+              F1: {
+                waypoints: [{ id: "w1", type: "door", position: { x: 0.1, y: 0.1 }, connections: [] }],
+                rooms: [{ id: "A", bounds: { x: 0, y: 0, w: 0.02, h: 0.02 }, nearestWaypoint: "w1" }],
+              },
+            },
+          },
+          2: {
+            image: null,
+            data: {
+              F2: {
+                waypoints: [{ id: "w2", type: "door", position: { x: 0.1, y: 0.1 }, connections: [] }],
+                rooms: [{ id: "B", bounds: { x: 0, y: 0, w: 0.02, h: 0.02 }, nearestWaypoint: "w2" }],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "1", room: "A" },
+      to: { floor: "2", room: "B" },
+    });
+    expect(result.success).toBe(false);
+    expect(result.meta?.reason).toBe("NO_PATH");
+  });
 });

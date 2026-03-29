@@ -8,7 +8,7 @@ const GRAPH_CACHE = new Map();
 /**
  * UTILITIES
  */
-const floorKeyToString = String;
+const floorKeyToString = (floor) => String(floor);
 
 // Center of a room rectangle (normalized 0–1 coords), for "nearest waypoint" fallback.
 function roomCenter(room) {
