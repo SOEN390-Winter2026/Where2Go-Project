@@ -23,26 +23,18 @@ describe('LoginScreen', () => {
         expect(getByTestId('user-icon')).toBeTruthy();
     });
 
-    it('renders Sign in with Google btn', () => {
+    it('renders Continue btn', () => {
         const { getByText } = render(
             <LoginScreen onSkip={mockOnSkip} />
         );
-        
-        expect(getByText('Sign in with Google')).toBeTruthy();
+        expect(getByText('Continue')).toBeTruthy();
     });
 
-    it('renders Skip btn', () => {
+    it('has to call onSkip when Continue btn is pressed', () => {
         const { getByText } = render(
             <LoginScreen onSkip={mockOnSkip} />
         );
-        expect(getByText('Skip')).toBeTruthy();
-    });
-
-    it('has to call onSkip when Skip btn is pressed', () => {
-        const { getByText } = render(
-            <LoginScreen onSkip={mockOnSkip} />
-        );
-        const skipButton = getByText('Skip');
+        const skipButton = getByText('Continue');
         fireEvent.press(skipButton);
         expect(mockOnSkip).toHaveBeenCalledTimes(1);
     });
