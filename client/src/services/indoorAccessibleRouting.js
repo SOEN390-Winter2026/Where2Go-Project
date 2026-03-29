@@ -508,7 +508,8 @@ function dijkstra(startNode, goalNode, adjacencyList) {
     path.push(step);
     step = previous.get(step);
   }
-  return { success: true, path: path.toReversed(), cost: distances.get(goalNode) };
+  const reversed = path.slice().reverse();
+  return { success: true, path: reversed, cost: distances.get(goalNode) };
 }
 
 function isBlank(value) {
