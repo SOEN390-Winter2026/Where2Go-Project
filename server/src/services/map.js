@@ -803,11 +803,3 @@ function getBuildings(campusName) {
 }
 
 module.exports = { getCampusCoordinates, getBuildings };
-
-// jest.config.js
-module.exports = {
-  preset: 'jest-expo',
-  transformIgnorePatterns: [
-    'node_modules/(?!(@react-native|expo|react-native|jest-expo)/)'
-  ],
-};
