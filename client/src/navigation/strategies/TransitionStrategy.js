@@ -26,40 +26,29 @@ export default class TransitionStrategy extends NavigationStrategy {
     const routes = [];
 
     if (transition.originIndoor && !transition.destinationIndoor) {
-      // Indoor to outdoor: walk from indoor location to building entrance, then to destination
       const entrance = getNearestEntrance(transition.originBuilding.code, origin.lat, origin.lng);
       if (entrance) {
-        const indoorToEntranceRoute = await this._getOutdoorRoute(origin, entrance);
-        const entranceToDestinationRoute = await this._getOutdoorRoute(entrance, destination);
-
-        if (indoorToEntranceRoute.length > 0 && entranceToDestinationRoute.length > 0) {
-          const combinedRoute = this._combineRoutes(
-            indoorToEntranceRoute[0],
-            entranceToDestinationRoute[0],
-            "Exit building via " + entrance.description
-          );
-          if (combinedRoute) routes.push(combinedRoute);
-        }
+        const combinedRoute = await this._buildCombinedRoute(origin, entrance, destination, "Exit building via " + entrance.description);
+        if (combinedRoute) routes.push(combinedRoute);
       }
     } else if (!transition.originIndoor && transition.destinationIndoor) {
-      // Outdoor to indoor: walk from origin to building entrance, then to indoor destination
       const entrance = getNearestEntrance(transition.destBuilding.code, destination.lat, destination.lng);
       if (entrance) {
-        const originToEntranceRoute = await this._getOutdoorRoute(origin, entrance);
-        const entranceToIndoorRoute = await this._getOutdoorRoute(entrance, destination);
-
-        if (originToEntranceRoute.length > 0 && entranceToIndoorRoute.length > 0) {
-          const combinedRoute = this._combineRoutes(
-            originToEntranceRoute[0],
-            entranceToIndoorRoute[0],
-            "Enter building via " + entrance.description
-          );
-          if (combinedRoute) routes.push(combinedRoute);
-        }
+        const combinedRoute = await this._buildCombinedRoute(origin, entrance, destination, "Enter building via " + entrance.description);
+        if (combinedRoute) routes.push(combinedRoute);
       }
     }
 
     return routes;
+  }
+
+  async _buildCombinedRoute(origin, entrance, destination, transitionInstruction) {
+    const firstLeg = await this._getOutdoorRoute(origin, entrance);
+    const secondLeg = await this._getOutdoorRoute(entrance, destination);
+    if (firstLeg.length > 0 && secondLeg.length > 0) {
+      return this._combineRoutes(firstLeg[0], secondLeg[0], transitionInstruction);
+    }
+    return null;
   }
 
   async _getOutdoorRoute(origin, destination) {
