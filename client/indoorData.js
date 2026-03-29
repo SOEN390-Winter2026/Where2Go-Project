@@ -1,3 +1,18 @@
+const VEVL = {
+  1: {
+    image: require('./assets/indoor/Loyola/VEVL-1.png'),
+    data: require('./assets/indoor/Loyola/floorplan_VEVL1.json'),
+  },
+  2: {
+    image: require('./assets/indoor/Loyola/VEVL-2.png'),
+    data: require('./assets/indoor/Loyola/floorplan_VEVL2.json'),
+  },
+  3: {
+    image: require('./assets/indoor/Loyola/VEVL-3.png'),
+    data: require('./assets/indoor/Loyola/floorplan_VEVL3.json'),
+  },
+};
+
 export const indoorMaps = {
   SGW: {
     H: {
@@ -90,21 +105,8 @@ export const indoorMaps = {
         data: require('./assets/indoor/Loyola/floorplan_CC4.json'),
       },
     },
-
-    VE: {
-      1: {
-        image: require('./assets/indoor/Loyola/VEVL-1.png'),
-        data: require('./assets/indoor/Loyola/floorplan_VEVL1.json'),
-      },
-      2: {
-        image: require('./assets/indoor/Loyola/VEVL-2.png'),
-        data: require('./assets/indoor/Loyola/floorplan_VEVL2.json'),
-      },
-      3: {
-        image: require('./assets/indoor/Loyola/VEVL-3.png'),
-        // no JSON yet → safe placeholder
-        data: null,
-      },
-    },
+    //pointing to same floor plans
+    VE: VEVL,
+    VL: VEVL,
   },
 };

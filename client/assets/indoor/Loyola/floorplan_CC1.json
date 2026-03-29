@@ -1,4 +1,9 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "CC1": {
     "floor": "CC1",
     "rooms": [
@@ -214,7 +219,7 @@
     "waypoints": [
       {
         "id": "wp1_CC1",
-        "type": "corridor",
+        "type": "exit",
         "floor": "CC3",
         "position": {
           "x": 0.1165,
@@ -306,7 +311,7 @@
       },
       {
         "id": "wp12_CC1",
-        "type": "corridor",
+        "type": "exit",
         "floor": "CC3",
         "position": {
           "x": 0.8064,
