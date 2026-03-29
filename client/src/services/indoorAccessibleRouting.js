@@ -6,9 +6,6 @@ import { trailingAsciiDigitSuffix } from "../utils/trailingDigits";
 // Cache graph build per building+rules
 const GRAPH_CACHE = new Map();
 
-// Cache graph build per building+rules
-const GRAPH_CACHE = new Map();
-
 /**
  * UTILITIES
  */
