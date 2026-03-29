@@ -500,10 +500,146 @@ describe('IndoorMaps', () => {
             expect(getByText('MB')).toBeTruthy();
         });
 
+    it('shows Navigation unavailable badge for floor with no JSON data', () => {
+        const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        fireEvent.press(getByTestId('floor-btn-12'));
+        expect(getByText('Navigation unavailable')).toBeTruthy();
+    });
+
+    it('zoom in button is pressable', () => {
+        const { getByLabelText } = render(<IndoorMaps {...defaultProps} />);
+        const zoomInBtn = getByLabelText('Zoom in');
+        expect(() => fireEvent.press(zoomInBtn)).not.toThrow();
+    });
+
+    it('zoom out button is pressable', () => {
+        const { getByLabelText } = render(<IndoorMaps {...defaultProps} />);
+        const zoomOutBtn = getByLabelText('Zoom out');
+        expect(() => fireEvent.press(zoomOutBtn)).not.toThrow();
+    });
+
+    it('recenter button is pressable', () => {
+        const { getByLabelText } = render(<IndoorMaps {...defaultProps} />);
+        const recenterBtn = getByLabelText('Recenter map');
+        expect(() => fireEvent.press(recenterBtn)).not.toThrow();
+    });
+
+    it('renders for Loyola campus', () => {
+        const { getAllByText } = render(<IndoorMaps {...defaultProps} campus="Loyola" building={{ ...mockBuilding, code: 'CC' }} />);
+        expect(getAllByText('CC').length).toBeGreaterThan(0);
+    });
+
+    it('shows different floors for Loyola building', () => {
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} campus="Loyola" building={{ ...mockBuilding, code: 'CC' }} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        expect(getByTestId('floor-btn-1')).toBeTruthy();
+    });
+
+    it('handles missing building data gracefully', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} building={{ ...mockBuilding, code: 'INVALID' }} />);
+        expect(getByText('No map available.')).toBeTruthy();
+    });
+
+    it('handles missing campus gracefully', () => {
+        const { getByText } = render(<IndoorMaps {...defaultProps} campus="INVALID" />);
+        expect(getByText('No map available.')).toBeTruthy();
+    });
+
+    it('directions tab handles building selection for Loyola', () => {
+        const { getByTestId, getByText } = render(<IndoorMaps {...defaultProps} campus="Loyola" building={{ ...mockBuilding, code: 'CC' }} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        fireEvent.press(getByTestId('from-building'));
+        expect(getByText('CC')).toBeTruthy();
+    });
+
+    it('classroom input handles empty floor selection', () => {
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        fireEvent.press(getByTestId('floor-btn-2')); // select floor
+        fireEvent.press(getByTestId('floor-btn-2')); // deselect
+        expect(getByTestId('classroom-input').props.value).toBe('');
+    });
+
+    describe('directions tab', () => {
+        let getByText, getByTestId;
+
+        beforeEach(() => {
+            ({ getByText, getByTestId } = render(<IndoorMaps {...defaultProps} />));
+            fireEvent.press(getByText('Get Room Directions'));
+        });
+
+        it('opens showing swap button', () => {
+            expect(getByTestId('swap-directions')).toBeTruthy();
+        });
+
+        it('shows From and To labels', () => {
+            expect(getByText('From')).toBeTruthy();
+            expect(getByText('To')).toBeTruthy();
+        });
+
+        it('shows Directions section title', () => {
+            expect(getByText('Directions')).toBeTruthy();
+        });
+
+        it('shows Generate Directions button', () => {
+            expect(getByTestId('generate-directions-btn')).toBeTruthy();
+        });
+
+        it('pressing Generate Directions button does not throw', () => {
+            expect(() => fireEvent.press(getByTestId('generate-directions-btn'))).not.toThrow();
+        });
+
+        it('swap button is pressable and does not throw', () => {
+            expect(() => fireEvent.press(getByTestId('swap-directions'))).not.toThrow();
+        });
+
+        it('remains on directions tab after pressing swap', () => {
+            fireEvent.press(getByTestId('swap-directions'));
+            expect(getByTestId('generate-directions-btn')).toBeTruthy();
+        });
+
+        it('renders from-building dropdown', () => {
+            expect(getByTestId('from-building')).toBeTruthy();
+        });
+
+        it('renders to-building dropdown', () => {
+            expect(getByTestId('to-building')).toBeTruthy();
+        });
+
+        it('renders from-floor dropdown', () => {
+            expect(getByTestId('from-floor')).toBeTruthy();
+        });
+
+        it('renders to-floor dropdown', () => {
+            expect(getByTestId('to-floor')).toBeTruthy();
+        });
+
+        it('switching to floors tab works', () => {
+            fireEvent.press(getByTestId('tab-floors'));
+            expect(getByTestId('classroom-input')).toBeTruthy();
+        });
+
+        it('opens from-building dropdown modal and shows building options', () => {
+            fireEvent.press(getByTestId('from-building'));
+            expect(getByText('MB')).toBeTruthy();
+        });
+
         it('selects a building from the dropdown', () => {
             fireEvent.press(getByTestId('from-building'));
             fireEvent.press(getByText('MB'));
             expect(getByTestId('from-floor')).toBeTruthy();
+        });
+
+        it('handles directions with no selected floor', () => {
+            fireEvent.press(getByTestId('generate-directions-btn'));
+            // Should not throw
+        });
+
+        it('directions tab persists after tab switches', () => {
+            fireEvent.press(getByTestId('tab-info'));
+            fireEvent.press(getByTestId('tab-directions'));
+            expect(getByTestId('swap-directions')).toBeTruthy();
         });
     });
 
