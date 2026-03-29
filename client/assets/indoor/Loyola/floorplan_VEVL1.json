@@ -1,7 +1,6 @@
 {
   "VEVL1": {
     "floor": "VEVL1",
-    "building": "VEVL",
     "rooms": [
       {
         "id": "VEVL-121",
@@ -760,6 +759,7 @@
         "label": "VEVL-190",
         "type": "staircase",
         "floor": "VEVL1",
+        "nearestWaypoint": "wp39_VEVL1",
         "bounds": {
           "x": 0.0993,
           "y": 0.211,
@@ -785,6 +785,7 @@
         "label": "hallway",
         "type": "hallway",
         "floor": "VEVL1",
+        "nearestWaypoint": "wp38_VEVL1",
         "bounds": {
           "x": 0.1753,
           "y": 0.2399,
@@ -1511,13 +1512,27 @@
           "y": 0.1565
         },
         "connections": []
+      },
+      {
+        "id": "wp38_VEVL1",
+        "type": "exit",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.1108,
+          "y": 0.1385
+        },
+        "connections": []
+      },
+      {
+        "id": "wp39_VEVL1",
+        "type": "exit",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.142,
+          "y": 0.2073
+        },
+        "connections": []
       }
     ]
-  },
-  "VEVL2": {
-    "floor": "VEVL2",
-    "building": "VEVL",
-    "rooms": [],
-    "waypoints": []
   }
 }

@@ -10,6 +10,8 @@ import {
     ActivityIndicator,
     StyleSheet,
     Pressable,
+    Modal,
+    TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -19,6 +21,7 @@ import IndoorMapsBottomSheet from './IndoorMapsBottomSheet';
 import styles from './styles/IndoorMapsStyles';
 import useIndoorMaps from './utils/useIndoorMaps';
 import { indoorMaps } from '../indoorData';
+import { extractFloorPlan } from './utils/floorPlanUtils';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -35,6 +38,18 @@ const clampTranslation = (containerSize, tx, ty, s) => {
     const { x: maxX, y: maxY } = getMaxTranslate(containerSize, s);
     return { x: clamp(tx, maxX), y: clamp(ty, maxY) };
 };
+
+//Compute rendered image rect inside a contain-mode container
+function getContainBounds(containerW, containerH, imageAspect) {
+    if (!containerW || !containerH || !imageAspect) return null;
+    const containerAspect = containerW / containerH;
+    if (imageAspect > containerAspect) {
+        const h = containerW / imageAspect;
+        return { left: 0, top: (containerH - h) / 2, width: containerW, height: h };
+    }
+    const w = containerH * imageAspect;
+    return { left: (containerW - w) / 2, top: 0, width: w, height: containerH };
+}
 
 function ZoomButton({ iconName, onPress, accessibilityLabel }) {
     return (
@@ -55,7 +70,9 @@ ZoomButton.propTypes = {
     accessibilityLabel: PropTypes.string.isRequired,
 };
 
-function ZoomableImage({ source }) {
+//rooms: from type === 'classroom' in JSON
+//onRoomPress: callback(roomId) when label is tapped
+function ZoomableImage({ source, rooms, onRoomPress }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
     const translateX = useRef(new Animated.Value(0)).current;
@@ -67,6 +84,20 @@ function ZoomableImage({ source }) {
 
     const [isZoomed, setIsZoomed] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [containerDims, setContainerDims] = useState({ width: 0, height: 0 });
+    const [imageAspect, setImageAspect] = useState(null);
+
+    // resolve natural image aspect ratio for letterbox calculation
+    useEffect(() => {
+        try {
+            const asset = Image.resolveAssetSource(source);
+            if (asset?.width && asset?.height) {
+                setImageAspect(asset.width / asset.height);
+            }
+        } catch (e) {
+            console.warn('IndoorMaps: could not resolve asset source for label overlay:', e?.message);
+        }
+    }, [source]);
 
     useEffect(() => {
         return () => {
@@ -171,11 +202,16 @@ function ZoomableImage({ source }) {
 
     const composed = Gesture.Simultaneous(pinchGesture, panGesture);
 
+    //actual rendered image area accounting for contain letterboxing
+    const containBounds = getContainBounds(containerDims.width, containerDims.height, imageAspect);
+
     return (
         <View
+            testID="zoomable-container"
             style={styles.zoomableContainer}
             onLayout={({ nativeEvent: { layout } }) => {
                 containerSize.current = { width: layout.width, height: layout.height };
+                setContainerDims({ width: layout.width, height: layout.height });
             }}
         >
             {isLoading && (
@@ -195,6 +231,30 @@ function ZoomableImage({ source }) {
                         onLoadStart={() => setIsLoading(true)}
                         onLoadEnd={() => setIsLoading(false)}
                     />
+
+                    {/*Classroom label overlay*/}
+                    {containBounds && rooms?.length > 0 && (
+                        <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+                            {rooms.map((room, idx) => {
+                                const { x, y, w, h } = room.bounds;
+                                const cx = containBounds.left + (x + w / 2) * containBounds.width;
+                                const cy = containBounds.top  + (y + h / 2) * containBounds.height;
+                                return (
+                                    <TouchableOpacity
+                                        key={`${room.id}-${idx}`}
+                                        testID={`room-label-${room.id}`}
+                                        style={[styles.roomLabel, { left: cx, top: cy }]}
+                                        onPress={() => onRoomPress?.(room.id)}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Text style={styles.roomLabelText} numberOfLines={1}>
+                                            {room.id}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+                    )}
                 </Animated.View>
             </GestureDetector>
             <View style={styles.zoomControls}>
@@ -210,6 +270,13 @@ function ZoomableImage({ source }) {
 
 ZoomableImage.propTypes = {
     source: PropTypes.oneOfType([PropTypes.number, PropTypes.object]).isRequired,
+    rooms: PropTypes.array,
+    onRoomPress: PropTypes.func,
+};
+
+ZoomableImage.defaultProps = {
+    rooms: [],
+    onRoomPress: null,
 };
 
 function Placeholder({ width, text }) {
@@ -226,7 +293,8 @@ Placeholder.propTypes = {
     text: PropTypes.string.isRequired,
 };
 
-function FloorMapImage({ campus, buildingCode, selectedFloor, width }) {
+// onRoomPress: callback(roomId) wher tapping a label opens the action modal
+function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
 
     if (!selectedFloor) return <Placeholder width={width} text="Select a floor" />;
@@ -241,15 +309,26 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width }) {
 
             {Object.entries(buildingData).map(([floor, entry]) => {
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
+
+                // only compute rooms for the active floor to avoid unnecessary work
+                const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
+                const classrooms = (floorPlan?.rooms ?? []).filter(
+                    r => r.type === 'classroom' && r.bounds
+                );
+
                 return (
                     <View
                         key={floor}
                         style={[StyleSheet.absoluteFill, { opacity: isActive ? 1 : 0, zIndex: isActive ? 1 : 0 }]}
                         pointerEvents={isActive ? 'auto' : 'none'}
                     >
-                        {entry.image ? (
+                        {isActive && (entry.image ? (
                             <>
-                                <ZoomableImage source={entry.image} />
+                                <ZoomableImage
+                                    source={entry.image}
+                                    rooms={classrooms}
+                                    onRoomPress={onRoomPress}
+                                />
                                 {!entry.data && (
                                     <View style={styles.navUnavailableBadge}>
                                         <Text style={styles.navUnavailableText}>Navigation unavailable</Text>
@@ -258,7 +337,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width }) {
                             </>
                         ) : (
                             <Placeholder width={width} text={`No map for floor ${floor}`} />
-                        )}
+                        ))}
                     </View>
                 );
             })}
@@ -271,15 +350,53 @@ FloorMapImage.propTypes = {
     buildingCode: PropTypes.string,
     selectedFloor: PropTypes.string,
     width: PropTypes.number.isRequired,
+    onRoomPress: PropTypes.func,
 };
 
-export default function IndoorMaps({
-    building,
-    onPressBack,
-    campus,
-    isAccessibilityEnabled = false,
-    onToggleAccessibility = () => {},
-}) {
+FloorMapImage.defaultProps = { onRoomPress: null };
+
+// Small modal shows when a room label is tapped
+function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
+    return (
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={onClose}
+        >
+            <Pressable style={styles.roomModalOverlay} onPress={onClose}>
+                <View style={styles.roomModalCard}>
+                    <Text style={styles.roomModalTitle}>{roomId}</Text>
+                    <TouchableOpacity style={styles.roomModalBtn} onPress={onSetFrom}>
+                        <Ionicons name="navigate-outline" size={18} color="#912338" />
+                        <Text style={styles.roomModalBtnText}>Set as departure</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.roomModalBtn} onPress={onSetTo}>
+                        <Ionicons name="location-outline" size={18} color="#912338" />
+                        <Text style={styles.roomModalBtnText}>Set as destination</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.roomModalBtn, styles.roomModalBtnCancel]} onPress={onClose}>
+                        <Text style={styles.roomModalBtnCancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                </View>
+            </Pressable>
+        </Modal>
+    );
+}
+
+RoomActionModal.propTypes = {
+    visible: PropTypes.bool.isRequired,
+    roomId: PropTypes.string,
+    onSetFrom: PropTypes.func.isRequired,
+    onSetTo: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+};
+
+RoomActionModal.defaultProps = { roomId: '' };
+
+// buildings: full array of building objects for this campus fetched from the server
+export default function IndoorMaps({ building, onPressBack, campus, buildings, isAccessibilityEnabled = false,
+    onToggleAccessibility = () => {}}) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -291,7 +408,7 @@ export default function IndoorMaps({
         directionsFrom, setDirectionsFrom,
         directionsTo, setDirectionsTo,
         handleSwapDirections,
-    } = useIndoorMaps(height, campus, building?.code);
+    } = useIndoorMaps(height, campus, building?.code, buildings);
 
     const topPadding = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) + 8 : height * 0.06;
 
@@ -301,13 +418,30 @@ export default function IndoorMaps({
     const FONT_SM = Math.round(width * 0.03);
     const FONT_MD = Math.round(width * 0.038);
 
+    // which room was tapped to show the action modal
+    const [roomModal, setRoomModal] = useState({ visible: false, roomId: null });
+
+    const handleRoomPress = (roomId) => {
+        setRoomModal({ visible: true, roomId });
+    };
+
+    const handleSetFrom = () => {
+        setDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
+        setRoomModal({ visible: false, roomId: null });
+        handleTabPress('directions');
+    };
+
+    const handleSetTo = () => {
+        setDirectionsTo({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
+        setRoomModal({ visible: false, roomId: null });
+        handleTabPress('directions');
+    };
+
     return (
         <View style={[styles.container, { paddingTop: topPadding }]}>
             <IndoorSideLeftBar
                 onPressBack={onPressBack}
                 onOpenDirections={() => handleTabPress('directions')}
-                isAccessibilityEnabled={isAccessibilityEnabled}
-                onToggleAccessibility={onToggleAccessibility}
             />
 
             <View style={[styles.mapArea, { paddingBottom: SHEET_COLLAPSED }]}>
@@ -316,6 +450,7 @@ export default function IndoorMaps({
                     buildingCode={building?.code}
                     selectedFloor={selectedFloor}
                     width={width}
+                    onRoomPress={handleRoomPress}
                 />
             </View>
 
@@ -344,6 +479,15 @@ export default function IndoorMaps({
                 setDirectionsTo={setDirectionsTo}
                 handleSwapDirections={handleSwapDirections}
             />
+
+            {/* Use room.id for labels (from JSON) */}
+            <RoomActionModal
+                visible={roomModal.visible}
+                roomId={roomModal.roomId}
+                onSetFrom={handleSetFrom}
+                onSetTo={handleSetTo}
+                onClose={() => setRoomModal({ visible: false, roomId: null })}
+            />
         </View>
     );
 }
@@ -357,6 +501,14 @@ IndoorMaps.propTypes = {
     }),
     onPressBack: PropTypes.func.isRequired,
     campus: PropTypes.string,
+    buildings: PropTypes.arrayOf(PropTypes.shape({
+        code: PropTypes.string,
+        name: PropTypes.string,
+    })),
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
+};
+
+IndoorMaps.defaultProps = {
+    buildings: [],
 };

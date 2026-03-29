@@ -1,3 +1,6 @@
+// Polyfill for Node < 20 which does not support Array.prototype.toReversed
+Array.prototype.toReversed ??= function () { return [...this].reverse(); };
+
 // Indoor routing unit tests (accessibility: avoid stairs, prefer elevators)
 
 const {
@@ -275,4 +278,3 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     expect(waypointIds).not.toContain("e8_far");
   });
 });
-
