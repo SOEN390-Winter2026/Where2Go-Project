@@ -4,7 +4,7 @@ import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
 import { API_BASE_URL } from '../config';
 
-// Indoor JSON for this campus only (avoids mixing Loyola/SGW when the directions list includes all API codes)
+// Indoor JSON for this campus only 
 function getBuildingIndoorData(campus, bCode) {
     if (!campus || !bCode) return null;
     return indoorMaps?.[campus]?.[bCode] ?? null;
