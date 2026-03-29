@@ -51,8 +51,16 @@ export default class TransitionStrategy extends NavigationStrategy {
     return null;
   }
 
-  async _getOutdoorRoute(origin, destination) { const routes = await this._getDirections(origin, destination, "walking");
-  return routes.filter(r => r.mode === "walking");
+  async _getOutdoorRoute(origin, destination) {
+    const clientTime = encodeURIComponent(new Date().toISOString());
+    const res = await fetch(
+      `${API_BASE_URL}/directions?originLat=${origin.lat}&originLng=${origin.lng}` +
+      `&destLat=${destination.lat}&destLng=${destination.lng}` +
+      `&clientTime=${clientTime}&mode=walking`
+    );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error?.message || "Failed to fetch walking routes");
+    return (data.routes || []).filter((r) => r.mode === "walking");
   }
 
   _combineRoutes(route1, route2, transitionInstruction) {
