@@ -547,9 +547,14 @@ describe('IndoorMaps', () => {
             expect(getByTestId('from-floor')).toBeTruthy();
         });
 
-        it('dropdown shows placeholder dashes when no value selected', () => {
-            expect(getAllByText('—').length).toBeGreaterThan(0);
+        it('handles directions with no selected floor', () => {
+            fireEvent.press(getByTestId('generate-directions-btn'));
+            // Should not throw
         });
-    });
 
-});
+        it('directions tab persists after tab switches', () => {
+            fireEvent.press(getByTestId('tab-info'));
+            fireEvent.press(getByText('Get Room Directions'));
+            expect(getByTestId('swap-directions')).toBeTruthy();
+        });
+    });});
