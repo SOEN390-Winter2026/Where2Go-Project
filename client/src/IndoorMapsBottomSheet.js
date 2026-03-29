@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { formatMultiFloorInstructions } from './utils/formatMultiFloorInstructions';
 import {
     View,
     Text,
@@ -190,7 +191,48 @@ LocationSelector.propTypes = {
     testIDPrefix: PropTypes.string.isRequired,
     FONT_SM: PropTypes.number.isRequired,
 };
+function InstructionList({ instructions, onReset, FONT_SM, FONT_MD }) {
+    return (
+        <View style={styles.instructionsWrap}>
+            {instructions.map((instruction, index) => (
+                <View key={instruction.id} style={styles.instructionRow}>
+                    <View style={styles.instructionStepBadge}>
+                        <Text style={styles.instructionStepBadgeText}>{index + 1}</Text>
+                    </View>
 
+                    <View style={styles.instructionTextWrap}>
+                        <Text style={[styles.instructionText, { fontSize: FONT_SM + 1 }]}>
+                            {instruction.text}
+                        </Text>
+                    </View>
+                </View>
+            ))}
+
+            <Pressable
+                testID="edit-directions-btn"
+                style={styles.takeToDirectionsBtn}
+                onPress={onReset}
+            >
+                <Text style={[styles.takeToDirectionsBtnText, { fontSize: FONT_MD - 1 }]}>
+                    Edit Directions
+                </Text>
+            </Pressable>
+        </View>
+    );
+}
+
+InstructionList.propTypes = {
+    instructions: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            text: PropTypes.string.isRequired,
+            type: PropTypes.string,
+        })
+    ).isRequired,
+    onReset: PropTypes.func.isRequired,
+    FONT_SM: PropTypes.number.isRequired,
+    FONT_MD: PropTypes.number.isRequired,
+};
 function SheetContent({
     activeTab,
     building,
@@ -210,7 +252,47 @@ function SheetContent({
     setDirectionsTo,
     handleSwapDirections,
     handleTabPress,
+    generatedInstructions,
+    setGeneratedInstructions,
 }) {
+    const clearGeneratedInstructions = () => {
+        setGeneratedInstructions([]);
+    };
+
+    const fromHandlers = {
+        onSelectBuilding: (v) => {
+            clearGeneratedInstructions();
+            setDirectionsFrom({ building: v, floor: null, room: null });
+        },
+        onSelectFloor: (v) => {
+            clearGeneratedInstructions();
+            setDirectionsFrom((prev) => ({ ...prev, floor: v, room: null }));
+        },
+        onSelectRoom: (v) => {
+            clearGeneratedInstructions();
+            setDirectionsFrom((prev) => ({ ...prev, room: v }));
+        },
+    };
+
+    const toHandlers = {
+        onSelectBuilding: (v) => {
+            clearGeneratedInstructions();
+            setDirectionsTo({ building: v, floor: null, room: null });
+        },
+        onSelectFloor: (v) => {
+            clearGeneratedInstructions();
+            setDirectionsTo((prev) => ({ ...prev, floor: v, room: null }));
+        },
+        onSelectRoom: (v) => {
+            clearGeneratedInstructions();
+            setDirectionsTo((prev) => ({ ...prev, room: v }));
+        },
+    };
+
+    const handleSwapWithReset = () => {
+        clearGeneratedInstructions();
+        handleSwapDirections();
+    };
     if (activeTab === 'floors') {
         return (
             <View style={styles.sheetContent}>
@@ -251,6 +333,53 @@ function SheetContent({
     }
 
     if (activeTab === 'directions') {
+        const handleGenerateDirections = () => {
+            const fromRoom = directionsFrom?.room;
+            const toRoom = directionsTo?.room;
+            const fromFloor = directionsFrom?.floor;
+            const toFloor = directionsTo?.floor;
+
+            if (!fromRoom || !toRoom || !fromFloor || !toFloor) {
+                return;
+            }
+
+            const mockPath = [];
+
+            if (fromFloor === toFloor) {
+                mockPath.push({
+                    type: 'walk',
+                    from: fromRoom,
+                    to: toRoom,
+                    floor: fromFloor,
+                });
+            } else {
+                mockPath.push({
+                    type: 'walk',
+                    from: fromRoom,
+                    to: 'Staircase A',
+                    floor: fromFloor,
+                });
+
+                mockPath.push({
+                    type: 'floor_change',
+                    method: 'stairs',
+                    fromFloor,
+                    toFloor,
+                    at: 'Staircase A',
+                });
+
+                mockPath.push({
+                    type: 'walk',
+                    from: 'Staircase A',
+                    to: toRoom,
+                    floor: toFloor,
+                });
+            }
+
+            const formattedInstructions = formatMultiFloorInstructions(mockPath);
+            setGeneratedInstructions(formattedInstructions);
+        };
+
         return (
             <ScrollView
                 style={styles.sheetScrollView}
@@ -261,51 +390,60 @@ function SheetContent({
                     <Text style={[styles.directionsSectionTitle, { fontSize: FONT_MD + 2 }]}>
                         Directions
                     </Text>
+                    {generatedInstructions.length > 0 ? (
+                        <InstructionList
+                            instructions={generatedInstructions}
+                            onReset={() => setGeneratedInstructions([])}
+                            FONT_SM={FONT_SM}
+                            FONT_MD={FONT_MD}
+                        />
+                    ) : (
+                        <>
+                            <LocationSelector
+                                label="From"
+                                location={directionsFrom}
+                                {...fromHandlers}
+                                BUILDINGS_LIST={BUILDINGS_LIST}
+                                getFloors={getFloors}
+                                getRooms={getRooms}
+                                testIDPrefix="from"
+                                FONT_SM={FONT_SM}
+                            />
 
-                    <LocationSelector
-                        label="From"
-                        location={directionsFrom}
-                        {...makeLocationHandlers(setDirectionsFrom)}
-                        BUILDINGS_LIST={BUILDINGS_LIST}
-                        getFloors={getFloors}
-                        getRooms={getRooms}
-                        testIDPrefix="from"
-                        FONT_SM={FONT_SM}
-                    />
+                            <View style={styles.swapRow}>
+                                <View style={styles.swapLine} />
+                                <Pressable
+                                    testID="swap-directions"
+                                    style={styles.swapBtn}
+                                    onPress={handleSwapWithReset}
+                                >
+                                    <Ionicons name="swap-vertical" size={18} color="#fff" />
+                                </Pressable>
+                                <View style={styles.swapLine} />
+                            </View>
 
-                    <View style={styles.swapRow}>
-                        <View style={styles.swapLine} />
-                        <Pressable
-                            testID="swap-directions"
-                            style={styles.swapBtn}
-                            onPress={handleSwapDirections}
-                        >
-                            <Ionicons name="swap-vertical" size={18} color="#fff" />
-                        </Pressable>
-                        <View style={styles.swapLine} />
-                    </View>
+                            <LocationSelector
+                                label="To"
+                                location={directionsTo}
+                                {...toHandlers}
+                                BUILDINGS_LIST={BUILDINGS_LIST}
+                                getFloors={getFloors}
+                                getRooms={getRooms}
+                                testIDPrefix="to"
+                                FONT_SM={FONT_SM}
+                            />
 
-                    <LocationSelector
-                        label="To"
-                        location={directionsTo}
-                        {...makeLocationHandlers(setDirectionsTo)}
-                        BUILDINGS_LIST={BUILDINGS_LIST}
-                        getFloors={getFloors}
-                        getRooms={getRooms}
-                        testIDPrefix="to"
-                        FONT_SM={FONT_SM}
-                    />
-
-                    {/* GENERATE DIRECTIONS BTN -- TO IMPLEMENT AFTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
-                    <Pressable
-                        testID="generate-directions-btn"
-                        style={styles.generateDirectionsBtn}
-                        onPress={() => {}}
-                    >
-                        <Text style={[styles.generateDirectionsBtnText, { fontSize: FONT_MD }]}>
-                            Generate Directions
-                        </Text>
-                    </Pressable>
+                            <Pressable
+                                testID="generate-directions-btn"
+                                style={styles.generateDirectionsBtn}
+                                onPress={handleGenerateDirections}
+                            >
+                                <Text style={[styles.generateDirectionsBtnText, { fontSize: FONT_MD }]}>
+                                    Generate Directions
+                                </Text>
+                            </Pressable>
+                        </>
+                    )}
                 </View>
             </ScrollView>
         );
@@ -355,6 +493,14 @@ SheetContent.propTypes = {
     activeTab: PropTypes.string,
     building: buildingShape,
     handleTabPress: PropTypes.func.isRequired,
+    generatedInstructions: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            text: PropTypes.string.isRequired,
+            type: PropTypes.string,
+        })
+    ).isRequired,
+    setGeneratedInstructions: PropTypes.func.isRequired,
 };
 
 SheetContent.defaultProps = {
@@ -387,6 +533,7 @@ export default function IndoorMapsBottomSheet({
     setDirectionsTo,
     handleSwapDirections,
 }) {
+    const [generatedInstructions, setGeneratedInstructions] = useState([]);
     return (
         <Animated.View style={[styles.sheet, { height: sheetHeight }]}>
             <View {...panResponder.panHandlers} style={styles.dragArea}>
@@ -446,6 +593,8 @@ export default function IndoorMapsBottomSheet({
                 setDirectionsTo={setDirectionsTo}
                 handleSwapDirections={handleSwapDirections}
                 handleTabPress={handleTabPress}
+                generatedInstructions={generatedInstructions}
+                setGeneratedInstructions={setGeneratedInstructions}
             />
         </Animated.View>
     );

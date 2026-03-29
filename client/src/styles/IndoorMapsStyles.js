@@ -465,6 +465,41 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden',
     },
+        instructionsWrap: {
+        marginTop: 4,
+        gap: 12,
+    },
+    instructionRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 10,
+    },
+    instructionStepBadge: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#912338',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 1,
+    },
+    instructionStepBadgeText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    instructionTextWrap: {
+        flex: 1,
+        backgroundColor: '#f8f3f5',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 9,
+    },
+    instructionText: {
+        color: '#333',
+        fontWeight: '500',
+        lineHeight: 20,
+    },
 });
 
 export default styles;
