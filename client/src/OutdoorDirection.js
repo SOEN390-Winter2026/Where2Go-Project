@@ -538,4 +538,5 @@ export const __test__ = {
   getModeDisplay,
   decodePolylineToCoords,
   stepsToSegments,
+  snapToEntrance,
 };
