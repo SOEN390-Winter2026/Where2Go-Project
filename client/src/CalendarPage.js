@@ -623,5 +623,3 @@ CalendarPage.propTypes = {
   title: PropTypes.string,
   onGenerateDirections: PropTypes.func,
 };
-
-
