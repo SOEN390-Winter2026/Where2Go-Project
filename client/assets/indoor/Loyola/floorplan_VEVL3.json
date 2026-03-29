@@ -1354,7 +1354,8 @@
           "y": 0.1569
         },
         "connections": [
-          "wp14_VEVL3"
+          "wp14_VEVL3",
+          "wp_exit_VEVL3"
         ]
       },
       {
@@ -2196,6 +2197,18 @@
           "y": 0.245
         },
         "connections": []
+      },
+      {
+        "id": "wp_exit_VEVL3",
+        "type": "exit",
+        "floor": "VEVL3",
+        "position": {
+          "x": 0.47,
+          "y": 0.91
+        },
+        "connections": [
+          "wp15_VEVL3"
+        ]
       }
     ]
   }
