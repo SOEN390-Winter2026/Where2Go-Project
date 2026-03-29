@@ -59,6 +59,35 @@ function equivalentCodes(campus, code) {
 }
 import { extractFloorPlan } from './floorPlanUtils';
 
+function normalizeCode(code) {
+    return String(code ?? '').trim().toUpperCase();
+}
+
+function resolveCampusIndoorCode(campus, code) {
+    const c = normalizeCode(code);
+    const campusData = indoorMaps?.[campus] ?? {};
+    const keys = Object.keys(campusData);
+    if (campusData[c]) return c;
+
+    // First, try normalized exact match.
+    const exact = keys.find((k) => normalizeCode(k) === c);
+    if (exact) return exact;
+
+    // Then alias-style prefixes
+    const pref = keys.find((k) => {
+        const nk = normalizeCode(k);
+        return nk.startsWith(c) || c.startsWith(nk);
+    });
+    return pref ?? c;
+}
+
+function equivalentCodes(campus, code) {
+    const resolved = resolveCampusIndoorCode(campus, code);
+    const c = normalizeCode(resolved);
+    if (c === 'VE' || c === 'VL') return ['VE', 'VL'];
+    return [resolved];
+}
+
 /**
  * Extracts all exit waypoints from a building's floor plans.
  * Returns array:
