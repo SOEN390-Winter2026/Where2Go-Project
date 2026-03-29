@@ -153,14 +153,23 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
 
     try {
       const dayEvents = await Calendar.getEventsAsync(selectedCalendarIds, start, end);
+      
       dayEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      
       const isToday = selectedDateString === todayString();
-      const now = new Date();
-      const nextIndex = isToday ? dayEvents.findIndex((e) => new Date(e.endDate) > now) : -1;
-      const ordered =
-        nextIndex >= 0
-          ? [dayEvents[nextIndex], ...dayEvents.filter((_, i) => i !== nextIndex)]
-          : dayEvents;
+      let ordered = dayEvents;
+
+      if (isToday) {
+        const now = new Date();
+        const nextIndex = dayEvents.findIndex((e) => new Date(e.endDate) > now);
+
+        if (nextIndex >= 0) {
+          const nextEvent = dayEvents[nextIndex];
+          const otherEvents = dayEvents.filter((_, i) => i !== nextIndex);
+          ordered = [nextEvent, ...otherEvents];
+        }
+      }
+
       setEvents(ordered);
     } catch (e) {
       console.error(e);
@@ -200,7 +209,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
           setIsCalendarsChosen(true);
         }
       } catch (e) {
-        // AsyncStorage can fail in Expo Go/web
+        console.error("Failed to restore calendar settings:", e);
       } finally {
         if (!cancelled) setIsRestoring(false);
       }
@@ -479,7 +488,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                         try {
                           await AsyncStorage.removeItem(SAVED_CALENDAR_IDS_KEY);
                         } catch (e) {
-                          // ignore
+                          console.error("Failed to clear saved calendar IDs:", e);
                         }
                         setCalendars([]);
                         setSelectedCalendarIds([]);
@@ -526,7 +535,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                         JSON.stringify(idsToSave)
                       );
                     } catch (e) {
-                      // AsyncStorage can fail in Expo Go/web
+                      console.error("Error saving calendar IDs to storage:", e);
                     }
                   }
                   setIsCalendarsChosen(true);
