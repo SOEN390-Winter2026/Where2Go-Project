@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
-import { indoorMaps } from '../../indoorData';
+import { indoorMaps } from '../data/indoorData';
 import { API_URL } from '@env';
 import { extractFloorPlan } from './floorPlanUtils';
 

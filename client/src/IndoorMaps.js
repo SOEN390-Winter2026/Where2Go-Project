@@ -20,9 +20,9 @@ import IndoorSideLeftBar from './IndoorSideLeftBar';
 import IndoorMapsBottomSheet from './IndoorMapsBottomSheet';
 import styles from './styles/IndoorMapsStyles';
 import useIndoorMaps from './utils/useIndoorMaps';
-import { indoorMaps } from '../indoorData';
+import { indoorMaps } from './data/indoorData';
 import { extractFloorPlan } from './utils/floorPlanUtils';
-import { getPOIOverlay } from './utils/indoorPoisLogic';
+import { getPOIOverlay } from './data/indoorPoisLogic';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;

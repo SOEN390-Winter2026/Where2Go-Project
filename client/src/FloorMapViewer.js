@@ -4,7 +4,7 @@ import {
   Dimensions, ScrollView
 } from 'react-native';
 import PropTypes from 'prop-types';
-import { indoorMaps } from '../../indoorData';
+import { indoorMaps } from './data/indoorData';
 import { styles } from "./styles/FloorMapViewer_styles";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
