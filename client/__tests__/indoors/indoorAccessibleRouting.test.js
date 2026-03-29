@@ -277,4 +277,86 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     expect(waypointIds).toContain("e8_near");
     expect(waypointIds).not.toContain("e8_far");
   });
+
+  test("returns INVALID_BUILDING when building code is missing from campus maps", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "NOT_A_BUILDING",
+      from: { floor: "7", room: "H-701" },
+      to: { floor: "8", room: "H-801" },
+    });
+    expect(result.success).toBe(false);
+    expect(result.meta?.reason).toBe("INVALID_BUILDING");
+  });
+
+  test("allow stairs when avoidStairs is false (same graph as stairs-only NO_PATH case)", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+      SGW: {
+        H: {
+          7: {
+            image: null,
+            data: {
+              "H-7": {
+                waypoints: [
+                  { id: "wpStart", type: "door", position: { x: 0.1, y: 0.1 }, connections: ["wpS7"] },
+                  {
+                    id: "wpS7",
+                    type: "staircase",
+                    position: { x: 0.2, y: 0.2 },
+                    connections: [],
+                    floorsReachable: ["8"],
+                  },
+                ],
+                rooms: [{ id: "H-701", bounds: { x: 0, y: 0, w: 0.1, h: 0.1 }, nearestWaypoint: "wpStart" }],
+              },
+            },
+          },
+          8: {
+            image: null,
+            data: {
+              "H-8": {
+                waypoints: [
+                  {
+                    id: "wpS8",
+                    type: "staircase",
+                    position: { x: 0.21, y: 0.21 },
+                    connections: ["wpGoal"],
+                    floorsReachable: ["7"],
+                  },
+                  { id: "wpGoal", type: "door", position: { x: 0.9, y: 0.1 }, connections: [] },
+                ],
+                rooms: [{ id: "H-801", bounds: { x: 0.9, y: 0, w: 0.1, h: 0.1 }, nearestWaypoint: "wpGoal" }],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "7", room: "H-701" },
+      to: { floor: "8", room: "H-801" },
+      avoidStairs: false,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.path.map((p) => String(p.type).toLowerCase())).toContain("staircase");
+  });
+
+  test("uses graph cache on second identical request", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+    const args = {
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "7", room: "H-701" },
+      to: { floor: "8", room: "H-801" },
+    };
+    const a = generateAccessibleIndoorPath(args);
+    const b = generateAccessibleIndoorPath(args);
+    expect(a.success && b.success).toBe(true);
+    expect(b.cost).toBe(a.cost);
+  });
 });

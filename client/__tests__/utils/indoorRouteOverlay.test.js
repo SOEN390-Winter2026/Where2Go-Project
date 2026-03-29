@@ -55,4 +55,33 @@ describe("indoorRouteOverlay", () => {
     expect(getPolylinesForFloor(map, "7")).toEqual([[{ x: 0, y: 0 }]]);
     expect(getPolylinesForFloor(map, 7)).toEqual([[{ x: 0, y: 0 }]]);
   });
+
+  test("contiguousNormRunsByFloor returns [] for non-array", () => {
+    expect(contiguousNormRunsByFloor(null)).toEqual([]);
+  });
+
+  test("contiguousNormRunsByFloor skips waypoints without numeric positions", () => {
+    expect(
+      contiguousNormRunsByFloor([
+        { floor: "1", position: { x: "bad", y: 0 } },
+        { floor: "1", position: { x: 0.1, y: 0.1 } },
+      ])
+    ).toEqual([]);
+  });
+
+  test("buildIndoorRoutePolylinesByFloor returns {} when buildingCode missing", () => {
+    expect(buildIndoorRoutePolylinesByFloor([{ kind: "indoor", buildingCode: "H", path: [] }], "")).toEqual(
+      {}
+    );
+  });
+
+  test("getPolylinesForFloor uses loose key match for H-7 vs 7", () => {
+    const map = { "H-7": [[{ x: 0.1, y: 0.2 }]] };
+    const lines = getPolylinesForFloor(map, "7");
+    expect(lines.length).toBeGreaterThan(0);
+  });
+
+  test("getPolylinesForFloor returns [] when routeByFloor null", () => {
+    expect(getPolylinesForFloor(null, "1")).toEqual([]);
+  });
 });
