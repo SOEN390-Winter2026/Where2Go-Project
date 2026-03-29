@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
-import { API_BASE_URL } from '../config';
 
 
 // Indoor JSON for this campus only (avoids mixing Loyola/SGW when the directions list includes all API codes)

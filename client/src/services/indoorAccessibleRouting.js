@@ -5,9 +5,6 @@ import { extractFloorPlan } from "../utils/floorPlanUtils";
 // Cache graph build per building+rules
 const GRAPH_CACHE = new Map();
 
-// Cache graph build per building+rules
-const GRAPH_CACHE = new Map();
-
 /**
  * UTILITIES
  */
