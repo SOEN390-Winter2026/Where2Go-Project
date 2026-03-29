@@ -13,7 +13,7 @@ function getBuildingIndoorData(campus, bCode) {
 // Fetches building codes for one campus, falls back to indoorData keys on failure.
 async function fetchCampusBuildings(campus) {
     try {
-        const res  = await fetch(`${API_BASE_URL}/campus/${campus}/buildings`);
+        const res = await fetch(`${API_BASE_URL}/campus/${campus}/buildings`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const list = Array.isArray(data) ? data : (data.buildings ?? []);

@@ -484,6 +484,7 @@ FloorMapImage.defaultProps = {
     onRoomPress: null,
     routeByFloor: null,
     isPOIEnabled: false,
+    routeByFloor: null,
 };
 
 function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {

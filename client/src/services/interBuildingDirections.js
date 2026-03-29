@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../config";
-import { indoorMaps } from "../../indoorData";
+import { indoorMaps } from "../data/indoorData";
 import { generateAccessibleIndoorPath } from "./indoorAccessibleRouting";
 import { findClosestExitPair, exitPositionToLatLng, getExitWaypoints } from "../utils/Buildingexits";
 import { decodePolylineToCoords } from "./routeServices";

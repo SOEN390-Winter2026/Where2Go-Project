@@ -382,6 +382,12 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingBottom: 12,
     },
+    routeSummaryScroll: {
+        maxHeight: 220,
+    },
+    routeSummaryScrollContent: {
+        paddingBottom: 2,
+    },
     routeSummaryTitle: {
         color: '#912338',
         fontWeight: '700',
