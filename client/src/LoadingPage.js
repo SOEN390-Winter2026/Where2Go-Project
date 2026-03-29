@@ -32,9 +32,6 @@ const styles = StyleSheet.create({
   image: {
     width: '80%', // to make it responsive
     height: undefined,
-    // width: 200,
-    // height: 200, // for testing
-    // backgroundColor: "cyan", // testing 2
     aspectRatio: 1, // to keep the logo square
     marginBottom: 30, // spacing
   },

@@ -24,9 +24,6 @@ export default function TopRightMenu({onPressDirection, onPressCalendar}) {
       {/* The Dropdown Menu */}
       {isOpen && (
         <View style={styles.dropdown}>
-          <Pressable style={styles.menuItem} onPress={() => setIsOpen(false)}>
-            <Text style={styles.menuText}>Map</Text>
-          </Pressable>
           <Pressable style={styles.menuItem} onPress={onPressDirection}>
             <Text style={styles.menuText}>Direction</Text>
           </Pressable>
