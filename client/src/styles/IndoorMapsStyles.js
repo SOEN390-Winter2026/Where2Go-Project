@@ -52,6 +52,11 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
+    poiOverlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
     loadingOverlay: {
         position: 'absolute',
         top: 0,

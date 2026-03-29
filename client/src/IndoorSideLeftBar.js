@@ -15,15 +15,17 @@ export default function IndoorSideLeftBar({
     onOpenDirections,
     isAccessibilityEnabled = false,
     onToggleAccessibility = () => {},
+    isPOIEnabled = false,
+    onTogglePOI = () => {},
 }) {
 
     const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
     const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
     const firstPOIIcon = require("../assets/gis--poi-alt.png");
     const secondPOIIcon = require("../assets/gis--poi-alt-2.png");
-    const [activePOI, setActivePOI] = useState(null);
     const [activeSearch, setActiveSearch] = useState(false);
 
+    const activePOI = isPOIEnabled ? "poi" : null;
     const leftBarActiveInputs = { isAccessibilityEnabled, activePOI };
     const iconPairs = {
         disability: [firstDisabilityIcon, secondDisabilityIcon],
@@ -68,9 +70,7 @@ export default function IndoorSideLeftBar({
             {/* POIs */}
             <Pressable testID="poi-btn"
                 style={[sideLeftBarSharedStyles.barItem, leftBarIconState("poi", leftBarActiveInputs)]}
-                onPress={() =>
-                    setActivePOI((prev) => (prev === "poi" ? null : "poi"))
-                }
+                onPress={onTogglePOI}
             >
                 <Image source={leftBarIconSource("poi", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
             </Pressable>
@@ -83,4 +83,6 @@ IndoorSideLeftBar.propTypes = {
     onOpenDirections: PropTypes.func,
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
+    isPOIEnabled: PropTypes.bool,
+    onTogglePOI: PropTypes.func,
 };
