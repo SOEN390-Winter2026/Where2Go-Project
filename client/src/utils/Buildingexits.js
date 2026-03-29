@@ -1,4 +1,4 @@
-import { indoorMaps } from '../../../indoorData';
+import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
 
 /**

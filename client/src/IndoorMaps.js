@@ -20,8 +20,9 @@ import IndoorSideLeftBar from './IndoorSideLeftBar';
 import IndoorMapsBottomSheet from './IndoorMapsBottomSheet';
 import styles from './styles/IndoorMapsStyles';
 import useIndoorMaps from './utils/useIndoorMaps';
-import { indoorMaps } from '../indoorData';
+import { indoorMaps } from './data/indoorData';
 import { extractFloorPlan } from './utils/floorPlanUtils';
+import { getPOIOverlay } from './data/indoorPoisLogic';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -39,7 +40,6 @@ const clampTranslation = (containerSize, tx, ty, s) => {
     return { x: clamp(tx, maxX), y: clamp(ty, maxY) };
 };
 
-//Compute rendered image rect inside a contain-mode container
 function getContainBounds(containerW, containerH, imageAspect) {
     if (!containerW || !containerH || !imageAspect) return null;
     const containerAspect = containerW / containerH;
@@ -70,9 +70,7 @@ ZoomButton.propTypes = {
     accessibilityLabel: PropTypes.string.isRequired,
 };
 
-//rooms: from type === 'classroom' in JSON
-//onRoomPress: callback(roomId) when label is tapped
-function ZoomableImage({ source, rooms, onRoomPress }) {
+function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
     const translateX = useRef(new Animated.Value(0)).current;
@@ -201,8 +199,6 @@ function ZoomableImage({ source, rooms, onRoomPress }) {
         .runOnJS(true);
 
     const composed = Gesture.Simultaneous(pinchGesture, panGesture);
-
-    //actual rendered image area accounting for contain letterboxing
     const containBounds = getContainBounds(containerDims.width, containerDims.height, imageAspect);
 
     return (
@@ -224,6 +220,7 @@ function ZoomableImage({ source, rooms, onRoomPress }) {
                     styles.zoomableAnimatedView,
                     { transform: [{ translateX }, { translateY }, { scale }] },
                 ]}>
+                    {/* Base floor plan */}
                     <Image
                         source={source}
                         style={styles.mapImage}
@@ -232,7 +229,17 @@ function ZoomableImage({ source, rooms, onRoomPress }) {
                         onLoadEnd={() => setIsLoading(false)}
                     />
 
-                    {/*Classroom label overlay*/}
+                    {/* POI overlay */}
+                    {poiOverlay && (
+                        <Image
+                            source={poiOverlay}
+                            style={[styles.poiOverlay, { opacity: isPOIEnabled ? 1 : 0 }]}
+                            resizeMode="contain"
+                            pointerEvents="none"
+                        />
+                    )}
+
+                    {/* Classroom label overlay */}
                     {containBounds && rooms?.length > 0 && (
                         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
                             {rooms.map((room, idx) => {
@@ -272,11 +279,15 @@ ZoomableImage.propTypes = {
     source: PropTypes.oneOfType([PropTypes.number, PropTypes.object]).isRequired,
     rooms: PropTypes.array,
     onRoomPress: PropTypes.func,
+    poiOverlay: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    isPOIEnabled: PropTypes.bool,
 };
 
 ZoomableImage.defaultProps = {
     rooms: [],
     onRoomPress: null,
+    poiOverlay: null,
+    isPOIEnabled: false,
 };
 
 function Placeholder({ width, text }) {
@@ -293,8 +304,7 @@ Placeholder.propTypes = {
     text: PropTypes.string.isRequired,
 };
 
-// onRoomPress: callback(roomId) wher tapping a label opens the action modal
-function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress }) {
+function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
 
     if (!selectedFloor) return <Placeholder width={width} text="Select a floor" />;
@@ -302,7 +312,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
 
     return (
         <View style={styles.floorLayersContainer}>
-            {/*Floor label */}
+            {/* Floor label */}
             <View style={styles.badge} pointerEvents="none">
                 <Text style={styles.floorLabelText}>{`Floor ${selectedFloor}`}</Text>
             </View>
@@ -310,11 +320,13 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
             {Object.entries(buildingData).map(([floor, entry]) => {
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
 
-                // only compute rooms for the active floor to avoid unnecessary work
                 const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
                 const classrooms = (floorPlan?.rooms ?? []).filter(
                     r => r.type === 'classroom' && r.bounds
                 );
+
+                // look up the POI overlay PNG for this specific floor
+                const poiOverlay = isActive ? getPOIOverlay(campus, buildingCode, floor) : null;
 
                 return (
                     <View
@@ -328,6 +340,8 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                                     source={entry.image}
                                     rooms={classrooms}
                                     onRoomPress={onRoomPress}
+                                    poiOverlay={poiOverlay}
+                                    isPOIEnabled={isPOIEnabled}
                                 />
                                 {!entry.data && (
                                     <View style={styles.navUnavailableBadge}>
@@ -351,11 +365,14 @@ FloorMapImage.propTypes = {
     selectedFloor: PropTypes.string,
     width: PropTypes.number.isRequired,
     onRoomPress: PropTypes.func,
+    isPOIEnabled: PropTypes.bool,
 };
 
-FloorMapImage.defaultProps = { onRoomPress: null };
+FloorMapImage.defaultProps = {
+    onRoomPress: null,
+    isPOIEnabled: false,
+};
 
-// Small modal shows when a room label is tapped
 function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
     return (
         <Modal
@@ -394,7 +411,6 @@ RoomActionModal.propTypes = {
 
 RoomActionModal.defaultProps = { roomId: '' };
 
-// buildings: full array of building objects for this campus fetched from the server
 export default function IndoorMaps({ building, onPressBack, campus, buildings, isAccessibilityEnabled = false,
     onToggleAccessibility = () => {}}) {
     const { width, height } = useWindowDimensions();
@@ -418,12 +434,11 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
     const FONT_SM = Math.round(width * 0.03);
     const FONT_MD = Math.round(width * 0.038);
 
-    // which room was tapped to show the action modal
-    const [roomModal, setRoomModal] = useState({ visible: false, roomId: null });
+    const [roomModal,    setRoomModal]    = useState({ visible: false, roomId: null });
+    //poi state is here so that the sidebar btn and the map can read it
+    const [isPOIEnabled, setIsPOIEnabled] = useState(false);
 
-    const handleRoomPress = (roomId) => {
-        setRoomModal({ visible: true, roomId });
-    };
+    const handleRoomPress = (roomId) => setRoomModal({ visible: true, roomId });
 
     const handleSetFrom = () => {
         setDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
@@ -442,6 +457,10 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
             <IndoorSideLeftBar
                 onPressBack={onPressBack}
                 onOpenDirections={() => handleTabPress('directions')}
+                isAccessibilityEnabled={isAccessibilityEnabled}
+                onToggleAccessibility={onToggleAccessibility}
+                isPOIEnabled={isPOIEnabled}
+                onTogglePOI={() => setIsPOIEnabled(prev => !prev)}
             />
 
             <View style={[styles.mapArea, { paddingBottom: SHEET_COLLAPSED }]}>
@@ -451,6 +470,7 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
                     selectedFloor={selectedFloor}
                     width={width}
                     onRoomPress={handleRoomPress}
+                    isPOIEnabled={isPOIEnabled}
                 />
             </View>
 
@@ -480,7 +500,6 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
                 handleSwapDirections={handleSwapDirections}
             />
 
-            {/* Use room.id for labels (from JSON) */}
             <RoomActionModal
                 visible={roomModal.visible}
                 roomId={roomModal.roomId}

@@ -70,7 +70,7 @@ function defaultIndoorMaps() {
 
 function loadGenerateAccessibleIndoorPath(indoorMaps) {
   jest.resetModules();
-  jest.doMock("../indoorData", () => ({ indoorMaps }));
+  jest.doMock("../src/data/indoorData", () => ({ indoorMaps }));
   return require("../src/services/indoorAccessibleRouting").generateAccessibleIndoorPath;
 }
 

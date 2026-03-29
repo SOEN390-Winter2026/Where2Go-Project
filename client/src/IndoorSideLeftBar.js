@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Image, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
@@ -15,15 +15,27 @@ export default function IndoorSideLeftBar({
     onOpenDirections,
     isAccessibilityEnabled = false,
     onToggleAccessibility = () => {},
+    isPOIEnabled = false,
+    onTogglePOI = () => {},
 }) {
 
     const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
     const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
     const firstPOIIcon = require("../assets/gis--poi-alt.png");
     const secondPOIIcon = require("../assets/gis--poi-alt-2.png");
-    const [activePOI, setActivePOI] = useState(null);
     const [activeSearch, setActiveSearch] = useState(false);
+    const [internalPOIEnabled, setInternalPOIEnabled] = useState(isPOIEnabled);
 
+    useEffect(() => {
+        setInternalPOIEnabled(isPOIEnabled);
+    }, [isPOIEnabled]);
+
+    const handlePOIPress = () => {
+        setInternalPOIEnabled(prev => !prev);
+        onTogglePOI();
+    };
+
+    const activePOI = internalPOIEnabled ? "poi" : null;
     const leftBarActiveInputs = { isAccessibilityEnabled, activePOI };
     const iconPairs = {
         disability: [firstDisabilityIcon, secondDisabilityIcon],
@@ -46,7 +58,7 @@ export default function IndoorSideLeftBar({
             </Pressable>
 
             {/* Directions or search (?) to be changed if needed */}
-            <Pressable testID="search-btn" //btw this should lead to another page once implemented for indoors directions
+            <Pressable testID="search-btn"
                 style={[sideLeftBarSharedStyles.barItem, { backgroundColor: activeSearch ? LEFT_BAR_BURGUNDY : LEFT_BAR_GREY }]}
                 onPress={handleSearchPress}
             >
@@ -68,9 +80,7 @@ export default function IndoorSideLeftBar({
             {/* POIs */}
             <Pressable testID="poi-btn"
                 style={[sideLeftBarSharedStyles.barItem, leftBarIconState("poi", leftBarActiveInputs)]}
-                onPress={() =>
-                    setActivePOI((prev) => (prev === "poi" ? null : "poi"))
-                }
+                onPress={handlePOIPress}
             >
                 <Image source={leftBarIconSource("poi", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
             </Pressable>
@@ -83,4 +93,6 @@ IndoorSideLeftBar.propTypes = {
     onOpenDirections: PropTypes.func,
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
+    isPOIEnabled: PropTypes.bool,
+    onTogglePOI: PropTypes.func,
 };
