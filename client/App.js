@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { buildRouteFromResponse } from './src/services/routeServices';
 import { resolveEventDestination } from './src/services/eventServices';
-import { StyleSheet, View, Pressable } from "react-native";
+import { StyleSheet, View, Pressable, Text } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
@@ -125,6 +125,19 @@ export default function App() {
     setActiveSegments([]);
     setActiveRouteMeta(null);
     setIsRouteActive(false);
+  };
+
+  const routeDestinationBuilding = (() => {
+    if (!isRouteActive || !activeRouteMeta?.destination) return null;
+    const destLabel = activeRouteMeta.destination.label?.toLowerCase() || "";
+    return buildings.find((b) => destLabel.includes(b.name?.toLowerCase())) ?? destinationBuilding;
+  })();
+
+  const handleGoInsideFromRoute = () => {
+    if (!routeDestinationBuilding) return;
+    setSelectedBuilding(routeDestinationBuilding);
+    handleCancelRoute();
+    setShowIndoorMaps(true);
   };
 
   const handleGenerateDirectionsFromEvent = ({ buildingCode, room, event }) => {
@@ -388,8 +401,15 @@ export default function App() {
         )}
 
         {isRouteActive && (
-          <Pressable style={styles.cancelButton} onPress={handleCancelRoute}>
+          <Pressable style={styles.cancelButton} onPress={handleCancelRoute} testID="cancel-route-btn">
             <Ionicons name="close" size={22} color="white" />
+          </Pressable>
+        )}
+
+        {isRouteActive && routeDestinationBuilding && (
+          <Pressable style={styles.goInsideButton} onPress={handleGoInsideFromRoute} testID="go-inside-route-btn">
+            <Ionicons name="log-in-outline" size={20} color="white" />
+            <Text style={styles.goInsideButtonText}>Go Inside</Text>
           </Pressable>
         )}
 
@@ -419,6 +439,29 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  goInsideButton: {
+    position: "absolute",
+    top: '12%',
+    right: '16%',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#912338",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 23,
+    zIndex: 10,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    gap: 6,
+  },
+  goInsideButtonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 14,
   },
   recenterButton: {
     position: "absolute",

@@ -12,8 +12,20 @@ import { getBuildingDisplayName, filterLocations, resolveLocationByName } from "
 import polyline from "@mapbox/polyline";
 
 import NavigationContext from "./navigation/NavigationContext";
+import { BUILDING_ENTRANCES, getNearestEntrance } from "./data/locations";
 
 import { styles } from "./styles/OutdoorDirection_styles";
+
+function snapToEntrance(point, refPoint, buildingsList) {
+  if (!point?.lat || !point?.lng || !refPoint?.lat) return point;
+  const match = buildingsList?.find((b) =>
+    point.label && b.name && point.label.toLowerCase().includes(b.name.toLowerCase())
+  );
+  if (!match || !BUILDING_ENTRANCES[match.id]) return point;
+  const entrance = getNearestEntrance(match.id, refPoint.lat, refPoint.lng);
+  if (!entrance) return point;
+  return { ...point, lat: entrance.lat, lng: entrance.lng };
+}
 
 function getModeDisplay(mode) {
   if (mode === "concordia_shuttle") return { label: "Concordia Shuttle", icon: "bus" };
@@ -162,7 +174,9 @@ export default function OutdoorDirection({
     setErrorCode(null);
 
     try {
-      const newRoutes = await navContext.current.getRoutes(origin, destination);
+      const routeOrigin = snapToEntrance(origin, destination, buildings);
+      const routeDest = snapToEntrance(destination, origin, buildings);
+      const newRoutes = await navContext.current.getRoutes(routeOrigin, routeDest);
       setRoutes(newRoutes);
       setSelectedRouteIndex(newRoutes.length > 0 ? 0 : -1);
       if (newRoutes.length === 0) setErrorCode("NO_ROUTES");

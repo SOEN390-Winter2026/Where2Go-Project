@@ -3,7 +3,6 @@ import WalkingStrategy from "./strategies/WalkingStrategy";
 import TransitStrategy from "./strategies/TransitStrategy";
 import ShuttleStrategy from "./strategies/ShuttleStrategy";
 import TransitionStrategy from "./strategies/TransitionStrategy";
-import { analyzeRouteTransition } from "../data/locations";
 
 const STRATEGIES = {
   all: new DefaultStrategy(),
@@ -34,15 +33,6 @@ export default class NavigationContext {
   }
 
   async getRoutes(origin, destination) {
-    // Check if this route requires indoor-outdoor transition
-    const transition = analyzeRouteTransition(origin, destination);
-
-    if (transition.requiresTransition) {
-      // Use transition strategy for indoor-outdoor bridging
-      return STRATEGIES["transition"].getRoutes(origin, destination);
-    }
-
-    // Use the configured strategy for regular outdoor routes
     return this._strategy.getRoutes(origin, destination);
   }
 }

@@ -75,6 +75,8 @@ jest.mock("../src/data/locations", () => ({
     { label: "EV Building", lat: 45.495, lng: -73.577, searchText: "ev building" },
     { label: "Library", lat: 45.496, lng: -73.577, searchText: "library" },
   ],
+  BUILDING_ENTRANCES: {},
+  getNearestEntrance: () => null,
 }));
 
 jest.mock("../src/ErrorModal", () => {
