@@ -100,7 +100,10 @@ const BuildingInfoModal = ({ building, visible, onClose, onSetDeparture, onSetDe
                 </View>
               )}
 
-              <Pressable style={styles.goInsideBtn} onPress={() => onGoInside(building)}>
+              <Pressable 
+              style={styles.goInsideBtn} 
+              testID="go-inside"
+              onPress={() => onGoInside(building)}>
                 <Text style={styles.goInsideBtnText}>Go inside <Ionicons size={20} name="log-in-outline"></Ionicons></Text>
               </Pressable>
             </View>
