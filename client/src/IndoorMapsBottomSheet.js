@@ -341,30 +341,23 @@ function SheetContent({
                     {hasSummary ? (
                         <View style={styles.routeSummaryCard}>
                             <Text style={styles.routeSummaryTitle}>Directions Summary</Text>
-                            <ScrollView
-                                style={styles.routeSummaryScroll}
-                                contentContainerStyle={styles.routeSummaryScrollContent}
-                                nestedScrollEnabled
-                                showsVerticalScrollIndicator
-                            >
-                                {routeSegments.map((seg, idx) => (
-                                    <View key={`summary-${seg.kind}-${idx}`} style={styles.routeSummarySegment}>
-                                        <Text style={styles.routeSummaryHeading}>
-                                            {seg.kind === 'indoor' ? 'Indoor' : 'Outdoor'} {idx + 1}
+                            {routeSegments.map((seg, idx) => (
+                                <View key={`summary-${seg.kind}-${idx}`} style={styles.routeSummarySegment}>
+                                    <Text style={styles.routeSummaryHeading}>
+                                        {seg.kind === 'indoor' ? 'Indoor' : 'Outdoor'} {idx + 1}
+                                    </Text>
+                                    {seg.kind === 'outdoor' && (seg.distanceText || seg.durationText) ? (
+                                        <Text style={styles.routeSummaryMeta}>
+                                            {[seg.distanceText, seg.durationText].filter(Boolean).join(' · ')}
                                         </Text>
-                                        {seg.kind === 'outdoor' && (seg.distanceText || seg.durationText) ? (
-                                            <Text style={styles.routeSummaryMeta}>
-                                                {[seg.distanceText, seg.durationText].filter(Boolean).join(' · ')}
-                                            </Text>
-                                        ) : null}
-                                        {(seg.steps || []).map((line, j) => (
-                                            <Text key={`summary-step-${idx}-${j}`} style={styles.routeSummaryLine}>
-                                                • {line}
-                                            </Text>
-                                        ))}
-                                    </View>
-                                ))}
-                            </ScrollView>
+                                    ) : null}
+                                    {(seg.steps || []).map((line, j) => (
+                                        <Text key={`summary-step-${idx}-${j}`} style={styles.routeSummaryLine}>
+                                            • {line}
+                                        </Text>
+                                    ))}
+                                </View>
+                            ))}
                         </View>
                     ) : null}
                 </View>
