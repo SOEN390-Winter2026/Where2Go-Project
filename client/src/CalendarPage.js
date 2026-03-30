@@ -19,8 +19,9 @@ import Checkbox from "expo-checkbox";
 import { Calendar as CalendarUI, CalendarList } from "react-native-calendars";
 import PropTypes from "prop-types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { parseEventLocation } from './utils/eventLocationParser'; // location string → { building, room }
+import { parseEventLocation } from './utils/eventLocationParser';
 import { getValidCalendarIds, fetchCalendarsIfPermitted } from './utils/calendarUtils';
+import CalendarAddEvent from "./CalendarAddEvent";
 import styles from "./styles/CalendarPage_styles";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -60,6 +61,10 @@ function formatTimeRange(event) {
   if (start && end) return `${start} - ${end}`;
   if (start) return start;
   return "Time not specified";
+}
+
+function toDateString(date) {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
 
 export default function CalendarPage({ onPressBack, onGenerateDirections }) {
@@ -111,6 +116,18 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
   const [selectedCalsModalVisible, setSelectedCalsModalVisible] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(todayString());
+
+  const [showAddEvent, setShowAddEvent] = useState(false);
+
+  const handleEventAdded = (newEvent) => {
+    const eventDateStr = toDateString(new Date(newEvent.startDate));
+    if (eventDateStr === selectedDate) {
+      setEvents((prev) =>
+        [...prev, newEvent].sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+      );
+    }
+    setShowAddEvent(false);
+  };
 
   const getCalendars = async () => {
     const { status } = await Calendar.requestCalendarPermissionsAsync();
@@ -270,6 +287,16 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
       <Text style={styles.txtNoCal}>No Calendar Yet</Text>
     </View>
   );
+
+  if (showAddEvent) {
+    return (
+      <CalendarAddEvent
+        selectedCalendarIds={selectedCalendarIds}
+        onEventAdded={handleEventAdded}
+        onCancel={() => setShowAddEvent(false)}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -573,8 +600,14 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
               <Text style={styles.btnTxt}>Connect to Google Calendar</Text>
             </Pressable>
 
-            {/* not implemented yet*/}
-            <Pressable style={styles.manualBtn}>
+            <Pressable
+              testID="manualAddBtn"
+              style={styles.manualBtn}
+              onPress={() => {
+                close();
+                setShowAddEvent(true);
+              }}
+            >
               <Text style={styles.btnTxt}>Manually Add Events</Text>
             </Pressable>
           </Animated.View>
@@ -590,5 +623,3 @@ CalendarPage.propTypes = {
   title: PropTypes.string,
   onGenerateDirections: PropTypes.func,
 };
-
-
