@@ -4,6 +4,23 @@ import TopRightMenu from '../../src/TopRightMenu.js';
 import { Pressable, Text } from 'react-native';
 import React, { useState } from 'react';
 
+jest.mock('react-native', () => {
+    const RN = jest.requireActual('react-native');
+    RN.Animated.timing = (value, config) => ({
+        start: (callback) => {
+            value.setValue(config.toValue);
+            if (callback) callback({ finished: true });
+        },
+    });
+    RN.Animated.spring = (value, config) => ({
+        start: (callback) => {
+            if (config && config.toValue !== undefined) value.setValue(config.toValue);
+            if (callback) callback({ finished: true });
+        },
+    });
+    return RN;
+});
+
 //mocking backend
 const map = {
     getCampusCoordinates: (name) => {
@@ -77,6 +94,8 @@ describe(" Buttons Test", () => {
                     onToggleCampus={() =>
                         setCurrentCampus((prev) => (prev === 'SGW' ? 'Loyola' : 'SGW'))
                     }
+                    onToggleLiveLocation={() => {}}
+                    onPressPOI={() => {}}
                 />
                 {/* Add text so we can assert the current campus */}
                 <Text testID="campusText">{currentCampus}</Text>
@@ -117,16 +136,14 @@ describe(" Buttons Test", () => {
         const { getByTestId } = render(<TestWrapper />);
 
         const pressToggleButton = getByTestId("campusToggle");
-        const currentCampus = getByTestId("campusText");
-
-        expect(currentCampus.props.children).toBe('SGW');
+        expect(getByTestId("campusText").props.children).toBe('SGW');
 
         await act(async () => {
             fireEvent.press(pressToggleButton);
         });
 
-        expect(currentCampus.props.children).toBe('Loyola');
-    }, 15000);
+        expect(getByTestId("campusText").props.children).toBe('Loyola');
+    });
 
     it("Disability Button", () => {
         const mockOnPress = jest.fn();
