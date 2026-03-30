@@ -163,8 +163,9 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
                     s.activeTab === 'directions'
                         ? [s.SHEET_COLLAPSED, s.SHEET_DIRECTIONS, s.SHEET_DIRECTIONS_MAX]
                         : [s.SHEET_COLLAPSED, s.SHEET_EXPANDED];
-                const nearest = candidates.reduce((best, c) =>
-                    Math.abs(c - clamped) < Math.abs(best - clamped) ? c : best
+                const nearest = candidates.reduce(
+                    (best, c) => (Math.abs(c - clamped) < Math.abs(best - clamped) ? c : best),
+                    candidates[0]
                 );
                 animateSheet(nearest);
                 if (nearest === s.SHEET_COLLAPSED) {
