@@ -81,6 +81,14 @@ describe("indoorRouteOverlay", () => {
     expect(lines.length).toBeGreaterThan(0);
   });
 
+  test("getPolylinesForFloor returns [] when trailing digit matches multiple floors", () => {
+    const map = {
+      "H-7": [[{ x: 0.1, y: 0.1 }]],
+      "G-7": [[{ x: 0.2, y: 0.2 }]],
+    };
+    expect(getPolylinesForFloor(map, "7")).toEqual([]);
+  });
+
   test("getPolylinesForFloor returns [] when routeByFloor null", () => {
     expect(getPolylinesForFloor(null, "1")).toEqual([]);
   });

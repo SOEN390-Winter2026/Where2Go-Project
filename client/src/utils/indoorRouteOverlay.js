@@ -5,6 +5,26 @@
 
 import { trailingAsciiDigitSuffix } from "./trailingDigits";
 
+function normalizedFloorLabel(wp) {
+  return wp?.floor != null ? String(wp.floor) : null;
+}
+
+function isFinitePoint(pos) {
+  return pos != null && typeof pos.x === "number" && typeof pos.y === "number";
+}
+
+/** @returns {{ floor: string, x: number, y: number } | null} */
+function parseWaypointForRun(wp) {
+  const floor = normalizedFloorLabel(wp);
+  const pos = wp?.position;
+  if (!floor || !isFinitePoint(pos)) return null;
+  return { floor, x: pos.x, y: pos.y };
+}
+
+function appendRunIfLongEnough(runs, run) {
+  if (run && run.points.length >= 2) runs.push(run);
+}
+
 /**
  * @param {Array<{ floor?: string|number, position?: { x?: number, y?: number } }>} path
  * @returns {Array<{ floor: string, points: Array<{ x: number, y: number }> }>}
@@ -16,30 +36,24 @@ export function contiguousNormRunsByFloor(path) {
   let current = null;
 
   for (const wp of path) {
-    const f = wp?.floor != null ? String(wp.floor) : null;
-    const pos = wp?.position;
-    if (!f || pos == null || typeof pos.x !== "number" || typeof pos.y !== "number") {
+    const parsed = parseWaypointForRun(wp);
+    if (!parsed) continue;
+
+    const pt = { x: parsed.x, y: parsed.y };
+
+    if (!current || current.floor !== parsed.floor) {
+      appendRunIfLongEnough(runs, current);
+      current = { floor: parsed.floor, points: [pt] };
       continue;
     }
-    const pt = { x: pos.x, y: pos.y };
 
-    if (!current || current.floor !== f) {
-      if (current && current.points.length >= 2) {
-        runs.push(current);
-      }
-      current = { floor: f, points: [pt] };
-    } else {
-      const last = current.points[current.points.length - 1];
-      if (!last || last.x !== pt.x || last.y !== pt.y) {
-        current.points.push(pt);
-      }
+    const last = current.points[current.points.length - 1];
+    if (!last || last.x !== pt.x || last.y !== pt.y) {
+      current.points.push(pt);
     }
   }
 
-  if (current && current.points.length >= 2) {
-    runs.push(current);
-  }
-
+  appendRunIfLongEnough(runs, current);
   return runs;
 }
 
@@ -71,6 +85,34 @@ export function buildIndoorRoutePolylinesByFloor(segments, buildingCode) {
  * @param {string|number|null|undefined} selectedFloor
  * @returns {Array<Array<{ x: number, y: number }>>}
  */
+
+function buildPolylineAliasIndex(routeByFloor) {
+  /** @type {Map<string, Set<string>>} */
+  const aliasToCanonicalKeys = new Map();
+  const add = (alias, canonicalKey) => {
+    if (!alias) return;
+    if (!aliasToCanonicalKeys.has(alias)) aliasToCanonicalKeys.set(alias, new Set());
+    aliasToCanonicalKeys.get(alias).add(canonicalKey);
+  };
+
+  for (const canonicalKey of Object.keys(routeByFloor)) {
+    const lines = routeByFloor[canonicalKey];
+    if (!Array.isArray(lines) || !lines.length) continue;
+    const ks = String(canonicalKey).trim();
+    const kCompact = ks.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const kTrailing = trailingAsciiDigitSuffix(kCompact);
+    add(ks, canonicalKey);
+    add(kCompact, canonicalKey);
+    if (kTrailing) add(kTrailing, canonicalKey);
+  }
+  return aliasToCanonicalKeys;
+}
+
+function polylinesForCanonicalKey(routeByFloor, canonicalKey) {
+  const lines = routeByFloor[canonicalKey];
+  return Array.isArray(lines) && lines.length ? lines : null;
+}
+
 export function getPolylinesForFloor(routeByFloor, selectedFloor) {
   if (!routeByFloor || selectedFloor == null) return [];
   const key = String(selectedFloor).trim();
@@ -79,21 +121,25 @@ export function getPolylinesForFloor(routeByFloor, selectedFloor) {
 
   const candidateKeys = [key, compact, trailingDigits].filter(Boolean);
   for (const k of candidateKeys) {
-    const direct = routeByFloor[k];
-    if (Array.isArray(direct) && direct.length) return direct;
+    const direct = polylinesForCanonicalKey(routeByFloor, k);
+    if (direct) return direct;
   }
 
-  // Last-resort loose matching between aliases like "7" and "H-7".
-  const entries = Object.entries(routeByFloor);
-  for (const [k, lines] of entries) {
-    const kCompact = String(k).toLowerCase().replace(/[^a-z0-9]/g, "");
-    const kTrailing = trailingAsciiDigitSuffix(kCompact);
-    if (
-      kCompact === compact ||
-      (trailingDigits && kTrailing === trailingDigits)
-    ) {
-      if (Array.isArray(lines) && lines.length) return lines;
-    }
+  const aliasIndex = buildPolylineAliasIndex(routeByFloor);
+
+  const uniqueCanonicalForAlias = (alias) => {
+    const set = aliasIndex.get(alias);
+    if (!set || set.size !== 1) return null;
+    return [...set][0];
+  };
+
+  for (const alias of [compact, trailingDigits]) {
+    if (!alias) continue;
+    const canonicalKey = uniqueCanonicalForAlias(alias);
+    if (!canonicalKey) continue;
+    const lines = polylinesForCanonicalKey(routeByFloor, canonicalKey);
+    if (lines) return lines;
   }
+
   return [];
 }

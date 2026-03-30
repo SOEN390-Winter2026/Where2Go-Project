@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
-
+import { API_BASE_URL } from '../config';
 
 // Indoor JSON for this campus only (avoids mixing Loyola/SGW when the directions list includes all API codes)
 function getBuildingIndoorData(campus, bCode) {
@@ -28,9 +28,12 @@ function normalizeCode(code) {
 }
 
 export default function useIndoorMaps(height, campus, buildingCode, _buildings = []) {
-    const SHEET_COLLAPSED  = height * 0.11;
-    const SHEET_EXPANDED   = height * 0.45;
-    const SHEET_DIRECTIONS = height * 0.6;
+    const SHEET_COLLAPSED = height * 0.11;
+    const SHEET_EXPANDED = height * 0.45;
+    /** Default height when opening the directions tab. */
+    const SHEET_DIRECTIONS = height * 0.72;
+    /** Extra-tall snap when on directions so long step lists are reachable (drag handle up). */
+    const SHEET_DIRECTIONS_MAX = height * 0.92;
 
     const [selectedFloor,  setSelectedFloor]  = useState(null);
     const [activeTab,      setActiveTab]      = useState(null);
@@ -114,7 +117,9 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
     };
 
     const sheetHeight = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
-    const lastHeight  = useRef(SHEET_COLLAPSED);
+    const lastHeight = useRef(SHEET_COLLAPSED);
+    /** Keeps pan callbacks in sync (PanResponder is created once). */
+    const sheetMetricsRef = useRef({});
 
     const animateSheet = (toValue) => {
         Animated.spring(sheetHeight, { toValue, useNativeDriver: false }).start();
@@ -130,28 +135,42 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
         setActiveTab(null);
     };
 
-    const onPanMove = (_, g) => {
-        const next = lastHeight.current - g.dy;
-        if (next >= SHEET_COLLAPSED && next <= SHEET_DIRECTIONS) {
-            sheetHeight.setValue(next);
-        }
-    };
-
-    const onPanRelease = (_, g) => {
-        const next = lastHeight.current - g.dy;
-        const mid  = (SHEET_COLLAPSED + SHEET_EXPANDED) / 2;
-        if (next > mid) {
-            expandSheet(activeTab);
-        } else {
-            collapseSheet();
-        }
+    sheetMetricsRef.current = {
+        activeTab,
+        SHEET_COLLAPSED,
+        SHEET_EXPANDED,
+        SHEET_DIRECTIONS,
+        SHEET_DIRECTIONS_MAX,
     };
 
     const panResponder = useRef(
         PanResponder.create({
             onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 5,
-            onPanResponderMove:   onPanMove,
-            onPanResponderRelease: onPanRelease,
+            onPanResponderMove: (_, g) => {
+                const s = sheetMetricsRef.current;
+                const max = s.activeTab === 'directions' ? s.SHEET_DIRECTIONS_MAX : s.SHEET_EXPANDED;
+                const next = lastHeight.current - g.dy;
+                if (next >= s.SHEET_COLLAPSED && next <= max) {
+                    sheetHeight.setValue(next);
+                }
+            },
+            onPanResponderRelease: (_, g) => {
+                const s = sheetMetricsRef.current;
+                const max = s.activeTab === 'directions' ? s.SHEET_DIRECTIONS_MAX : s.SHEET_EXPANDED;
+                const next = lastHeight.current - g.dy;
+                const clamped = Math.min(Math.max(next, s.SHEET_COLLAPSED), max);
+                const candidates =
+                    s.activeTab === 'directions'
+                        ? [s.SHEET_COLLAPSED, s.SHEET_DIRECTIONS, s.SHEET_DIRECTIONS_MAX]
+                        : [s.SHEET_COLLAPSED, s.SHEET_EXPANDED];
+                const nearest = candidates.reduce((best, c) =>
+                    Math.abs(c - clamped) < Math.abs(best - clamped) ? c : best
+                );
+                animateSheet(nearest);
+                if (nearest === s.SHEET_COLLAPSED) {
+                    setActiveTab(null);
+                }
+            },
         })
     ).current;
 

@@ -101,6 +101,28 @@ function buildIndoorNarrative({ path, buildingCode, startRoom, endRoom, endFloor
   return lines;
 }
 
+/** Single-segment success: indoor routing within one building between two rooms. */
+function indoorRoomToRoomOk(buildingCode, path, { startRoom, endRoom, endFloor }) {
+  return {
+    ok: true,
+    segments: [
+      {
+        kind: "indoor",
+        buildingCode,
+        summary: `Inside ${buildingCode} — room to room`,
+        steps: buildIndoorNarrative({
+          path,
+          buildingCode,
+          startRoom,
+          endRoom,
+          endFloor,
+        }),
+        path,
+      },
+    ],
+  };
+}
+
 async function fetchOutdoorWalkingSegment(originLatLng, destLatLng) {
   function normalizePolyline(route) {
     if (typeof route?.polyline === "string") return route.polyline;
@@ -460,24 +482,11 @@ export async function buildInterBuildingDirections({
         avoidStairs: indoorOpts.avoidStairs,
       });
       if (fallbackPath) {
-        return {
-          ok: true,
-          segments: [
-            {
-              kind: "indoor",
-              buildingCode: fromB,
-              summary: `Inside ${fromB} — room to room`,
-          steps: buildIndoorNarrative({
-            path: fallbackPath,
-            buildingCode: fromB,
-            startRoom: from.room,
-            endRoom: to.room,
-            endFloor: to.floor,
-          }),
-              path: fallbackPath,
-            },
-          ],
-        };
+        return indoorRoomToRoomOk(fromB, fallbackPath, {
+          startRoom: from.room,
+          endRoom: to.room,
+          endFloor: to.floor,
+        });
       }
       return {
         ok: false,
@@ -486,24 +495,11 @@ export async function buildInterBuildingDirections({
         details: indoor.meta,
       };
     }
-    return {
-      ok: true,
-      segments: [
-        {
-          kind: "indoor",
-          buildingCode: fromB,
-          summary: `Inside ${fromB} — room to room`,
-          steps: buildIndoorNarrative({
-            path: indoor.path,
-            buildingCode: fromB,
-            startRoom: from.room,
-            endRoom: to.room,
-            endFloor: to.floor,
-          }),
-          path: indoor.path,
-        },
-      ],
-    };
+    return indoorRoomToRoomOk(fromB, indoor.path, {
+      startRoom: from.room,
+      endRoom: to.room,
+      endFloor: to.floor,
+    });
   }
 
   const exitPair = findClosestExitPair(fromB, campus, toB, campus, buildings);

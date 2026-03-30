@@ -242,7 +242,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     sheetScrollContent: {
-        paddingBottom: 16,
+        flexGrow: 1,
+        paddingBottom: 28,
     },
 
     classroomRow: {
@@ -379,12 +380,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff9fa',
         borderRadius: 10,
         padding: 10,
-    },
-    routeSummaryScroll: {
-        maxHeight: 220,
-    },
-    routeSummaryScrollContent: {
-        paddingBottom: 2,
+        paddingBottom: 12,
     },
     routeSummaryTitle: {
         color: '#912338',

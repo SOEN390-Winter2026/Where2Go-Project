@@ -34,6 +34,7 @@ import {
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const ZOOM_STEP = 0.75;
+// reference for svg Polyline, avoids allocating a new array every render
 const INDOOR_ROUTE_STROKE_DASH = [8, 6];
 
 const clamp = (value, max) => Math.min(Math.max(value, -max), max);
