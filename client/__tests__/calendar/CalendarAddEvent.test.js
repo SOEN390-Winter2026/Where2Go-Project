@@ -30,7 +30,7 @@ const DEFAULT_PROPS = {
 async function fillAndSave(getByPlaceholderText, getAllByPlaceholderText, getByText, overrides = {}) {
     fireEvent.changeText(getByPlaceholderText("Event title"), overrides.title ?? "Lecture");
     fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), overrides.date ?? "2026-04-01");
-    const timeInputs = getAllByPlaceholderText("HH:MM");
+    const timeInputs = getAllByPlaceholderText("HH:MM, 24h");
     fireEvent.changeText(timeInputs[0], overrides.start ?? "09:00");
     fireEvent.changeText(timeInputs[1], overrides.end ?? "10:15");
     if (overrides.room) {
@@ -111,7 +111,7 @@ describe("CalendarAddEvent", () => {
       );
       fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
       fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2026-04-01");
-      const timeInputs = getAllByPlaceholderText("HH:MM");
+      const timeInputs = getAllByPlaceholderText("HH:MM, 24h");
       fireEvent.changeText(timeInputs[0], "10:00");
       fireEvent.changeText(timeInputs[1], "09:00");
       fireEvent.press(getByText("Save Event"));
@@ -127,7 +127,7 @@ describe("CalendarAddEvent", () => {
       );
       fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
       fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2026-04-01");
-      const timeInputs = getAllByPlaceholderText("HH:MM");
+      const timeInputs = getAllByPlaceholderText("HH:MM, 24h");
       fireEvent.changeText(timeInputs[0], "09:00");
       fireEvent.changeText(timeInputs[1], "10:00");
       fireEvent.press(getByText("Save Event"));
