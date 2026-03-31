@@ -726,12 +726,25 @@ function connectTransferWaypoints({
   // No stair edges at all when accessibility mode avoids stairs.
   if (pointType === "staircase" && rules.avoidStairs) return;
 
-  (waypoint.floorsReachable || []).forEach((targetFloorId) => {
+  let floorsReachable = waypoint.floorsReachable || [];
+
+  // If no floorsReachable specified, infer adjacent floors
+  if (floorsReachable.length === 0) {
+    const allFloorIds = Array.from(floorGraphs.keys()).map(id => parseInt(id)).filter(id => !isNaN(id)).sort((a, b) => a - b);
+    const currentFloorNum = parseInt(floorId);
+    if (!isNaN(currentFloorNum)) {
+      const prevFloor = allFloorIds.find(f => f === currentFloorNum - 1);
+      const nextFloor = allFloorIds.find(f => f === currentFloorNum + 1);
+      floorsReachable = [prevFloor, nextFloor].filter(f => f != null).map(f => f.toString());
+    }
+  }
+
+  floorsReachable.forEach((targetFloorId) => {
     const targetStr = resolveFloorId(targetFloorId);
     if (!targetStr || targetStr === floorId || !floorGraphs.has(targetStr)) return;
 
     const targetFloorGraph = floorGraphs.get(targetStr);
-    // Precomputed lookup: avoid scanning all waypoints for every transfer edge.
+    // avoid scanning all waypoints for every transfer edge.
     const candidates = targetFloorGraph.waypointsByType?.get(pointType) ?? [];
     if (candidates.length === 0) return;
 
