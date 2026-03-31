@@ -1,0 +1,23 @@
+appId: host.exp.exponent
+---
+- tapOn:
+    text: "Continue"
+    optional: true
+- waitForAnimationToEnd    
+    
+# readjust
+- tapOn: SGW
+- waitForAnimationToEnd    
+- tapOn: Loyola
+- waitForAnimationToEnd
+
+# looking for JMSB
+- tapOn:
+    point: 30%,60%
+- tapOn:
+    id: "go-inside"
+
+- tapOn:
+    id: "poi-btn"
+
+- assertVisible: "Maestro visible - POI loaded"

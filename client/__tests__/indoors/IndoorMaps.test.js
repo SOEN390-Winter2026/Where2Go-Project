@@ -84,7 +84,7 @@ jest.mock('react-native-gesture-handler', () => {
 jest.mock('../../src/IndoorSideLeftBar', () => {
     const { Pressable, Text } = require('react-native');
     const PropTypes = require('prop-types');
-    const MockIndoorSideLeftBar = ({ onPressBack, onOpenDirections }) => (
+    const MockIndoorSideLeftBar = ({ onPressBack, onOpenDirections, onTogglePOI }) => (
         <>
             <Pressable testID="mock-back-btn" onPress={onPressBack}>
                 <Text>Back</Text>
@@ -92,11 +92,15 @@ jest.mock('../../src/IndoorSideLeftBar', () => {
             <Pressable testID="mock-open-directions-btn" onPress={onOpenDirections}>
                 <Text>OpenDirections</Text>
             </Pressable>
+            <Pressable testID="mock-poi-btn" onPress={onTogglePOI}>
+                <Text>POI</Text>
+            </Pressable>
         </>
     );
     MockIndoorSideLeftBar.propTypes = {
         onPressBack: PropTypes.func.isRequired,
         onOpenDirections: PropTypes.func,
+        onTogglePOI: PropTypes.func,
     };
     return MockIndoorSideLeftBar;
 });
@@ -420,6 +424,16 @@ describe('IndoorMaps', () => {
             <IndoorMaps {...defaultProps} onToggleAccessibility={toggle} />
         );
         expect(getAllByText('H').length).toBeGreaterThan(0);
+    });
+
+    it('shows "Maestro visible - POI loaded" text when POI is enabled', () => {
+        const { getByTestId, getByText, queryByText } = render(<IndoorMaps {...defaultProps} />);
+        
+        expect(queryByText('Maestro visible - POI loaded')).toBeNull();
+        
+        fireEvent.press(getByTestId('mock-poi-btn'));
+        
+        expect(getByText('Maestro visible - POI loaded')).toBeTruthy();
     });
 
     describe('RoomActionModal', () => {
