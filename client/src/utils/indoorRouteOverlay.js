@@ -7,7 +7,8 @@ import { trailingAsciiDigitSuffix } from "./trailingDigits";
 import { areBuildingCodesEquivalent } from "./buildingCode";
 
 function normalizedFloorLabel(wp) {
-  return wp?.floor != null ? String(wp.floor) : null;
+  if (wp?.floor == null) return null;
+  return String(wp.floor);
 }
 
 function isFinitePoint(pos) {
@@ -42,14 +43,14 @@ export function contiguousNormRunsByFloor(path) {
 
     const pt = { x: parsed.x, y: parsed.y };
 
-    if (!current || current.floor !== parsed.floor) {
+    if (current?.floor !== parsed.floor) {
       appendRunIfLongEnough(runs, current);
       current = { floor: parsed.floor, points: [pt] };
       continue;
     }
 
-    const last = current.points[current.points.length - 1];
-    if (!last || last.x !== pt.x || last.y !== pt.y) {
+    const last = current.points.at(-1);
+    if (last?.x !== pt.x || last?.y !== pt.y) {
       current.points.push(pt);
     }
   }
@@ -105,7 +106,7 @@ function buildPolylineAliasIndex(routeByFloor) {
     const lines = routeByFloor[canonicalKey];
     if (!Array.isArray(lines) || !lines.length) continue;
     const ks = String(canonicalKey).trim();
-    const kCompact = ks.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const kCompact = ks.toLowerCase().replaceAll(/[^a-z0-9]/g, "");
     const kTrailing = trailingAsciiDigitSuffix(kCompact);
     add(ks, canonicalKey);
     add(kCompact, canonicalKey);
@@ -122,7 +123,7 @@ function polylinesForCanonicalKey(routeByFloor, canonicalKey) {
 export function getPolylinesForFloor(routeByFloor, selectedFloor) {
   if (!routeByFloor || selectedFloor == null) return [];
   const key = String(selectedFloor).trim();
-  const compact = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const compact = key.toLowerCase().replaceAll(/[^a-z0-9]/g, "");
   const trailingDigits = trailingAsciiDigitSuffix(compact);
 
   const candidateKeys = [key, compact, trailingDigits].filter(Boolean);

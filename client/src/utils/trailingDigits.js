@@ -6,7 +6,7 @@ export function trailingAsciiDigitSuffix(s) {
   const text = String(s ?? "");
   let i = text.length;
   while (i > 0) {
-    const c = text.charCodeAt(i - 1);
+    const c = text.codePointAt(i - 1);
     if (c < 48 || c > 57) break;
     i -= 1;
   }

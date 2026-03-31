@@ -457,8 +457,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 14,
         padding: 16,
-        width: '80%',
-        maxHeight: '70%',
+        width: '88%',
+        maxHeight: '80%',
         elevation: 8,
         shadowColor: '#000',
         shadowOpacity: 0.2,
@@ -467,8 +467,12 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     dropdownOptionsScroll: {
-        flexGrow: 0,
-        maxHeight: 360,
+        flexShrink: 1,
+        minHeight: 60,
+        maxHeight: 420,
+    },
+    dropdownOptionsScrollContent: {
+        paddingBottom: 6,
     },
     dropdownModalTitle: {
         fontWeight: '700',

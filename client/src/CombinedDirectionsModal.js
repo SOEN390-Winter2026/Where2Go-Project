@@ -26,6 +26,21 @@ export default function CombinedDirectionsModal({
   errorMessage,
   segments,
 }) {
+  const segmentCounts = new Map();
+  const segmentKey = (seg) => {
+    const base = [
+      seg.kind,
+      seg.buildingCode || "none",
+      seg.summary || "segment",
+      seg.durationText || "",
+      seg.distanceText || "",
+      (seg.steps || []).join("|"),
+    ].join("|");
+    const next = (segmentCounts.get(base) || 0) + 1;
+    segmentCounts.set(base, next);
+    return `${base}#${next}`;
+  };
+
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
@@ -46,7 +61,7 @@ export default function CombinedDirectionsModal({
           {!loading && !errorMessage && segments?.length > 0 && (
             <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
               {segments.map((seg, i) => (
-                <View key={`${seg.kind}-${i}`} style={styles.segment}>
+                <View key={segmentKey(seg, i)} style={styles.segment}>
                   <Text style={styles.segmentBadge}>
                     {seg.kind === "indoor" ? "Indoor" : "Outdoor"}{" "}
                     {i + 1}/{segments.length}
@@ -58,11 +73,19 @@ export default function CombinedDirectionsModal({
                     </Text>
                   ) : null}
                   {seg.kind === "outdoor"
-                    ? (seg.steps || []).map((line, j) => (
-                        <Text key={j} style={styles.stepLine}>
-                          • {line}
-                        </Text>
-                      ))
+                    ? (() => {
+                        const stepCounts = new Map();
+                        return (seg.steps || []).map((line) => {
+                          const text = String(line);
+                          const seen = (stepCounts.get(text) || 0) + 1;
+                          stepCounts.set(text, seen);
+                          return (
+                            <Text key={`${text}#${seen}`} style={styles.stepLine}>
+                              • {line}
+                            </Text>
+                          );
+                        });
+                      })()
                     : null}
                 </View>
               ))}

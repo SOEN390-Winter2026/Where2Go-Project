@@ -108,29 +108,29 @@ function indoorRoomToRoomOk(buildingCode, path, { startRoom, endRoom, endFloor }
   };
 }
 
+function normalizePolyline(route) {
+  if (typeof route?.polyline === "string") return route.polyline;
+  return (
+    route?.polyline?.encodedPolyline ??
+    route?.polyline?.points ??
+    route?.overview_polyline?.points ??
+    route?.overviewPolyline?.points ??
+    null
+  );
+}
+
+function normalizeStepPolyline(step) {
+  if (typeof step?.polyline === "string") return step.polyline;
+  return (
+    step?.polyline?.encodedPolyline ??
+    step?.polyline?.points ??
+    step?.overview_polyline?.points ??
+    step?.overviewPolyline?.points ??
+    null
+  );
+}
+
 async function fetchOutdoorWalkingSegment(originLatLng, destLatLng) {
-  function normalizePolyline(route) {
-    if (typeof route?.polyline === "string") return route.polyline;
-    return (
-      route?.polyline?.encodedPolyline ??
-      route?.polyline?.points ??
-      route?.overview_polyline?.points ??
-      route?.overviewPolyline?.points ??
-      null
-    );
-  }
-
-  function normalizeStepPolyline(step) {
-    if (typeof step?.polyline === "string") return step.polyline;
-    return (
-      step?.polyline?.encodedPolyline ??
-      step?.polyline?.points ??
-      step?.overview_polyline?.points ??
-      step?.overviewPolyline?.points ??
-      null
-    );
-  }
-
   const clientTime = encodeURIComponent(new Date().toISOString());
   const url =
     `${API_BASE_URL}/directions?originLat=${originLatLng.latitude}&originLng=${originLatLng.longitude}` +
@@ -206,8 +206,8 @@ function distance2(a, b) {
 }
 
 function floorDistancePenalty(roomFloor, exitFloor) {
-  const rf = String(roomFloor ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const ef = String(exitFloor ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const rf = String(roomFloor ?? "").toLowerCase().replaceAll(/[^a-z0-9]/g, "");
+  const ef = String(exitFloor ?? "").toLowerCase().replaceAll(/[^a-z0-9]/g, "");
   if (!rf || !ef) return 2;
   if (rf === ef) return 0;
   const rd = trailingAsciiDigitSuffix(rf);
@@ -374,6 +374,134 @@ function buildHeuristicIndoorPath({ campus, buildingCode, from, to, avoidStairs 
   return nodes.length >= 2 ? nodes : null;
 }
 
+function validateDirectionInput(campus, from, to) {
+  if (blank(campus) || blank(from?.building) || blank(to?.building)) {
+    return { ok: false, code: "INVALID_INPUT", message: "Select campus, start building, and destination building." };
+  }
+  if (blank(from?.floor) || blank(from?.room) || blank(to?.floor) || blank(to?.room)) {
+    return { ok: false, code: "INVALID_INPUT", message: "Select floor and room for both start and destination." };
+  }
+  return { ok: true };
+}
+
+function ensureIndoorMapsExist(campus, fromB, toB) {
+  if (!hasIndoorFloorPlans(campus, fromB)) {
+    return {
+      ok: false,
+      code: "NO_INDOOR_MAP",
+      message: `No indoor floor plans for ${fromB}. Open indoor maps from a building that has plans.`,
+    };
+  }
+  if (!hasIndoorFloorPlans(campus, toB)) {
+    return {
+      ok: false,
+      code: "NO_INDOOR_MAP",
+      message: `No indoor floor plans for ${toB}. Only buildings with floor data in the app can be start or destination for combined directions.`,
+    };
+  }
+  return { ok: true };
+}
+
+function buildSameBuildingDirections({ campus, fromB, from, to, avoidStairs }) {
+  const indoor = computeIndoorWithStairsFallback({
+    campus,
+    buildingCode: fromB,
+    from: { floor: from.floor, room: from.room },
+    to: { floor: to.floor, room: to.room },
+    avoidStairs,
+  });
+  if (indoor.success) {
+    return indoorRoomToRoomOk(fromB, indoor.path, {
+      startRoom: from.room,
+      endRoom: to.room,
+      endFloor: to.floor,
+    });
+  }
+
+  const fallbackPath = buildHeuristicIndoorPath({
+    campus,
+    buildingCode: fromB,
+    from: { floor: from.floor, room: from.room },
+    to: { floor: to.floor, room: to.room },
+    avoidStairs,
+  });
+  if (fallbackPath) {
+    return indoorRoomToRoomOk(fromB, fallbackPath, {
+      startRoom: from.room,
+      endRoom: to.room,
+      endFloor: to.floor,
+    });
+  }
+
+  return {
+    ok: false,
+    code: indoor.meta?.reason || "NO_INDOOR_PATH",
+    message: "Could not find an indoor path between these rooms.",
+    details: indoor.meta,
+  };
+}
+
+function buildCandidateExitPairs({ fromB, toB, campus, buildings, from, to }) {
+  const exitPair = findClosestExitPair(fromB, campus, toB, campus, buildings);
+  const fallbackPairs = buildSortedExitPairs(fromB, toB, campus, buildings, from, to);
+  if ((!exitPair?.from || !exitPair.to) && fallbackPairs.length === 0) return null;
+
+  const pairs = [];
+  if (exitPair?.from && exitPair?.to) {
+    const a = exitPositionToLatLng(exitPair.from, buildings);
+    const b = exitPositionToLatLng(exitPair.to, buildings);
+    if (a && b) pairs.push({ from: exitPair.from, to: exitPair.to, a, b, d2: distance2(a, b) });
+  }
+  for (const p of fallbackPairs) {
+    if (!pairs.some((x) => x.from.waypointId === p.from.waypointId && x.to.waypointId === p.to.waypointId)) {
+      pairs.push(p);
+    }
+  }
+  return pairs;
+}
+
+function buildCombinedSegments({ fromB, toB, from, to, legOut, legIn, outdoor }) {
+  return [
+    {
+      kind: "indoor",
+      buildingCode: fromB,
+      summary: `Inside ${fromB} — to exit`,
+      steps: buildIndoorNarrative({
+        path: legOut.path,
+        buildingCode: fromB,
+        startRoom: from.room,
+      }),
+      path: legOut.path,
+    },
+    {
+      kind: "outdoor",
+      summary: `Outside — between ${fromB} and ${toB}`,
+      steps: [
+        `Walk ${outdoor.distanceText || "outside"} from ${fromB} to ${toB}.`,
+        ...outdoor.steps,
+        `Enter ${toB} through the main entrance/exit.`,
+      ],
+      durationText: outdoor.durationText,
+      distanceText: outdoor.distanceText,
+      coords: outdoor.coords,
+      mapSegments: outdoor.segments,
+    },
+    {
+      kind: "indoor",
+      buildingCode: toB,
+      summary: `Inside ${toB} — from entrance to room`,
+      steps: buildIndoorNarrative({
+        path: legIn.path,
+        buildingCode: toB,
+        endRoom: to.room,
+        endFloor: to.floor,
+        heading: `From the entrance of ${toB}, continue inside.`,
+      }),
+      path: legIn.path,
+    },
+  ];
+}
+
 function collectTransferWaypointIds(campus, buildingCode, floor, avoidStairs) {
   const b = indoorMaps?.[campus]?.[buildingCode];
   const entry = b?.[floor] ?? b?.[Number(floor)];
@@ -424,88 +552,32 @@ export async function buildInterBuildingDirections({
   buildings = [],
   avoidStairs = true,
 } = {}) {
-  if (blank(campus) || blank(from?.building) || blank(to?.building)) {
-    return { ok: false, code: "INVALID_INPUT", message: "Select campus, start building, and destination building." };
-  }
-  if (blank(from?.floor) || blank(from?.room) || blank(to?.floor) || blank(to?.room)) {
-    return { ok: false, code: "INVALID_INPUT", message: "Select floor and room for both start and destination." };
-  }
+  const validation = validateDirectionInput(campus, from, to);
+  if (!validation.ok) return validation;
 
   const fromB = resolveIndoorCode(campus, from.building);
   const toB = resolveIndoorCode(campus, to.building);
-  const indoorOpts = { avoidStairs };
-
-  if (!hasIndoorFloorPlans(campus, fromB)) {
-    return {
-      ok: false,
-      code: "NO_INDOOR_MAP",
-      message: `No indoor floor plans for ${fromB}. Open indoor maps from a building that has plans.`,
-    };
-  }
-  if (!hasIndoorFloorPlans(campus, toB)) {
-    return {
-      ok: false,
-      code: "NO_INDOOR_MAP",
-      message: `No indoor floor plans for ${toB}. Only buildings with floor data in the app can be start or destination for combined directions.`,
-    };
-  }
+  const indoorOpts = { avoidStairs: !!avoidStairs };
+  const mapCheck = ensureIndoorMapsExist(campus, fromB, toB);
+  if (!mapCheck.ok) return mapCheck;
 
   if (fromB === toB) {
-    const indoor = computeIndoorWithStairsFallback({
+    return buildSameBuildingDirections({
       campus,
-      buildingCode: fromB,
-      from: { floor: from.floor, room: from.room },
-      to: { floor: to.floor, room: to.room },
+      fromB,
+      from,
+      to,
       avoidStairs: indoorOpts.avoidStairs,
-    });
-    if (!indoor.success) {
-      const fallbackPath = buildHeuristicIndoorPath({
-        campus,
-        buildingCode: fromB,
-        from: { floor: from.floor, room: from.room },
-        to: { floor: to.floor, room: to.room },
-        avoidStairs: indoorOpts.avoidStairs,
-      });
-      if (fallbackPath) {
-        return indoorRoomToRoomOk(fromB, fallbackPath, {
-          startRoom: from.room,
-          endRoom: to.room,
-          endFloor: to.floor,
-        });
-      }
-      return {
-        ok: false,
-        code: indoor.meta?.reason || "NO_INDOOR_PATH",
-        message: "Could not find an indoor path between these rooms.",
-        details: indoor.meta,
-      };
-    }
-    return indoorRoomToRoomOk(fromB, indoor.path, {
-      startRoom: from.room,
-      endRoom: to.room,
-      endFloor: to.floor,
     });
   }
 
-  const exitPair = findClosestExitPair(fromB, campus, toB, campus, buildings);
-  const fallbackPairs = buildSortedExitPairs(fromB, toB, campus, buildings, from, to);
-  if ((!exitPair?.from || !exitPair.to) && fallbackPairs.length === 0) {
+  const pairs = buildCandidateExitPairs({ fromB, toB, campus, buildings, from, to });
+  if (!pairs || pairs.length === 0) {
     return {
       ok: false,
       code: "NO_EXITS",
       message: "No mapped building exits for this pair. Indoor routing between buildings needs exit waypoints in the floor data.",
     };
-  }
-  const pairs = [];
-  if (exitPair?.from && exitPair?.to) {
-    const a = exitPositionToLatLng(exitPair.from, buildings);
-    const b = exitPositionToLatLng(exitPair.to, buildings);
-    if (a && b) pairs.push({ from: exitPair.from, to: exitPair.to, a, b, d2: distance2(a, b) });
-  }
-  for (const p of fallbackPairs) {
-    if (!pairs.some((x) => x.from.waypointId === p.from.waypointId && x.to.waypointId === p.to.waypointId)) {
-      pairs.push(p);
-    }
   }
 
   let lastFailure = { code: "NO_INDOOR_PATH", message: "Could not find a path between these buildings." };
@@ -529,48 +601,7 @@ export async function buildInterBuildingDirections({
       continue;
     }
 
-    return {
-      ok: true,
-      segments: [
-        {
-          kind: "indoor",
-          buildingCode: fromB,
-          summary: `Inside ${fromB} — to exit`,
-          steps: buildIndoorNarrative({
-            path: legOut.path,
-            buildingCode: fromB,
-            startRoom: from.room,
-          }),
-          path: legOut.path,
-        },
-        {
-          kind: "outdoor",
-          summary: `Outside — between ${fromB} and ${toB}`,
-          steps: [
-            `Walk ${outdoor.distanceText || "outside"} from ${fromB} to ${toB}.`,
-            ...outdoor.steps,
-            `Enter ${toB} through the main entrance/exit.`,
-          ],
-          durationText: outdoor.durationText,
-          distanceText: outdoor.distanceText,
-          coords: outdoor.coords,
-          mapSegments: outdoor.segments,
-        },
-        {
-          kind: "indoor",
-          buildingCode: toB,
-          summary: `Inside ${toB} — from entrance to room`,
-          steps: buildIndoorNarrative({
-            path: legIn.path,
-            buildingCode: toB,
-            endRoom: to.room,
-            endFloor: to.floor,
-            heading: `From the entrance of ${toB}, continue inside.`,
-          }),
-          path: legIn.path,
-        },
-      ],
-    };
+    return { ok: true, segments: buildCombinedSegments({ fromB, toB, from, to, legOut, legIn, outdoor }) };
   }
 
   return { ok: false, ...lastFailure };
