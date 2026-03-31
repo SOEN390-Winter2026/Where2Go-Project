@@ -19,6 +19,22 @@ const styles = StyleSheet.create({
     mapArea: {
         flex: 1,
     },
+    routeErrorBanner: {
+        position: 'absolute',
+        left: 12,
+        right: 12,
+        bottom: 12,
+        backgroundColor: 'rgba(176, 0, 32, 0.92)',
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+    },
+    routeErrorText: {
+        color: '#fff',
+        fontSize: 13,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
     mapPlaceholderSub: {
         color: '#aaa',
         fontStyle: 'italic',
@@ -203,6 +219,17 @@ const styles = StyleSheet.create({
     tabBtn: {
         padding: 6,
     },
+    sheetBody: {
+        flex: 1,
+        minHeight: 0,
+    },
+    sheetFloorsScroll: {
+        flex: 1,
+    },
+    sheetFloorsScrollContent: {
+        flexGrow: 1,
+        paddingBottom: 16,
+    },
     sheetContent: {
         backgroundColor: '#fff',
         marginHorizontal: 16,
@@ -215,7 +242,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     sheetScrollContent: {
-        paddingBottom: 16,
+        flexGrow: 1,
+        paddingBottom: 28,
     },
 
     classroomRow: {
@@ -340,6 +368,48 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         letterSpacing: 0.4,
     },
+    routeInlineError: {
+        color: '#b00020',
+        marginTop: 10,
+        fontWeight: '600',
+    },
+    routeSummaryCard: {
+        marginTop: 12,
+        borderWidth: 1,
+        borderColor: '#ead4d8',
+        backgroundColor: '#fff9fa',
+        borderRadius: 10,
+        padding: 10,
+        paddingBottom: 12,
+    },
+    routeSummaryScroll: {
+        maxHeight: 220,
+    },
+    routeSummaryScrollContent: {
+        paddingBottom: 2,
+    },
+    routeSummaryTitle: {
+        color: '#912338',
+        fontWeight: '700',
+        marginBottom: 6,
+    },
+    routeSummarySegment: {
+        marginBottom: 8,
+    },
+    routeSummaryHeading: {
+        fontWeight: '700',
+        color: '#444',
+    },
+    routeSummaryMeta: {
+        color: '#666',
+        fontSize: 12,
+        marginBottom: 2,
+    },
+    routeSummaryLine: {
+        color: '#444',
+        fontSize: 12,
+        lineHeight: 17,
+    },
 
     dropdownWrapper: {
         flex: 1,
@@ -388,12 +458,17 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         padding: 16,
         width: '80%',
-        maxHeight: 280,
+        maxHeight: '70%',
         elevation: 8,
         shadowColor: '#000',
         shadowOpacity: 0.2,
         shadowOffset: { width: 0, height: 4 },
         shadowRadius: 8,
+        zIndex: 1,
+    },
+    dropdownOptionsScroll: {
+        flexGrow: 0,
+        maxHeight: 360,
     },
     dropdownModalTitle: {
         fontWeight: '700',

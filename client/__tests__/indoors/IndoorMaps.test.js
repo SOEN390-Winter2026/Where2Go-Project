@@ -1,6 +1,25 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import IndoorMaps from '../../src/IndoorMaps';
+
+jest.mock('../../src/services/interBuildingDirections', () => ({
+    buildInterBuildingDirections: jest.fn(),
+}));
+
+jest.mock('react-native-svg', () => {
+    const React = require('react');
+    const { View } = require('react-native');
+    const Mock = ({ children, testID, ...rest }) => (
+        <View testID={testID} {...rest}>{children}</View>
+    );
+    return {
+        __esModule: true,
+        default: Mock,
+        Svg: Mock,
+        Polyline: Mock,
+        Circle: Mock,
+    };
+});
 
 jest.mock('indoorData', () => ({
     indoorMaps: {
@@ -16,6 +35,11 @@ jest.mock('indoorData', () => ({
                                     id: 'H-201',
                                     type: 'classroom',
                                     bounds: { x: 0.1, y: 0.1, w: 0.1, h: 0.1 },
+                                },
+                                {
+                                    id: 'H-202',
+                                    type: 'classroom',
+                                    bounds: { x: 0.25, y: 0.1, w: 0.1, h: 0.1 },
                                 },
                             ],
                             waypoints: [],
@@ -549,6 +573,95 @@ describe('IndoorMaps', () => {
 
         it('dropdown shows placeholder dashes when no value selected', () => {
             expect(getAllByText('—').length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('directions generation', () => {
+        const { buildInterBuildingDirections } = require('../../src/services/interBuildingDirections');
+
+        beforeEach(() => {
+            buildInterBuildingDirections.mockReset();
+            buildInterBuildingDirections.mockResolvedValue({ ok: true, segments: [] });
+        });
+
+        it('successful generate calls onPersistCombinedRoute, avoidStairs matches accessibility', async () => {
+            buildInterBuildingDirections.mockResolvedValue({
+                ok: true,
+                segments: [{
+                    kind: 'indoor',
+                    buildingCode: 'H',
+                    path: [
+                        { floor: '2', position: { x: 0.1, y: 0.1 } },
+                        { floor: '2', position: { x: 0.2, y: 0.2 } },
+                    ],
+                }],
+            });
+            const onPersist = jest.fn();
+            const s = jest.spyOn(require('react-native').Image, 'resolveAssetSource').mockReturnValue({
+                width: 800,
+                height: 600,
+            });
+
+            const { getByText, getByTestId, findByTestId } = render(
+                <IndoorMaps {...defaultProps} onPersistCombinedRoute={onPersist} isAccessibilityEnabled />
+            );
+            fireEvent.press(getByText('Get Room Directions'));
+            fireEvent.press(getByTestId('from-room'));
+            fireEvent.press(getByText('H-201'));
+            fireEvent.press(getByTestId('to-room'));
+            fireEvent.press(getByText('H-202'));
+
+            fireEvent(getByTestId('zoomable-container'), 'layout', {
+                nativeEvent: { layout: { width: 400, height: 600 } },
+            });
+
+            await act(async () => {
+                fireEvent.press(getByTestId('generate-directions-btn'));
+            });
+
+            await waitFor(() => {
+                expect(onPersist).toHaveBeenCalled();
+            });
+            expect(buildInterBuildingDirections).toHaveBeenCalledWith(
+                expect.objectContaining({ campus: 'SGW', avoidStairs: true })
+            );
+            expect(await findByTestId('indoor-route-overlay')).toBeTruthy();
+            s.mockRestore();
+        });
+
+        it('failed ok clears overlay and sets route error in sheet', async () => {
+            buildInterBuildingDirections.mockResolvedValue({
+                ok: false,
+                message: 'No route today',
+            });
+            const { getByText, getByTestId, getAllByText } = render(<IndoorMaps {...defaultProps} />);
+            fireEvent.press(getByText('Get Room Directions'));
+            fireEvent.press(getByTestId('from-room'));
+            fireEvent.press(getByText('H-201'));
+            fireEvent.press(getByTestId('to-room'));
+            fireEvent.press(getByText('H-202'));
+            await act(async () => {
+                fireEvent.press(getByTestId('generate-directions-btn'));
+            });
+            await waitFor(() => {
+                expect(getAllByText('No route today').length).toBeGreaterThan(0);
+            });
+        });
+
+        it('rejected promise sets route error from exception', async () => {
+            buildInterBuildingDirections.mockRejectedValue(new Error('network down'));
+            const { getByText, getByTestId, getAllByText } = render(<IndoorMaps {...defaultProps} />);
+            fireEvent.press(getByText('Get Room Directions'));
+            fireEvent.press(getByTestId('from-room'));
+            fireEvent.press(getByText('H-201'));
+            fireEvent.press(getByTestId('to-room'));
+            fireEvent.press(getByText('H-202'));
+            await act(async () => {
+                fireEvent.press(getByTestId('generate-directions-btn'));
+            });
+            await waitFor(() => {
+                expect(getAllByText('network down').length).toBeGreaterThan(0);
+            });
         });
     });
 

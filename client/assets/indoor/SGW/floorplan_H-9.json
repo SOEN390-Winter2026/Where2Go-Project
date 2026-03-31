@@ -1247,7 +1247,8 @@
           "y": 0.3912
         },
         "connections": [
-          "wp3_H-92"
+          "wp3_H-92",
+          "wp_exit_H9"
         ]
       },
       {
@@ -2340,6 +2341,18 @@
           "y": 0.2582
         },
         "connections": []
+      },
+      {
+        "id": "wp_exit_H9",
+        "type": "exit",
+        "floor": "H-9",
+        "position": {
+          "x": 0.2,
+          "y": 0.92
+        },
+        "connections": [
+          "wp1_H-9"
+        ]
       }
     ]
   }

@@ -984,7 +984,20 @@
           "y": 0.382
         },
         "connections": [
-          "wp45_H-21"
+          "wp45_H-21",
+          "wp_exit_H7"
+        ]
+      },
+      {
+        "id": "wp_exit_H7",
+        "type": "exit",
+        "floor": "H-7",
+        "position": {
+          "x": 0.52,
+          "y": 0.94
+        },
+        "connections": [
+          "wp46_H-22"
         ]
       }
     ]

@@ -1,11 +1,15 @@
 import { indoorMaps } from "../data/indoorData";
 import { MinCostHeap } from "../utils/MinCostHeap";
 import { extractFloorPlan } from "../utils/floorPlanUtils";
+import { trailingAsciiDigitSuffix } from "../utils/trailingDigits";
+
+// Cache graph build per building+rules
+const GRAPH_CACHE = new Map();
 
 /**
  * UTILITIES
  */
-const floorKeyToString = String;
+const floorKeyToString = (floor) => String(floor);
 
 // Center of a room rectangle (normalized 0–1 coords), for "nearest waypoint" fallback.
 function roomCenter(room) {
@@ -25,13 +29,19 @@ function dist(a, b) {
 export function findNearestWaypointId(floorGraphs, floorId, roomId, waypointId) {
   const floorGraph = floorGraphs?.get?.(floorId);
   if (!floorGraph) return null;
-  if (waypointId) return String(waypointId);
+  if (waypointId) {
+    const wid = String(waypointId);
+    if (floorGraph.waypointById?.has?.(wid)) return wid;
+  }
 
   const rooms = Array.isArray(floorGraph.floorPlan.rooms) ? floorGraph.floorPlan.rooms : [];
   const matchedRoom = rooms.find(
     (r) => String(r?.id).toLowerCase() === String(roomId).toLowerCase()
   );
-  if (matchedRoom?.nearestWaypoint) return String(matchedRoom.nearestWaypoint);
+  if (matchedRoom?.nearestWaypoint) {
+    const wid = String(matchedRoom.nearestWaypoint);
+    if (floorGraph.waypointById?.has?.(wid)) return wid;
+  }
 
   const roomBoundsCenter = roomCenter(matchedRoom);
   const waypoints = Array.isArray(floorGraph.floorPlan.waypoints)
@@ -48,15 +58,7 @@ export function findNearestWaypointId(floorGraphs, floorId, roomId, waypointId) 
 // Extract trailing digits from a string: e.g. "H-7" -> "7".
 // This lets us treat "7" and "H-7" as aliases for the same graph floor key.
 function getTrailingDigits(value) {
-  const text = String(value ?? "");
-  let end = text.length;
-  while (end > 0) {
-    const code = text.codePointAt(end - 1);
-    if (code < 48 || code > 57) break; // not 0-9
-    end -= 1;
-  }
-  const digits = text.slice(end);
-  return digits.length ? digits : "";
+  return trailingAsciiDigitSuffix(value);
 }
 
 // Lowercase letters+digits only (strips spaces/dashes for loose matching).
@@ -129,17 +131,126 @@ function createFloorResolver(floorAliases) {
   };
 }
 
-// Walkable edges from waypoint.connections on one floor.
 function connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules) {
+  const fromKey = `${floorId}::${waypoint.id}`;
   (Array.isArray(waypoint.connections) ? waypoint.connections : []).forEach((toId) => {
     const toWaypointId = String(toId);
     const toWaypoint = waypointById.get(toWaypointId);
     if (!toWaypoint) return;
 
-    const edgeWeight =
-      dist(waypoint.position, toWaypoint.position) + nodePenalty(toWaypoint.type, rules);
-    addEdge(adjacencyList, `${floorId}::${waypoint.id}`, `${floorId}::${toWaypointId}`, edgeWeight);
+    const toKey = `${floorId}::${toWaypointId}`;
+    const wFwd = dist(waypoint.position, toWaypoint.position) + nodePenalty(toWaypoint.type, rules);
+    const wRev = dist(waypoint.position, toWaypoint.position) + nodePenalty(waypoint.type, rules);
+    addEdge(adjacencyList, fromKey, toKey, wFwd);
+    addEdge(adjacencyList, toKey, fromKey, wRev);
   });
+}
+
+
+function bridgeDisconnectedComponentsOnFloor(adjacencyList, floorId, floorPlan, waypointById, rules) {
+  const wps = (floorPlan.waypoints || []).filter((w) => w?.id);
+  if (wps.length < 2) return;
+
+  const nodeKey = (id) => `${floorId}::${id}`;
+  const idFromKey = (key) => key.slice(key.indexOf("::") + 2);
+
+  function undirectedNeighbors() {
+    const m = new Map();
+    for (const w of wps) m.set(nodeKey(w.id), new Set());
+    for (const [from, edges] of adjacencyList.entries()) {
+      if (!from.startsWith(`${floorId}::`)) continue;
+      for (const { to } of edges) {
+        if (!m.has(from)) m.set(from, new Set());
+        if (!m.has(to)) m.set(to, new Set());
+        m.get(from).add(to);
+        m.get(to).add(from);
+      }
+    }
+    return m;
+  }
+
+  function componentsFrom(adj) {
+    const keys = wps.map((w) => nodeKey(w.id));
+    const visited = new Set();
+    const out = [];
+    for (const start of keys) {
+      if (visited.has(start)) continue;
+      const comp = [];
+      const stack = [start];
+      visited.add(start);
+      while (stack.length) {
+        const u = stack.pop();
+        comp.push(u);
+        for (const v of adj.get(u) || []) {
+          if (!visited.has(v)) {
+            visited.add(v);
+            stack.push(v);
+          }
+        }
+      }
+      out.push(comp);
+    }
+    return out;
+  }
+
+  function edgeWeightBetween(u, v) {
+    const uu = waypointById.get(idFromKey(u));
+    const vv = waypointById.get(idFromKey(v));
+    if (!uu?.position || !vv?.position) return Infinity;
+    return dist(uu.position, vv.position) + nodePenalty(vv.type, rules);
+  }
+
+  function euclidBetweenKeys(u, v) {
+    const uu = waypointById.get(idFromKey(u));
+    const vv = waypointById.get(idFromKey(v));
+    if (!uu?.position || !vv?.position) return Infinity;
+    return dist(uu.position, vv.position);
+  }
+
+  const adj = undirectedNeighbors();
+  const comps = componentsFrom(adj);
+  if (comps.length <= 1) return;
+
+  const MAX_SAMPLE_PER_COMPONENT = 80;
+  const sampleNodes = (comp) => {
+    if (comp.length <= MAX_SAMPLE_PER_COMPONENT) return comp;
+    const out = [];
+    const step = Math.ceil(comp.length / MAX_SAMPLE_PER_COMPONENT);
+    for (let i = 0; i < comp.length; i += step) out.push(comp[i]);
+    return out;
+  };
+
+  let anchor = comps[0];
+  for (const comp of comps) {
+    if (comp.length > anchor.length) anchor = comp;
+  }
+
+  for (const comp of comps) {
+    if (comp === anchor) continue;
+    const anchorSample = sampleNodes(anchor);
+    const compSample = sampleNodes(comp);
+    let bestA = null;
+    let bestB = null;
+    let bestD = Infinity;
+
+    for (const a of anchorSample) {
+      for (const b of compSample) {
+        const d = euclidBetweenKeys(a, b);
+        if (d < bestD) {
+          bestD = d;
+          bestA = a;
+          bestB = b;
+        }
+      }
+    }
+
+    if (!bestA || !bestB || !Number.isFinite(bestD) || bestD >= 1e9) continue;
+    const wAB = edgeWeightBetween(bestA, bestB);
+    const wBA = edgeWeightBetween(bestB, bestA);
+    addEdge(adjacencyList, bestA, bestB, wAB);
+    addEdge(adjacencyList, bestB, bestA, wBA);
+    anchor = anchor.concat(comp);
+  }
 }
 
 function pickClosestTransferWaypoint(waypoint, candidates) {
@@ -166,13 +277,103 @@ function indexFloorWaypoints(floorPlan) {
   return { waypointById, waypointsByType };
 }
 
+function nearestWaypointIdByPosition(waypoints, position, excludeId = null) {
+  let best = null;
+  let bestD = Infinity;
+  for (const w of waypoints) {
+    if (!w?.id || !w?.position) continue;
+    if (excludeId && String(w.id) === String(excludeId)) continue;
+    const d = dist(position, w.position);
+    if (d < bestD) {
+      bestD = d;
+      best = String(w.id);
+    }
+  }
+  return best;
+}
+
+/**
+ * - Ensure every room has a usable entry waypoint.
+ * - Ensure each exit waypoint is linked to the local graph so inter-building routes can leave/enter.
+ */
+function ensureRoomAndExitConnectivity(floorPlan, floorId) {
+  if (!Array.isArray(floorPlan?.waypoints)) return;
+  const rooms = Array.isArray(floorPlan?.rooms) ? floorPlan.rooms : [];
+  const waypoints = floorPlan.waypoints;
+  const idSet = new Set(waypoints.filter((w) => w?.id).map((w) => String(w.id)));
+
+  let syntheticCount = 0;
+
+  // Ensure each room has an accessible doorway waypoint.
+  for (const room of rooms) {
+    if (!room?.id) continue;
+    const center = roomCenter(room);
+    if (!center) continue;
+    const nearestId = room?.nearestWaypoint ? String(room.nearestWaypoint) : null;
+    if (nearestId && idSet.has(nearestId)) continue;
+
+    const syntheticId = `__room_${String(floorId)}_${syntheticCount++}`;
+    const nearestExisting = nearestWaypointIdByPosition(waypoints, center);
+    const wp = {
+      id: syntheticId,
+      type: "door",
+      floor: floorPlan.floor ?? floorId,
+      position: center,
+      connections: nearestExisting ? [nearestExisting] : [],
+    };
+    waypoints.push(wp);
+    idSet.add(syntheticId);
+    room.nearestWaypoint = syntheticId;
+
+    if (nearestExisting) {
+      const neighbor = waypoints.find((x) => String(x?.id) === nearestExisting);
+      if (neighbor) {
+        if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
+        if (!neighbor.connections.includes(syntheticId)) neighbor.connections.push(syntheticId);
+      }
+    }
+  }
+
+  // Ensure exits have at least one walkable link.
+  for (const wp of waypoints) {
+    if (!wp?.id || String(wp.type || "").toLowerCase() !== "exit") continue;
+    if (Array.isArray(wp.connections) && wp.connections.length > 0) continue;
+
+    const nearest = nearestWaypointIdByPosition(waypoints, wp.position, wp.id);
+    if (!nearest) continue;
+    wp.connections = [nearest];
+    const neighbor = waypoints.find((x) => String(x?.id) === nearest);
+    if (neighbor) {
+      if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
+      if (!neighbor.connections.includes(String(wp.id))) neighbor.connections.push(String(wp.id));
+    }
+  }
+}
+
 function buildFloorGraphsAndAliases(buildingData, floorAliases) {
   const floorGraphs = new Map();
 
   for (const floorId of Object.keys(buildingData)) {
-    // use extractFloorPlan
-    const floorPlan = extractFloorPlan(buildingData[floorId]?.data, floorId);
-    if (!Array.isArray(floorPlan?.waypoints)) continue;
+    const srcFloorPlan = extractFloorPlan(buildingData[floorId]?.data, floorId);
+    if (!Array.isArray(srcFloorPlan?.waypoints)) continue;
+
+    const floorPlan = {
+      ...srcFloorPlan,
+      rooms: Array.isArray(srcFloorPlan.rooms)
+        ? srcFloorPlan.rooms.map((r) => ({
+            ...r,
+            bounds: r?.bounds ? { ...r.bounds } : r?.bounds,
+          }))
+        : srcFloorPlan.rooms,
+      waypoints: srcFloorPlan.waypoints.map((w) => ({
+        ...w,
+        position: w?.position ? { ...w.position } : w?.position,
+        connections: Array.isArray(w?.connections) ? [...w.connections] : [],
+        floorsReachable: Array.isArray(w?.floorsReachable) ? [...w.floorsReachable] : w?.floorsReachable,
+      })),
+    };
+
+    ensureRoomAndExitConnectivity(floorPlan, floorId);
 
     const { waypointById, waypointsByType } = indexFloorWaypoints(floorPlan);
     floorGraphs.set(floorId, { floorPlan, waypointById, waypointsByType });
@@ -214,9 +415,16 @@ function linkAllFloorWaypoints({ floorGraphs, adjacencyList, resolveFloorId, rul
   for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
     for (const waypoint of floorPlan.waypoints) {
       if (!waypoint?.id) continue;
-      const pointType = String(waypoint.type || "").toLowerCase();
-
       connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules);
+    }
+  }
+  for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
+    bridgeDisconnectedComponentsOnFloor(adjacencyList, floorId, floorPlan, waypointById, rules);
+  }
+  for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
+    for (const waypoint of floorPlan.waypoints) {
+      if (!waypoint?.id) continue;
+      const pointType = String(waypoint.type || "").toLowerCase();
       const isTransferPoint = pointType === "elevator" || pointType === "staircase";
       if (!isTransferPoint) continue;
 
@@ -247,6 +455,18 @@ function buildMultiFloorGraph({ campus, buildingCode, rules }) {
 
   linkAllFloorWaypoints({ floorGraphs, adjacencyList, resolveFloorId, rules });
   return { adjacencyList, floorGraphs, resolveFloorId };
+}
+
+function graphCacheKey({ campus, buildingCode, rules }) {
+  return `${String(campus)}::${String(buildingCode)}::avoidStairs=${rules.avoidStairs ? "1" : "0"}`;
+}
+
+function getCachedMultiFloorGraph({ campus, buildingCode, rules }) {
+  const key = graphCacheKey({ campus, buildingCode, rules });
+  if (GRAPH_CACHE.has(key)) return GRAPH_CACHE.get(key);
+  const graph = buildMultiFloorGraph({ campus, buildingCode, rules });
+  if (graph) GRAPH_CACHE.set(key, graph);
+  return graph;
 }
 
 function dijkstra(startNode, goalNode, adjacencyList) {
@@ -280,7 +500,8 @@ function dijkstra(startNode, goalNode, adjacencyList) {
     path.push(step);
     step = previous.get(step);
   }
-  return { success: true, path: path.toReversed(), cost: distances.get(goalNode) };
+  const reversed = path.slice().reverse();
+  return { success: true, path: reversed, cost: distances.get(goalNode) };
 }
 
 function isBlank(value) {
@@ -328,10 +549,16 @@ function buildLocationNotFoundMeta(startWaypointId, goalWaypointId, from, to, fr
 
 /**
  * MAIN EXPORT
+ * @param {object} [opts]
+ * @param {boolean} [opts.avoidStairs=true] When true, stairwells are not used for vertical moves.
  */
-export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } = {}) {
-  // avoidStairs: block stair vertical edges. elevatorBonus / stairsPenalty tweak relative edge costs.
-  const rules = { avoidStairs: true, stairsPenalty: 2, elevatorBonus: -0.1, floorTransferCost: 1 };
+export function generateAccessibleIndoorPath({ campus, buildingCode, from, to, avoidStairs = true } = {}) {
+  const rules = {
+    avoidStairs: !!avoidStairs,
+    stairsPenalty: 2,
+    elevatorBonus: -0.1,
+    floorTransferCost: 1,
+  };
 
   const rootMissing = [];
   if (isBlank(campus)) rootMissing.push("campus");
@@ -347,7 +574,7 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
     return buildInvalidInputMeta(details);
   }
 
-  const graph = buildMultiFloorGraph({ campus, buildingCode, rules });
+  const graph = getCachedMultiFloorGraph({ campus, buildingCode, rules });
   if (!graph) return { success: false, meta: { reason: "INVALID_BUILDING" } };
 
   const fromFloorId = graph.resolveFloorId(from.floor) ?? floorKeyToString(from.floor);
@@ -376,10 +603,11 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to } 
 
   if (!result.success) return { success: false, meta: { reason: "NO_PATH" } };
 
-  // Turn raw node keys back into waypoint objects for the caller / UI.
   const path = result.path
     .map((nodeKey) => {
-      const [floorId, waypointId] = nodeKey.split("::");
+      const sep = nodeKey.indexOf("::");
+      const floorId = sep === -1 ? nodeKey : nodeKey.slice(0, sep);
+      const waypointId = sep === -1 ? "" : nodeKey.slice(sep + 2);
       const floorGraph = graph.floorGraphs.get(floorId);
       const waypoint = floorGraph?.waypointById?.get(waypointId);
       if (!waypoint) return null;
