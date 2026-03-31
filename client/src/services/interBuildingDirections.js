@@ -4,25 +4,10 @@ import { generateAccessibleIndoorPath } from "./indoorAccessibleRouting";
 import { findClosestExitPair, exitPositionToLatLng, getExitWaypoints } from "../utils/Buildingexits";
 import { decodePolylineToCoords } from "./routeServices";
 import { trailingAsciiDigitSuffix } from "../utils/trailingDigits";
-
-function normalizeCode(code) {
-  return String(code ?? "").trim().toUpperCase();
-}
+import { resolveCampusIndoorCode } from "../utils/buildingCode";
 
 function resolveIndoorCode(campus, buildingCode) {
-  const c = normalizeCode(buildingCode);
-  const campusData = indoorMaps?.[campus] ?? {};
-  const keys = Object.keys(campusData);
-  if (campusData[c]) return c;
-
-  const exact = keys.find((k) => normalizeCode(k) === c);
-  if (exact) return exact;
-
-  const pref = keys.find((k) => {
-    const nk = normalizeCode(k);
-    return nk.startsWith(c) || c.startsWith(nk);
-  });
-  return pref ?? c;
+  return resolveCampusIndoorCode(campus, buildingCode);
 }
 
 function hasIndoorFloorPlans(campus, buildingCode) {

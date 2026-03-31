@@ -4,6 +4,7 @@
  */
 
 import { trailingAsciiDigitSuffix } from "./trailingDigits";
+import { areBuildingCodesEquivalent } from "./buildingCode";
 
 function normalizedFloorLabel(wp) {
   return wp?.floor != null ? String(wp.floor) : null;
@@ -60,14 +61,19 @@ export function contiguousNormRunsByFloor(path) {
 /**
  * @param {Array<{ kind?: string, buildingCode?: string, path?: unknown[] }>} segments
  * @param {string} buildingCode
+ * @param {string | null} campus
  * @returns {Record<string, Array<Array<{ x: number, y: number }>>>}
  */
-export function buildIndoorRoutePolylinesByFloor(segments, buildingCode) {
+export function buildIndoorRoutePolylinesByFloor(segments, buildingCode, campus = null) {
   const out = {};
   if (!buildingCode || !Array.isArray(segments)) return out;
 
   for (const seg of segments) {
-    if (seg?.kind !== "indoor" || seg.buildingCode !== buildingCode || !Array.isArray(seg.path)) {
+    if (
+      seg?.kind !== "indoor" ||
+      !areBuildingCodesEquivalent({ campus, a: seg.buildingCode, b: buildingCode }) ||
+      !Array.isArray(seg.path)
+    ) {
       continue;
     }
     const runs = contiguousNormRunsByFloor(seg.path);

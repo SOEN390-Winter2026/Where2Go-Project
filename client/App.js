@@ -251,6 +251,10 @@ export default function App() {
   }
 
   if (showIndoorMaps) {
+    const persistedCombinedSegments =
+      activeRouteMeta?.source === "indoorCombined" && Array.isArray(activeRouteMeta?.segments)
+        ? activeRouteMeta.segments
+        : [];
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <IndoorMaps
@@ -261,6 +265,7 @@ export default function App() {
           isAccessibilityEnabled={isAccessibilityEnabled}
           onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
           onPersistCombinedRoute={handlePersistCombinedRoute}
+          persistedCombinedSegments={persistedCombinedSegments}
         />
       </GestureHandlerRootView>
     );

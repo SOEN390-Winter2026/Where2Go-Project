@@ -526,7 +526,7 @@ RoomActionModal.propTypes = {
 RoomActionModal.defaultProps = { roomId: '' };
 
 export default function IndoorMaps({ building, onPressBack, campus, buildings = [], isAccessibilityEnabled = false,
-    onToggleAccessibility = () => {}, onPersistCombinedRoute = () => {} }) {
+    onToggleAccessibility = () => {}, onPersistCombinedRoute = () => {}, persistedCombinedSegments = [] }) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -557,6 +557,15 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
     const [routeError, setRouteError] = useState(null);
     const [routeSegments, setRouteSegments] = useState(null);
 
+    useEffect(() => {
+        if (!Array.isArray(persistedCombinedSegments) || !persistedCombinedSegments.length) return;
+        setRouteError(null);
+        setRouteSegments(persistedCombinedSegments);
+        setIndoorRouteByFloor(
+            buildIndoorRoutePolylinesByFloor(persistedCombinedSegments, building?.code, campus)
+        );
+    }, [persistedCombinedSegments, building?.code, campus]);
+
     const handleGenerateDirections = async () => {
         setIndoorRouteByFloor(null);
         setRouteError(null);
@@ -573,7 +582,7 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
             if (result.ok) {
                 setRouteSegments(result.segments || null);
                 setIndoorRouteByFloor(
-                    buildIndoorRoutePolylinesByFloor(result.segments, building?.code)
+                    buildIndoorRoutePolylinesByFloor(result.segments, building?.code, campus)
                 );
                 onPersistCombinedRoute(result.segments || []);
             } else {
@@ -688,9 +697,11 @@ IndoorMaps.propTypes = {
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
     onPersistCombinedRoute: PropTypes.func,
+    persistedCombinedSegments: PropTypes.array,
 };
 
 IndoorMaps.defaultProps = {
     buildings: [],
     onPersistCombinedRoute: () => {},
+    persistedCombinedSegments: [],
 };
