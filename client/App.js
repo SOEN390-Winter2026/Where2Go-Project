@@ -198,9 +198,9 @@ export default function App() {
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
           setUserLocation({
-            latitude: 45.49728, longitude: -73.57896
-            //latitude: loc.coords.latitude,
-            //longitude: loc.coords.longitude,
+            //latitude: 45.49728, longitude: -73.57896 // hall building coordinates for testing
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
           });
         }
       );
