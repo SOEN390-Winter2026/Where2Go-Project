@@ -73,6 +73,7 @@ export default function OutdoorDirection({
   buildings,
   onPressBack,
   __testMapRef,
+  userLocation,
 }) {
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
@@ -250,47 +251,62 @@ export default function OutdoorDirection({
     setTimeout(() => setActiveField((prev) => (prev === field ? null : prev)), 150);
   };
 
-  const getCurrentLocation = async () => {
-    try {
-      const isLocationEnabled = await Location.hasServicesEnabledAsync();
-      if (!isLocationEnabled) {
-        setErrorMessage("Location services are turned off. Please enable location services in your device settings to use your current location.");
-        setShowErrorModal(true);
-        return;
-      }
+  const getCurrentLocation = () => {
+    if (!userLocation) {
+      setErrorMessage("Location not available. Please enable location services and try again.");
+      setShowErrorModal(true);
+      return;
+    }
 
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMessage("Location permission denied. Please enable location permission in your app settings to use your current location.");
-        setShowErrorModal(true);
-        return;
-      }
-
-      await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
-        (loc) => {
-          if (!loc?.coords) {
-            setErrorMessage("Unable to get your location coordinates. Please try again or enter your starting location manually.");
-            setShowErrorModal(true);
-            return;
-          }
-          const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
-          const label = `${coords.latitude},${coords.longitude}`;
-          setOriginQuery(label);
-          setOrigin({ label, lat: coords.latitude, lng: coords.longitude });
-        }
-      );
-    } catch (err) {
-      let errorMsg = "Unable to get your current location. Please try again or enter your starting location manually.";
-      if (err.code === "E_LOCATION_TIMEOUT") {
-        errorMsg = "Location request timed out. Please check your GPS signal and try again, or enter your starting location manually.";
-      } else if (err.code === "E_LOCATION_UNAVAILABLE") {
-        errorMsg = "Location is currently unavailable. Please check your device settings and try again, or enter your starting location manually.";
-      }
-      setErrorMessage(errorMsg);
+    const { latitude, longitude } = userLocation;
+    console.log("User location obtained:", latitude, longitude);
+    const nearestBuilding = findNearestBuilding(latitude, longitude);
+    console.log("Nearest building found:", nearestBuilding);
+    
+    if (nearestBuilding) {
+      const buildingLat = nearestBuilding.coordinates?.[0]?.latitude || nearestBuilding.lat;
+      const buildingLng = nearestBuilding.coordinates?.[0]?.longitude || nearestBuilding.lng;
+      const cleanLabel = getBuildingDisplayName(nearestBuilding.name || nearestBuilding.label);
+      setOriginQuery(cleanLabel);
+      setOrigin({ label: cleanLabel, lat: buildingLat, lng: buildingLng });
+    } else {
+      setErrorMessage("No nearby buildings found. Please enter your starting location manually.");
       setShowErrorModal(true);
     }
   };
+
+  const findNearestBuilding = useCallback((latitude, longitude) => {
+    if (!buildings || buildings.length === 0) return null;
+    
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+      const R = 6371; // Earth's radius in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    };
+
+    let nearestBuilding = null;
+    let minDistance = Infinity;
+
+    buildings.forEach((building) => {
+      const buildingLat = building.coordinates?.[0]?.latitude || building.lat;
+      const buildingLng = building.coordinates?.[0]?.longitude || building.lng;
+      
+      if (buildingLat && buildingLng) {
+        const distance = calculateDistance(latitude, longitude, buildingLat, buildingLng);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestBuilding = building;
+        }
+      }
+    });
+
+    return nearestBuilding;
+  }, [buildings]);
 
   const handleRetry = useCallback(() => {
     if (loading) return;
@@ -389,7 +405,7 @@ export default function OutdoorDirection({
         {activeField === "origin" && (
           <Pressable onPress={getCurrentLocation} style={styles.liveLoc}>
             <Ionicons name="location" size={26} color="#912338" />
-            <Text>Set to Your Location</Text>
+            <Text>Set Nearest Building as the Departure Location</Text>
           </Pressable>
         )}
 
@@ -513,6 +529,7 @@ OutdoorDirection.propTypes = {
   initialTo: PropTypes.string,
   buildings: PropTypes.array,
   __testMapRef: PropTypes.object,
+  userLocation: PropTypes.shape({ latitude: PropTypes.number, longitude: PropTypes.number }),
 };
 
 export const __test__ = {

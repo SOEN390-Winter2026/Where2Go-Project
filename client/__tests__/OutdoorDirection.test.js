@@ -748,9 +748,6 @@ describe("Location Error Handling", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    Location.hasServicesEnabledAsync.mockResolvedValue(true);
-    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: "granted" });
-
     jest.spyOn(console, "error").mockImplementation((message) => {
       if (typeof message === "string" && message.includes("was not wrapped in act")) return;
     });
@@ -760,103 +757,106 @@ describe("Location Error Handling", () => {
     jest.restoreAllMocks();
   });
 
-  it("shows error modal when location services are disabled", async () => {
-    Location.hasServicesEnabledAsync.mockResolvedValue(false);
+  it("shows error modal when userLocation is not available", async () => {
+    const mockBuildings = [
+      {
+        id: "1",
+        name: "Hall Building",
+        campus: "SGW",
+        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+      },
+    ];
 
     const { getByTestId, getByText, findByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+      <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} userLocation={null} />
     );
 
     const input = getByTestId("inputStartLoc");
     act(() => fireEvent(input, "focus"));
 
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
-
-    expect(await findByText("Location Unavailable")).toBeTruthy();
-    expect(await findByText(/Location services are turned off/i)).toBeTruthy();
-  });
-
-  it("shows error modal when location permission is denied", async () => {
-    Location.hasServicesEnabledAsync.mockResolvedValue(true);
-    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: "denied" });
-
-    const { getByTestId, getByText, findByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
-    );
-
-    const input = getByTestId("inputStartLoc");
-    act(() => fireEvent(input, "focus"));
-
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
+    await waitFor(() => expect(getByText("Set Nearest Building as the Departure Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set Nearest Building as the Departure Location")));
 
     expect(await findByText("Location Unavailable")).toBeTruthy();
-    expect(await findByText(/Location permission denied/i)).toBeTruthy();
+    expect(await findByText(/Location not available/i)).toBeTruthy();
   });
 
-  it("shows error modal when coordinates are missing", async () => {
-    Location.watchPositionAsync.mockImplementation(async (_opts, cb) => {
-      cb(null);
-      return { remove: jest.fn() };
-    });
+  it("sets nearest building as origin when userLocation is provided", async () => {
+    const mockBuildings = [
+      {
+        id: "1",
+        name: "Hall Building",
+        campus: "SGW",
+        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+      },
+    ];
 
-    const { getByTestId, getByText, findByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
-    );
-
-    const input = getByTestId("inputStartLoc");
-    act(() => fireEvent(input, "focus"));
-
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
-
-    expect(await findByText("Location Unavailable")).toBeTruthy();
-    expect(await findByText(/Unable to get your location coordinates/i)).toBeTruthy();
-  });
-
-  it("successfully sets location when all permissions are granted", async () => {
-    const mockCoords = { latitude: 40.7128, longitude: -74.006 };
-
-    Location.watchPositionAsync.mockImplementation(async (_opts, cb) => {
-      cb({ coords: mockCoords });
-      return { remove: jest.fn() };
-    });
+    const mockUserLocation = { latitude: 45.4971, longitude: -73.5791 };
 
     const { getByTestId, getByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={mockBuildings}
+        userLocation={mockUserLocation}
+      />
     );
 
     const input = getByTestId("inputStartLoc");
     act(() => fireEvent(input, "focus"));
 
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
+    await waitFor(() => expect(getByText("Set Nearest Building as the Departure Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set Nearest Building as the Departure Location")));
 
     await waitFor(() => {
-      expect(getByTestId("inputStartLoc").props.value).toBe(
-        `${mockCoords.latitude},${mockCoords.longitude}`
-      );
+      expect(getByTestId("inputStartLoc").props.value).toBe("Hall Building");
     });
+  });
+
+  it("shows error modal when no nearby buildings found", async () => {
+    const mockUserLocation = { latitude: 45.4971, longitude: -73.5791 };
+
+    const { getByTestId, getByText, findByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={[]}
+        userLocation={mockUserLocation}
+      />
+    );
+
+    const input = getByTestId("inputStartLoc");
+    act(() => fireEvent(input, "focus"));
+
+    await waitFor(() => expect(getByText("Set Nearest Building as the Departure Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set Nearest Building as the Departure Location")));
+
+    expect(await findByText("Location Unavailable")).toBeTruthy();
+    expect(await findByText(/No nearby buildings found/i)).toBeTruthy();
   });
 
   it("closes error modal when OK is pressed", async () => {
-    Location.hasServicesEnabledAsync.mockResolvedValue(false);
+    const mockBuildings = [
+      {
+        id: "1",
+        name: "Hall Building",
+        campus: "SGW",
+        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+      },
+    ];
 
     const { getByTestId, getByText, findByText, queryByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
+      <OutdoorDirection
+        onPressBack={() => {}}
+        buildings={mockBuildings}
+        userLocation={null}
+      />
     );
 
     const input = getByTestId("inputStartLoc");
     act(() => fireEvent(input, "focus"));
 
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
+    await waitFor(() => expect(getByText("Set Nearest Building as the Departure Location")).toBeTruthy());
+    await act(async () => fireEvent.press(getByText("Set Nearest Building as the Departure Location")));
 
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
     expect(await findByText("Location Unavailable")).toBeTruthy();
 
     act(() => fireEvent.press(getByText("OK")));
@@ -864,62 +864,6 @@ describe("Location Error Handling", () => {
     await waitFor(() => {
       expect(queryByText("Location Unavailable")).toBeNull();
     });
-  });
-
-  it("shows timeout error when location request times out", async () => {
-    const timeoutError = new Error("Location request timed out");
-    timeoutError.code = "E_LOCATION_TIMEOUT";
-    Location.watchPositionAsync.mockRejectedValue(timeoutError);
-
-    const { getByTestId, getByText, findByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
-    );
-
-    const input = getByTestId("inputStartLoc");
-    act(() => fireEvent(input, "focus"));
-
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
-
-    expect(await findByText("Location Unavailable")).toBeTruthy();
-    expect(await findByText(/Location request timed out/i)).toBeTruthy();
-  });
-
-  it("shows unavailable error when location is unavailable", async () => {
-    const unavailableError = new Error("Location unavailable");
-    unavailableError.code = "E_LOCATION_UNAVAILABLE";
-    Location.watchPositionAsync.mockRejectedValue(unavailableError);
-
-    const { getByTestId, getByText, findByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
-    );
-
-    const input = getByTestId("inputStartLoc");
-    act(() => fireEvent(input, "focus"));
-
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
-
-    expect(await findByText("Location Unavailable")).toBeTruthy();
-    expect(await findByText(/Location is currently unavailable/i)).toBeTruthy();
-  });
-
-  it("shows generic error for unknown location errors", async () => {
-    const genericError = new Error("Unknown error");
-    Location.watchPositionAsync.mockRejectedValue(genericError);
-
-    const { getByTestId, getByText, findByText } = render(
-      <OutdoorDirection onPressBack={() => {}} buildings={[]} />
-    );
-
-    const input = getByTestId("inputStartLoc");
-    act(() => fireEvent(input, "focus"));
-
-    await waitFor(() => expect(getByText("Set to Your Location")).toBeTruthy());
-    await act(async () => fireEvent.press(getByText("Set to Your Location")));
-
-    expect(await findByText("Location Unavailable")).toBeTruthy();
-    expect(await findByText(/Unable to get your current location/i)).toBeTruthy();
   });
 });
 

@@ -196,8 +196,9 @@ export default function App() {
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
           setUserLocation({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
+            latitude: 45.49728, longitude: -73.57896
+            //latitude: loc.coords.latitude,
+            //longitude: loc.coords.longitude,
           });
         }
       );
@@ -256,6 +257,7 @@ export default function App() {
         initialFrom={departureBuilding ? departureBuilding.name : ""}
         initialTo={destinationBuilding ? destinationBuilding.name : ""}
         onSelectRoute={handleSelectRoute}
+        userLocation={userLocation}
       />
     );
   }
