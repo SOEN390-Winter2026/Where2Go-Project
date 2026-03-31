@@ -61,7 +61,7 @@ export default function CombinedDirectionsModal({
           {!loading && !errorMessage && segments?.length > 0 && (
             <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
               {segments.map((seg, i) => (
-                <View key={segmentKey(seg, i)} style={styles.segment}>
+                <View key={segmentKey(seg)} style={styles.segment}>
                   <Text style={styles.segmentBadge}>
                     {seg.kind === "indoor" ? "Indoor" : "Outdoor"}{" "}
                     {i + 1}/{segments.length}
