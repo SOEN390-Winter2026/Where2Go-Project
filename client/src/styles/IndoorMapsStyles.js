@@ -52,6 +52,11 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
+    poiOverlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
     loadingOverlay: {
         position: 'absolute',
         top: 0,
@@ -61,6 +66,74 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1,
+    },
+
+    // Classroom label overlayy
+    roomLabel: {
+        position: 'absolute',
+        backgroundColor: '#912338',
+        borderWidth: 0.8,
+        borderColor: '#fff',
+        borderRadius: 2,
+        paddingHorizontal: 2,
+        paddingVertical: 1,
+        marginLeft: -18,
+        marginTop: -6,
+    },
+    roomLabelText: {
+        fontSize: 6,
+        fontWeight: '700',
+        color: '#fff',
+        textAlign: 'center',
+        maxWidth: 36,
+    },
+
+    // Room action modal
+    roomModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        justifyContent: 'flex-end',
+    },
+    roomModalCard: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingBottom: 32,
+        gap: 4,
+    },
+    roomModalTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#912338',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    roomModalBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingVertical: 14,
+        paddingHorizontal: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    roomModalBtnText: {
+        fontSize: 15,
+        color: '#912338',
+        fontWeight: '600',
+    },
+    roomModalBtnCancel: {
+        borderBottomWidth: 0,
+        justifyContent: 'center',
+        marginTop: 4,
+    },
+    roomModalBtnCancelText: {
+        fontSize: 14,
+        color: '#999',
+        textAlign: 'center',
+        width: '100%',
     },
 
     navUnavailableBadge: {
@@ -397,7 +470,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden',
     },
-
 });
 
 export default styles;

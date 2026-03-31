@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { buildRouteFromResponse } from './src/services/routeServices';
 import { resolveEventDestination } from './src/services/eventServices';
 import { StyleSheet, View, Pressable } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import CampusMap from "./src/Map";
@@ -69,6 +69,8 @@ export default function App() {
   const [isRouteActive, setIsRouteActive] = useState(false);
   const [directionOrigin, setDirectionOrigin] = useState(null);
   const [directionDestination, setDirectionDestination] = useState(null);
+
+  const [isAccessibilityEnabled, setIsAccessibilityEnabled] = useState(false);
 
   useEffect(() => {
     if (!showIndoorMaps && lastMapRegion.current) {
@@ -238,6 +240,8 @@ export default function App() {
           building={selectedBuilding}
           onPressBack={() => setShowIndoorMaps(false)}
           campus={currentCampus}
+          isAccessibilityEnabled={isAccessibilityEnabled}
+          onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
         />
       </GestureHandlerRootView>
     );
@@ -318,6 +322,8 @@ export default function App() {
         <SideLeftBar
           currentCampus={currentCampus}
           isPressedPOI={isPressedPOI}
+          isAccessibilityEnabled={isAccessibilityEnabled}
+          onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
           onToggleCampus={() =>
             setCurrentCampus((prev) => (prev === "SGW" ? "Loyola" : "SGW"))
           }
