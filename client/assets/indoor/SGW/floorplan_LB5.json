@@ -1,0 +1,831 @@
+{
+  "LB5": {
+    "floor": "LB5",
+    "rooms": [
+      {
+        "id": "LB-585",
+        "label": "Nepal Reading room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.4961,
+          "y": 0.0456,
+          "w": 0.3988,
+          "h": 0.1336
+        }
+      },
+      {
+        "id": "LB-583",
+        "label": "Poland Group Study Room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.7237,
+          "y": 0.183,
+          "w": 0.0623,
+          "h": 0.0523
+        }
+      },
+      {
+        "id": "LB-573-T1",
+        "label": "Bathroom",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.716,
+          "y": 0.2469,
+          "w": 0.0934,
+          "h": 0.0465
+        }
+      },
+      {
+        "id": "emergency exit",
+        "label": "emergency exit",
+        "type": "exit",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.8132,
+          "y": 0.2237,
+          "w": 0.0934,
+          "h": 0.0987
+        }
+      },
+      {
+        "id": "LB-561",
+        "label": "Iceland Dissertation Writer's room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.8677,
+          "y": 0.3514,
+          "w": 0.0934,
+          "h": 0.1994
+        }
+      },
+      {
+        "id": "LB-562",
+        "label": "Venezuela Dissertation Writer's room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.7296,
+          "y": 0.3631,
+          "w": 0.0798,
+          "h": 0.0968
+        }
+      },
+      {
+        "id": "LB-564",
+        "label": "Mali Dissertation Writer's room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.7296,
+          "y": 0.4618,
+          "w": 0.0856,
+          "h": 0.0929
+        }
+      },
+      {
+        "id": "LB-555",
+        "label": "Argentina Reading Room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.4805,
+          "y": 0.3572,
+          "w": 0.2082,
+          "h": 0.1878
+        }
+      },
+      {
+        "id": "LB5-545",
+        "label": "Spain Grduate Student Reading Room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.4922,
+          "y": 0.7269,
+          "w": 0.4125,
+          "h": 0.1258
+        }
+      },
+      {
+        "id": "emergency exit",
+        "label": "emergency exit",
+        "type": "exit",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.8113,
+          "y": 0.5837,
+          "w": 0.0875,
+          "h": 0.0987
+        }
+      },
+      {
+        "id": "LB-549-T2",
+        "label": "washroom",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.7179,
+          "y": 0.6186,
+          "w": 0.0953,
+          "h": 0.0406
+        }
+      },
+      {
+        "id": "LB-547",
+        "label": "Lithuania Group Study Room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.7198,
+          "y": 0.6786,
+          "w": 0.0642,
+          "h": 0.0484
+        }
+      },
+      {
+        "id": "LB-2-3-4",
+        "label": "LB-2-3-4",
+        "type": "staircase",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.4163,
+          "y": 0.7308,
+          "w": 0.0739,
+          "h": 0.06
+        }
+      },
+      {
+        "id": "LB-2-3-4",
+        "label": "LB-2-3-4",
+        "type": "staircase",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.4144,
+          "y": 0.1134,
+          "w": 0.0817,
+          "h": 0.0619
+        }
+      },
+      {
+        "id": "LB-518",
+        "label": "Ukraine study room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.286,
+          "y": 0.3708,
+          "w": 0.0486,
+          "h": 0.06
+        }
+      },
+      {
+        "id": "LB-520",
+        "label": "South Africa Group Study Room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.2821,
+          "y": 0.4347,
+          "w": 0.0564,
+          "h": 0.0387
+        }
+      },
+      {
+        "id": "LB-522",
+        "label": "Peru Group Study Room",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.286,
+          "y": 0.4792,
+          "w": 0.0545,
+          "h": 0.06
+        }
+      },
+      {
+        "id": "elevator",
+        "label": "elevator",
+        "type": "elevator",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.2821,
+          "y": 0.5682,
+          "w": 0.0506,
+          "h": 0.1181
+        }
+      },
+      {
+        "id": "LB-524-T3",
+        "label": "Washroom",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.216,
+          "y": 0.5663,
+          "w": 0.0603,
+          "h": 0.06
+        }
+      },
+      {
+        "id": "LB5-526-T4",
+        "label": "Washroom",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.216,
+          "y": 0.6321,
+          "w": 0.0661,
+          "h": 0.0619
+        }
+      },
+      {
+        "id": "LB-527",
+        "label": "Information system and technology",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.07,
+          "y": 0.6844,
+          "w": 0.2588,
+          "h": 0.1684
+        }
+      },
+      {
+        "id": "LB-505",
+        "label": "Librarian's office and information services",
+        "type": "other",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.0623,
+          "y": 0.0785,
+          "w": 0.2237,
+          "h": 0.209
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.2977,
+          "y": 0.1792,
+          "w": 0.3911,
+          "h": 0.0503
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.6887,
+          "y": 0.1811,
+          "w": 0.0272,
+          "h": 0.5439
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.3288,
+          "y": 0.6805,
+          "w": 0.3658,
+          "h": 0.0523
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.3405,
+          "y": 0.2276,
+          "w": 0.0603,
+          "h": 0.4568
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.1829,
+          "y": 0.5411,
+          "w": 0.1576,
+          "h": 0.0252
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.1907,
+          "y": 0.5702,
+          "w": 0.0253,
+          "h": 0.0774
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.7218,
+          "y": 0.5508,
+          "w": 0.1712,
+          "h": 0.031
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "CC3",
+        "bounds": {
+          "x": 0.716,
+          "y": 0.3263,
+          "w": 0.1751,
+          "h": 0.0232
+        }
+      },
+      {
+        "id": "LB-500",
+        "label": "LB-500",
+        "type": "hallway",
+        "floor": "LB5",
+        "bounds": {
+          "x": 0.814,
+          "y": 0.3561,
+          "w": 0.0254,
+          "h": 0.1939
+        }
+      }
+    ],
+    "waypoints": [
+      {
+        "id": "wp1_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.358,
+          "y": 0.216
+        },
+        "connections": [
+          "wp2_LB5"
+        ]
+      },
+      {
+        "id": "wp2_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3658,
+          "y": 0.2508
+        },
+        "connections": [
+          "wp1_LB5"
+        ]
+      },
+      {
+        "id": "wp3_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.323,
+          "y": 0.5527
+        },
+        "connections": [
+          "wp4_LB5"
+        ]
+      },
+      {
+        "id": "wp4_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3521,
+          "y": 0.5547
+        },
+        "connections": [
+          "wp3_LB5"
+        ]
+      },
+      {
+        "id": "wp5_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.1946,
+          "y": 0.5876
+        },
+        "connections": [
+          "wp6_LB5"
+        ]
+      },
+      {
+        "id": "wp6_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.2023,
+          "y": 0.5547
+        },
+        "connections": [
+          "wp5_LB5"
+        ]
+      },
+      {
+        "id": "wp7_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3735,
+          "y": 0.6573
+        },
+        "connections": [
+          "wp8_LB5"
+        ]
+      },
+      {
+        "id": "wp8_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3755,
+          "y": 0.694
+        },
+        "connections": [
+          "wp7_LB5"
+        ]
+      },
+      {
+        "id": "wp9_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.6848,
+          "y": 0.7115
+        },
+        "connections": [
+          "wp10_LB5"
+        ]
+      },
+      {
+        "id": "wp10_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7043,
+          "y": 0.6882
+        },
+        "connections": [
+          "wp9_LB5"
+        ]
+      },
+      {
+        "id": "wp11_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7023,
+          "y": 0.5779
+        },
+        "connections": [
+          "wp12_LB5"
+        ]
+      },
+      {
+        "id": "wp12_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7296,
+          "y": 0.5721
+        },
+        "connections": [
+          "wp11_LB5"
+        ]
+      },
+      {
+        "id": "wp13_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7043,
+          "y": 0.3534
+        },
+        "connections": [
+          "wp14_LB5"
+        ]
+      },
+      {
+        "id": "wp14_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7276,
+          "y": 0.3398
+        },
+        "connections": [
+          "wp13_LB5"
+        ]
+      },
+      {
+        "id": "wp15_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.6634,
+          "y": 0.1908
+        },
+        "connections": [
+          "wp16_LB5"
+        ]
+      },
+      {
+        "id": "wp16_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.6926,
+          "y": 0.2005
+        },
+        "connections": [
+          "wp15_LB5"
+        ]
+      },
+      {
+        "id": "wp17_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.2724,
+          "y": 0.2082
+        },
+        "connections": []
+      },
+      {
+        "id": "wp18_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.323,
+          "y": 0.394
+        },
+        "connections": []
+      },
+      {
+        "id": "wp19_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3307,
+          "y": 0.454
+        },
+        "connections": []
+      },
+      {
+        "id": "wp20_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3307,
+          "y": 0.5044
+        },
+        "connections": []
+      },
+      {
+        "id": "wp21_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.2218,
+          "y": 0.605
+        },
+        "connections": []
+      },
+      {
+        "id": "wp22_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.2237,
+          "y": 0.6495
+        },
+        "connections": []
+      },
+      {
+        "id": "wp23_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3152,
+          "y": 0.7173
+        },
+        "connections": []
+      },
+      {
+        "id": "wp24_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.3249,
+          "y": 0.6282
+        },
+        "connections": []
+      },
+      {
+        "id": "wp25_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.5486,
+          "y": 0.7386
+        },
+        "connections": []
+      },
+      {
+        "id": "wp26_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7257,
+          "y": 0.7057
+        },
+        "connections": []
+      },
+      {
+        "id": "wp27_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7296,
+          "y": 0.6418
+        },
+        "connections": []
+      },
+      {
+        "id": "wp28_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7296,
+          "y": 0.2798
+        },
+        "connections": []
+      },
+      {
+        "id": "wp29_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7257,
+          "y": 0.2082
+        },
+        "connections": []
+      },
+      {
+        "id": "wp30_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.5467,
+          "y": 0.1695
+        },
+        "connections": []
+      },
+      {
+        "id": "wp31_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8872,
+          "y": 0.5392
+        },
+        "connections": []
+      },
+      {
+        "id": "wp32_LB5",
+        "type": "staircase",
+        "floor": "LB5",
+        "position": {
+          "x": 0.4572,
+          "y": 0.7463
+        },
+        "connections": []
+      },
+      {
+        "id": "wp33_LB5",
+        "type": "staircase",
+        "floor": "LB5",
+        "position": {
+          "x": 0.4572,
+          "y": 0.1618
+        },
+        "connections": []
+      },
+      {
+        "id": "wp34_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.7997,
+          "y": 0.4397
+        },
+        "connections": []
+      },
+      {
+        "id": "wp35_LB5",
+        "type": "door",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8029,
+          "y": 0.4791
+        },
+        "connections": []
+      },
+      {
+        "id": "wp36_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8251,
+          "y": 0.3404
+        },
+        "connections": [
+          "wp37_LB5"
+        ]
+      },
+      {
+        "id": "wp37_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8251,
+          "y": 0.364
+        },
+        "connections": [
+          "wp36_LB5"
+        ]
+      },
+      {
+        "id": "wp38_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8251,
+          "y": 0.5359
+        },
+        "connections": [
+          "wp39_LB5"
+        ]
+      },
+      {
+        "id": "wp39_LB5",
+        "type": "corridor",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8267,
+          "y": 0.5595
+        },
+        "connections": [
+          "wp38_LB5"
+        ]
+      },
+      {
+        "id": "wp40_LB5",
+        "type": "exit",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8188,
+          "y": 0.6052
+        },
+        "connections": []
+      },
+      {
+        "id": "wp41_LB5",
+        "type": "exit",
+        "floor": "LB5",
+        "position": {
+          "x": 0.8203,
+          "y": 0.2505
+        },
+        "connections": []
+      }
+    ]
+  }
+}
