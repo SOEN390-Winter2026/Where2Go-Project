@@ -75,6 +75,36 @@ describe("indoorRouteOverlay", () => {
     );
   });
 
+  test("buildIndoorRoutePolylinesByFloor accepts equivalent building code aliases", () => {
+    const segments = [
+      {
+        kind: "indoor",
+        buildingCode: "H",
+        path: [
+          { floor: "7", position: { x: 0.1, y: 0.1 } },
+          { floor: "7", position: { x: 0.2, y: 0.2 } },
+        ],
+      },
+    ];
+    const byFloor = buildIndoorRoutePolylinesByFloor(segments, "H-7");
+    expect(byFloor["7"]).toHaveLength(1);
+  });
+
+  test("buildIndoorRoutePolylinesByFloor uses campus canonical code matching", () => {
+    const segments = [
+      {
+        kind: "indoor",
+        buildingCode: "VE",
+        path: [
+          { floor: "1", position: { x: 0.1, y: 0.1 } },
+          { floor: "1", position: { x: 0.2, y: 0.2 } },
+        ],
+      },
+    ];
+    const byFloor = buildIndoorRoutePolylinesByFloor(segments, "VL", "Loyola");
+    expect(byFloor["1"]).toHaveLength(1);
+  });
+
   test("getPolylinesForFloor uses loose key match for H-7 vs 7", () => {
     const map = { "H-7": [[{ x: 0.1, y: 0.2 }]] };
     const lines = getPolylinesForFloor(map, "7");

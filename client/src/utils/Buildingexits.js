@@ -1,31 +1,9 @@
 import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
-
-function normalizeCode(code) {
-    return String(code ?? '').trim().toUpperCase();
-}
-
-function resolveCampusIndoorCode(campus, code) {
-    const c = normalizeCode(code);
-    const campusData = indoorMaps?.[campus] ?? {};
-    const keys = Object.keys(campusData);
-    if (campusData[c]) return c;
-
-    const exact = keys.find((k) => normalizeCode(k) === c);
-    if (exact) return exact;
-
-    const pref = keys.find((k) => {
-        const nk = normalizeCode(k);
-        return nk.startsWith(c) || c.startsWith(nk);
-    });
-    return pref ?? c;
-}
+import { equivalentCampusIndoorCodes, normalizeBuildingCode } from './buildingCode';
 
 function equivalentCodes(campus, code) {
-    const resolved = resolveCampusIndoorCode(campus, code);
-    const c = normalizeCode(resolved);
-    if (c === 'VE' || c === 'VL') return ['VE', 'VL'];
-    return [resolved];
+    return equivalentCampusIndoorCodes(campus, code);
 }
 
 /**
@@ -82,7 +60,7 @@ export function getAllExitsForCampus(campus) {
  */
 export function exitPositionToLatLng(exitWaypoint, buildings) {
     const aliases = equivalentCodes(exitWaypoint.campus, exitWaypoint.buildingCode);
-    const building = buildings.find(b => aliases.includes(normalizeCode(b.code)));
+    const building = buildings.find(b => aliases.includes(normalizeBuildingCode(b.code)));
     if (!building?.coordinates?.length) return null;
 
     const lats = building.coordinates.map(c => c.latitude);
