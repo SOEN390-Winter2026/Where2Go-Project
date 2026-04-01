@@ -321,9 +321,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
 
                 const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
-                // const classrooms = (floorPlan?.rooms ?? []).filter(
-                //     r => r.type === 'classroom' && r.bounds
-                // );
+        
                 const allRooms = (floorPlan?.rooms ?? []).filter(r => r.bounds);
 
                 // look up the POI overlay PNG for this specific floor
