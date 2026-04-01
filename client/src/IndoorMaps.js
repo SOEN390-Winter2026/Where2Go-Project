@@ -350,6 +350,15 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
                         />
                     )}
 
+                    {/* maestro poi loaded */}
+                    { isPOIEnabled && (
+                        <Text
+                            style={{ position: 'absolute', color: 'transparent', fontSize: 1 }}
+                        >
+                            Maestro visible - POI loaded
+                        </Text>
+                    )}
+
                     {/* Classroom label overlay */}
                     {containBounds && rooms?.length > 0 && (
                         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">

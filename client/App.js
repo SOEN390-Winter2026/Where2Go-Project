@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { buildRouteFromResponse } from './src/services/routeServices';
 import { resolveEventDestination } from './src/services/eventServices';
 import { StyleSheet, View, Pressable } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import CampusMap from "./src/Map";

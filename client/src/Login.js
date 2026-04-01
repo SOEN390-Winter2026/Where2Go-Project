@@ -1,5 +1,4 @@
-import React from "react";
-import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, ImageBackground, TouchableOpacity, Image } from "react-native";
 import PropTypes from 'prop-types';
 import styles from "./styles/Login_styles";
 

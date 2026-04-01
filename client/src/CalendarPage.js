@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -27,7 +27,7 @@ import styles from "./styles/CalendarPage_styles";
 WebBrowser.maybeCompleteAuthSession();
 
 const SAVED_CALENDAR_IDS_KEY = "where2go_saved_calendar_ids";
-const { height, width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 const SHEET_HEIGHT = height * 0.6;
 

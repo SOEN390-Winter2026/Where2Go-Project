@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Image, ActivityIndicator, StyleSheet } from "react-native";
 
 export default function LoadingPage() {
