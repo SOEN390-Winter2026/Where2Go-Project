@@ -113,6 +113,16 @@ import polyline from "@mapbox/polyline";
 const origin = { label: "A", lat: 1, lng: 1 };
 const destination = { label: "B", lat: 2, lng: 2 };
 
+const mockBuildings = [
+      {
+        id: "1",
+        name: "Hall Building",
+        campus: "SGW",
+        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
+      },
+    ];
+
+
 describe("Rendering Features Properly", () => {
   it("component exists", () => {
     expect(OutdoorDirection).toBeDefined();
@@ -758,14 +768,6 @@ describe("Location Error Handling", () => {
   });
 
   it("shows error modal when userLocation is not available", async () => {
-    const mockBuildings = [
-      {
-        id: "1",
-        name: "Hall Building",
-        campus: "SGW",
-        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
-      },
-    ];
 
     const { getByTestId, getByText, findByText } = render(
       <OutdoorDirection onPressBack={() => {}} buildings={mockBuildings} userLocation={null} />
@@ -782,14 +784,6 @@ describe("Location Error Handling", () => {
   });
 
   it("sets nearest building as origin when userLocation is provided", async () => {
-    const mockBuildings = [
-      {
-        id: "1",
-        name: "Hall Building",
-        campus: "SGW",
-        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
-      },
-    ];
 
     const mockUserLocation = { latitude: 45.4971, longitude: -73.5791 };
 
@@ -834,14 +828,6 @@ describe("Location Error Handling", () => {
   });
 
   it("closes error modal when OK is pressed", async () => {
-    const mockBuildings = [
-      {
-        id: "1",
-        name: "Hall Building",
-        campus: "SGW",
-        coordinates: [{ latitude: 45.497, longitude: -73.579 }],
-      },
-    ];
 
     const { getByTestId, getByText, findByText, queryByText } = render(
       <OutdoorDirection
