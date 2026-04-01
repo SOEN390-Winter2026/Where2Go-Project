@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { buildRouteFromResponse } from './src/services/routeServices';
 import { resolveEventDestination } from './src/services/eventServices';
-import { StyleSheet, View, Pressable } from "react-native";
+import { StyleSheet, View, Pressable, Alert } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,12 +19,46 @@ import IndoorMaps from './src/IndoorMaps';
 import { API_BASE_URL } from './src/config';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { CAMPUS_COORDS } from "./src/data/locations";
+import { indoorMaps } from "./src/data/indoorData";
+import { extractFloorPlan } from "./src/utils/floorPlanUtils";
 
 const colors = {
   buildingHighlightFill: "rgba(107,15,26,0.20)",
   buildingHighlightStroke: "rgba(107,15,26,0.85)",
   destinationHighlightFill: "rgba(30,136,229,0.25)",
 };
+
+// Helper function to find which floor a room is on
+function findRoomFloor(buildingCode, room, campus) {
+  if (!room || !buildingCode || !campus) return null;
+  
+  const buildingData = indoorMaps?.[campus]?.[buildingCode];
+  if (!buildingData) return null;
+
+  const roomStr = String(room);
+
+  for (const [floorKey, floorData] of Object.entries(buildingData)) {
+    if (!floorData?.data) continue;
+    
+    try {
+      const floorPlan = extractFloorPlan(floorData.data, floorKey);
+      if (floorPlan?.rooms) {
+        const roomIds = floorPlan.rooms
+          .filter(r => r.type === 'classroom')
+          .map(r => String(r.id));
+        
+        // Check for exact match or match without building code prefix
+        if (roomIds.some(id => id === roomStr || id.endsWith(roomStr) || id.endsWith(`-${roomStr}`))) {
+          return floorKey;
+        }
+      }
+    } catch (e) {
+      console.warn(`Error extracting floor plan for ${buildingCode} floor ${floorKey}:`, e?.message);
+    }
+  }
+
+  return null;
+}
 
 export default function App() {
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
@@ -71,6 +105,9 @@ export default function App() {
   const [directionDestination, setDirectionDestination] = useState(null);
 
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] = useState(false);
+
+  const [targetRoom, setTargetRoom] = useState(null);
+  const [targetFloor, setTargetFloor] = useState(null);
 
   useEffect(() => {
     if (!showIndoorMaps && lastMapRegion.current) {
@@ -141,6 +178,41 @@ export default function App() {
     setDestinationPoi(null);
     setShowCalendar(false);
     setShowOutdoorDirection(true);
+  };
+
+  const handleLocateRoom = ({ buildingCode, room, event }) => {
+    const targetBuilding = buildings.find(
+      (b) => b.code === buildingCode || b.name?.toUpperCase() === buildingCode
+    );
+    
+    if (!targetBuilding) {
+      Alert.alert(
+        "Building Not Found",
+        `Could not find building with code ${buildingCode}.`,
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
+    // Find which floor the room is on
+    let floor = null;
+    if (room) {
+      floor = findRoomFloor(buildingCode, room, currentCampus);
+      if (!floor) {
+        Alert.alert(
+          "Room Not Found",
+          `Could not find room ${room} in building ${buildingCode}.`,
+          [{ text: "OK" }]
+        );
+        return;
+      }
+    }
+
+    setSelectedBuilding(targetBuilding);
+    setTargetRoom(room);
+    setTargetFloor(floor);
+    setShowCalendar(false);
+    setShowIndoorMaps(true);
   };
 
   const handleBuildingPress = (building) => {
@@ -237,10 +309,16 @@ export default function App() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <IndoorMaps
           building={selectedBuilding}
-          onPressBack={() => setShowIndoorMaps(false)}
+          onPressBack={() => {
+            setShowIndoorMaps(false);
+            setTargetRoom(null);
+            setTargetFloor(null);
+          }}
           campus={currentCampus}
           isAccessibilityEnabled={isAccessibilityEnabled}
           onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
+          targetFloor={targetFloor}
+          targetRoom={targetRoom}
         />
       </GestureHandlerRootView>
     );
@@ -269,6 +347,7 @@ export default function App() {
       <CalendarPage
         onPressBack={() => setShowCalendar(false)}
         onGenerateDirections={handleGenerateDirectionsFromEvent}
+        onLocateRoom={handleLocateRoom}
       />
     );
   }

@@ -67,7 +67,7 @@ function toDateString(date) {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
 
-export default function CalendarPage({ onPressBack, onGenerateDirections }) {
+export default function CalendarPage({ onPressBack, onGenerateDirections, onLocateRoom }) {
   const [visible, setVisible] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
 
@@ -384,6 +384,8 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                     const now = new Date();
                     const isViewingToday = selectedDate === todayString();
                     const isNextEvent = isViewingToday && index === 0 && new Date(event.endDate) > now;
+                    const parsed = parseEventLocation(event.location);
+                    const hasValidBuilding = parsed?.building;
 
                     return (
                       <Pressable
@@ -392,7 +394,6 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                         style={styles.eventRow}
                         onPress={() => {
                           if (!onGenerateDirections) return;
-                          const parsed = parseEventLocation(event.location);
                           if (!parsed?.building) {
                             console.log("Event location is missing or not a Concordia building. Skipping directions.");
                             Alert.alert(
@@ -434,6 +435,24 @@ export default function CalendarPage({ onPressBack, onGenerateDirections }) {
                             {getLocation(event)}
                           </Text>
                         </View>
+
+                        {hasValidBuilding && onLocateRoom && (
+                          <Pressable
+                            testID={`locate-room-btn-${event.id}`}
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              onLocateRoom({
+                                event,
+                                buildingCode: parsed.building,
+                                room: parsed.room ?? null,
+                              });
+                            }}
+                            style={{ marginRight: 8, padding: 8 }}
+                            accessibilityLabel="Locate room in building"
+                          >
+                            <Ionicons name="location" size={20} color="#912338" />
+                          </Pressable>
+                        )}
 
                         <Ionicons name="chevron-forward" size={18} color="#888" />
                       </Pressable>
@@ -622,4 +641,5 @@ CalendarPage.propTypes = {
   onPressCalendar: PropTypes.func,
   title: PropTypes.string,
   onGenerateDirections: PropTypes.func,
+  onLocateRoom: PropTypes.func,
 };

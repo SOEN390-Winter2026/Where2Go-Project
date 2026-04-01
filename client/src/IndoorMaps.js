@@ -70,7 +70,7 @@ ZoomButton.propTypes = {
     accessibilityLabel: PropTypes.string.isRequired,
 };
 
-function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled }) {
+function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, targetRoom }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
     const translateX = useRef(new Animated.Value(0)).current;
@@ -104,6 +104,18 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled })
             translateY.stopAnimation();
         };
     }, [scale, translateX, translateY]);
+
+    // Auto-zoom on target room
+    useEffect(() => {
+        if (targetRoom && lastScale.current <= MIN_SCALE) {
+            // Find the room and zoom to it
+            const room = rooms?.find(r => String(r.id) === String(targetRoom));
+            if (room && containerDims.width > 0 && containerDims.height > 0 && imageAspect > 0) {
+                // Zoom in significantly
+                applyScale(3, true);
+            }
+        }
+    }, [targetRoom, rooms]);
 
     const commitTranslation = (tx, ty, s, animated = false) => {
         const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
@@ -290,6 +302,7 @@ ZoomableImage.propTypes = {
     onRoomPress: PropTypes.func,
     poiOverlay: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     isPOIEnabled: PropTypes.bool,
+    targetRoom: PropTypes.string,
 };
 
 ZoomableImage.defaultProps = {
@@ -297,6 +310,7 @@ ZoomableImage.defaultProps = {
     onRoomPress: null,
     poiOverlay: null,
     isPOIEnabled: false,
+    targetRoom: null,
 };
 
 function Placeholder({ width, text }) {
@@ -313,7 +327,7 @@ Placeholder.propTypes = {
     text: PropTypes.string.isRequired,
 };
 
-function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled }) {
+function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled, targetRoom }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
 
     if (!selectedFloor) return <Placeholder width={width} text="Select a floor" />;
@@ -351,6 +365,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                                     onRoomPress={onRoomPress}
                                     poiOverlay={poiOverlay}
                                     isPOIEnabled={isPOIEnabled}
+                                    targetRoom={targetRoom}
                                 />
                                 {!entry.data && (
                                     <View style={styles.navUnavailableBadge}>
@@ -375,11 +390,13 @@ FloorMapImage.propTypes = {
     width: PropTypes.number.isRequired,
     onRoomPress: PropTypes.func,
     isPOIEnabled: PropTypes.bool,
+    targetRoom: PropTypes.string,
 };
 
 FloorMapImage.defaultProps = {
     onRoomPress: null,
     isPOIEnabled: false,
+    targetRoom: null,
 };
 
 function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
@@ -421,7 +438,7 @@ RoomActionModal.propTypes = {
 RoomActionModal.defaultProps = { roomId: '' };
 
 export default function IndoorMaps({ building, onPressBack, campus, buildings, isAccessibilityEnabled = false,
-    onToggleAccessibility = () => {}}) {
+    onToggleAccessibility = () => {}, targetFloor = null, targetRoom = null }) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -448,6 +465,23 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
     const [isPOIEnabled, setIsPOIEnabled] = useState(false);
 
     const handleRoomPress = (roomId) => setRoomModal({ visible: true, roomId });
+
+    // Navigate to target floor and optionally focus on room when passed as props
+    useEffect(() => {
+        if (targetFloor) {
+            setSelectedFloor(targetFloor);
+            // Open room modal after floor is set
+            if (targetRoom) {
+                const timer = setTimeout(() => {
+                    handleRoomPress(targetRoom);
+                }, 100);
+                return () => clearTimeout(timer);
+            }
+        } else if (targetRoom) {
+            // If only room is specified without floor, open it immediately
+            handleRoomPress(targetRoom);
+        }
+    }, [targetFloor, targetRoom]);
 
     const handleSetFrom = () => {
         setDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
@@ -480,6 +514,7 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
                     width={width}
                     onRoomPress={handleRoomPress}
                     isPOIEnabled={isPOIEnabled}
+                    targetRoom={targetRoom}
                 />
             </View>
 
@@ -535,6 +570,8 @@ IndoorMaps.propTypes = {
     })),
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
+    targetFloor: PropTypes.string,
+    targetRoom: PropTypes.string,
 };
 
 IndoorMaps.defaultProps = {

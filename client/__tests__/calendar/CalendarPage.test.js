@@ -470,7 +470,7 @@ describe('CalendarPage', () => {
         await waitFor(() => {
             expect(parseEventLocation).toHaveBeenCalledWith('H 435');
             expect(parseEventLocation).toHaveBeenCalledWith('EV 213');
-            expect(parseEventLocation).toHaveBeenCalledTimes(2);
+            expect(parseEventLocation).toHaveBeenCalledTimes(8);
         });
     });
 
