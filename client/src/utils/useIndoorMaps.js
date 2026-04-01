@@ -106,8 +106,15 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
         if (!floorPlan?.rooms) return [];
         return [...new Set(
             floorPlan.rooms
-                .filter(r => r.type === 'classroom')
-                .map(r => String(r.id))
+                .filter((r) => {
+                    const type = String(r?.type || '').toLowerCase().trim();
+                    const id = String(r?.id || '').toLowerCase().trim();
+                    if (type !== 'classroom') return false;
+                    if (id.includes('hallway') || id.includes('corridor') || id.includes('stair')) return false;
+                    return true;
+                })
+                .map((r) => String(r.id))
+                .filter(Boolean)
         )];
     };
 

@@ -9,8 +9,6 @@ const GRAPH_CACHE = new Map();
 /**
  * UTILITIES
  */
-const floorKeyToString = (floor) => String(floor);
-
 // Center of a room rectangle (normalized 0–1 coords), for "nearest waypoint" fallback.
 function roomCenter(room) {
   const { x, y, w, h } = room?.bounds || {};
@@ -22,6 +20,55 @@ function dist(a, b) {
   const dx = (a?.x ?? 0) - (b?.x ?? 0);
   const dy = (a?.y ?? 0) - (b?.y ?? 0);
   return Math.hypot(dx, dy);
+}
+
+function isHallwayRoom(room) {
+  const t = String(room?.type || "").toLowerCase();
+  return t === "hallway" || t === "corridor";
+}
+
+function pointInBounds(point, bounds, eps = 0) {
+  if (!point || !bounds) return false;
+  return (
+    point.x >= bounds.x - eps &&
+    point.x <= bounds.x + bounds.w + eps &&
+    point.y >= bounds.y - eps &&
+    point.y <= bounds.y + bounds.h + eps
+  );
+}
+
+function pointInAnyBounds(point, rooms, eps = 0) {
+  for (const room of rooms) {
+    if (pointInBounds(point, room?.bounds, eps)) return true;
+  }
+  return false;
+}
+
+function snapToHallwaySpine(from, to, hallwayRooms) {
+  if (!Array.isArray(hallwayRooms) || hallwayRooms.length === 0) return [from, to];
+  for (const room of hallwayRooms) {
+    const b = room?.bounds;
+    if (!b) continue;
+    const spineY = b.y + b.h / 2;
+    const inHallX = (p) => p?.x >= b.x && p?.x <= b.x + b.w;
+    if (inHallX(from) && inHallX(to)) {
+      return [{ x: from.x, y: spineY }, { x: to.x, y: spineY }];
+    }
+  }
+  return [from, to];
+}
+
+function hallwayEdgeAllowed(from, to, hallwayRooms) {
+  if (!Array.isArray(hallwayRooms) || hallwayRooms.length === 0) return true;
+  // Keep interior samples inside hallway; allow endpoint slack for door points at room thresholds.
+  const SAMPLES = 12;
+  for (let i = 1; i < SAMPLES; i += 1) {
+    const t = i / SAMPLES;
+    const p = { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
+    const eps = t <= 0.15 || t >= 0.85 ? 0.03 : 0.002;
+    if (!pointInAnyBounds(p, hallwayRooms, eps)) return false;
+  }
+  return true;
 }
 
 // Resolve room -> graph waypoint id: explicit waypoint id, or room.nearestWaypoint,
@@ -132,25 +179,92 @@ function createFloorResolver(floorAliases) {
 }
 
 function connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules) {
-  const fromKey = `${floorId}::${waypoint.id}`;
+  const sourceKey = `${floorId}::${waypoint.id}`;
   (Array.isArray(waypoint.connections) ? waypoint.connections : []).forEach((toId) => {
     const toWaypointId = String(toId);
     const toWaypoint = waypointById.get(toWaypointId);
     if (!toWaypoint) return;
 
-    const toKey = `${floorId}::${toWaypointId}`;
+    const targetKey = `${floorId}::${toWaypointId}`;
     const wFwd = dist(waypoint.position, toWaypoint.position) + nodePenalty(toWaypoint.type, rules);
     const wRev = dist(waypoint.position, toWaypoint.position) + nodePenalty(waypoint.type, rules);
-    addEdge(adjacencyList, fromKey, toKey, wFwd);
-    addEdge(adjacencyList, toKey, fromKey, wRev);
+    addEdge(adjacencyList, sourceKey, targetKey, wFwd);
+    addEdge(adjacencyList, targetKey, sourceKey, wRev);
   });
 }
 
+function connectLocalProximityWaypoints(adjacencyList, floorId, floorPlan, rules) {
+  const wps = (floorPlan?.waypoints || []).filter((w) => w?.id && w?.position);
+  if (wps.length < 2) return;
+  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayRoom(r));
+  const MAX_LOCAL_DIST = 0.08;
+  const MAX_NEIGHBORS = 4;
+
+  for (const from of wps) {
+    const candidates = [];
+    for (const to of wps) {
+      if (String(from.id) === String(to.id)) continue;
+      const d = dist(from.position, to.position);
+      if (!Number.isFinite(d) || d > MAX_LOCAL_DIST) continue;
+      candidates.push({ to, d });
+    }
+
+    candidates.sort((a, b) => a.d - b.d);
+    for (const { to } of candidates.slice(0, MAX_NEIGHBORS)) {
+      const [snapA, snapB] = snapToHallwaySpine(from.position, to.position, hallwayRooms);
+      if (!hallwayEdgeAllowed(snapA, snapB, hallwayRooms)) continue;
+      const fromKey = `${floorId}::${from.id}`;
+      const toKey = `${floorId}::${to.id}`;
+      const edgeDist = dist(snapA, snapB);
+      addEdge(adjacencyList, fromKey, toKey, edgeDist + nodePenalty(to.type, rules));
+      addEdge(adjacencyList, toKey, fromKey, edgeDist + nodePenalty(from.type, rules));
+    }
+  }
+}
+
+
+function pickClosestNodesBetweenComponents(anchorSample, compSample, euclidBetweenKeys) {
+  let bestA = null;
+  let bestB = null;
+  let bestD = Infinity;
+  for (const a of anchorSample) {
+    for (const b of compSample) {
+      const d = euclidBetweenKeys(a, b);
+      if (d < bestD) {
+        bestD = d;
+        bestA = a;
+        bestB = b;
+      }
+    }
+  }
+  return { bestA, bestB, bestD };
+}
+
+function isBridgeCandidateAllowed({
+  bestA,
+  bestB,
+  bestD,
+  hasHallwayRooms,
+  waypointById,
+  idFromKey,
+  hallwayRooms,
+}) {
+  if (!bestA || !bestB || !Number.isFinite(bestD) || bestD >= 1e9) return false;
+  if (!hasHallwayRooms) return true;
+  if (bestD > 0.14) return false;
+  const wa = waypointById.get(idFromKey(bestA));
+  const wb = waypointById.get(idFromKey(bestB));
+  if (!wa?.position || !wb?.position) return false;
+  const [snapA, snapB] = snapToHallwaySpine(wa.position, wb.position, hallwayRooms);
+  return hallwayEdgeAllowed(snapA, snapB, hallwayRooms);
+}
 
 function bridgeDisconnectedComponentsOnFloor(adjacencyList, floorId, floorPlan, waypointById, rules) {
   const wps = (floorPlan.waypoints || []).filter((w) => w?.id);
   if (wps.length < 2) return;
 
+  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayRoom(r));
+  const hasHallwayRooms = hallwayRooms.length > 0;
   const nodeKey = (id) => `${floorId}::${id}`;
   const idFromKey = (key) => key.slice(key.indexOf("::") + 2);
 
@@ -229,22 +343,22 @@ function bridgeDisconnectedComponentsOnFloor(adjacencyList, floorId, floorPlan, 
     if (comp === anchor) continue;
     const anchorSample = sampleNodes(anchor);
     const compSample = sampleNodes(comp);
-    let bestA = null;
-    let bestB = null;
-    let bestD = Infinity;
-
-    for (const a of anchorSample) {
-      for (const b of compSample) {
-        const d = euclidBetweenKeys(a, b);
-        if (d < bestD) {
-          bestD = d;
-          bestA = a;
-          bestB = b;
-        }
-      }
-    }
-
-    if (!bestA || !bestB || !Number.isFinite(bestD) || bestD >= 1e9) continue;
+    const { bestA, bestB, bestD } = pickClosestNodesBetweenComponents(
+      anchorSample,
+      compSample,
+      euclidBetweenKeys
+    );
+    if (
+      !isBridgeCandidateAllowed({
+        bestA,
+        bestB,
+        bestD,
+        hasHallwayRooms,
+        waypointById,
+        idFromKey,
+        hallwayRooms,
+      })
+    ) continue;
     const wAB = edgeWeightBetween(bestA, bestB);
     const wBA = edgeWeightBetween(bestB, bestA);
     addEdge(adjacencyList, bestA, bestB, wAB);
@@ -292,6 +406,94 @@ function nearestWaypointIdByPosition(waypoints, position, excludeId = null) {
   return best;
 }
 
+function hasConnection(from, toId) {
+  if (!Array.isArray(from?.connections)) return false;
+  return from.connections.some((id) => String(id) === String(toId));
+}
+
+function addBidirectionalConnection(a, b) {
+  if (!a?.id || !b?.id) return;
+  if (!Array.isArray(a.connections)) a.connections = [];
+  if (!Array.isArray(b.connections)) b.connections = [];
+  if (!hasConnection(a, b.id)) a.connections.push(String(b.id));
+  if (!hasConnection(b, a.id)) b.connections.push(String(a.id));
+}
+
+function ensureRoomDoorwayWaypoint(room, floorPlan, floorId, idSet, syntheticState) {
+  if (!room?.id) return;
+  const center = roomCenter(room);
+  if (!center) return;
+  const nearestId = room?.nearestWaypoint ? String(room.nearestWaypoint) : null;
+  if (nearestId && idSet.has(nearestId)) return;
+
+  const syntheticId = `__room_${String(floorId)}_${syntheticState.count++}`;
+  const nearestExisting = nearestWaypointIdByPosition(floorPlan.waypoints, center);
+  const wp = {
+    id: syntheticId,
+    type: "door",
+    floor: floorPlan.floor ?? floorId,
+    position: center,
+    connections: nearestExisting ? [nearestExisting] : [],
+  };
+  floorPlan.waypoints.push(wp);
+  idSet.add(syntheticId);
+  room.nearestWaypoint = syntheticId;
+
+  if (!nearestExisting) return;
+  const neighbor = floorPlan.waypoints.find((x) => String(x?.id) === nearestExisting);
+  if (!neighbor) return;
+  if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
+  if (!neighbor.connections.includes(syntheticId)) neighbor.connections.push(syntheticId);
+}
+
+function ensureExitWaypointLink(wp, waypoints) {
+  if (!wp?.id || String(wp.type || "").toLowerCase() !== "exit") return;
+  if (Array.isArray(wp.connections) && wp.connections.length > 0) return;
+  const nearest = nearestWaypointIdByPosition(waypoints, wp.position, wp.id);
+  if (!nearest) return;
+  wp.connections = [nearest];
+  const neighbor = waypoints.find((x) => String(x?.id) === nearest);
+  if (!neighbor) return;
+  if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
+  if (!neighbor.connections.includes(String(wp.id))) neighbor.connections.push(String(wp.id));
+}
+
+function populateMissingWaypointConnections(floorPlan) {
+  const waypoints = Array.isArray(floorPlan?.waypoints) ? floorPlan.waypoints : [];
+  if (waypoints.length < 2) return;
+
+  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayRoom(r));
+  const hasHallways = hallwayRooms.length > 0;
+  const MAX_LINK_DIST = hasHallways ? 0.11 : 0.08;
+  const MAX_NEIGHBORS = 3;
+  const idToWaypoint = new Map(waypoints.filter((w) => w?.id).map((w) => [String(w.id), w]));
+
+  for (const from of waypoints) {
+    if (!from?.id || !from?.position) continue;
+    if (!Array.isArray(from.connections)) from.connections = [];
+    // Keep authored topology intact; only fill sparse nodes.
+    if (from.connections.length > 0) continue;
+
+    const neighbors = [];
+    for (const to of waypoints) {
+      if (!to?.id || !to?.position) continue;
+      if (String(from.id) === String(to.id)) continue;
+      const d = dist(from.position, to.position);
+      if (!Number.isFinite(d) || d > MAX_LINK_DIST) continue;
+      const [snapA, snapB] = snapToHallwaySpine(from.position, to.position, hallwayRooms);
+      if (!hallwayEdgeAllowed(snapA, snapB, hallwayRooms)) continue;
+      neighbors.push({ id: String(to.id), d });
+    }
+
+    neighbors.sort((a, b) => a.d - b.d);
+    for (const n of neighbors.slice(0, MAX_NEIGHBORS)) {
+      const to = idToWaypoint.get(n.id);
+      if (!to) continue;
+      addBidirectionalConnection(from, to);
+    }
+  }
+}
+
 /**
  * - Ensure every room has a usable entry waypoint.
  * - Ensure each exit waypoint is linked to the local graph so inter-building routes can leave/enter.
@@ -301,53 +503,21 @@ function ensureRoomAndExitConnectivity(floorPlan, floorId) {
   const rooms = Array.isArray(floorPlan?.rooms) ? floorPlan.rooms : [];
   const waypoints = floorPlan.waypoints;
   const idSet = new Set(waypoints.filter((w) => w?.id).map((w) => String(w.id)));
-
-  let syntheticCount = 0;
+  const syntheticState = { count: 0 };
 
   // Ensure each room has an accessible doorway waypoint.
   for (const room of rooms) {
-    if (!room?.id) continue;
-    const center = roomCenter(room);
-    if (!center) continue;
-    const nearestId = room?.nearestWaypoint ? String(room.nearestWaypoint) : null;
-    if (nearestId && idSet.has(nearestId)) continue;
-
-    const syntheticId = `__room_${String(floorId)}_${syntheticCount++}`;
-    const nearestExisting = nearestWaypointIdByPosition(waypoints, center);
-    const wp = {
-      id: syntheticId,
-      type: "door",
-      floor: floorPlan.floor ?? floorId,
-      position: center,
-      connections: nearestExisting ? [nearestExisting] : [],
-    };
-    waypoints.push(wp);
-    idSet.add(syntheticId);
-    room.nearestWaypoint = syntheticId;
-
-    if (nearestExisting) {
-      const neighbor = waypoints.find((x) => String(x?.id) === nearestExisting);
-      if (neighbor) {
-        if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
-        if (!neighbor.connections.includes(syntheticId)) neighbor.connections.push(syntheticId);
-      }
-    }
+    ensureRoomDoorwayWaypoint(room, floorPlan, floorId, idSet, syntheticState);
   }
 
   // Ensure exits have at least one walkable link.
   for (const wp of waypoints) {
-    if (!wp?.id || String(wp.type || "").toLowerCase() !== "exit") continue;
-    if (Array.isArray(wp.connections) && wp.connections.length > 0) continue;
-
-    const nearest = nearestWaypointIdByPosition(waypoints, wp.position, wp.id);
-    if (!nearest) continue;
-    wp.connections = [nearest];
-    const neighbor = waypoints.find((x) => String(x?.id) === nearest);
-    if (neighbor) {
-      if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
-      if (!neighbor.connections.includes(String(wp.id))) neighbor.connections.push(String(wp.id));
-    }
+    ensureExitWaypointLink(wp, waypoints);
   }
+
+  // Deterministically fill empty waypoint connections from floor geometry.
+  // This avoids hand-editing every JSON while keeping authored links untouched.
+  populateMissingWaypointConnections(floorPlan);
 }
 
 function buildFloorGraphsAndAliases(buildingData, floorAliases) {
@@ -430,11 +600,12 @@ function linkAllFloorWaypoints({ floorGraphs, adjacencyList, resolveFloorId, rul
       if (!waypoint?.id) continue;
       connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointById, rules);
     }
+    connectLocalProximityWaypoints(adjacencyList, floorId, floorPlan, rules);
   }
   for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
     bridgeDisconnectedComponentsOnFloor(adjacencyList, floorId, floorPlan, waypointById, rules);
   }
-  for (const [floorId, { floorPlan, waypointById }] of floorGraphs.entries()) {
+  for (const [floorId, { floorPlan }] of floorGraphs.entries()) {
     for (const waypoint of floorPlan.waypoints) {
       if (!waypoint?.id) continue;
       const pointType = String(waypoint.type || "").toLowerCase();
@@ -590,8 +761,8 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to, a
   const graph = getCachedMultiFloorGraph({ campus, buildingCode, rules });
   if (!graph) return { success: false, meta: { reason: "INVALID_BUILDING" } };
 
-  const fromFloorId = graph.resolveFloorId(from.floor) ?? floorKeyToString(from.floor);
-  const toFloorId = graph.resolveFloorId(to.floor) ?? floorKeyToString(to.floor);
+  const fromFloorId = graph.resolveFloorId(from.floor) ?? String(from.floor);
+  const toFloorId = graph.resolveFloorId(to.floor) ?? String(to.floor);
   const startWaypointId = findNearestWaypointId(
     graph.floorGraphs,
     fromFloorId,

@@ -43,8 +43,8 @@ export function areBuildingCodesEquivalent({ campus, a, b }) {
   }
 
   // Fallback for formatting variants when campus context is unavailable.
-  const pa = na.replace(/[^A-Z0-9]/g, "");
-  const pb = nb.replace(/[^A-Z0-9]/g, "");
+  const pa = na.replaceAll(/[^A-Z0-9]/g, "");
+  const pb = nb.replaceAll(/[^A-Z0-9]/g, "");
   if (!pa || !pb) return false;
   return pa === pb || pa.startsWith(pb) || pb.startsWith(pa);
 }

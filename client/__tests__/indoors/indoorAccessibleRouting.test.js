@@ -374,4 +374,74 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     expect(result.success).toBe(false);
     expect(result.meta?.reason).toBe("NO_PATH");
   });
+
+  test("connects empty waypoint graph using hallway-constrained local links", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+      SGW: {
+        H: {
+          1: {
+            image: null,
+            data: {
+              F1: {
+                waypoints: [
+                  { id: "w1", type: "door", position: { x: 0.20, y: 0.50 }, connections: [] },
+                  { id: "w2", type: "door", position: { x: 0.26, y: 0.50 }, connections: [] },
+                ],
+                rooms: [
+                  { id: "hall", type: "hallway", bounds: { x: 0.1, y: 0.46, w: 0.3, h: 0.08 } },
+                  { id: "A", type: "classroom", bounds: { x: 0.18, y: 0.44, w: 0.02, h: 0.02 }, nearestWaypoint: "w1" },
+                  { id: "B", type: "classroom", bounds: { x: 0.26, y: 0.44, w: 0.02, h: 0.02 }, nearestWaypoint: "w2" },
+                ],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "1", room: "A" },
+      to: { floor: "1", room: "B" },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.path.map((p) => p.id)).toEqual(expect.arrayContaining(["w1", "w2"]));
+  });
+
+  test("does not connect waypoints when sampled edge leaves hallway polygon", () => {
+    const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+      SGW: {
+        H: {
+          1: {
+            image: null,
+            data: {
+              F1: {
+                waypoints: [
+                  { id: "w1", type: "door", position: { x: 0.20, y: 0.20 }, connections: [] },
+                  { id: "w2", type: "door", position: { x: 0.80, y: 0.80 }, connections: [] },
+                ],
+                rooms: [
+                  { id: "hall", type: "hallway", bounds: { x: 0.1, y: 0.45, w: 0.3, h: 0.08 } },
+                  { id: "A", type: "classroom", bounds: { x: 0.18, y: 0.18, w: 0.02, h: 0.02 }, nearestWaypoint: "w1" },
+                  { id: "B", type: "classroom", bounds: { x: 0.78, y: 0.78, w: 0.02, h: 0.02 }, nearestWaypoint: "w2" },
+                ],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const result = generateAccessibleIndoorPath({
+      campus: "SGW",
+      buildingCode: "H",
+      from: { floor: "1", room: "A" },
+      to: { floor: "1", room: "B" },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.meta?.reason).toBe("NO_PATH");
+  });
 });

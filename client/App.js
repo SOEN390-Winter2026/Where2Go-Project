@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { buildRouteFromResponse } from './src/services/routeServices';
 import { resolveEventDestination } from './src/services/eventServices';
 import { StyleSheet, View, Pressable } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import CampusMap from "./src/Map";
@@ -72,7 +72,7 @@ export default function App() {
 
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] = useState(false);
 
-  const handlePersistCombinedRoute = (segments = []) => {
+  const handlePersistCombinedRoute = (segments = [], selection = null) => {
     const outdoor = Array.isArray(segments)
       ? segments.find((s) => s?.kind === "outdoor")
       : null;
@@ -86,7 +86,11 @@ export default function App() {
     if (!coords.length) return;
     setActiveSegments(mapSegments);
     setActiveRouteCoords(coords);
-    setActiveRouteMeta({ source: "indoorCombined", segments });
+    setActiveRouteMeta({
+      source: "indoorCombined",
+      segments,
+      selection: selection && selection.from && selection.to ? selection : null,
+    });
     setIsRouteActive(true);
   };
 
@@ -255,6 +259,10 @@ export default function App() {
       activeRouteMeta?.source === "indoorCombined" && Array.isArray(activeRouteMeta?.segments)
         ? activeRouteMeta.segments
         : [];
+    const persistedDirectionsFrom =
+      activeRouteMeta?.source === "indoorCombined" ? activeRouteMeta?.selection?.from ?? null : null;
+    const persistedDirectionsTo =
+      activeRouteMeta?.source === "indoorCombined" ? activeRouteMeta?.selection?.to ?? null : null;
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <IndoorMaps
@@ -266,6 +274,8 @@ export default function App() {
           onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
           onPersistCombinedRoute={handlePersistCombinedRoute}
           persistedCombinedSegments={persistedCombinedSegments}
+          persistedDirectionsFrom={persistedDirectionsFrom}
+          persistedDirectionsTo={persistedDirectionsTo}
         />
       </GestureHandlerRootView>
     );

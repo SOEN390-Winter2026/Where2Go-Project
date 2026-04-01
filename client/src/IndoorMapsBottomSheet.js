@@ -74,6 +74,7 @@ function DropdownSelect({ label, options, value, onSelect, disabled, testID, pla
                         <Text style={styles.dropdownModalTitle}>{label}</Text>
                         <ScrollView
                             style={styles.dropdownOptionsScroll}
+                            contentContainerStyle={styles.dropdownOptionsScrollContent}
                             nestedScrollEnabled
                             keyboardShouldPersistTaps="handled"
                             showsVerticalScrollIndicator
@@ -418,6 +419,9 @@ SheetContent.propTypes = {
     activeTab: PropTypes.string,
     building: buildingShape,
     handleTabPress: PropTypes.func.isRequired,
+    generatingDirections: PropTypes.bool,
+    routeError: PropTypes.string,
+    routeSegments: PropTypes.array,
 };
 
 SheetContent.defaultProps = {
@@ -537,6 +541,7 @@ IndoorMapsBottomSheet.propTypes = {
     building: buildingShape,
     ICON_SIZE: PropTypes.number.isRequired,
     FONT_LG: PropTypes.number.isRequired,
+    generatingDirections: PropTypes.bool,
     routeError: PropTypes.string,
     routeSegments: PropTypes.array,
 };
