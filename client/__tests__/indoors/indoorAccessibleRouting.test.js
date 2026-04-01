@@ -125,10 +125,10 @@ test("does not infer a floor that does not exist in the graph", () => {
     campus: "SGW",
     buildingCode: "H",
     from: { floor: "7", room: "H-701" },
-    to: { floor: "6", room: "H-601" },
+    to: { floor: "3", room: "H-301" },
   });
   expect(result.success).toBe(false);
-  expect(result.meta?.reason).toBe("NO_PATH");
+  expect(result.meta?.reason).toBe("LOCATION_NOT_FOUND");
 });
 
   test("resolves floor aliases like H-7/H-8 and still routes", () => {
