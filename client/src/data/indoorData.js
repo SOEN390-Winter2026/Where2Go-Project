@@ -61,31 +61,31 @@ export const indoorMaps = {
     MB: {
       3: {
         image: require('../../assets/indoor/SGW/MB-3.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-6.json'), // you'll add later
+        data: require('../../assets/indoor/SGW/floorplan_MB3.json'), // you'll add later
       },
       4: {
         image: require('../../assets/indoor/SGW/MB-4.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-7.json'),
+        data: require('../../assets/indoor/SGW/floorplan_MB4.json'),
       },
       5: {
         image: require('../../assets/indoor/SGW/MB-5.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-8.json'),
+        data: require('../../assets/indoor/SGW/floorplan_MB5.json'),
       },
       6: {
         image: require('../../assets/indoor/SGW/MB-6.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-6.json'), // you'll add later
+        data: require('../../assets/indoor/SGW/floorplan_MB6.json'), // you'll add later
       },
       7: {
         image: require('../../assets/indoor/SGW/MB-7.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-7.json'),
+        data: require('../../assets/indoor/SGW/floorplan_MB7.json'),
       },
       8: {
         image: require('../../assets/indoor/SGW/MB-8.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-8.json'),
+        data: require('../../assets/indoor/SGW/floorplan_MB8.json'),
       },
       9: {
         image: require('../../assets/indoor/SGW/MB-9.png'),
-        data: require('../../assets/indoor/SGW/floorplan_MB-9.json'),
+        data: require('../../assets/indoor/SGW/floorplan_MB9.json'),
       },
       S1: {
         image: require('../../assets/indoor/SGW/MB-S1.png'),
@@ -100,19 +100,19 @@ export const indoorMaps = {
       JW: {
         2: {
           image: require('../../assets/indoor/SGW/LB-2.png'),
-          data: require('../../assets/indoor/SGW/floorplan_LB-2.json'),
+          data: require('../../assets/indoor/SGW/floorplan_LB2.json'),
         },
         3: {
           image: require('../../assets/indoor/SGW/LB-3.png'),
-          data: require('../../assets/indoor/SGW/floorplan_LB-3.json'), 
+          data: require('../../assets/indoor/SGW/floorplan_LB3.json'), 
         },
         4: {
           image: require('../../assets/indoor/SGW/LB-4.png'),
-          data: require('../../assets/indoor/SGW/floorplan_LB-4.json'),
+          data: require('../../assets/indoor/SGW/floorplan_LB4.json'),
         },
         5: {
           image: require('../../assets/indoor/SGW/LB-5.png'),
-          data: require('../../assets/indoor/SGW/floorplan_LB-5.json'),
+          data: require('../../assets/indoor/SGW/floorplan_LB5.json'),
         }
       }
   },

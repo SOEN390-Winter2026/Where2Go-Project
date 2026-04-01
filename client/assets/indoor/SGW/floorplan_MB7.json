@@ -6,7 +6,7 @@
         "id": "elevator",
         "label": "elevator",
         "type": "elevator",
-        "floor": "CC3",
+        "floor": "MB7",
         "bounds": {
           "x": 0.4,
           "y": 0.5021,
@@ -18,7 +18,7 @@
         "id": "elevator",
         "label": "elevator",
         "type": "elevator",
-        "floor": "CC3",
+        "floor": "MB7",
         "bounds": {
           "x": 0.4025,
           "y": 0.5769,
@@ -30,7 +30,7 @@
         "id": "MB-7.394",
         "label": "MB-7.394",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "MB7",
         "bounds": {
           "x": 0.645,
           "y": 0.5769,

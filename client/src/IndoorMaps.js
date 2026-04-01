@@ -321,9 +321,10 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
 
                 const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
-                const classrooms = (floorPlan?.rooms ?? []).filter(
-                    r => r.type === 'classroom' && r.bounds
-                );
+                // const classrooms = (floorPlan?.rooms ?? []).filter(
+                //     r => r.type === 'classroom' && r.bounds
+                // );
+                const allRooms = (floorPlan?.rooms ?? []).filter(r => r.bounds);
 
                 // look up the POI overlay PNG for this specific floor
                 const poiOverlay = isActive ? getPOIOverlay(campus, buildingCode, floor) : null;
@@ -338,11 +339,13 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                             <>
                                 <ZoomableImage
                                     source={entry.image}
-                                    rooms={classrooms}
+                                    //rooms={classrooms}
+                                    rooms={allRooms}
                                     onRoomPress={onRoomPress}
                                     poiOverlay={poiOverlay}
                                     isPOIEnabled={isPOIEnabled}
                                 />
+
                                 {!entry.data && (
                                     <View style={styles.navUnavailableBadge}>
                                         <Text style={styles.navUnavailableText}>Navigation unavailable</Text>
