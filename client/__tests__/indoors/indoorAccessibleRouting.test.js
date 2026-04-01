@@ -105,6 +105,32 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     );
   });
 
+  test("infers adjacent floors when floorsReachable is empty", () => {
+  const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+  // floor 7 elevator has no explicit floorsReachable — should auto-connect to floor 8
+  const result = generateAccessibleIndoorPath({
+    campus: "SGW",
+    buildingCode: "H",
+    from: { floor: "7", room: "H-701" },
+    to: { floor: "8", room: "H-801" },
+  });
+  expect(result.success).toBe(true);
+  expect(result.path.map((p) => String(p.type).toLowerCase())).toContain("elevator");
+});
+
+test("does not infer a floor that does not exist in the graph", () => {
+  const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
+  // floor 6 doesn't exist, so inference from floor 7 should only yield floor 8
+  const result = generateAccessibleIndoorPath({
+    campus: "SGW",
+    buildingCode: "H",
+    from: { floor: "7", room: "H-701" },
+    to: { floor: "6", room: "H-601" },
+  });
+  expect(result.success).toBe(false);
+  expect(result.meta?.reason).toBe("NO_PATH");
+});
+
   test("resolves floor aliases like H-7/H-8 and still routes", () => {
     const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
       SGW: {
@@ -233,6 +259,50 @@ describe("generateAccessibleIndoorPath (indoor accessibility)", () => {
     expect(waypointIds).toContain("e8_near");
     expect(waypointIds).not.toContain("e8_far");
   });
+  test("skips target floor when no candidates of matching type exist", () => {
+  const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath({
+    SGW: {
+      H: {
+        7: {
+          image: null,
+          data: {
+            "H-7": {
+              waypoints: [
+                { id: "start", type: "door", position: { x: 0.1, y: 0.1 }, connections: ["e7"] },
+                { id: "e7", type: "elevator", position: { x: 0.2, y: 0.1 }, connections: [], floorsReachable: ["8"] },
+              ],
+              rooms: [{ id: "R7", nearestWaypoint: "start", bounds: { x: 0, y: 0, w: 0.1, h: 0.1 } }],
+            },
+          },
+        },
+        8: {
+          image: null,
+          data: {
+            "H-8": {
+              // floor 8 only has stairs — no elevator candidates to match
+              waypoints: [
+                { id: "s8", type: "staircase", position: { x: 0.2, y: 0.1 }, connections: ["goal"] },
+                { id: "goal", type: "door", position: { x: 0.8, y: 0.1 }, connections: [] },
+              ],
+              rooms: [{ id: "R8", nearestWaypoint: "goal", bounds: { x: 0.8, y: 0, w: 0.1, h: 0.1 } }],
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const result = generateAccessibleIndoorPath({
+    campus: "SGW",
+    buildingCode: "H",
+    from: { floor: "7", room: "R7" },
+    to: { floor: "8", room: "R8" },
+  });
+
+  // elevator on 7 can't link to floor 8 (no elevator there) → no accessible path
+  expect(result.success).toBe(false);
+  expect(result.meta?.reason).toBe("NO_PATH");
+});
 
   test("returns INVALID_BUILDING when building code is missing from campus maps", () => {
     const generateAccessibleIndoorPath = loadGenerateAccessibleIndoorPath(defaultIndoorMaps());
