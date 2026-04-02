@@ -27,6 +27,16 @@ function isHallwayRoom(room) {
   return t === "hallway" || t === "corridor";
 }
 
+// Hallway/corridor walkable polygons for routing 
+
+function isHallwayPolygon(room) {
+  if (!room?.bounds) return false;
+  if (isHallwayRoom(room)) return true;
+  const id = String(room?.id || "").toLowerCase().trim();
+  const label = String(room?.label || "").toLowerCase().trim();
+  return id === "hallway" || label === "hallway";
+}
+
 function pointInBounds(point, bounds, eps = 0) {
   if (!point || !bounds) return false;
   return (
@@ -42,6 +52,155 @@ function pointInAnyBounds(point, rooms, eps = 0) {
     if (pointInBounds(point, room?.bounds, eps)) return true;
   }
   return false;
+}
+
+function expandBounds(bounds, eps) {
+  if (!bounds) return null;
+  return {
+    x: bounds.x - eps,
+    y: bounds.y - eps,
+    w: bounds.w + 2 * eps,
+    h: bounds.h + 2 * eps,
+  };
+}
+
+/**
+ * Guardrail code to ensure the floor is one coherent navigable network. (Will rarely get used, unless the maps are not well connected)
+ * ties every room door (and exits/transfers) into hallway hub waypoints and
+ * chain hubs along each hallway polygon so the floor is one coherent navigable network.
+ */
+
+function ensureHallwaySpanningConnections(floorPlan) {
+  const rooms = Array.isArray(floorPlan?.rooms) ? floorPlan.rooms : [];
+  const waypoints = Array.isArray(floorPlan?.waypoints) ? floorPlan.waypoints : [];
+  if (!waypoints.length) return;
+
+  const hallwayRooms = rooms.filter((r) => isHallwayPolygon(r) && r.bounds);
+  if (!hallwayRooms.length) return;
+
+  const hallwayWaysForSnap = hallwayRooms.filter((r) => r?.bounds);
+  const idToWp = new Map(waypoints.filter((w) => w?.id).map((w) => [String(w.id), w]));
+
+  const hallGroups = hallwayRooms.map((hr) => {
+    const expanded = expandBounds(hr.bounds, 0.06) || hr.bounds;
+    const hubs = new Map();
+    for (const w of waypoints) {
+      if (!w?.id || !w?.position) continue;
+      if (pointInBounds(w.position, expanded, 0.002)) {
+        hubs.set(String(w.id), w);
+      }
+    }
+    const nw = hr?.nearestWaypoint ? String(hr.nearestWaypoint) : null;
+    if (nw && idToWp.has(nw)) hubs.set(nw, idToWp.get(nw));
+    const list = [...hubs.values()];
+    const b = hr.bounds;
+    if (list.length >= 2) {
+      if (b.h >= b.w) list.sort((a, c) => (a.position?.y ?? 0) - (c.position?.y ?? 0));
+      else list.sort((a, c) => (a.position?.x ?? 0) - (c.position?.x ?? 0));
+    }
+    return { bounds: hr.bounds, hubs: list };
+  });
+
+  const allHubIds = new Set();
+  for (const g of hallGroups) {
+    for (let i = 0; i < g.hubs.length; i += 1) {
+      const w = g.hubs[i];
+      allHubIds.add(String(w.id));
+      if (i + 1 < g.hubs.length) addBidirectionalConnection(w, g.hubs[i + 1]);
+    }
+  }
+
+  for (let gi = 0; gi < hallGroups.length; gi += 1) {
+    for (let gj = gi + 1; gj < hallGroups.length; gj += 1) {
+      const a = hallGroups[gi].hubs;
+      const b = hallGroups[gj].hubs;
+      if (!a.length || !b.length) continue;
+      let bestA = null;
+      let bestB = null;
+      let bestD = Infinity;
+      for (const wa of a) {
+        for (const wb of b) {
+          const d = dist(wa.position, wb.position);
+          if (d < bestD) {
+            bestD = d;
+            bestA = wa;
+            bestB = wb;
+          }
+        }
+      }
+      if (bestA && bestB && bestD < 0.42) {
+        const [snapA, snapB] = snapToHallwaySpine(bestA.position, bestB.position, hallwayWaysForSnap);
+        if (hallwayEdgeAllowed(snapA, snapB, hallwayWaysForSnap) || bestD < 0.2) {
+          addBidirectionalConnection(bestA, bestB);
+        }
+      }
+    }
+  }
+
+  const nearestHallHubForWaypoint = (wp) => {
+    let best = null;
+    let bestD = Infinity;
+    for (const id of allHubIds) {
+      const h = idToWp.get(id);
+      if (!h?.position || !wp?.position) continue;
+      const d = dist(wp.position, h.position);
+      if (d < bestD) {
+        bestD = d;
+        best = h;
+      }
+    }
+    if (best) return { hub: best, d: bestD };
+    return { hub: null, d: Infinity };
+  };
+
+  const maybeLinkToHall = (wp, maxDist = 0.35) => {
+    if (!wp?.id || !wp?.position) return;
+    let touchesHall = false;
+    for (const hid of wp.connections || []) {
+      if (allHubIds.has(String(hid))) {
+        touchesHall = true;
+        break;
+      }
+    }
+    if (touchesHall) return;
+    const { hub, d } = nearestHallHubForWaypoint(wp);
+    if (!hub || d > maxDist) return;
+    const [snapA, snapB] = snapToHallwaySpine(wp.position, hub.position, hallwayWaysForSnap);
+    if (hallwayEdgeAllowed(snapA, snapB, hallwayWaysForSnap) || d < 0.12) {
+      addBidirectionalConnection(wp, hub);
+    }
+  };
+
+  for (const room of rooms) {
+    if (isHallwayPolygon(room)) continue;
+    const wid = room?.nearestWaypoint ? String(room.nearestWaypoint) : null;
+    if (!wid || !idToWp.has(wid)) continue;
+    maybeLinkToHall(idToWp.get(wid), 0.38);
+  }
+
+  for (const wp of waypoints) {
+    if (!wp?.id) continue;
+    const t = String(wp.type || "").toLowerCase();
+    if (t === "exit" || t === "staircase" || t === "elevator") {
+      maybeLinkToHall(wp, 0.45);
+    }
+  }
+
+  for (const g of hallGroups) {
+    if (g.hubs.length) continue;
+    const c = roomCenter({ bounds: g.bounds });
+    if (!c) continue;
+    const nearestId = nearestWaypointIdByPosition(waypoints, c);
+    const nw = nearestId ? idToWp.get(nearestId) : null;
+    if (nw) {
+      for (const room of rooms) {
+        if (isHallwayPolygon(room)) continue;
+        const wid = room?.nearestWaypoint ? String(room.nearestWaypoint) : null;
+        const wp = wid ? idToWp.get(wid) : null;
+        if (wp) addBidirectionalConnection(wp, nw);
+      }
+    }
+  }
 }
 
 function snapToHallwaySpine(from, to, hallwayRooms) {
@@ -196,7 +355,7 @@ function connectSameFloorWaypoints(adjacencyList, floorId, waypoint, waypointByI
 function connectLocalProximityWaypoints(adjacencyList, floorId, floorPlan, rules) {
   const wps = (floorPlan?.waypoints || []).filter((w) => w?.id && w?.position);
   if (wps.length < 2) return;
-  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayRoom(r));
+  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayPolygon(r));
   const MAX_LOCAL_DIST = 0.08;
   const MAX_NEIGHBORS = 4;
 
@@ -263,7 +422,7 @@ function bridgeDisconnectedComponentsOnFloor(adjacencyList, floorId, floorPlan, 
   const wps = (floorPlan.waypoints || []).filter((w) => w?.id);
   if (wps.length < 2) return;
 
-  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayRoom(r));
+  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayPolygon(r));
   const hasHallwayRooms = hallwayRooms.length > 0;
   const nodeKey = (id) => `${floorId}::${id}`;
   const idFromKey = (key) => key.slice(key.indexOf("::") + 2);
@@ -462,7 +621,7 @@ function populateMissingWaypointConnections(floorPlan) {
   const waypoints = Array.isArray(floorPlan?.waypoints) ? floorPlan.waypoints : [];
   if (waypoints.length < 2) return;
 
-  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayRoom(r));
+  const hallwayRooms = (floorPlan?.rooms || []).filter((r) => r?.bounds && isHallwayPolygon(r));
   const hasHallways = hallwayRooms.length > 0;
   const MAX_LINK_DIST = hasHallways ? 0.11 : 0.08;
   const MAX_NEIGHBORS = 3;
@@ -518,6 +677,7 @@ function ensureRoomAndExitConnectivity(floorPlan, floorId) {
   // Deterministically fill empty waypoint connections from floor geometry.
   // This avoids hand-editing every JSON while keeping authored links untouched.
   populateMissingWaypointConnections(floorPlan);
+  ensureHallwaySpanningConnections(floorPlan);
 }
 
 function buildFloorGraphsAndAliases(buildingData, floorAliases) {
