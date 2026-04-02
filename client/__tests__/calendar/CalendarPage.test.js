@@ -8,7 +8,7 @@ import { parseEventLocation } from '../../src/utils/eventLocationParser';
 jest.mock('react-native-calendars', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
-    
+
     return {
         Calendar: ({ onDayPress, onMonthChange }) => (
             <View>
@@ -29,23 +29,23 @@ jest.mock('react-native-calendars', () => {
             </View>
         ),
         CalendarList: ({ onDayPress, onVisibleMonthsChange }) => (
-      <View>
-        <Pressable
-          testID="full-calendar-list"
-          onPress={() => onDayPress({ dateString: "2026-02-28" })}
-        >
-          <Text>Mock CalendarList</Text>
-        </Pressable>
-        {onVisibleMonthsChange && (
-          <Pressable
-            testID="mock-visible-months-change"
-            onPress={() => onVisibleMonthsChange([{ dateString: new Date().toISOString().slice(0, 10) }])}
-          >
-            <Text>Trigger Visible Months Change</Text>
-          </Pressable>
-        )}
-      </View>
-    ),
+            <View>
+                <Pressable
+                    testID="full-calendar-list"
+                    onPress={() => onDayPress({ dateString: "2026-02-28" })}
+                >
+                    <Text>Mock CalendarList</Text>
+                </Pressable>
+                {onVisibleMonthsChange && (
+                    <Pressable
+                        testID="mock-visible-months-change"
+                        onPress={() => onVisibleMonthsChange([{ dateString: new Date().toISOString().slice(0, 10) }])}
+                    >
+                        <Text>Trigger Visible Months Change</Text>
+                    </Pressable>
+                )}
+            </View>
+        ),
     };
 });
 
@@ -114,25 +114,25 @@ jest.mock('../../src/utils/eventLocationParser', () => ({
 }));
 
 jest.mock('../../src/CalendarAddEvent', () => {
-  const { View, Text, Pressable } = require('react-native');
-  return ({ onEventAdded, onCancel }) => (
-    <View testID="calendar-add-event">
-      <Pressable testID="mock-save-event" onPress={() =>
-        onEventAdded({
-          id: 'new-evt',
-          title: 'New Event',
-          startDate: new Date().toISOString(),
-          endDate: new Date().toISOString(),
-          location: 'Hall Building 110',
-        })
-      }>
-        <Text>Save Event</Text>
-      </Pressable>
-      <Pressable testID="mock-cancel-add" onPress={onCancel}>
-        <Text>Cancel</Text>
-      </Pressable>
-    </View>
-  );
+    const { View, Text, Pressable } = require('react-native');
+    return ({ onEventAdded, onCancel }) => (
+        <View testID="calendar-add-event">
+            <Pressable testID="mock-save-event" onPress={() =>
+                onEventAdded({
+                    id: 'new-evt',
+                    title: 'New Event',
+                    startDate: new Date().toISOString(),
+                    endDate: new Date().toISOString(),
+                    location: 'Hall Building 110',
+                })
+            }>
+                <Text>Save Event</Text>
+            </Pressable>
+            <Pressable testID="mock-cancel-add" onPress={onCancel}>
+                <Text>Cancel</Text>
+            </Pressable>
+        </View>
+    );
 });
 
 function todayStr() {
@@ -337,7 +337,7 @@ describe('CalendarPage', () => {
         parseEventLocation.mockReturnValue({ building: null, room: null });
 
         const onGenerateDirections = jest.fn();
-        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => { });
 
         const { getByTestId, getByText, findByTestId } = render(
             <CalendarPage onPressBack={mockOnPressBack} onGenerateDirections={onGenerateDirections} />
@@ -375,7 +375,7 @@ describe('CalendarPage', () => {
         parseEventLocation.mockReturnValue({ building: null, room: null });
 
         const onGenerateDirections = jest.fn();
-        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => { });
 
         const { getByTestId, getByText, findByTestId } = render(
             <CalendarPage onPressBack={mockOnPressBack} onGenerateDirections={onGenerateDirections} />
@@ -518,7 +518,7 @@ describe('CalendarPage', () => {
 
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'denied' });
 
-        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => { });
 
         const { getByTestId, getByText, queryByText } = render(<CalendarPage />);
 
@@ -539,7 +539,7 @@ describe('CalendarPage', () => {
     it('shows generic message when permission is not granted and not denied', async () => {
         Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: 'undetermined' });
 
-        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+        const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => { });
 
         const { getByTestId, getByText } = render(<CalendarPage />);
 
@@ -1479,230 +1479,235 @@ describe('CalendarPage', () => {
         });
     });
 
-    describe("Manually Add Event feature", () => {    
+    describe("Manually Add Event feature", () => {
         beforeEach(() => {
             jest.clearAllMocks();
             AsyncStorage.getItem.mockResolvedValue(null);
             Calendar.requestCalendarPermissionsAsync.mockResolvedValue({ status: "granted" });
             Calendar.getCalendarsAsync.mockResolvedValue([
-            { id: "cal-1", title: "Work", color: "#ff0000" },
+                { id: "cal-1", title: "Work", color: "#ff0000" },
             ]);
             Calendar.getEventsAsync.mockResolvedValue([]);
         });
-        
+
         it("pressing Manually Add Events opens CalendarAddEvent screen", async () => {
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByText(/Manually Add Events/i)).toBeTruthy()
+                expect(result.getByText(/Manually Add Events/i)).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
         });
-        
+
         it("CalendarAddEvent is no longer shown after onCancel is called", async () => {
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("mock-cancel-add"));
-        
+
             await waitFor(() =>
-            expect(result.queryByTestId("calendar-add-event")).toBeNull()
+                expect(result.queryByTestId("calendar-add-event")).toBeNull()
             );
         });
-        
+
         it("returns to calendar view after cancel and shows calendar UI", async () => {
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             await connectAndChooseCalendar(result);
             await result.findByTestId("mock-calendar");
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("mock-cancel-add"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("mock-calendar")).toBeTruthy()
+                expect(result.getByTestId("mock-calendar")).toBeTruthy()
             );
         });
-        
+
         it("new event is added to the list when onEventAdded is called for today's date", async () => {
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             await connectAndChooseCalendar(result);
             await result.findByTestId("mock-calendar");
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("mock-save-event"));
-        
+
             await waitFor(() =>
-            expect(result.getByText("New Event")).toBeTruthy()
+                expect(result.getByText("New Event")).toBeTruthy()
             );
         });
-        
+
         it("new event is NOT added to the list when its date differs from selected date", async () => {
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             await connectAndChooseCalendar(result);
-        
+
             const calendarUI = await result.findByTestId("mock-calendar");
             fireEvent.press(calendarUI);
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("mock-save-event"));
-        
+
             await waitFor(() =>
-            expect(result.queryByText("New Event")).toBeNull()
+                expect(result.queryByText("New Event")).toBeNull()
             );
         });
-        
+
         it("after saving, CalendarAddEvent screen is dismissed", async () => {
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             await connectAndChooseCalendar(result);
             await result.findByTestId("mock-calendar");
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("mock-save-event"));
-        
+
             await waitFor(() =>
-            expect(result.queryByTestId("calendar-add-event")).toBeNull()
+                expect(result.queryByTestId("calendar-add-event")).toBeNull()
             );
         });
-        
+
         it("new event is sorted into the correct position in the list", async () => {
             const now = new Date();
             const earlierStart = new Date(now.getTime() + 1800000).toISOString();
             const earlierEnd = new Date(now.getTime() + 3600000).toISOString();
-        
+
             Calendar.getEventsAsync.mockResolvedValue([
-            {
-                id: "e-existing",
-                title: "Existing Event",
-                startDate: earlierStart,
-                endDate: earlierEnd,
-                location: "H 100",
-            },
+                {
+                    id: "e-existing",
+                    title: "Existing Event",
+                    startDate: earlierStart,
+                    endDate: earlierEnd,
+                    location: "H 100",
+                },
             ]);
-        
+
             const result = render(<CalendarPage onPressBack={jest.fn()} />);
-        
+
             await connectAndChooseCalendar(result);
             await result.findByTestId("mock-calendar");
             await result.findByText("Existing Event");
-        
+
             fireEvent.press(result.getByTestId("openModalBtn"));
             fireEvent.press(result.getByTestId("manualAddBtn"));
-        
+
             await waitFor(() =>
-            expect(result.getByTestId("calendar-add-event")).toBeTruthy()
+                expect(result.getByTestId("calendar-add-event")).toBeTruthy()
             );
-        
+
             fireEvent.press(result.getByTestId("mock-save-event"));
-        
+
             await waitFor(() => {
-            expect(result.getByText("Existing Event")).toBeTruthy();
-            expect(result.getByText("New Event")).toBeTruthy();
+                expect(result.getByText("Existing Event")).toBeTruthy();
+                expect(result.getByText("New Event")).toBeTruthy();
             });
         });
 
         it('manually adds an event and displays it in the list', async () => {
-        const { getByTestId, findByText, queryByTestId } = render(<CalendarPage />);
+            const { getByTestId, findByText, queryByTestId } = render(<CalendarPage />);
 
-        // 1. Open bottom sheet and select Manual Add
-        fireEvent.press(getByTestId('openModalBtn'));
-        fireEvent.press(getByTestId('manualAddBtn'));
+         
+            fireEvent.press(getByTestId('openModalBtn'));
+            fireEvent.press(getByTestId('manualAddBtn'));
 
-        // 2. Verify the Manual Add component is rendered (Mocked)
-        expect(getByTestId('calendar-add-event')).toBeTruthy();
+            
+            expect(getByTestId('calendar-add-event')).toBeTruthy();
 
-        // 3. Trigger the mock save
-        fireEvent.press(getByTestId('mock-save-event'));
+           
+            fireEvent.press(getByTestId('mock-save-event'));
 
-        // 4. Verify we are back on the main page and the event is visible
-        await waitFor(() => {
-            expect(queryByTestId('calendar-add-event')).toBeNull();
-            expect(findByText('New Event')).toBeTruthy();
+            
+            
+
+            await waitFor(() => {
+                
+                expect(queryByTestId('calendar-add-event')).toBeNull();
+
+                
+                expect(getByText('New Event')).toBeTruthy();
+            });
         });
-    });
 
-    it('saves selected calendars to AsyncStorage when Done is pressed', async () => {
-        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-99', title: 'Uni', color: 'red' }]);
-        const { getByTestId, findByText, getByText } = render(<CalendarPage />);
+        it('saves selected calendars to AsyncStorage when Done is pressed', async () => {
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-99', title: 'Uni', color: 'red' }]);
+            const { getByTestId, findByText, getByText } = render(<CalendarPage />);
 
-        fireEvent.press(getByTestId('openModalBtn'));
-        fireEvent.press(getByTestId('calBtn'));
-        
-        await findByText('Uni');
-        fireEvent(getByTestId('checkbox-cal-99'), 'onValueChange', true);
-        fireEvent.press(getByText(/Done/i));
+            fireEvent.press(getByTestId('openModalBtn'));
+            fireEvent.press(getByTestId('calBtn'));
 
-        await waitFor(() => {
-            expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-                "where2go_saved_calendar_ids",
-                JSON.stringify(["cal-99"])
+            await findByText('Uni');
+            fireEvent(getByTestId('checkbox-cal-99'), 'onValueChange', true);
+            fireEvent.press(getByText(/Done/i));
+
+            await waitFor(() => {
+                expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+                    "where2go_saved_calendar_ids",
+                    JSON.stringify(["cal-99"])
+                );
+            });
+        });
+
+        it('shows an alert when trying to navigate to an event with no valid building', async () => {
+            const alertSpy = jest.spyOn(Alert, 'alert');
+            Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
+            // Mocking parseEventLocation to return no building
+            const { parseEventLocation } = require('../../src/utils/eventLocationParser');
+            parseEventLocation.mockReturnValueOnce({ building: null, room: null });
+
+            Calendar.getEventsAsync.mockResolvedValue([
+                { id: 'evt-1', title: 'Remote Meeting', location: 'Zoom', startDate: new Date().toISOString() }
+            ]);
+
+            const renderResult = render(<CalendarPage onGenerateDirections={jest.fn()} />);
+            await connectAndChooseCalendar(renderResult);
+
+            const eventItem = await renderResult.findByTestId('event-item-evt-1');
+            fireEvent.press(eventItem);
+
+            expect(alertSpy).toHaveBeenCalledWith(
+                "Cannot Generate Directions",
+                expect.any(String),
+                expect.any(Array)
             );
+            alertSpy.mockRestore();
         });
-    });
-
-    it('shows an alert when trying to navigate to an event with no valid building', async () => {
-        const alertSpy = jest.spyOn(Alert, 'alert');
-        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
-        // Mocking parseEventLocation to return no building
-        const { parseEventLocation } = require('../../src/utils/eventLocationParser');
-        parseEventLocation.mockReturnValueOnce({ building: null, room: null });
-
-        Calendar.getEventsAsync.mockResolvedValue([
-            { id: 'evt-1', title: 'Remote Meeting', location: 'Zoom', startDate: new Date().toISOString() }
-        ]);
-
-        const renderResult = render(<CalendarPage onGenerateDirections={jest.fn()} />);
-        await connectAndChooseCalendar(renderResult);
-
-        const eventItem = await renderResult.findByTestId('event-item-evt-1');
-        fireEvent.press(eventItem);
-
-        expect(alertSpy).toHaveBeenCalledWith(
-            "Cannot Generate Directions",
-            expect.any(String),
-            expect.any(Array)
-        );
-        alertSpy.mockRestore();
-    });
     });
 });
