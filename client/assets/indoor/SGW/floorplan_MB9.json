@@ -1,0 +1,759 @@
+{
+  "MB9": {
+    "floor": "MB9",
+    "rooms": [
+      {
+        "id": "MB-9_9.285",
+        "label": "MB-9_9.285",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp1_MB9_9.285",
+        "bounds": {
+          "x": 0.0904,
+          "y": 0.0256,
+          "w": 0.2367,
+          "h": 0.1319
+        }
+      },
+      {
+        "id": "MB-9_9.275",
+        "label": "MB-9_9.275",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp2_MB9_9.275",
+        "bounds": {
+          "x": 0.0877,
+          "y": 0.1606,
+          "w": 0.2341,
+          "h": 0.0853
+        }
+      },
+      {
+        "id": "MB-9_9.265",
+        "label": "MB-9_9.265",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp3_MB9_9.265",
+        "bounds": {
+          "x": 0.0877,
+          "y": 0.249,
+          "w": 0.2367,
+          "h": 0.0946
+        }
+      },
+      {
+        "id": "MB-9_9.225",
+        "label": "MB-9_9.225",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp4_MB9_9.225",
+        "bounds": {
+          "x": 0.0824,
+          "y": 0.3483,
+          "w": 0.25,
+          "h": 0.1288
+        }
+      },
+      {
+        "id": "MB-9_9.201",
+        "label": "MB-9_9.201",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp5_MB9_9.201",
+        "bounds": {
+          "x": 0.0904,
+          "y": 0.4802,
+          "w": 0.2793,
+          "h": 0.135
+        }
+      },
+      {
+        "id": "MB-9_9.475",
+        "label": "MB-9_9.475",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp6_MB9_9.475",
+        "bounds": {
+          "x": 0.0797,
+          "y": 0.6168,
+          "w": 0.2234,
+          "h": 0.1831
+        }
+      },
+      {
+        "id": "MB-9_9.476",
+        "label": "MB-9_9.476",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp7_MB9_9.476",
+        "bounds": {
+          "x": 0.3191,
+          "y": 0.6928,
+          "w": 0.0532,
+          "h": 0.0372
+        }
+      },
+      {
+        "id": "MB-9_9.474",
+        "label": "MB-9_9.474",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp8_MB9_9.474",
+        "bounds": {
+          "x": 0.3218,
+          "y": 0.7517,
+          "w": 0.0479,
+          "h": 0.0388
+        }
+      },
+      {
+        "id": "MB-9_9.465",
+        "label": "MB-9_9.465",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp9_MB9_9.465",
+        "bounds": {
+          "x": 0.2074,
+          "y": 0.8092,
+          "w": 0.1702,
+          "h": 0.135
+        }
+      },
+      {
+        "id": "MB-9_9.455",
+        "label": "MB-9_9.455",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp10_MB9_9.455",
+        "bounds": {
+          "x": 0.4255,
+          "y": 0.8278,
+          "w": 0.0984,
+          "h": 0.0931
+        }
+      },
+      {
+        "id": "MB-9_9.445",
+        "label": "MB-9_9.445",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp11_MB9_9.445",
+        "bounds": {
+          "x": 0.5346,
+          "y": 0.8278,
+          "w": 0.0984,
+          "h": 0.0869
+        }
+      },
+      {
+        "id": "MB-9_9.424",
+        "label": "MB-9_9.424",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp12_MB9_9.424",
+        "bounds": {
+          "x": 0.4761,
+          "y": 0.6168,
+          "w": 0.1383,
+          "h": 0.059
+        }
+      },
+      {
+        "id": "MB-9_9.240",
+        "label": "MB-9_9.240",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp13_MB9_9.240",
+        "bounds": {
+          "x": 0.4415,
+          "y": 0.4507,
+          "w": 0.0825,
+          "h": 0.0388
+        }
+      },
+      {
+        "id": "MB-9_9.330",
+        "label": "MB-9_9.330",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp14_MB9_9.330",
+        "bounds": {
+          "x": 0.5559,
+          "y": 0.4492,
+          "w": 0.0931,
+          "h": 0.0388
+        }
+      },
+      {
+        "id": "MB-9_9.255",
+        "label": "MB-9_9.255",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp15_MB9_9.255",
+        "bounds": {
+          "x": 0.4787,
+          "y": 0.4088,
+          "w": 0.1011,
+          "h": 0.0357
+        }
+      },
+      {
+        "id": "MB-9_9.250",
+        "label": "MB-9_9.250",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp16_MB9_9.250",
+        "bounds": {
+          "x": 0.4441,
+          "y": 0.2801,
+          "w": 0.1436,
+          "h": 0.0884
+        }
+      },
+      {
+        "id": "MB-9_9.270",
+        "label": "MB-9_9.270",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp17_MB9_9.270",
+        "bounds": {
+          "x": 0.4521,
+          "y": 0.1978,
+          "w": 0.1357,
+          "h": 0.076
+        }
+      },
+      {
+        "id": "MB-9_9.280",
+        "label": "MB-9_9.280",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp18_MB9_9.280",
+        "bounds": {
+          "x": 0.4521,
+          "y": 0.0985,
+          "w": 0.2181,
+          "h": 0.0978
+        }
+      },
+      {
+        "id": "MB-9_9.260",
+        "label": "MB-9_9.260",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp19_MB9_9.260",
+        "bounds": {
+          "x": 0.6064,
+          "y": 0.204,
+          "w": 0.2154,
+          "h": 0.1505
+        }
+      },
+      {
+        "id": "MB-9_9.315",
+        "label": "MB-9_9.315",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp20_MB9_9.315",
+        "bounds": {
+          "x": 0.6543,
+          "y": 0.3701,
+          "w": 0.1889,
+          "h": 0.135
+        }
+      },
+      {
+        "id": "MB-9_9.335",
+        "label": "MB-9_9.335",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp21_MB9_9.335",
+        "bounds": {
+          "x": 0.6942,
+          "y": 0.5159,
+          "w": 0.1729,
+          "h": 0.0559
+        }
+      },
+      {
+        "id": "MB-9_9.345",
+        "label": "MB-9_9.345",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp22_MB9_9.345",
+        "bounds": {
+          "x": 0.7101,
+          "y": 0.5749,
+          "w": 0.1649,
+          "h": 0.0403
+        }
+      },
+      {
+        "id": "MB-9_9.405",
+        "label": "MB-9_9.405",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp23_MB9_9.405",
+        "bounds": {
+          "x": 0.7128,
+          "y": 0.6199,
+          "w": 0.1729,
+          "h": 0.0574
+        }
+      },
+      {
+        "id": "MB-9_9.415",
+        "label": "MB-9_9.415",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp24_MB9_9.415",
+        "bounds": {
+          "x": 0.7527,
+          "y": 0.6804,
+          "w": 0.125,
+          "h": 0.0745
+        }
+      },
+      {
+        "id": "MB-9_9.425",
+        "label": "MB-9_9.425",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp25_MB9_9.425",
+        "bounds": {
+          "x": 0.7101,
+          "y": 0.7611,
+          "w": 0.1676,
+          "h": 0.059
+        }
+      },
+      {
+        "id": "MB-9_9.435",
+        "label": "MB-9_9.435",
+        "type": "classroom",
+        "floor": "MB9",
+        "nearestWaypoint": "wp26_MB9_9.435",
+        "bounds": {
+          "x": 0.7154,
+          "y": 0.8231,
+          "w": 0.1596,
+          "h": 0.0605
+        }
+      },
+      {
+        "id": "MB-9_Elevator",
+        "label": "MB-9_Elevator",
+        "type": "elevator",
+        "floor": "MB9",
+        "bounds": {
+          "x": 0.419,
+          "y": 0.4903,
+          "w": 0.2459,
+          "h": 0.1211
+        }
+      },
+      {
+        "id": "MB-9_T1",
+        "label": "MB-9_T1",
+        "type": "other",
+        "floor": "MB9",
+        "nearestWaypoint": "wp29_MB9_T1",
+        "bounds": {
+          "x": 0.4286,
+          "y": 0.6766,
+          "w": 0.1054,
+          "h": 0.1192
+        }
+      },
+      {
+        "id": "MB-9_T2",
+        "label": "MB-9_T2",
+        "type": "other",
+        "floor": "MB9",
+        "nearestWaypoint": "wp30_MB9_T2",
+        "bounds": {
+          "x": 0.5468,
+          "y": 0.6841,
+          "w": 0.1181,
+          "h": 0.108
+        }
+      },
+      {
+        "id": "MB-9_S1",
+        "label": "MB-9_S1",
+        "type": "staircase",
+        "floor": "MB9",
+        "nearestWaypoint": "wp28_MB9_Exit1",
+        "bounds": {
+          "x": 0.4286,
+          "y": 0.0414,
+          "w": 0.2235,
+          "h": 0.0559
+        }
+      },
+      {
+        "id": "MB-9_S2",
+        "label": "MB-9_S2",
+        "type": "staircase",
+        "floor": "MB9",
+        "nearestWaypoint": "wp27_MB9_Exit2",
+        "bounds": {
+          "x": 0.6585,
+          "y": 0.8852,
+          "w": 0.2235,
+          "h": 0.0782
+        }
+      },
+      {
+        "id": "MB-9_Corridor1",
+        "label": "MB-9_Corridor1",
+        "type": "hallway",
+        "floor": "MB9",
+        "bounds": {
+          "x": 0.3616,
+          "y": 0.0303,
+          "w": 0.0575,
+          "h": 0.7879
+        }
+      },
+      {
+        "id": "MB-9_Corridor2",
+        "label": "MB-9_Corridor2",
+        "type": "hallway",
+        "floor": "MB9",
+        "bounds": {
+          "x": 0.4286,
+          "y": 0.7958,
+          "w": 0.2459,
+          "h": 0.0242
+        }
+      },
+      {
+        "id": "MB-9_Corridor3",
+        "label": "MB-9_Corridor3",
+        "type": "hallway",
+        "floor": "MB9",
+        "bounds": {
+          "x": 0.6649,
+          "y": 0.509,
+          "w": 0.0415,
+          "h": 0.3614
+        }
+      },
+      {
+        "id": "MB-9_Corridor4",
+        "label": "MB-9_Corridor4",
+        "type": "hallway",
+        "floor": "MB9",
+        "bounds": {
+          "x": 0.4318,
+          "y": 0.3804,
+          "w": 0.2012,
+          "h": 0.0242
+        }
+      }
+    ],
+    "waypoints": [
+      {
+        "id": "wp1_MB9_9.285",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.336,
+          "y": 0.0526
+        },
+        "connections": []
+      },
+      {
+        "id": "wp2_MB9_9.275",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3392,
+          "y": 0.196
+        },
+        "connections": []
+      },
+      {
+        "id": "wp3_MB9_9.265",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3424,
+          "y": 0.3115
+        },
+        "connections": []
+      },
+      {
+        "id": "wp4_MB9_9.225",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3392,
+          "y": 0.4419
+        },
+        "connections": []
+      },
+      {
+        "id": "wp5_MB9_9.201",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3712,
+          "y": 0.522
+        },
+        "connections": []
+      },
+      {
+        "id": "wp6_MB9_9.475",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3105,
+          "y": 0.7362
+        },
+        "connections": []
+      },
+      {
+        "id": "wp7_MB9_9.476",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3552,
+          "y": 0.7325
+        },
+        "connections": []
+      },
+      {
+        "id": "wp8_MB9_9.474",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3488,
+          "y": 0.7455
+        },
+        "connections": []
+      },
+      {
+        "id": "wp9_MB9_9.465",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.3839,
+          "y": 0.8256
+        },
+        "connections": []
+      },
+      {
+        "id": "wp10_MB9_9.455",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.4478,
+          "y": 0.82
+        },
+        "connections": []
+      },
+      {
+        "id": "wp11_MB9_9.445",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.5595,
+          "y": 0.82
+        },
+        "connections": []
+      },
+      {
+        "id": "wp12_MB9_9.424",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6106,
+          "y": 0.6803
+        },
+        "connections": []
+      },
+      {
+        "id": "wp13_MB9_9.240",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.4318,
+          "y": 0.4605
+        },
+        "connections": []
+      },
+      {
+        "id": "wp14_MB9_9.330",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.649,
+          "y": 0.4419
+        },
+        "connections": []
+      },
+      {
+        "id": "wp15_MB9_9.255",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.5468,
+          "y": 0.4065
+        },
+        "connections": []
+      },
+      {
+        "id": "wp16_MB9_9.250",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.4797,
+          "y": 0.3693
+        },
+        "connections": []
+      },
+      {
+        "id": "wp17_MB9_9.270",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.4414,
+          "y": 0.2203
+        },
+        "connections": []
+      },
+      {
+        "id": "wp18_MB9_9.280",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.4382,
+          "y": 0.1625
+        },
+        "connections": []
+      },
+      {
+        "id": "wp19_MB9_9.260",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6266,
+          "y": 0.36
+        },
+        "connections": []
+      },
+      {
+        "id": "wp20_MB9_9.315",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6362,
+          "y": 0.3972
+        },
+        "connections": []
+      },
+      {
+        "id": "wp21_MB9_9.335",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6809,
+          "y": 0.535
+        },
+        "connections": []
+      },
+      {
+        "id": "wp22_MB9_9.345",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.7,
+          "y": 0.6002
+        },
+        "connections": []
+      },
+      {
+        "id": "wp23_MB9_9.405",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.7288,
+          "y": 0.6841
+        },
+        "connections": []
+      },
+      {
+        "id": "wp24_MB9_9.415",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.7511,
+          "y": 0.7362
+        },
+        "connections": []
+      },
+      {
+        "id": "wp25_MB9_9.425",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.7064,
+          "y": 0.8089
+        },
+        "connections": []
+      },
+      {
+        "id": "wp26_MB9_9.435",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.7064,
+          "y": 0.8293
+        },
+        "connections": []
+      },
+      {
+        "id": "wp27_MB9_Exit2",
+        "type": "exit",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6841,
+          "y": 0.8759
+        },
+        "connections": []
+      },
+      {
+        "id": "wp28_MB9_Exit1",
+        "type": "exit",
+        "floor": "MB9",
+        "position": {
+          "x": 0.4222,
+          "y": 0.075
+        },
+        "connections": []
+      },
+      {
+        "id": "wp29_MB9_T1",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.5404,
+          "y": 0.7846
+        },
+        "connections": []
+      },
+      {
+        "id": "wp30_MB9_T2",
+        "type": "door",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6617,
+          "y": 0.6859
+        },
+        "connections": []
+      }
+    ]
+  }
+}

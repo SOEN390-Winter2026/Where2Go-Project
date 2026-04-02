@@ -1,0 +1,1088 @@
+{
+  "MB5": {
+    "floor": "MB5",
+    "rooms": [
+      {
+        "id": "MB-5.245",
+        "label": "MB-5.245",
+        "type": "classroom",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2229,
+          "y": 0.5446,
+          "w": 0.2176,
+          "h": 0.1121
+        }
+      },
+      {
+        "id": "MB-5.255",
+        "label": "MB-5.255",
+        "type": "classroom",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2537,
+          "y": 0.6907,
+          "w": 0.2053,
+          "h": 0.1172
+        }
+      },
+      {
+        "id": "MB-5.215",
+        "label": "MB-5.215",
+        "type": "classroom",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5534,
+          "y": 0.4274,
+          "w": 0.1581,
+          "h": 0.2243
+        }
+      },
+      {
+        "id": "MB-5.265",
+        "label": "MB-5.265",
+        "type": "classroom",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5759,
+          "y": 0.6822,
+          "w": 0.1786,
+          "h": 0.1359
+        }
+      },
+      {
+        "id": "MB-5.275",
+        "label": "MB-5.275",
+        "type": "classroom",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5801,
+          "y": 0.8233,
+          "w": 0.1745,
+          "h": 0.1291
+        }
+      },
+      {
+        "id": "MB-5.285",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2701,
+          "y": 0.8199,
+          "w": 0.0739,
+          "h": 0.0782
+        }
+      },
+      {
+        "id": "MB-5.455",
+        "label": "Study/office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2044,
+          "y": 0.3492,
+          "w": 0.0985,
+          "h": 0.0459
+        }
+      },
+      {
+        "id": "MB-5.420-T1",
+        "label": "washroom",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3502,
+          "y": 0.2268,
+          "w": 0.0842,
+          "h": 0.1088
+        }
+      },
+      {
+        "id": "MB-5.410-T2",
+        "label": "washroom",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4384,
+          "y": 0.2285,
+          "w": 0.078,
+          "h": 0.1003
+        }
+      },
+      {
+        "id": "MB-5.101",
+        "label": "Study lounge",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.539,
+          "y": 0.079,
+          "w": 0.1498,
+          "h": 0.1801
+        }
+      },
+      {
+        "id": "elevator",
+        "label": "elevator",
+        "type": "elevator",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3522,
+          "y": 0.3917,
+          "w": 0.1663,
+          "h": 0.0323
+        }
+      },
+      {
+        "id": "elevator",
+        "label": "elevator",
+        "type": "elevator",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3481,
+          "y": 0.4817,
+          "w": 0.1724,
+          "h": 0.0391
+        }
+      },
+      {
+        "id": "MB-5.232",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4487,
+          "y": 0.5633,
+          "w": 0.0554,
+          "h": 0.0374
+        }
+      },
+      {
+        "id": "MB-5.234",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4446,
+          "y": 0.6058,
+          "w": 0.0677,
+          "h": 0.0408
+        }
+      },
+      {
+        "id": "MB-5.267",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4651,
+          "y": 0.7077,
+          "w": 0.0328,
+          "h": 0.0408
+        }
+      },
+      {
+        "id": "MB-5.269",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.461,
+          "y": 0.7604,
+          "w": 0.0452,
+          "h": 0.0527
+        }
+      },
+      {
+        "id": "MB-5.109",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3625,
+          "y": 0.1062,
+          "w": 0.0739,
+          "h": 0.034
+        }
+      },
+      {
+        "id": "MB-5.107",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4446,
+          "y": 0.1028,
+          "w": 0.0862,
+          "h": 0.0425
+        }
+      },
+      {
+        "id": "MB-5.106",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4528,
+          "y": 0.1657,
+          "w": 0.0636,
+          "h": 0.0357
+        }
+      },
+      {
+        "id": "MB-5.110",
+        "label": "Study room",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3666,
+          "y": 0.1657,
+          "w": 0.0534,
+          "h": 0.0442
+        }
+      },
+      {
+        "id": "MB-5.494",
+        "label": "MB-5.494",
+        "type": "staircase",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2044,
+          "y": 0.0637,
+          "w": 0.1519,
+          "h": 0.0697
+        }
+      },
+      {
+        "id": "MB-5.201",
+        "label": "study lounge",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.6991,
+          "y": 0.3781,
+          "w": 0.0534,
+          "h": 0.2957
+        }
+      },
+      {
+        "id": "MB-5.445",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2024,
+          "y": 0.1317,
+          "w": 0.0677,
+          "h": 0.0493
+        }
+      },
+      {
+        "id": "MB-5.433",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2763,
+          "y": 0.1368,
+          "w": 0.0431,
+          "h": 0.0238
+        }
+      },
+      {
+        "id": "MB-5.447",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.1962,
+          "y": 0.1776,
+          "w": 0.0718,
+          "h": 0.0476
+        }
+      },
+      {
+        "id": "MB-5.449",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.1962,
+          "y": 0.2218,
+          "w": 0.0718,
+          "h": 0.0408
+        }
+      },
+      {
+        "id": "MB-5.451",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.1983,
+          "y": 0.2676,
+          "w": 0.0657,
+          "h": 0.034
+        }
+      },
+      {
+        "id": "MB-5.453",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.19,
+          "y": 0.3016,
+          "w": 0.078,
+          "h": 0.0408
+        }
+      },
+      {
+        "id": "MB-5.312",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2167,
+          "y": 0.4834,
+          "w": 0.0472,
+          "h": 0.0544
+        }
+      },
+      {
+        "id": "MB-5.310",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.266,
+          "y": 0.4783,
+          "w": 0.0472,
+          "h": 0.068
+        }
+      },
+      {
+        "id": "MB-5.306",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3173,
+          "y": 0.48,
+          "w": 0.0349,
+          "h": 0.0323
+        }
+      },
+      {
+        "id": "MB-5.308",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3214,
+          "y": 0.5174,
+          "w": 0.0267,
+          "h": 0.0255
+        }
+      },
+      {
+        "id": "MB-5.457",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.305,
+          "y": 0.339,
+          "w": 0.0431,
+          "h": 0.034
+        }
+      },
+      {
+        "id": "MB-5.459",
+        "label": "office",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3112,
+          "y": 0.3713,
+          "w": 0.0369,
+          "h": 0.0272
+        }
+      },
+      {
+        "id": "MB-5.394",
+        "label": "MB-5.394",
+        "type": "staircase",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2024,
+          "y": 0.3985,
+          "w": 0.1293,
+          "h": 0.0391
+        }
+      },
+      {
+        "id": "MB-5.194",
+        "label": "MB-5.194",
+        "type": "staircase",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5698,
+          "y": 0.3067,
+          "w": 0.0493,
+          "h": 0.0612
+        }
+      },
+      {
+        "id": "MB-5.228",
+        "label": "MB-5.228",
+        "type": "other",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.4487,
+          "y": 0.5259,
+          "w": 0.0616,
+          "h": 0.0374
+        }
+      },
+      {
+        "id": "MB-5.294",
+        "label": "MB-5.294",
+        "type": "staircase",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3625,
+          "y": 0.8828,
+          "w": 0.117,
+          "h": 0.0629
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2065,
+          "y": 0.4359,
+          "w": 0.3141,
+          "h": 0.0374
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3489,
+          "y": 0.8234,
+          "w": 0.1796,
+          "h": 0.025
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5178,
+          "y": 0.2333,
+          "w": 0.0356,
+          "h": 0.7314
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.3524,
+          "y": 0.2038,
+          "w": 0.1831,
+          "h": 0.0221
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.2778,
+          "y": 0.1656,
+          "w": 0.0711,
+          "h": 0.1692
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.372,
+          "y": 0.1405,
+          "w": 0.1689,
+          "h": 0.0235
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5196,
+          "y": 0.1597,
+          "w": 0.0213,
+          "h": 0.0471
+        }
+      },
+      {
+        "id": "MB-500",
+        "label": "MB-500",
+        "type": "hallway",
+        "floor": "MB5",
+        "bounds": {
+          "x": 0.5462,
+          "y": 0.3819,
+          "w": 0.1564,
+          "h": 0.0427
+        }
+      }
+    ],
+    "waypoints": [
+      {
+        "id": "wp1_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3364,
+          "y": 0.2185
+        },
+        "connections": [
+          "wp2_MB5"
+        ]
+      },
+      {
+        "id": "wp2_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3578,
+          "y": 0.2156
+        },
+        "connections": [
+          "wp1_MB5"
+        ]
+      },
+      {
+        "id": "wp3_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5249,
+          "y": 0.1935
+        },
+        "connections": [
+          "wp7_MB5"
+        ]
+      },
+      {
+        "id": "wp4_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5213,
+          "y": 0.2097
+        },
+        "connections": []
+      },
+      {
+        "id": "wp5_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5107,
+          "y": 0.1538
+        },
+        "connections": [
+          "wp6_MB5"
+        ]
+      },
+      {
+        "id": "wp6_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5284,
+          "y": 0.1685
+        },
+        "connections": [
+          "wp5_MB5"
+        ]
+      },
+      {
+        "id": "wp7_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5231,
+          "y": 0.2215
+        },
+        "connections": [
+          "wp3_MB5",
+          "wp8_MB5"
+        ]
+      },
+      {
+        "id": "wp8_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5284,
+          "y": 0.2406
+        },
+        "connections": [
+          "wp7_MB5"
+        ]
+      },
+      {
+        "id": "wp9_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5409,
+          "y": 0.4128
+        },
+        "connections": [
+          "wp10_MB5"
+        ]
+      },
+      {
+        "id": "wp10_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5622,
+          "y": 0.4157
+        },
+        "connections": [
+          "wp9_MB5"
+        ]
+      },
+      {
+        "id": "wp11_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5089,
+          "y": 0.4555
+        },
+        "connections": [
+          "wp12_MB5"
+        ]
+      },
+      {
+        "id": "wp12_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5302,
+          "y": 0.4599
+        },
+        "connections": [
+          "wp11_MB5"
+        ]
+      },
+      {
+        "id": "wp13_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5036,
+          "y": 0.8411
+        },
+        "connections": [
+          "wp14_MB5"
+        ]
+      },
+      {
+        "id": "wp14_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5391,
+          "y": 0.8528
+        },
+        "connections": [
+          "wp13_MB5"
+        ]
+      },
+      {
+        "id": "wp15_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4259,
+          "y": 0.1349
+        },
+        "connections": []
+      },
+      {
+        "id": "wp16_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4521,
+          "y": 0.1342
+        },
+        "connections": []
+      },
+      {
+        "id": "wp17_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4623,
+          "y": 0.1678
+        },
+        "connections": []
+      },
+      {
+        "id": "wp18_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4115,
+          "y": 0.1699
+        },
+        "connections": []
+      },
+      {
+        "id": "wp19_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2837,
+          "y": 0.1559
+        },
+        "connections": []
+      },
+      {
+        "id": "wp20_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2676,
+          "y": 0.1692
+        },
+        "connections": []
+      },
+      {
+        "id": "wp21_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2642,
+          "y": 0.1874
+        },
+        "connections": []
+      },
+      {
+        "id": "wp22_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2634,
+          "y": 0.2463
+        },
+        "connections": []
+      },
+      {
+        "id": "wp23_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2583,
+          "y": 0.2722
+        },
+        "connections": []
+      },
+      {
+        "id": "wp24_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2617,
+          "y": 0.3045
+        },
+        "connections": []
+      },
+      {
+        "id": "wp25_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2794,
+          "y": 0.3584
+        },
+        "connections": []
+      },
+      {
+        "id": "wp26_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3108,
+          "y": 0.3479
+        },
+        "connections": []
+      },
+      {
+        "id": "wp27_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.425,
+          "y": 0.24
+        },
+        "connections": []
+      },
+      {
+        "id": "wp28_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.453,
+          "y": 0.2435
+        },
+        "connections": []
+      },
+      {
+        "id": "wp29_MB5",
+        "type": "corridor",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5478,
+          "y": 0.2169
+        },
+        "connections": []
+      },
+      {
+        "id": "wp30_MB5",
+        "type": "exit",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3192,
+          "y": 0.4047
+        },
+        "connections": []
+      },
+      {
+        "id": "wp31_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5774,
+          "y": 0.4306
+        },
+        "connections": []
+      },
+      {
+        "id": "wp32_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.7069,
+          "y": 0.4208
+        },
+        "connections": []
+      },
+      {
+        "id": "wp33_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5061,
+          "y": 0.5515
+        },
+        "connections": []
+      },
+      {
+        "id": "wp34_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5001,
+          "y": 0.5707
+        },
+        "connections": []
+      },
+      {
+        "id": "wp35_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5033,
+          "y": 0.6418
+        },
+        "connections": []
+      },
+      {
+        "id": "wp36_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2565,
+          "y": 0.4847
+        },
+        "connections": []
+      },
+      {
+        "id": "wp37_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.2796,
+          "y": 0.486
+        },
+        "connections": []
+      },
+      {
+        "id": "wp38_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3412,
+          "y": 0.4835
+        },
+        "connections": []
+      },
+      {
+        "id": "wp39_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5822,
+          "y": 0.6988
+        },
+        "connections": []
+      },
+      {
+        "id": "wp40_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4521,
+          "y": 0.6976
+        },
+        "connections": []
+      },
+      {
+        "id": "wp41_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3404,
+          "y": 0.8392
+        },
+        "connections": []
+      },
+      {
+        "id": "wp42_MB5",
+        "type": "exit",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3735,
+          "y": 0.8979
+        },
+        "connections": []
+      },
+      {
+        "id": "wp43_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5836,
+          "y": 0.8386
+        },
+        "connections": []
+      },
+      {
+        "id": "wp44_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5014,
+          "y": 0.8036
+        },
+        "connections": []
+      },
+      {
+        "id": "wp45_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.494,
+          "y": 0.7156
+        },
+        "connections": []
+      },
+      {
+        "id": "wp46_MB5",
+        "type": "staircase",
+        "floor": "MB5",
+        "position": {
+          "x": 0.5816,
+          "y": 0.311
+        },
+        "connections": []
+      },
+      {
+        "id": "wp47_MB5",
+        "type": "elevator",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4312,
+          "y": 0.421
+        },
+        "connections": []
+      },
+      {
+        "id": "wp48_MB5",
+        "type": "elevator",
+        "floor": "MB5",
+        "position": {
+          "x": 0.436,
+          "y": 0.4898
+        },
+        "connections": []
+      },
+      {
+        "id": "wp49_MB5",
+        "type": "door",
+        "floor": "MB5",
+        "position": {
+          "x": 0.4248,
+          "y": 0.6462
+        },
+        "connections": []
+      },
+      {
+        "id": "wp50_MB5",
+        "type": "exit",
+        "floor": "MB5",
+        "position": {
+          "x": 0.3382,
+          "y": 0.1126
+        },
+        "connections": []
+      }
+    ]
+  }
+}
