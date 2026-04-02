@@ -170,9 +170,9 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
 
     try {
       const dayEvents = await Calendar.getEventsAsync(selectedCalendarIds, start, end);
-      
+
       dayEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-      
+
       const isToday = selectedDateString === todayString();
       let ordered = dayEvents;
 
@@ -249,7 +249,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
 
   useEffect(() => {
     console.log("CalendarPage events:", events.map(event => event.title));
-        // Turn each event’s location string into { building, room } for nav/routing later
+    // Turn each event’s location string into { building, room } for nav/routing later
     const parsedLocations = events.map((e) => parseEventLocation(e.location));
     console.log("CalendarPage parsed locations:", parsedLocations);
   }, [events]);
@@ -477,7 +477,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
                 <Pressable
                   testID="selectedCalsContent"
                   style={styles.selectedCalsModal}
-                  onPress={() => {}}
+                  onPress={() => { }}
                 >
                   <View style={styles.selectedCalsHeader}>
                     <Text style={styles.selectedCalsTitle} testID="selectedCalendarsModalTitle">Selected Calendars</Text>

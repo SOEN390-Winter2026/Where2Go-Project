@@ -31,7 +31,7 @@ const ZOOM_STEP = 0.75;
 const clamp = (value, max) => Math.min(Math.max(value, -max), max);
 
 const getMaxTranslate = (containerSize, s) => ({
-    x: (containerSize.width  * (s - 1)) / 2,
+    x: (containerSize.width * (s - 1)) / 2,
     y: (containerSize.height * (s - 1)) / 2,
 });
 
@@ -97,25 +97,32 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
         }
     }, [source]);
 
-    useEffect(() => {
-        return () => {
-            scale.stopAnimation();
-            translateX.stopAnimation();
-            translateY.stopAnimation();
-        };
-    }, [scale, translateX, translateY]);
+    const hasShownInitialHighlight = useRef(false);
+    const [highlightedRoomId, setHighlightedRoomId] = useState(null);
 
-    // Auto-zoom on target room
     useEffect(() => {
-        if (targetRoom && lastScale.current <= MIN_SCALE) {
-            // Find the room and zoom to it
-            const room = rooms?.find(r => String(r.id) === String(targetRoom));
-            if (room && containerDims.width > 0 && containerDims.height > 0 && imageAspect > 0) {
-                // Zoom in significantly
-                applyScale(3, true);
-            }
-        }
-    }, [targetRoom, rooms]);
+    if (!targetRoom || !rooms || rooms.length === 0 || hasShownInitialHighlight.current) return;
+
+    const normalizedTarget = String(targetRoom).toLowerCase();
+    const matchedRoom = rooms.find(r => {
+        const rId = String(r.id).toLowerCase();
+        return rId === normalizedTarget || rId.endsWith(normalizedTarget);
+    });
+
+    if (matchedRoom) {
+        hasShownInitialHighlight.current = true; // Lock it immediately
+        setHighlightedRoomId(matchedRoom.id);
+
+        const timer = setTimeout(() => {
+            setHighlightedRoomId(null);
+        }, 3000);
+
+        return () => {
+            clearTimeout(timer);
+            setHighlightedRoomId(null); 
+        };
+    }
+}, [targetRoom, rooms.length]);
 
     const commitTranslation = (tx, ty, s, animated = false) => {
         const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
@@ -165,7 +172,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
     };
 
     const handleZoomIn = () => applyScale(Math.min(lastScale.current + ZOOM_STEP, MAX_SCALE), true);
-    const handleZoomOut  = () => applyScale(Math.max(lastScale.current - ZOOM_STEP, MIN_SCALE), true);
+    const handleZoomOut = () => applyScale(Math.max(lastScale.current - ZOOM_STEP, MIN_SCALE), true);
     const handleRecenter = () => {
         lastScale.current = MIN_SCALE;
         lastTranslateX.current = 0;
@@ -252,7 +259,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                     )}
 
                     {/* maestro poi loaded */}
-                    { isPOIEnabled && (
+                    {isPOIEnabled && (
                         <Text
                             style={{ position: 'absolute', color: 'transparent', fontSize: 1 }}
                         >
@@ -266,16 +273,32 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                             {rooms.map((room, idx) => {
                                 const { x, y, w, h } = room.bounds;
                                 const cx = containBounds.left + (x + w / 2) * containBounds.width;
-                                const cy = containBounds.top  + (y + h / 2) * containBounds.height;
+                                const cy = containBounds.top + (y + h / 2) * containBounds.height;
+
+                                // Determine if this specific label should change color
+                                const isTarget = room.id === highlightedRoomId;
+
                                 return (
                                     <TouchableOpacity
                                         key={`${room.id}-${idx}`}
-                                        testID={`room-label-${room.id}`}
-                                        style={[styles.roomLabel, { left: cx, top: cy }]}
+                                        style={[
+                                            styles.roomLabel,
+                                            { left: cx, top: cy },
+                                            // CHANGE: Conditional Background Color
+                                            isTarget && {
+                                                backgroundColor: '#FFD700', // Bright Gold/Yellow
+                                                borderColor: '#912338',
+                                                borderWidth: 2,
+                                                zIndex: 10 // Ensure it sits above other labels
+                                            }
+                                        ]}
                                         onPress={() => onRoomPress?.(room.id)}
-                                        activeOpacity={0.7}
                                     >
-                                        <Text style={styles.roomLabelText} numberOfLines={1}>
+                                        <Text style={[
+                                            styles.roomLabelText,
+                                            // CHANGE: Conditional Text Style
+                                            isTarget && { color: '#912338', fontWeight: 'bold' }
+                                        ]}>
                                             {room.id}
                                         </Text>
                                     </TouchableOpacity>
@@ -286,11 +309,11 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                 </Animated.View>
             </GestureDetector>
             <View style={styles.zoomControls}>
-                <ZoomButton iconName="add" onPress={handleZoomIn}   accessibilityLabel="Zoom in" />
+                <ZoomButton iconName="add" onPress={handleZoomIn} accessibilityLabel="Zoom in" />
                 <View style={styles.divider} />
-                <ZoomButton iconName="remove" onPress={handleZoomOut}  accessibilityLabel="Zoom out" />
+                <ZoomButton iconName="remove" onPress={handleZoomOut} accessibilityLabel="Zoom out" />
                 <View style={styles.divider} />
-                <ZoomButton iconName="locate-outline" onPress={handleRecenter} accessibilityLabel="Recenter map"/>
+                <ZoomButton iconName="locate-outline" onPress={handleRecenter} accessibilityLabel="Recenter map" />
             </View>
         </View>
     );
@@ -331,7 +354,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
 
     if (!selectedFloor) return <Placeholder width={width} text="Select a floor" />;
-    if (!buildingData)  return <Placeholder width={width} text="No map available." />;
+    if (!buildingData) return <Placeholder width={width} text="No map available." />;
 
     return (
         <View style={styles.floorLayersContainer}>
@@ -438,7 +461,7 @@ RoomActionModal.propTypes = {
 RoomActionModal.defaultProps = { roomId: '' };
 
 export default function IndoorMaps({ building, onPressBack, campus, buildings, isAccessibilityEnabled = false,
-    onToggleAccessibility = () => {}, targetFloor = null, targetRoom = null }) {
+    onToggleAccessibility = () => { }, targetFloor = null, targetRoom = null }) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -460,7 +483,7 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings, i
     const FONT_SM = Math.round(width * 0.03);
     const FONT_MD = Math.round(width * 0.038);
 
-    const [roomModal,    setRoomModal]    = useState({ visible: false, roomId: null });
+    const [roomModal, setRoomModal] = useState({ visible: false, roomId: null });
     //poi state is here so that the sidebar btn and the map can read it
     const [isPOIEnabled, setIsPOIEnabled] = useState(false);
 
