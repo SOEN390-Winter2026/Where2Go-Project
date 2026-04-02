@@ -72,6 +72,28 @@ export default function App() {
 
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] = useState(false);
 
+  const handlePersistCombinedRoute = (segments = [], selection = null) => {
+    const outdoor = Array.isArray(segments)
+      ? segments.find((s) => s?.kind === "outdoor")
+      : null;
+    if (!outdoor) return;
+
+    const mapSegments = Array.isArray(outdoor.mapSegments) ? outdoor.mapSegments : [];
+    const coords = mapSegments.length
+      ? mapSegments.flatMap((s) => s.coords || [])
+      : Array.isArray(outdoor.coords) ? outdoor.coords : [];
+
+    if (!coords.length) return;
+    setActiveSegments(mapSegments);
+    setActiveRouteCoords(coords);
+    setActiveRouteMeta({
+      source: "indoorCombined",
+      segments,
+      selection: selection && selection.from && selection.to ? selection : null,
+    });
+    setIsRouteActive(true);
+  };
+
   useEffect(() => {
     if (!showIndoorMaps && lastMapRegion.current) {
       const t = setTimeout(() => {
@@ -234,14 +256,27 @@ export default function App() {
   }
 
   if (showIndoorMaps) {
+    const persistedCombinedSegments =
+      activeRouteMeta?.source === "indoorCombined" && Array.isArray(activeRouteMeta?.segments)
+        ? activeRouteMeta.segments
+        : [];
+    const persistedDirectionsFrom =
+      activeRouteMeta?.source === "indoorCombined" ? activeRouteMeta?.selection?.from ?? null : null;
+    const persistedDirectionsTo =
+      activeRouteMeta?.source === "indoorCombined" ? activeRouteMeta?.selection?.to ?? null : null;
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <IndoorMaps
           building={selectedBuilding}
           onPressBack={() => setShowIndoorMaps(false)}
           campus={currentCampus}
+          buildings={buildings}
           isAccessibilityEnabled={isAccessibilityEnabled}
           onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
+          onPersistCombinedRoute={handlePersistCombinedRoute}
+          persistedCombinedSegments={persistedCombinedSegments}
+          persistedDirectionsFrom={persistedDirectionsFrom}
+          persistedDirectionsTo={persistedDirectionsTo}
         />
       </GestureHandlerRootView>
     );

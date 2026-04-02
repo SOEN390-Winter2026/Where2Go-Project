@@ -349,7 +349,9 @@
           "x": 0.1775,
           "y": 0.4824
         },
-        "connections": []
+        "connections": [
+          "wp_exit_CC2"
+        ]
       },
       {
         "id": "wp2_CC2_210",
@@ -550,6 +552,18 @@
           "y": 0.5709
         },
         "connections": []
+      },
+      {
+        "id": "wp_exit_CC2",
+        "type": "exit",
+        "floor": "CC2",
+        "position": {
+          "x": 0.09,
+          "y": 0.92
+        },
+        "connections": [
+          "wp1_CC2-211"
+        ]
       }
     ]
   }

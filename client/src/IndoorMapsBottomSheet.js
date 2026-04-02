@@ -7,6 +7,7 @@ import {
     TextInput,
     Modal,
     ScrollView,
+    StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from 'prop-types';
@@ -62,10 +63,22 @@ function DropdownSelect({ label, options, value, onSelect, disabled, testID, pla
                 animationType="fade"
                 onRequestClose={() => setVisible(false)}
             >
-                <Pressable style={styles.dropdownOverlay} onPress={() => setVisible(false)}>
+                <View style={styles.dropdownOverlay}>
+                    <Pressable
+                        style={StyleSheet.absoluteFill}
+                        onPress={() => setVisible(false)}
+                        accessibilityRole="button"
+                        accessibilityLabel="Close list"
+                    />
                     <View style={styles.dropdownModal}>
                         <Text style={styles.dropdownModalTitle}>{label}</Text>
-                        <ScrollView>
+                        <ScrollView
+                            style={styles.dropdownOptionsScroll}
+                            contentContainerStyle={styles.dropdownOptionsScrollContent}
+                            nestedScrollEnabled
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator
+                        >
                             {options.map((opt) => (
                                 <DropdownOption
                                     key={opt}
@@ -77,7 +90,7 @@ function DropdownSelect({ label, options, value, onSelect, disabled, testID, pla
                             ))}
                         </ScrollView>
                     </View>
-                </Pressable>
+                </View>
             </Modal>
         </View>
     );
@@ -210,52 +223,67 @@ function SheetContent({
     setDirectionsTo,
     handleSwapDirections,
     handleTabPress,
+    onGenerateDirections,
+    generatingDirections,
+    routeError,
+    routeSegments,
 }) {
     if (activeTab === 'floors') {
         return (
-            <View style={styles.sheetContent}>
-                <View style={styles.classroomRow}>
-                    <Text style={[styles.classroomLabel, { fontSize: FONT_MD }]}>Classroom # :</Text>
-                    <TextInput
-                        testID="classroom-input"
-                        style={[styles.classroomInput, { fontSize: FONT_MD }]}
-                        value={classroomInput}
-                        onChangeText={setClassroomInput}
-                        keyboardType="default"
-                    />
+            <ScrollView
+                style={styles.sheetFloorsScroll}
+                contentContainerStyle={styles.sheetFloorsScrollContent}
+                keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled
+                showsVerticalScrollIndicator
+            >
+                <View style={styles.sheetContent}>
+                    <View style={styles.classroomRow}>
+                        <Text style={[styles.classroomLabel, { fontSize: FONT_MD }]}>Classroom # :</Text>
+                        <TextInput
+                            testID="classroom-input"
+                            style={[styles.classroomInput, { fontSize: FONT_MD }]}
+                            value={classroomInput}
+                            onChangeText={setClassroomInput}
+                            keyboardType="default"
+                        />
+                    </View>
+                    <View style={styles.floorBtnsWrap}>
+                        {getFloors(building?.code).map((floor) => (
+                            <Pressable
+                                key={floor}
+                                testID={`floor-btn-${floor}`}
+                                style={[
+                                    styles.floorBtn,
+                                    { width: FLOOR_BTN, height: FLOOR_BTN, borderRadius: FLOOR_BTN / 2 },
+                                    selectedFloor === floor && styles.floorBtnActive,
+                                ]}
+                                onPress={() => setSelectedFloor(prev => prev === floor ? null : floor)}
+                            >
+                                <Text style={[
+                                    styles.floorBtnText,
+                                    { fontSize: FONT_MD },
+                                    selectedFloor === floor && styles.floorBtnTextActive,
+                                ]}>
+                                    {floor}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </View>
                 </View>
-                <View style={styles.floorBtnsWrap}>
-                    {getFloors(building?.code).map((floor) => (
-                        <Pressable
-                            key={floor}
-                            testID={`floor-btn-${floor}`}
-                            style={[
-                                styles.floorBtn,
-                                { width: FLOOR_BTN, height: FLOOR_BTN, borderRadius: FLOOR_BTN / 2 },
-                                selectedFloor === floor && styles.floorBtnActive,
-                            ]}
-                            onPress={() => setSelectedFloor(prev => prev === floor ? null : floor)}
-                        >
-                        <Text style={[
-                                styles.floorBtnText,
-                                { fontSize: FONT_MD },
-                                selectedFloor === floor && styles.floorBtnTextActive,
-                            ]}>
-                                {floor}
-                        </Text>
-                        </Pressable>
-                    ))}
-                </View>
-            </View>
+            </ScrollView>
         );
     }
 
     if (activeTab === 'directions') {
+        const hasSummary = Array.isArray(routeSegments) && routeSegments.length > 0;
         return (
             <ScrollView
                 style={styles.sheetScrollView}
                 contentContainerStyle={styles.sheetScrollContent}
                 keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled
+                showsVerticalScrollIndicator
             >
                 <View style={styles.sheetContent}>
                     <Text style={[styles.directionsSectionTitle, { fontSize: FONT_MD + 2 }]}>
@@ -296,16 +324,43 @@ function SheetContent({
                         FONT_SM={FONT_SM}
                     />
 
-                    {/* GENERATE DIRECTIONS BTN -- TO IMPLEMENT AFTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
                     <Pressable
                         testID="generate-directions-btn"
-                        style={styles.generateDirectionsBtn}
-                        onPress={() => {}}
+                        style={[styles.generateDirectionsBtn, generatingDirections && { opacity: 0.7 }]}
+                        onPress={onGenerateDirections}
+                        disabled={generatingDirections}
                     >
                         <Text style={[styles.generateDirectionsBtnText, { fontSize: FONT_MD }]}>
                             Generate Directions
                         </Text>
                     </Pressable>
+
+                    {routeError ? (
+                        <Text style={styles.routeInlineError}>{routeError}</Text>
+                    ) : null}
+
+                    {hasSummary ? (
+                        <View style={styles.routeSummaryCard}>
+                            <Text style={styles.routeSummaryTitle}>Directions Summary</Text>
+                            {routeSegments.map((seg, idx) => (
+                                <View key={`summary-${seg.kind}-${idx}`} style={styles.routeSummarySegment}>
+                                    <Text style={styles.routeSummaryHeading}>
+                                        {seg.kind === 'indoor' ? 'Indoor' : 'Outdoor'} {idx + 1}
+                                    </Text>
+                                    {seg.kind === 'outdoor' && (seg.distanceText || seg.durationText) ? (
+                                        <Text style={styles.routeSummaryMeta}>
+                                            {[seg.distanceText, seg.durationText].filter(Boolean).join(' · ')}
+                                        </Text>
+                                    ) : null}
+                                    {(seg.steps || []).map((line, j) => (
+                                        <Text key={`summary-step-${idx}-${j}`} style={styles.routeSummaryLine}>
+                                            • {line}
+                                        </Text>
+                                    ))}
+                                </View>
+                            ))}
+                        </View>
+                    ) : null}
                 </View>
             </ScrollView>
         );
@@ -348,6 +403,15 @@ const sharedSheetPropTypes = {
     directionsTo: locationShape.isRequired,
     setDirectionsTo: PropTypes.func.isRequired,
     handleSwapDirections: PropTypes.func.isRequired,
+    onGenerateDirections: PropTypes.func.isRequired,
+    generatingDirections: PropTypes.bool,
+    routeError: PropTypes.string,
+    routeSegments: PropTypes.arrayOf(PropTypes.shape({
+        kind: PropTypes.oneOf(['indoor', 'outdoor']),
+        steps: PropTypes.arrayOf(PropTypes.string),
+        distanceText: PropTypes.string,
+        durationText: PropTypes.string,
+    })),
 };
 
 SheetContent.propTypes = {
@@ -355,11 +419,17 @@ SheetContent.propTypes = {
     activeTab: PropTypes.string,
     building: buildingShape,
     handleTabPress: PropTypes.func.isRequired,
+    generatingDirections: PropTypes.bool,
+    routeError: PropTypes.string,
+    routeSegments: PropTypes.array,
 };
 
 SheetContent.defaultProps = {
     activeTab: null,
     building: null,
+    generatingDirections: false,
+    routeError: null,
+    routeSegments: null,
 };
 
 export default function IndoorMapsBottomSheet({
@@ -386,6 +456,10 @@ export default function IndoorMapsBottomSheet({
     directionsTo,
     setDirectionsTo,
     handleSwapDirections,
+    onGenerateDirections,
+    generatingDirections,
+    routeError,
+    routeSegments,
 }) {
     return (
         <Animated.View style={[styles.sheet, { height: sheetHeight }]}>
@@ -427,26 +501,32 @@ export default function IndoorMapsBottomSheet({
                 </View>
             </View>
 
-            <SheetContent
-                activeTab={activeTab}
-                building={building}
-                FONT_SM={FONT_SM}
-                FONT_MD={FONT_MD}
-                FLOOR_BTN={FLOOR_BTN}
-                classroomInput={classroomInput}
-                setClassroomInput={setClassroomInput}
-                selectedFloor={selectedFloor}
-                setSelectedFloor={setSelectedFloor}
-                BUILDINGS_LIST={BUILDINGS_LIST}
-                getFloors={getFloors}
-                getRooms={getRooms}
-                directionsFrom={directionsFrom}
-                setDirectionsFrom={setDirectionsFrom}
-                directionsTo={directionsTo}
-                setDirectionsTo={setDirectionsTo}
-                handleSwapDirections={handleSwapDirections}
-                handleTabPress={handleTabPress}
-            />
+            <View style={styles.sheetBody}>
+                <SheetContent
+                    activeTab={activeTab}
+                    building={building}
+                    FONT_SM={FONT_SM}
+                    FONT_MD={FONT_MD}
+                    FLOOR_BTN={FLOOR_BTN}
+                    classroomInput={classroomInput}
+                    setClassroomInput={setClassroomInput}
+                    selectedFloor={selectedFloor}
+                    setSelectedFloor={setSelectedFloor}
+                    BUILDINGS_LIST={BUILDINGS_LIST}
+                    getFloors={getFloors}
+                    getRooms={getRooms}
+                    directionsFrom={directionsFrom}
+                    setDirectionsFrom={setDirectionsFrom}
+                    directionsTo={directionsTo}
+                    setDirectionsTo={setDirectionsTo}
+                    handleSwapDirections={handleSwapDirections}
+                    handleTabPress={handleTabPress}
+                    onGenerateDirections={onGenerateDirections}
+                    generatingDirections={generatingDirections}
+                    routeError={routeError}
+                    routeSegments={routeSegments}
+                />
+            </View>
         </Animated.View>
     );
 }
@@ -461,10 +541,16 @@ IndoorMapsBottomSheet.propTypes = {
     building: buildingShape,
     ICON_SIZE: PropTypes.number.isRequired,
     FONT_LG: PropTypes.number.isRequired,
+    generatingDirections: PropTypes.bool,
+    routeError: PropTypes.string,
+    routeSegments: PropTypes.array,
 };
 
 IndoorMapsBottomSheet.defaultProps = {
     activeTab: null,
     campus: null,
     building: null,
+    generatingDirections: false,
+    routeError: null,
+    routeSegments: null,
 };

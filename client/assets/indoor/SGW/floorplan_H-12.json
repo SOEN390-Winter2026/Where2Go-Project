@@ -1267,7 +1267,20 @@
           "y": 0.2301
         },
         "connections": [
-          "wp57_H-22"
+          "wp57_H-22",
+          "wp_exit_H12"
+        ]
+      },
+      {
+        "id": "wp_exit_H12",
+        "type": "exit",
+        "floor": "H-12",
+        "position": {
+          "x": 0.48,
+          "y": 0.94
+        },
+        "connections": [
+          "wp58_H-23"
         ]
       }
     ]

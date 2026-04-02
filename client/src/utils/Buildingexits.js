@@ -1,5 +1,10 @@
 import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
+import { equivalentCampusIndoorCodes, normalizeBuildingCode } from './buildingCode';
+
+function equivalentCodes(campus, code) {
+    return equivalentCampusIndoorCodes(campus, code);
+}
 
 /**
  * Extracts all exit waypoints from a building's floor plans.
@@ -13,25 +18,29 @@ import { extractFloorPlan } from './floorPlanUtils';
  * }
  */
 export function getExitWaypoints(buildingCode, campus) {
-    const buildingData = indoorMaps?.[campus]?.[buildingCode];
+    const [primary, secondary] = equivalentCodes(campus, buildingCode);
+    const buildingData = indoorMaps?.[campus]?.[primary] ?? indoorMaps?.[campus]?.[secondary];
     if (!buildingData) return [];
 
-    const groundFloorKey = Object.keys(buildingData)[0];
-    const entry = buildingData[groundFloorKey];
-    if (!entry?.data) return [];
-
-    const floorPlan = extractFloorPlan(entry.data, groundFloorKey);
-    if (!Array.isArray(floorPlan?.waypoints)) return [];
-
-    return floorPlan.waypoints
-        .filter(wp => wp?.type === 'exit' && wp?.id && wp?.position)
-        .map(wp => ({
-            buildingCode,
-            campus,
-            floor: groundFloorKey,
-            waypointId: wp.id,
-            position: wp.position,
-        }));
+    const out = [];
+    for (const floorKey of Object.keys(buildingData)) {
+        const entry = buildingData[floorKey];
+        if (!entry?.data) continue;
+        const floorPlan = extractFloorPlan(entry.data, floorKey);
+        if (!Array.isArray(floorPlan?.waypoints)) continue;
+        for (const wp of floorPlan.waypoints) {
+            if (wp?.type === 'exit' && wp?.id && wp?.position) {
+                out.push({
+                    buildingCode: primary,
+                    campus,
+                    floor: floorKey,
+                    waypointId: wp.id,
+                    position: wp.position,
+                });
+            }
+        }
+    }
+    return out;
 }
 
 //Returns all exits across every mapped building on a campus.
@@ -50,7 +59,8 @@ export function getAllExitsForCampus(campus) {
  * Returns { latitude, longitude } or null if the building isn't found
  */
 export function exitPositionToLatLng(exitWaypoint, buildings) {
-    const building = buildings.find(b => b.code === exitWaypoint.buildingCode);
+    const aliases = equivalentCodes(exitWaypoint.campus, exitWaypoint.buildingCode);
+    const building = buildings.find(b => aliases.includes(normalizeBuildingCode(b.code)));
     if (!building?.coordinates?.length) return null;
 
     const lats = building.coordinates.map(c => c.latitude);

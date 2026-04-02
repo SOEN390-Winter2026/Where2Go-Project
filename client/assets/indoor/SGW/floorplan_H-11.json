@@ -2121,7 +2121,20 @@
           "y": 0.6012
         },
         "connections": [
-          "wp89_H-50"
+          "wp89_H-50",
+          "wp_exit_H11"
+        ]
+      },
+      {
+        "id": "wp_exit_H11",
+        "type": "exit",
+        "floor": "H-11",
+        "position": {
+          "x": 0.25,
+          "y": 0.93
+        },
+        "connections": [
+          "wp90_H-51"
         ]
       }
     ]

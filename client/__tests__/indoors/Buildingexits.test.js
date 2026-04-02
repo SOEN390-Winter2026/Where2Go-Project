@@ -82,9 +82,9 @@ const mockBuildings = [
 ];
 
 describe('getExitWaypoints', () => {
-    it('returns only exit waypoints from the ground floor', () => {
+    it('returns exit waypoints from every floor that has data', () => {
         const exits = getExitWaypoints('H', 'SGW');
-        expect(exits).toHaveLength(2);
+        expect(exits).toHaveLength(3);
         expect(exits.every(e => e.waypointId.includes('exit'))).toBe(true);
     });
 
@@ -94,9 +94,9 @@ describe('getExitWaypoints', () => {
         expect(exits.find(e => e.waypointId === 'wp_stair')).toBeUndefined();
     });
 
-    it('only reads from the first floor, not upper floors', () => {
+    it('includes upper-floor exits when present', () => {
         const exits = getExitWaypoints('H', 'SGW');
-        expect(exits.find(e => e.waypointId === 'wp_upper_exit')).toBeUndefined();
+        expect(exits.find(e => e.waypointId === 'wp_upper_exit')).toBeDefined();
     });
 
     it('returns correct shape for each exit', () => {
@@ -114,7 +114,7 @@ describe('getExitWaypoints', () => {
         expect(getExitWaypoints('ZZ', 'SGW')).toEqual([]);
     });
 
-    it('returns [] when ground floor has no data', () => {
+    it('returns [] when no floor has graph data', () => {
         expect(getExitWaypoints('MB', 'SGW')).toEqual([]);
     });
 
