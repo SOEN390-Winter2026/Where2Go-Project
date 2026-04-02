@@ -281,6 +281,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                                 return (
                                     <TouchableOpacity
                                         key={`${room.id}-${idx}`}
+                                        testID={`room-label-${room.id}`}
                                         style={[
                                             styles.roomLabel,
                                             { left: cx, top: cy },
