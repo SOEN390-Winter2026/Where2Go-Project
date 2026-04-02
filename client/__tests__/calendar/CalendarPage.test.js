@@ -1640,5 +1640,69 @@ describe('CalendarPage', () => {
             expect(result.getByText("New Event")).toBeTruthy();
             });
         });
+
+        it('manually adds an event and displays it in the list', async () => {
+        const { getByTestId, findByText, queryByTestId } = render(<CalendarPage />);
+
+        // 1. Open bottom sheet and select Manual Add
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByTestId('manualAddBtn'));
+
+        // 2. Verify the Manual Add component is rendered (Mocked)
+        expect(getByTestId('calendar-add-event')).toBeTruthy();
+
+        // 3. Trigger the mock save
+        fireEvent.press(getByTestId('mock-save-event'));
+
+        // 4. Verify we are back on the main page and the event is visible
+        await waitFor(() => {
+            expect(queryByTestId('calendar-add-event')).toBeNull();
+            expect(findByText('New Event')).toBeTruthy();
+        });
+    });
+
+    it('saves selected calendars to AsyncStorage when Done is pressed', async () => {
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-99', title: 'Uni', color: 'red' }]);
+        const { getByTestId, findByText, getByText } = render(<CalendarPage />);
+
+        fireEvent.press(getByTestId('openModalBtn'));
+        fireEvent.press(getByTestId('calBtn'));
+        
+        await findByText('Uni');
+        fireEvent(getByTestId('checkbox-cal-99'), 'onValueChange', true);
+        fireEvent.press(getByText(/Done/i));
+
+        await waitFor(() => {
+            expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+                "where2go_saved_calendar_ids",
+                JSON.stringify(["cal-99"])
+            );
+        });
+    });
+
+    it('shows an alert when trying to navigate to an event with no valid building', async () => {
+        const alertSpy = jest.spyOn(Alert, 'alert');
+        Calendar.getCalendarsAsync.mockResolvedValue([{ id: 'cal-1', title: 'Work' }]);
+        // Mocking parseEventLocation to return no building
+        const { parseEventLocation } = require('../../src/utils/eventLocationParser');
+        parseEventLocation.mockReturnValueOnce({ building: null, room: null });
+
+        Calendar.getEventsAsync.mockResolvedValue([
+            { id: 'evt-1', title: 'Remote Meeting', location: 'Zoom', startDate: new Date().toISOString() }
+        ]);
+
+        const renderResult = render(<CalendarPage onGenerateDirections={jest.fn()} />);
+        await connectAndChooseCalendar(renderResult);
+
+        const eventItem = await renderResult.findByTestId('event-item-evt-1');
+        fireEvent.press(eventItem);
+
+        expect(alertSpy).toHaveBeenCalledWith(
+            "Cannot Generate Directions",
+            expect.any(String),
+            expect.any(Array)
+        );
+        alertSpy.mockRestore();
+    });
     });
 });

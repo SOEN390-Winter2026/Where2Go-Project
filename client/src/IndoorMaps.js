@@ -52,12 +52,18 @@ function getContainBounds(containerW, containerH, imageAspect) {
 }
 
 function ZoomButton({ iconName, onPress, accessibilityLabel }) {
+    // Add testID for testability
+    let testID = undefined;
+    if (iconName === 'add') testID = 'zoom-in-btn';
+    else if (iconName === 'remove') testID = 'zoom-out-btn';
+    else if (iconName === 'locate-outline') testID = 'recenter-btn';
     return (
         <Pressable
             style={({ pressed }) => [styles.zoomBtn, pressed && styles.zoomBtnPressed]}
             onPress={onPress}
             accessibilityLabel={accessibilityLabel}
             accessibilityRole="button"
+            testID={testID}
         >
             <Ionicons name={iconName} size={22} color="#912338" />
         </Pressable>
