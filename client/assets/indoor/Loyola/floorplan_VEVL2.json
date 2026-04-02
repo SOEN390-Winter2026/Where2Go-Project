@@ -1,7 +1,6 @@
 {
   "VEVL2": {
     "floor": "VEVL2",
-    "building": "VEVL",
     "rooms": [
       {
         "id": "VEVL-295",
@@ -177,6 +176,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp4_VEVL2",
         "bounds": {
           "x": 0.3206,
           "y": 0.0829,
@@ -190,6 +190,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp4_VEVL2",
         "bounds": {
           "x": 0.3073,
           "y": 0.0468,
@@ -203,6 +204,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp4_VEVL2",
         "bounds": {
           "x": 0.2636,
           "y": 0.0468,
@@ -229,6 +231,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp13_VEVL2",
         "bounds": {
           "x": 0.4116,
           "y": 0.0829,
@@ -242,6 +245,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp13_VEVL2",
         "bounds": {
           "x": 0.3917,
           "y": 0.0456,
@@ -255,6 +259,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp13_VEVL2",
         "bounds": {
           "x": 0.35,
           "y": 0.0462,
@@ -268,6 +273,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp13_VEVL2",
         "bounds": {
           "x": 0.3471,
           "y": 0.0993,
@@ -281,6 +287,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp13_VEVL2",
         "bounds": {
           "x": 0.4126,
           "y": 0.1088,
@@ -294,6 +301,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp14_VEVL2",
         "bounds": {
           "x": 0.4914,
           "y": 0.0841,
@@ -307,6 +315,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp14_VEVL2",
         "bounds": {
           "x": 0.4762,
           "y": 0.0456,
@@ -320,6 +329,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp14_VEVL2",
         "bounds": {
           "x": 0.4339,
           "y": 0.0468,
@@ -333,6 +343,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp14_VEVL2",
         "bounds": {
           "x": 0.4344,
           "y": 0.0829,
@@ -360,6 +371,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp15_VEVL2",
         "bounds": {
           "x": 0.5179,
           "y": 0.0449,
@@ -373,6 +385,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp15_VEVL2",
         "bounds": {
           "x": 0.562,
           "y": 0.0443,
@@ -399,6 +412,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp16_VEVL2",
         "bounds": {
           "x": 0.6379,
           "y": 0.043,
@@ -412,6 +426,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp16_VEVL2",
         "bounds": {
           "x": 0.6882,
           "y": 0.0437,
@@ -425,6 +440,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp16_VEVL2",
         "bounds": {
           "x": 0.7025,
           "y": 0.0962,
@@ -466,6 +482,7 @@
         "type": "other",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp23_VEVL2",
         "bounds": {
           "x": 0.6041,
           "y": 0.1868,
@@ -479,6 +496,7 @@
         "type": "other",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp23_VEVL2",
         "bounds": {
           "x": 0.6041,
           "y": 0.2531,
@@ -520,6 +538,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp23_VEVL2",
         "bounds": {
           "x": 0.5188,
           "y": 0.1616,
@@ -617,6 +636,7 @@
         "type": "classroom",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp20_VEVL2",
         "bounds": {
           "x": 0.733,
           "y": 0.357,
@@ -697,6 +717,7 @@
         "type": "hallway",
         "floor": "VEVL2",
         "building": "VEVL",
+        "nearestWaypoint": "wp4_VEVL2",
         "bounds": {
           "x": 0.2625,
           "y": 0.1361,
@@ -926,7 +947,8 @@
           "y": 0.1484
         },
         "connections": [
-          "wp2_VEVL2"
+          "wp2_VEVL2",
+          "wp59_VEVL2"
         ]
       },
       {
@@ -938,7 +960,8 @@
           "y": 0.1484
         },
         "connections": [
-          "wp1_VEVL2"
+          "wp1_VEVL2",
+          "wp5_VEVL2"
         ]
       },
       {
@@ -949,7 +972,9 @@
           "x": 0.2986,
           "y": 0.1581
         },
-        "connections": []
+        "connections": [
+          "wp5_VEVL2"
+        ]
       },
       {
         "id": "wp4_VEVL2",
@@ -959,7 +984,9 @@
           "x": 0.3133,
           "y": 0.1386
         },
-        "connections": []
+        "connections": [
+          "wp5_VEVL2"
+        ]
       },
       {
         "id": "wp5_VEVL2",
@@ -970,7 +997,13 @@
           "y": 0.157
         },
         "connections": [
-          "wp6_VEVL2"
+          "wp6_VEVL2",
+          "wp2_VEVL2",
+          "wp60_VEVL2",
+          "wp3_VEVL2",
+          "wp4_VEVL2",
+          "wp11_VEVL2",
+          "wp12_VEVL2"
         ]
       },
       {
@@ -983,7 +1016,10 @@
         },
         "connections": [
           "wp5_VEVL2",
-          "wp_exit_VEVL2"
+          "wp7_VEVL2",
+          "wp8_VEVL2",
+          "wp9_VEVL2",
+          "wp10_VEVL2"
         ]
       },
       {
@@ -994,7 +1030,9 @@
           "x": 0.3171,
           "y": 0.1938
         },
-        "connections": []
+        "connections": [
+          "wp6_VEVL2"
+        ]
       },
       {
         "id": "wp8_VEVL2",
@@ -1004,7 +1042,9 @@
           "x": 0.3171,
           "y": 0.211
         },
-        "connections": []
+        "connections": [
+          "wp6_VEVL2"
+        ]
       },
       {
         "id": "wp9_VEVL2",
@@ -1014,7 +1054,9 @@
           "x": 0.3098,
           "y": 0.2254
         },
-        "connections": []
+        "connections": [
+          "wp6_VEVL2"
+        ]
       },
       {
         "id": "wp10_VEVL2",
@@ -1024,7 +1066,9 @@
           "x": 0.3176,
           "y": 0.2472
         },
-        "connections": []
+        "connections": [
+          "wp6_VEVL2"
+        ]
       },
       {
         "id": "wp11_VEVL2",
@@ -1034,7 +1078,9 @@
           "x": 0.3128,
           "y": 0.2633
         },
-        "connections": []
+        "connections": [
+          "wp5_VEVL2"
+        ]
       },
       {
         "id": "wp12_VEVL2",
@@ -1044,7 +1090,9 @@
           "x": 0.365,
           "y": 0.1857
         },
-        "connections": []
+        "connections": [
+          "wp5_VEVL2"
+        ]
       },
       {
         "id": "wp13_VEVL2",
@@ -1054,7 +1102,9 @@
           "x": 0.4055,
           "y": 0.1392
         },
-        "connections": []
+        "connections": [
+          "wp60_VEVL2"
+        ]
       },
       {
         "id": "wp14_VEVL2",
@@ -1064,7 +1114,9 @@
           "x": 0.4843,
           "y": 0.1403
         },
-        "connections": []
+        "connections": [
+          "wp60_VEVL2"
+        ]
       },
       {
         "id": "wp15_VEVL2",
@@ -1074,7 +1126,9 @@
           "x": 0.5688,
           "y": 0.1386
         },
-        "connections": []
+        "connections": [
+          "wp60_VEVL2"
+        ]
       },
       {
         "id": "wp16_VEVL2",
@@ -1084,7 +1138,9 @@
           "x": 0.6825,
           "y": 0.1398
         },
-        "connections": []
+        "connections": [
+          "wp30_VEVL2"
+        ]
       },
       {
         "id": "wp17_VEVL2",
@@ -1094,7 +1150,9 @@
           "x": 0.7385,
           "y": 0.1403
         },
-        "connections": []
+        "connections": [
+          "wp30_VEVL2"
+        ]
       },
       {
         "id": "wp18_VEVL2",
@@ -1104,7 +1162,9 @@
           "x": 0.692,
           "y": 0.2426
         },
-        "connections": []
+        "connections": [
+          "wp31_VEVL2"
+        ]
       },
       {
         "id": "wp19_VEVL2",
@@ -1114,7 +1174,9 @@
           "x": 0.6924,
           "y": 0.2593
         },
-        "connections": []
+        "connections": [
+          "wp28_VEVL2"
+        ]
       },
       {
         "id": "wp20_VEVL2",
@@ -1124,7 +1186,9 @@
           "x": 0.7002,
           "y": 0.3408
         },
-        "connections": []
+        "connections": [
+          "wp29_VEVL2"
+        ]
       },
       {
         "id": "wp21_VEVL2",
@@ -1134,7 +1198,9 @@
           "x": 0.6567,
           "y": 0.3414
         },
-        "connections": []
+        "connections": [
+          "wp29_VEVL2"
+        ]
       },
       {
         "id": "wp22_VEVL2",
@@ -1144,7 +1210,9 @@
           "x": 0.6114,
           "y": 0.3397
         },
-        "connections": []
+        "connections": [
+          "wp26_VEVL2"
+        ]
       },
       {
         "id": "wp23_VEVL2",
@@ -1154,7 +1222,9 @@
           "x": 0.583,
           "y": 0.3213
         },
-        "connections": []
+        "connections": [
+          "wp26_VEVL2"
+        ]
       },
       {
         "id": "wp24_VEVL2",
@@ -1164,7 +1234,9 @@
           "x": 0.5998,
           "y": 0.4236
         },
-        "connections": []
+        "connections": [
+          "wp27_VEVL2"
+        ]
       },
       {
         "id": "wp25_VEVL2",
@@ -1174,7 +1246,9 @@
           "x": 0.5989,
           "y": 0.5689
         },
-        "connections": []
+        "connections": [
+          "wp34_VEVL2"
+        ]
       },
       {
         "id": "wp26_VEVL2",
@@ -1185,7 +1259,11 @@
           "y": 0.338
         },
         "connections": [
-          "wp27_VEVL2"
+          "wp27_VEVL2",
+          "wp63_VEVL2",
+          "wp29_VEVL2",
+          "wp22_VEVL2",
+          "wp23_VEVL2"
         ]
       },
       {
@@ -1197,7 +1275,9 @@
           "y": 0.3512
         },
         "connections": [
-          "wp26_VEVL2"
+          "wp26_VEVL2",
+          "wp34_VEVL2",
+          "wp24_VEVL2"
         ]
       },
       {
@@ -1209,7 +1289,9 @@
           "y": 0.3127
         },
         "connections": [
-          "wp29_VEVL2"
+          "wp29_VEVL2",
+          "wp31_VEVL2",
+          "wp19_VEVL2"
         ]
       },
       {
@@ -1221,7 +1303,11 @@
           "y": 0.3242
         },
         "connections": [
-          "wp28_VEVL2"
+          "wp28_VEVL2",
+          "wp26_VEVL2",
+          "wp62_VEVL2",
+          "wp20_VEVL2",
+          "wp21_VEVL2"
         ]
       },
       {
@@ -1233,7 +1319,10 @@
           "y": 0.1507
         },
         "connections": [
-          "wp31_VEVL2"
+          "wp31_VEVL2",
+          "wp60_VEVL2",
+          "wp16_VEVL2",
+          "wp17_VEVL2"
         ]
       },
       {
@@ -1245,7 +1334,9 @@
           "y": 0.1691
         },
         "connections": [
-          "wp30_VEVL2"
+          "wp30_VEVL2",
+          "wp28_VEVL2",
+          "wp18_VEVL2"
         ]
       },
       {
@@ -1256,7 +1347,9 @@
           "x": 0.6584,
           "y": 0.6378
         },
-        "connections": []
+        "connections": [
+          "wp33_VEVL2"
+        ]
       },
       {
         "id": "wp33_VEVL2",
@@ -1267,7 +1360,9 @@
           "y": 0.6603
         },
         "connections": [
-          "wp34_VEVL2"
+          "wp34_VEVL2",
+          "wp32_VEVL2",
+          "wp38_VEVL2"
         ]
       },
       {
@@ -1279,7 +1374,10 @@
           "y": 0.6591
         },
         "connections": [
-          "wp33_VEVL2"
+          "wp33_VEVL2",
+          "wp27_VEVL2",
+          "wp36_VEVL2",
+          "wp25_VEVL2"
         ]
       },
       {
@@ -1291,7 +1389,8 @@
           "y": 0.7631
         },
         "connections": [
-          "wp36_VEVL2"
+          "wp36_VEVL2",
+          "wp37_VEVL2"
         ]
       },
       {
@@ -1303,7 +1402,8 @@
           "y": 0.7614
         },
         "connections": [
-          "wp35_VEVL2"
+          "wp35_VEVL2",
+          "wp34_VEVL2"
         ]
       },
       {
@@ -1314,7 +1414,9 @@
           "x": 0.6993,
           "y": 0.7642
         },
-        "connections": []
+        "connections": [
+          "wp35_VEVL2"
+        ]
       },
       {
         "id": "wp38_VEVL2",
@@ -1324,7 +1426,9 @@
           "x": 0.7131,
           "y": 0.6827
         },
-        "connections": []
+        "connections": [
+          "wp33_VEVL2"
+        ]
       },
       {
         "id": "wp39_VEVL2",
@@ -1334,7 +1438,9 @@
           "x": 0.1228,
           "y": 0.8585
         },
-        "connections": []
+        "connections": [
+          "wp42_VEVL2"
+        ]
       },
       {
         "id": "wp40_VEVL2",
@@ -1344,7 +1450,9 @@
           "x": 0.1099,
           "y": 0.7683
         },
-        "connections": []
+        "connections": [
+          "wp41_VEVL2"
+        ]
       },
       {
         "id": "wp41_VEVL2",
@@ -1355,7 +1463,8 @@
           "y": 0.7562
         },
         "connections": [
-          "wp42_VEVL2"
+          "wp42_VEVL2",
+          "wp40_VEVL2"
         ]
       },
       {
@@ -1367,7 +1476,9 @@
           "y": 0.755
         },
         "connections": [
-          "wp41_VEVL2"
+          "wp41_VEVL2",
+          "wp39_VEVL2",
+          "wp45_VEVL2"
         ]
       },
       {
@@ -1378,7 +1489,9 @@
           "x": 0.1107,
           "y": 0.62
         },
-        "connections": []
+        "connections": [
+          "wp44_VEVL2"
+        ]
       },
       {
         "id": "wp44_VEVL2",
@@ -1389,7 +1502,8 @@
           "y": 0.6373
         },
         "connections": [
-          "wp45_VEVL2"
+          "wp45_VEVL2",
+          "wp43_VEVL2"
         ]
       },
       {
@@ -1401,7 +1515,9 @@
           "y": 0.6367
         },
         "connections": [
-          "wp44_VEVL2"
+          "wp44_VEVL2",
+          "wp42_VEVL2",
+          "wp47_VEVL2"
         ]
       },
       {
@@ -1413,7 +1529,8 @@
           "y": 0.581
         },
         "connections": [
-          "wp47_VEVL2"
+          "wp47_VEVL2",
+          "wp48_VEVL2"
         ]
       },
       {
@@ -1425,7 +1542,8 @@
           "y": 0.5948
         },
         "connections": [
-          "wp46_VEVL2"
+          "wp46_VEVL2",
+          "wp45_VEVL2"
         ]
       },
       {
@@ -1437,7 +1555,8 @@
           "y": 0.5758
         },
         "connections": [
-          "wp49_VEVL2"
+          "wp49_VEVL2",
+          "wp46_VEVL2"
         ]
       },
       {
@@ -1449,7 +1568,8 @@
           "y": 0.5752
         },
         "connections": [
-          "wp48_VEVL2"
+          "wp48_VEVL2",
+          "wp51_VEVL2"
         ]
       },
       {
@@ -1461,7 +1581,9 @@
           "y": 0.473
         },
         "connections": [
-          "wp51_VEVL2"
+          "wp51_VEVL2",
+          "wp53_VEVL2",
+          "wp52_VEVL2"
         ]
       },
       {
@@ -1473,7 +1595,8 @@
           "y": 0.4845
         },
         "connections": [
-          "wp50_VEVL2"
+          "wp50_VEVL2",
+          "wp49_VEVL2"
         ]
       },
       {
@@ -1484,7 +1607,9 @@
           "x": 0.2676,
           "y": 0.4644
         },
-        "connections": []
+        "connections": [
+          "wp50_VEVL2"
+        ]
       },
       {
         "id": "wp53_VEVL2",
@@ -1495,7 +1620,8 @@
           "y": 0.4638
         },
         "connections": [
-          "wp54_VEVL2"
+          "wp54_VEVL2",
+          "wp50_VEVL2"
         ]
       },
       {
@@ -1507,7 +1633,8 @@
           "y": 0.4632
         },
         "connections": [
-          "wp53_VEVL2"
+          "wp53_VEVL2",
+          "wp55_VEVL2"
         ]
       },
       {
@@ -1519,7 +1646,8 @@
           "y": 0.3523
         },
         "connections": [
-          "wp56_VEVL2"
+          "wp56_VEVL2",
+          "wp54_VEVL2"
         ]
       },
       {
@@ -1531,7 +1659,10 @@
           "y": 0.3385
         },
         "connections": [
-          "wp55_VEVL2"
+          "wp55_VEVL2",
+          "wp58_VEVL2",
+          "wp63_VEVL2",
+          "wp57_VEVL2"
         ]
       },
       {
@@ -1542,7 +1673,9 @@
           "x": 0.2984,
           "y": 0.3375
         },
-        "connections": []
+        "connections": [
+          "wp56_VEVL2"
+        ]
       },
       {
         "id": "wp58_VEVL2",
@@ -1553,7 +1686,8 @@
           "y": 0.3261
         },
         "connections": [
-          "wp59_VEVL2"
+          "wp59_VEVL2",
+          "wp56_VEVL2"
         ]
       },
       {
@@ -1565,7 +1699,8 @@
           "y": 0.3081
         },
         "connections": [
-          "wp58_VEVL2"
+          "wp58_VEVL2",
+          "wp1_VEVL2"
         ]
       },
       {
@@ -1577,7 +1712,12 @@
           "y": 0.1555
         },
         "connections": [
-          "wp61_VEVL2"
+          "wp61_VEVL2",
+          "wp5_VEVL2",
+          "wp30_VEVL2",
+          "wp13_VEVL2",
+          "wp14_VEVL2",
+          "wp15_VEVL2"
         ]
       },
       {
@@ -1589,29 +1729,47 @@
           "y": 0.1734
         },
         "connections": [
-          "wp60_VEVL2"
+          "wp60_VEVL2",
+          "wp64_VEVL2"
         ]
       },
       {
         "id": "wp62_VEVL2",
-        "type": "corridor",
+        "type": "door",
         "floor": "VEVL2",
         "position": {
           "x": 0.7081,
           "y": 0.3231
         },
-        "connections": []
+        "connections": [
+          "wp29_VEVL2"
+        ]
       },
       {
-        "id": "wp_exit_VEVL2",
-        "type": "exit",
+        "id": "wp63_VEVL2",
+        "type": "corridor",
         "floor": "VEVL2",
         "position": {
-          "x": 0.32,
-          "y": 0.92
+          "x": 0.4966,
+          "y": 0.3277
         },
         "connections": [
-          "wp6_VEVL2"
+          "wp64_VEVL2",
+          "wp56_VEVL2",
+          "wp26_VEVL2"
+        ]
+      },
+      {
+        "id": "wp64_VEVL2",
+        "type": "corridor",
+        "floor": "VEVL2",
+        "position": {
+          "x": 0.4952,
+          "y": 0.3108
+        },
+        "connections": [
+          "wp63_VEVL2",
+          "wp61_VEVL2"
         ]
       }
     ]
