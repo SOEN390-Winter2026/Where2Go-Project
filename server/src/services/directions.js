@@ -414,6 +414,31 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
   };
 }
 
+function transportOptionsOk(routes) {
+  return { ok: true, routes };
+}
+
+function transportOptionsErr(code, message) {
+  return { ok: false, error: makeError(code, message) };
+}
+
+/** When no routes were built, pick the same error priority as before: accessible → upstream → invalid → none. */
+function resolveEmptyTransportOptionsResult(fetchErrors, accessible) {
+  if (accessible) {
+    return transportOptionsErr("NO_ACCESSIBLE_ROUTES", "No accessible routes found for this trip.");
+  }
+  const byCode = [
+    ["UPSTREAM_FAILED", "Failed to fetch directions"],
+    ["INVALID_RESPONSE", "Directions response invalid"],
+  ];
+  for (const [code, message] of byCode) {
+    if (fetchErrors.some((e) => e.code === code)) {
+      return transportOptionsErr(code, message);
+    }
+  }
+  return transportOptionsErr("NO_ROUTES", "No routes found");
+}
+
 /**
  * Get transport options (walking, transit, and Concordia shuttle when applicable) between origin and destination.
  * @param {{ lat: number, lng: number }} origin - Start coordinates
@@ -451,20 +476,10 @@ async function getTransportOptionsResult(origin, destination, opts = {}) {
 
   if (shuttleRoute) routes.push(shuttleRoute);
 
-  if (routes.length > 0) return { ok: true, routes };
+  if (routes.length > 0) return transportOptionsOk(routes);
 
-  const errors = [walkingRes.error, transitRes.error].filter(Boolean);
-
-  if (accessible) {
-    return { ok: false, error: makeError("NO_ACCESSIBLE_ROUTES", "No accessible routes found for this trip.") };
-  }
-  if (errors.some((e) => e.code === "UPSTREAM_FAILED")) {
-    return { ok: false, error: makeError("UPSTREAM_FAILED", "Failed to fetch directions") };
-  }
-  if (errors.some((e) => e.code === "INVALID_RESPONSE")) {
-    return { ok: false, error: makeError("INVALID_RESPONSE", "Directions response invalid") };
-  }
-  return { ok: false, error: makeError("NO_ROUTES", "No routes found") };
+  const fetchErrors = [walkingRes.error, transitRes.error].filter(Boolean);
+  return resolveEmptyTransportOptionsResult(fetchErrors, accessible);
 }
 
 async function getTransportOptions(origin, destination, opts = {}) {
