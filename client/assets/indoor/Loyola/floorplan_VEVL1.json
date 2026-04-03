@@ -1151,7 +1151,9 @@
           "x": 0.2353,
           "y": 0.3646
         },
-        "connections": []
+        "connections": [
+          "wp41_VEVL1"
+        ]
       },
       {
         "id": "wp2_110",
@@ -1161,7 +1163,9 @@
           "x": 0.3417,
           "y": 0.3645
         },
-        "connections": []
+        "connections": [
+          "wp43_VEVL1"
+        ]
       },
       {
         "id": "wp3_118",
@@ -1171,7 +1175,9 @@
           "x": 0.297,
           "y": 0.2365
         },
-        "connections": []
+        "connections": [
+          "wp48_VEVL1"
+        ]
       },
       {
         "id": "wp4_118",
@@ -1181,7 +1187,9 @@
           "x": 0.2806,
           "y": 0.2369
         },
-        "connections": []
+        "connections": [
+          "wp48_VEVL1"
+        ]
       },
       {
         "id": "wp5_119",
@@ -1191,7 +1199,9 @@
           "x": 0.2748,
           "y": 0.2161
         },
-        "connections": []
+        "connections": [
+          "wp48_VEVL1"
+        ]
       },
       {
         "id": "wp6_128",
@@ -1201,7 +1211,10 @@
           "x": 0.361,
           "y": 0.2376
         },
-        "connections": []
+        "connections": [
+          "wp49_VEVL1",
+          "wp48_VEVL1"
+        ]
       },
       {
         "id": "wp7_106-2",
@@ -1211,7 +1224,9 @@
           "x": 0.3741,
           "y": 0.274
         },
-        "connections": []
+        "connections": [
+          "wp44_VEVL1"
+        ]
       },
       {
         "id": "wp8_106-1",
@@ -1221,7 +1236,9 @@
           "x": 0.4283,
           "y": 0.283
         },
-        "connections": []
+        "connections": [
+          "wp44_VEVL1"
+        ]
       },
       {
         "id": "wp9_VEVL-121",
@@ -1231,7 +1248,9 @@
           "x": 0.1814,
           "y": 0.3684
         },
-        "connections": []
+        "connections": [
+          "wp41_VEVL1"
+        ]
       },
       {
         "id": "wp10_VEVL_staircase1",
@@ -1241,7 +1260,9 @@
           "x": 0.2204,
           "y": 0.4
         },
-        "connections": []
+        "connections": [
+          "wp41_VEVL1"
+        ]
       },
       {
         "id": "wp11_VEVL_staircase2",
@@ -1251,7 +1272,9 @@
           "x": 0.3337,
           "y": 0.4
         },
-        "connections": []
+        "connections": [
+          "wp43_VEVL1"
+        ]
       },
       {
         "id": "wp12_VEVl-127",
@@ -1261,7 +1284,9 @@
           "x": 0.1481,
           "y": 0.4862
         },
-        "connections": []
+        "connections": [
+          "wp42_VEVL1"
+        ]
       },
       {
         "id": "wp13_VEVL-127",
@@ -1271,7 +1296,9 @@
           "x": 0.1471,
           "y": 0.5541
         },
-        "connections": []
+        "connections": [
+          "wp40_VEVL1"
+        ]
       },
       {
         "id": "wp14_VEVL-126",
@@ -1281,7 +1308,9 @@
           "x": 0.1961,
           "y": 0.5359
         },
-        "connections": []
+        "connections": [
+          "wp40_VEVL1"
+        ]
       },
       {
         "id": "wp15_VEVL-128",
@@ -1291,7 +1320,9 @@
           "x": 0.1978,
           "y": 0.6155
         },
-        "connections": []
+        "connections": [
+          "wp40_VEVL1"
+        ]
       },
       {
         "id": "wp15_VEVL-128",
@@ -1311,7 +1342,9 @@
           "x": 0.1981,
           "y": 0.6363
         },
-        "connections": []
+        "connections": [
+          "wp40_VEVL1"
+        ]
       },
       {
         "id": "wp18_VEVL-199",
@@ -1321,7 +1354,9 @@
           "x": 0.1899,
           "y": 0.6497
         },
-        "connections": []
+        "connections": [
+          "wp40_VEVL1"
+        ]
       },
       {
         "id": "wp19_VEVL-122",
@@ -1331,7 +1366,9 @@
           "x": 0.3712,
           "y": 0.5674
         },
-        "connections": []
+        "connections": [
+          "wp54_VEVL1"
+        ]
       },
       {
         "id": "wp20_VEVL-124",
@@ -1341,7 +1378,9 @@
           "x": 0.3729,
           "y": 0.658
         },
-        "connections": []
+        "connections": [
+          "wp54_VEVL1"
+        ]
       },
       {
         "id": "wp21_VEVL-193",
@@ -1351,7 +1390,9 @@
           "x": 0.3633,
           "y": 0.6647
         },
-        "connections": []
+        "connections": [
+          "wp54_VEVL1"
+        ]
       },
       {
         "id": "wp22_VEVL194",
@@ -1361,7 +1402,9 @@
           "x": 0.4846,
           "y": 0.674
         },
-        "connections": []
+        "connections": [
+          "wp56_VEVL1"
+        ]
       },
       {
         "id": "wp23_VEVL-194-3",
@@ -1371,7 +1414,10 @@
           "x": 0.5432,
           "y": 0.6769
         },
-        "connections": []
+        "connections": [
+          "wp56_VEVL1",
+          "wp60_VEVL1"
+        ]
       },
       {
         "id": "wp24_VEVL-102",
@@ -1381,7 +1427,10 @@
           "x": 0.683,
           "y": 0.7947
         },
-        "connections": []
+        "connections": [
+          "wp64_VEVL1",
+          "wp67_VEVL1"
+        ]
       },
       {
         "id": "wp25_VEVL-101-7",
@@ -1391,7 +1440,9 @@
           "x": 0.7265,
           "y": 0.7947
         },
-        "connections": []
+        "connections": [
+          "wp64_VEVL1"
+        ]
       },
       {
         "id": "wp26_VEVL-101-5",
@@ -1401,7 +1452,9 @@
           "x": 0.7409,
           "y": 0.7947
         },
-        "connections": []
+        "connections": [
+          "wp64_VEVL1"
+        ]
       },
       {
         "id": "wp27_VEVL-101-5",
@@ -1411,7 +1464,9 @@
           "x": 0.7854,
           "y": 0.795
         },
-        "connections": []
+        "connections": [
+          "wp64_VEVL1"
+        ]
       },
       {
         "id": "wp28_VEVL-195",
@@ -1421,7 +1476,9 @@
           "x": 0.8574,
           "y": 0.8066
         },
-        "connections": []
+        "connections": [
+          "wp63_VEVL1"
+        ]
       },
       {
         "id": "wp29_VEVL-101-4",
@@ -1431,7 +1488,9 @@
           "x": 0.8526,
           "y": 0.6447
         },
-        "connections": []
+        "connections": [
+          "wp62_VEVL1"
+        ]
       },
       {
         "id": "wp30_VEVL-101-3",
@@ -1441,7 +1500,9 @@
           "x": 0.8379,
           "y": 0.6453
         },
-        "connections": []
+        "connections": [
+          "wp62_VEVL1"
+        ]
       },
       {
         "id": "wp31_VEVL-101-2",
@@ -1451,7 +1512,9 @@
           "x": 0.7128,
           "y": 0.4024
         },
-        "connections": []
+        "connections": [
+          "wp66_VEVL1"
+        ]
       },
       {
         "id": "wp32_VEVL-101-3",
@@ -1461,7 +1524,9 @@
           "x": 0.6323,
           "y": 0.3926
         },
-        "connections": []
+        "connections": [
+          "wp68_VEVL1"
+        ]
       },
       {
         "id": "wp33_VEVL-104",
@@ -1471,7 +1536,9 @@
           "x": 0.6354,
           "y": 0.3535
         },
-        "connections": []
+        "connections": [
+          "wp68_VEVL1"
+        ]
       },
       {
         "id": "wp34_VEVL-103-1",
@@ -1481,7 +1548,9 @@
           "x": 0.5959,
           "y": 0.2961
         },
-        "connections": []
+        "connections": [
+          "wp68_VEVL1"
+        ]
       },
       {
         "id": "wp35_VEVL-140",
@@ -1491,7 +1560,9 @@
           "x": 0.697,
           "y": 0.2269
         },
-        "connections": []
+        "connections": [
+          "wp52_VEVL1"
+        ]
       },
       {
         "id": "wp36_VEVL-102",
@@ -1501,7 +1572,9 @@
           "x": 0.5029,
           "y": 0.72
         },
-        "connections": []
+        "connections": [
+          "wp56_VEVL1"
+        ]
       },
       {
         "id": "wp37_VEVL-100",
@@ -1511,7 +1584,10 @@
           "x": 0.3856,
           "y": 0.1565
         },
-        "connections": []
+        "connections": [
+          "wp38_VEVL1",
+          "wp50_VEVL1"
+        ]
       },
       {
         "id": "wp38_VEVL1",
@@ -1521,7 +1597,9 @@
           "x": 0.1108,
           "y": 0.1385
         },
-        "connections": []
+        "connections": [
+          "wp37_VEVL-100"
+        ]
       },
       {
         "id": "wp39_VEVL1",
@@ -1532,6 +1610,430 @@
           "y": 0.2073
         },
         "connections": []
+      },
+      {
+        "id": "wp40_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.1908,
+          "y": 0.5525
+        },
+        "connections": [
+          "wp15_VEVL-128",
+          "wp17_VEVL-130",
+          "wp18_VEVL-199",
+          "wp13_VEVL-127",
+          "wp14_VEVL-126",
+          "wp42_VEVL1"
+        ]
+      },
+      {
+        "id": "wp41_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.189,
+          "y": 0.3855
+        },
+        "connections": [
+          "wp45_VEVL1",
+          "wp9_VEVL-121",
+          "wp1_112",
+          "wp10_VEVL_staircase1",
+          "wp43_VEVL1",
+          "wp42_VEVL1"
+        ]
+      },
+      {
+        "id": "wp42_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.1863,
+          "y": 0.4871
+        },
+        "connections": [
+          "wp41_VEVL1",
+          "wp12_VEVl-127",
+          "wp40_VEVL1"
+        ]
+      },
+      {
+        "id": "wp43_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.3629,
+          "y": 0.3809
+        },
+        "connections": [
+          "wp41_VEVL1",
+          "wp2_110",
+          "wp11_VEVL_staircase2",
+          "wp44_VEVL1",
+          "wp54_VEVL1",
+          "wp55_VEVL1"
+        ]
+      },
+      {
+        "id": "wp44_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.3711,
+          "y": 0.2947
+        },
+        "connections": [
+          "wp43_VEVL1",
+          "wp7_106-2",
+          "wp8_106-1"
+        ]
+      },
+      {
+        "id": "wp45_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.1881,
+          "y": 0.2632
+        },
+        "connections": [
+          "wp46_VEVL1",
+          "wp41_VEVL1"
+        ]
+      },
+      {
+        "id": "wp46_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.2145,
+          "y": 0.2639
+        },
+        "connections": [
+          "wp47_VEVL1",
+          "wp45_VEVL1"
+        ]
+      },
+      {
+        "id": "wp47_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.2163,
+          "y": 0.2262
+        },
+        "connections": [
+          "wp48_VEVL1",
+          "wp46_VEVL1"
+        ]
+      },
+      {
+        "id": "wp48_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.2974,
+          "y": 0.2224
+        },
+        "connections": [
+          "wp49_VEVL1",
+          "wp6_128",
+          "wp3_118",
+          "wp4_118",
+          "wp5_119",
+          "wp47_VEVL1"
+        ]
+      },
+      {
+        "id": "wp49_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.403,
+          "y": 0.2232
+        },
+        "connections": [
+          "wp50_VEVL1",
+          "wp48_VEVL1",
+          "wp6_128"
+        ]
+      },
+      {
+        "id": "wp50_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.4258,
+          "y": 0.1839
+        },
+        "connections": [
+          "wp51_VEVL1",
+          "wp37_VEVL-100",
+          "wp49_VEVL1"
+        ]
+      },
+      {
+        "id": "wp51_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.4904,
+          "y": 0.2516
+        },
+        "connections": [
+          "wp52_VEVL1",
+          "wp50_VEVL1",
+          "wp55_VEVL1"
+        ]
+      },
+      {
+        "id": "wp52_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6907,
+          "y": 0.2439
+        },
+        "connections": [
+          "wp35_VEVL-140",
+          "wp53_197",
+          "wp51_VEVL1"
+        ]
+      },
+      {
+        "id": "wp53_197",
+        "type": "door",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6489,
+          "y": 0.2224
+        },
+        "connections": [
+          "wp52_VEVL1"
+        ]
+      },
+      {
+        "id": "wp54_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.3606,
+          "y": 0.5639
+        },
+        "connections": [
+          "wp43_VEVL1",
+          "wp19_VEVL-122",
+          "wp21_VEVL-193",
+          "wp20_VEVL-124"
+        ]
+      },
+      {
+        "id": "wp55_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.4745,
+          "y": 0.3853
+        },
+        "connections": [
+          "wp57_VEVL1",
+          "wp56_VEVL1",
+          "wp43_VEVL1",
+          "wp51_VEVL1"
+        ]
+      },
+      {
+        "id": "wp56_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.4727,
+          "y": 0.6656
+        },
+        "connections": [
+          "wp60_VEVL1",
+          "wp22_VEVL194",
+          "wp23_VEVL-194-3",
+          "wp55_VEVL1",
+          "wp36_VEVL-102"
+        ]
+      },
+      {
+        "id": "wp57_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.551,
+          "y": 0.393
+        },
+        "connections": [
+          "wp58_VEVL1",
+          "wp55_VEVL1"
+        ]
+      },
+      {
+        "id": "wp58_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.5911,
+          "y": 0.4091
+        },
+        "connections": [
+          "wp59_VEVL1",
+          "wp57_VEVL1",
+          "wp68_VEVL1"
+        ]
+      },
+      {
+        "id": "wp59_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6148,
+          "y": 0.4692
+        },
+        "connections": [
+          "wp66_VEVL1",
+          "wp61_VEVL1",
+          "wp58_VEVL1"
+        ]
+      },
+      {
+        "id": "wp60_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6176,
+          "y": 0.6756
+        },
+        "connections": [
+          "wp61_VEVL1",
+          "wp56_VEVL1",
+          "wp23_VEVL-194-3",
+          "wp67_VEVL1"
+        ]
+      },
+      {
+        "id": "wp61_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6194,
+          "y": 0.6509
+        },
+        "connections": [
+          "wp60_VEVL1",
+          "wp65_VEVL1",
+          "wp59_VEVL1"
+        ]
+      },
+      {
+        "id": "wp62_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.854,
+          "y": 0.6537
+        },
+        "connections": [
+          "wp63_VEVL1",
+          "wp29_VEVL-101-4",
+          "wp30_VEVL-101-3",
+          "wp65_VEVL1"
+        ]
+      },
+      {
+        "id": "wp63_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.8502,
+          "y": 0.7884
+        },
+        "connections": [
+          "wp64_VEVL1",
+          "wp28_VEVL-195",
+          "wp62_VEVL1"
+        ]
+      },
+      {
+        "id": "wp64_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.7417,
+          "y": 0.7845
+        },
+        "connections": [
+          "wp67_VEVL1",
+          "wp24_VEVL-102",
+          "wp25_VEVL-101-7",
+          "wp26_VEVL-101-5",
+          "wp27_VEVL-101-5",
+          "wp63_VEVL1",
+          "wp65_VEVL1"
+        ]
+      },
+      {
+        "id": "wp65_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.7402,
+          "y": 0.6518
+        },
+        "connections": [
+          "wp62_VEVL1",
+          "wp64_VEVL1",
+          "wp61_VEVL1",
+          "wp66_VEVL1"
+        ]
+      },
+      {
+        "id": "wp66_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.7394,
+          "y": 0.4684
+        },
+        "connections": [
+          "wp65_VEVL1",
+          "wp59_VEVL1",
+          "wp31_VEVL-101-2"
+        ]
+      },
+      {
+        "id": "wp67_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6165,
+          "y": 0.7903
+        },
+        "connections": [
+          "wp60_VEVL1",
+          "wp64_VEVL1",
+          "wp24_VEVL-102"
+        ]
+      },
+      {
+        "id": "wp68_VEVL1",
+        "type": "corridor",
+        "floor": "VEVL1",
+        "position": {
+          "x": 0.6162,
+          "y": 0.3371
+        },
+        "connections": [
+          "wp58_VEVL1",
+          "wp33_VEVL-104",
+          "wp34_VEVL-103-1",
+          "wp32_VEVL-101-3"
+        ]
       }
     ]
   }
