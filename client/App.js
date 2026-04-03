@@ -297,6 +297,7 @@ export default function App() {
         initialTo={destinationBuilding ? destinationBuilding.name : ""}
         onSelectRoute={handleSelectRoute}
         userLocation={userLocation}
+        isAccessibilityEnabled={isAccessibilityEnabled}
       />
     );
   }

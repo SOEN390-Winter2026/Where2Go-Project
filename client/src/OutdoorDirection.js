@@ -46,6 +46,16 @@ function stepsToSegments(route) {
     .filter(Boolean);
 }
 
+/** Walking longer than this (seconds) shows an accessibility note when accessibility mode is on. */
+const ACCESSIBLE_MODE_MAX_WALK_SECONDS = 30 * 60;
+
+export function isWalkingLongForAccessibilityNote(route) {
+  if (route?.mode !== "walking") return false;
+  const secs = route.duration?.value;
+  if (typeof secs !== "number" || !Number.isFinite(secs)) return false;
+  return secs > ACCESSIBLE_MODE_MAX_WALK_SECONDS;
+}
+
 const RetryButton = ({ onPress, loading }) => (
   <Pressable
     style={[styles.retryButton, loading && { opacity: 0.6 }]}
@@ -74,6 +84,7 @@ export default function OutdoorDirection({
   onPressBack,
   __testMapRef,
   userLocation,
+  isAccessibilityEnabled = false,
 }) {
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
@@ -161,10 +172,14 @@ export default function OutdoorDirection({
     setErrorCode(null);
 
     try {
-      const newRoutes = await navContext.current.getRoutes(origin, destination);
+      const newRoutes = await navContext.current.getRoutes(origin, destination, {
+        accessible: isAccessibilityEnabled,
+      });
       setRoutes(newRoutes);
       setSelectedRouteIndex(newRoutes.length > 0 ? 0 : -1);
-      if (newRoutes.length === 0) setErrorCode("NO_ROUTES");
+      if (newRoutes.length === 0) {
+        setErrorCode(isAccessibilityEnabled ? "NO_ACCESSIBLE_ROUTES" : "NO_ROUTES");
+      }
     } catch (e) {
       setRoutes([]);
       setError(e?.message || "Failed to fetch directions");
@@ -172,7 +187,7 @@ export default function OutdoorDirection({
     } finally {
       setLoading(false);
     }
-  }, [origin, destination]);
+  }, [origin, destination, isAccessibilityEnabled]);
 
   // fetches routes whenever fetchroute changes. Since the user can decide to change either start or end or both inputs anytime, this keeps it up
   useEffect(() => {
@@ -318,7 +333,7 @@ export default function OutdoorDirection({
 
   const hasValidEndpoints = origin?.lat != null && destination?.lat != null;
   const showEmptyState = hasValidEndpoints && !loading && routes.length === 0 &&
-      (errorCode === "NO_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
+      (errorCode === "NO_ROUTES" || errorCode === "NO_ACCESSIBLE_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
   const showSelectLocationsState = !loading &&
     !hasValidEndpoints && (originQuery.trim().length > 0 || destQuery.trim().length > 0);
 
@@ -411,6 +426,15 @@ export default function OutdoorDirection({
           </Pressable>
         )}
 
+        {isAccessibilityEnabled && (
+          <View style={styles.accessibilityBanner} testID="accessibilityBanner">
+            <Ionicons name="accessibility" size={18} color="#912338" />
+            <Text style={styles.accessibilityBannerText}>
+              Accessibility mode enabled
+            </Text>
+          </View>
+        )}
+
 {/*routes count*/}
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
@@ -432,12 +456,23 @@ export default function OutdoorDirection({
           )}
           {showEmptyState && (
             <View style={styles.emptyStateContainer}>
-              <Ionicons name="map-outline" size={40} color="#7C2B38" style={{ marginBottom: 10 }} />
-              <Text style={styles.emptyStateTitle}>No routes found</Text>
+              <Ionicons
+                name={errorCode === "NO_ACCESSIBLE_ROUTES" ? "accessibility-outline" : "map-outline"}
+                size={40}
+                color="#7C2B38"
+                style={{ marginBottom: 10 }}
+              />
+              <Text style={styles.emptyStateTitle}>
+                {errorCode === "NO_ACCESSIBLE_ROUTES"
+                  ? "No accessible route available"
+                  : "No routes found"}
+              </Text>
               <Text style={styles.emptyStateText}>
-                {error
-                  ? "Try selecting different locations or check your connection."
-                  : "Try selecting different locations or another mode."}
+                {errorCode === "NO_ACCESSIBLE_ROUTES"
+                  ? "No wheelchair-accessible route could be found for this trip. Try different locations or disable accessibility mode for more options."
+                  : error
+                    ? "Try selecting different locations or check your connection."
+                    : "Try selecting different locations or another mode."}
               </Text>
               <RetryButton onPress={handleRetry} loading={loading} />
             </View>
@@ -456,6 +491,8 @@ export default function OutdoorDirection({
               const { label, icon } = getModeDisplay(r.mode);
               const isSelected = i === selectedRouteIndex;
               const routeKey = `${r.mode}-${r.duration?.text ?? i}`;
+              const showLongWalkNote =
+                isAccessibilityEnabled && isWalkingLongForAccessibilityNote(r);
 
               return (
                 <Pressable
@@ -501,6 +538,13 @@ export default function OutdoorDirection({
                           {r.scheduleNote}
                         </Text>
                       )}
+                      {showLongWalkNote && (
+                        <Text
+                          style={[styles.routeAccessibilityNote, isSelected && styles.routeSubTextSelected]}
+                        >
+                          Over 30 minutes of walking — access may be limited. This option is still available.
+                        </Text>
+                      )}
                     </View>
                   </View>
                 </Pressable>
@@ -532,6 +576,7 @@ OutdoorDirection.propTypes = {
   buildings: PropTypes.array,
   __testMapRef: PropTypes.object,
   userLocation: PropTypes.shape({ latitude: PropTypes.number, longitude: PropTypes.number }),
+  isAccessibilityEnabled: PropTypes.bool,
 };
 
 export const __test__ = {
@@ -541,4 +586,5 @@ export const __test__ = {
   getModeDisplay,
   decodePolylineToCoords,
   stepsToSegments,
+  isWalkingLongForAccessibilityNote,
 };

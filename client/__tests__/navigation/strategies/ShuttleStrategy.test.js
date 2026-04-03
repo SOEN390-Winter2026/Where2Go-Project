@@ -76,4 +76,15 @@ describe("ShuttleStrategy", () => {
     const calledUrl = globalThis.fetch.mock.calls[0][0];
     expect(calledUrl).toContain("mode=concordia_shuttle");
   });
+
+  it("appends accessible=true when options.accessible is true", async () => {
+    globalThis.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ routes: [] }),
+    });
+
+    await strategy.getRoutes(ORIGIN, DESTINATION, { accessible: true });
+
+    expect(globalThis.fetch.mock.calls[0][0]).toContain("accessible=true");
+  });
 });

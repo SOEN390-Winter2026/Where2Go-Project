@@ -30,7 +30,7 @@ export default class NavigationContext {
     return this._strategy.mode;
   }
 
-  async getRoutes(origin, destination) {
-    return this._strategy.getRoutes(origin, destination);
+  async getRoutes(origin, destination, options = {}) {
+    return this._strategy.getRoutes(origin, destination, options);
   }
 }

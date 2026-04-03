@@ -50,4 +50,12 @@ describe("OutdoorDirection helper coverage", () => {
     expect(segs.length).toBe(1);
     expect(segs[0].isWalk).toBe(true);
   });
+
+  test("isWalkingLongForAccessibilityNote is true only for walking over 30 minutes", () => {
+    const { isWalkingLongForAccessibilityNote } = __test__;
+    expect(isWalkingLongForAccessibilityNote({ mode: "walking", duration: { value: 20 * 60 } })).toBe(false);
+    expect(isWalkingLongForAccessibilityNote({ mode: "walking", duration: { value: 31 * 60 } })).toBe(true);
+    expect(isWalkingLongForAccessibilityNote({ mode: "transit", duration: { value: 99 * 60 } })).toBe(false);
+    expect(isWalkingLongForAccessibilityNote({ mode: "walking", duration: {} })).toBe(false);
+  });
 });

@@ -130,11 +130,12 @@ function normalizeStepPolyline(step) {
   );
 }
 
-async function fetchOutdoorWalkingSegment(originLatLng, destLatLng) {
+async function fetchOutdoorWalkingSegment(originLatLng, destLatLng, { accessible = false } = {}) {
   const clientTime = encodeURIComponent(new Date().toISOString());
-  const url =
+  let url =
     `${API_BASE_URL}/directions?originLat=${originLatLng.latitude}&originLng=${originLatLng.longitude}` +
     `&destLat=${destLatLng.latitude}&destLng=${destLatLng.longitude}&clientTime=${clientTime}`;
+  if (accessible) url += "&accessible=true";
   const res = await fetch(url);
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -595,7 +596,7 @@ export async function buildInterBuildingDirections({
       continue;
     }
 
-    const outdoor = await fetchOutdoorWalkingSegment(p.a, p.b);
+    const outdoor = await fetchOutdoorWalkingSegment(p.a, p.b, { accessible: indoorOpts.avoidStairs });
     if (!outdoor.ok) {
       lastFailure = { code: "OUTDOOR_FAILED", message: outdoor.message || "Outdoor segment failed" };
       continue;
