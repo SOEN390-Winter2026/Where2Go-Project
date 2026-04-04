@@ -1,6 +1,12 @@
 {
-  "H5": {
-    "floor": "H5",
+  "H": {
+    "floor": "H-5",
+    "building": "Hall",
+    "rooms": [],
+    "waypoints": []
+  },
+  "H-5": {
+    "floor": "H-5",
     "building": "Hall",
     "rooms": [
       {
@@ -248,6 +254,7 @@
         "label": "elevator",
         "type": "elevator",
         "floor": "CC3",
+        "nearestWaypoint": "wp81_H5",
         "bounds": {
           "x": 0.6176,
           "y": 0.637,
@@ -842,7 +849,9 @@
           "x": 0.1471,
           "y": 0.2459
         },
-        "connections": []
+        "connections": [
+          "wp61_H5"
+        ]
       },
       {
         "id": "wp2_H5",
@@ -852,7 +861,9 @@
           "x": 0.1505,
           "y": 0.3679
         },
-        "connections": []
+        "connections": [
+          "wp61_H5"
+        ]
       },
       {
         "id": "wp3_H5",
@@ -862,7 +873,9 @@
           "x": 0.154,
           "y": 0.4898
         },
-        "connections": []
+        "connections": [
+          "wp61_H5"
+        ]
       },
       {
         "id": "wp4_H5",
@@ -872,7 +885,9 @@
           "x": 0.1557,
           "y": 0.5247
         },
-        "connections": []
+        "connections": [
+          "wp78_H511"
+        ]
       },
       {
         "id": "wp5_H5",
@@ -882,7 +897,9 @@
           "x": 0.1488,
           "y": 0.577
         },
-        "connections": []
+        "connections": [
+          "wp78_H511"
+        ]
       },
       {
         "id": "wp6_H5",
@@ -892,7 +909,9 @@
           "x": 0.1436,
           "y": 0.8054
         },
-        "connections": []
+        "connections": [
+          "wp58_H5"
+        ]
       },
       {
         "id": "wp7_H5",
@@ -902,7 +921,9 @@
           "x": 0.154,
           "y": 0.8364
         },
-        "connections": []
+        "connections": [
+          "wp58_H5"
+        ]
       },
       {
         "id": "wp8_H5",
@@ -912,7 +933,9 @@
           "x": 0.192,
           "y": 0.8325
         },
-        "connections": []
+        "connections": [
+          "wp58_H5"
+        ]
       },
       {
         "id": "wp9_H5",
@@ -922,7 +945,9 @@
           "x": 0.2059,
           "y": 0.8364
         },
-        "connections": []
+        "connections": [
+          "wp58_H5"
+        ]
       },
       {
         "id": "wp10_H5",
@@ -932,7 +957,9 @@
           "x": 0.4827,
           "y": 0.8306
         },
-        "connections": []
+        "connections": [
+          "wp60_H5"
+        ]
       },
       {
         "id": "wp11_H5",
@@ -942,7 +969,9 @@
           "x": 0.5346,
           "y": 0.8286
         },
-        "connections": []
+        "connections": [
+          "wp60_H5"
+        ]
       },
       {
         "id": "wp12_H5",
@@ -952,7 +981,9 @@
           "x": 0.8322,
           "y": 0.8345
         },
-        "connections": []
+        "connections": [
+          "wp71_H5"
+        ]
       },
       {
         "id": "wp13_H5",
@@ -962,7 +993,9 @@
           "x": 0.8532,
           "y": 0.8094
         },
-        "connections": []
+        "connections": [
+          "wp71_H5"
+        ]
       },
       {
         "id": "wp14_H5",
@@ -972,7 +1005,9 @@
           "x": 0.8489,
           "y": 0.6287
         },
-        "connections": []
+        "connections": [
+          "wp78_H5"
+        ]
       },
       {
         "id": "wp15_H5",
@@ -982,7 +1017,9 @@
           "x": 0.8518,
           "y": 0.5964
         },
-        "connections": []
+        "connections": [
+          "wp78_H5"
+        ]
       },
       {
         "id": "wp16_H5",
@@ -992,7 +1029,9 @@
           "x": 0.8417,
           "y": 0.2366
         },
-        "connections": []
+        "connections": [
+          "wp74_H5"
+        ]
       },
       {
         "id": "wp17_H5",
@@ -1022,7 +1061,9 @@
           "x": 0.3039,
           "y": 0.7561
         },
-        "connections": []
+        "connections": [
+          "wp58_H5"
+        ]
       },
       {
         "id": "wp20_H5",
@@ -1032,7 +1073,9 @@
           "x": 0.3976,
           "y": 0.7577
         },
-        "connections": []
+        "connections": [
+          "wp60_H5"
+        ]
       },
       {
         "id": "wp21_H5",
@@ -1042,7 +1085,9 @@
           "x": 0.6298,
           "y": 0.7529
         },
-        "connections": []
+        "connections": [
+          "wp60_H5"
+        ]
       },
       {
         "id": "wp22_H5",
@@ -1052,7 +1097,9 @@
           "x": 0.6414,
           "y": 0.0796
         },
-        "connections": []
+        "connections": [
+          "wp81_H54"
+        ]
       },
       {
         "id": "wp23_H5",
@@ -1062,7 +1109,9 @@
           "x": 0.6,
           "y": 0.0751
         },
-        "connections": []
+        "connections": [
+          "wp81_H54"
+        ]
       },
       {
         "id": "wp24_H5",
@@ -1072,7 +1121,9 @@
           "x": 0.6621,
           "y": 0.0751
         },
-        "connections": []
+        "connections": [
+          "wp81_H54"
+        ]
       },
       {
         "id": "wp25_H5",
@@ -1082,7 +1133,9 @@
           "x": 0.7648,
           "y": 0.0785
         },
-        "connections": []
+        "connections": [
+          "wp81_H54"
+        ]
       },
       {
         "id": "wp26_H5",
@@ -1092,7 +1145,9 @@
           "x": 0.7776,
           "y": 0.1005
         },
-        "connections": []
+        "connections": [
+          "wp81_H54"
+        ]
       },
       {
         "id": "wp27_H5",
@@ -1102,7 +1157,9 @@
           "x": 0.7786,
           "y": 0.1569
         },
-        "connections": []
+        "connections": [
+          "wp81_H54"
+        ]
       },
       {
         "id": "wp28_H5",
@@ -1112,7 +1169,9 @@
           "x": 0.8032,
           "y": 0.2099
         },
-        "connections": []
+        "connections": [
+          "wp74_H5"
+        ]
       },
       {
         "id": "wp29_H5",
@@ -1122,7 +1181,9 @@
           "x": 0.6611,
           "y": 0.3667
         },
-        "connections": []
+        "connections": [
+          "wp68_H5"
+        ]
       },
       {
         "id": "wp30_H5",
@@ -1132,7 +1193,9 @@
           "x": 0.6858,
           "y": 0.3667
         },
-        "connections": []
+        "connections": [
+          "wp73_H5"
+        ]
       },
       {
         "id": "wp31_H5",
@@ -1142,7 +1205,9 @@
           "x": 0.6582,
           "y": 0.5445
         },
-        "connections": []
+        "connections": [
+          "wp79_H522"
+        ]
       },
       {
         "id": "wp32_H5",
@@ -1152,7 +1217,9 @@
           "x": 0.6878,
           "y": 0.5323
         },
-        "connections": []
+        "connections": [
+          "wp79_H522"
+        ]
       },
       {
         "id": "wp33_H5",
@@ -1162,7 +1229,9 @@
           "x": 0.5763,
           "y": 0.5864
         },
-        "connections": []
+        "connections": [
+          "wp76_H5"
+        ]
       },
       {
         "id": "wp34_H5",
@@ -1172,7 +1241,9 @@
           "x": 0.6,
           "y": 0.5787
         },
-        "connections": []
+        "connections": [
+          "wp76_H5"
+        ]
       },
       {
         "id": "wp35_H5",
@@ -1182,7 +1253,9 @@
           "x": 0.6365,
           "y": 0.5842
         },
-        "connections": []
+        "connections": [
+          "wp76_H5"
+        ]
       },
       {
         "id": "wp36_H5",
@@ -1192,7 +1265,9 @@
           "x": 0.7154,
           "y": 0.5908
         },
-        "connections": []
+        "connections": [
+          "wp76_H5"
+        ]
       },
       {
         "id": "wp37_H5",
@@ -1202,7 +1277,9 @@
           "x": 0.7411,
           "y": 0.5853
         },
-        "connections": []
+        "connections": [
+          "wp77_H51"
+        ]
       },
       {
         "id": "wp38_H5",
@@ -1212,97 +1289,9 @@
           "x": 0.7707,
           "y": 0.5842
         },
-        "connections": []
-      },
-      {
-        "id": "wp39_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.8322,
-          "y": 0.0716
-        },
-        "connections": []
-      },
-      {
-        "id": "wp40_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.8979,
-          "y": 0.0794
-        },
-        "connections": []
-      },
-      {
-        "id": "wp41_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.9204,
-          "y": 0.0813
-        },
-        "connections": []
-      },
-      {
-        "id": "wp42_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.9325,
-          "y": 0.1394
-        },
-        "connections": []
-      },
-      {
-        "id": "wp43_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.936,
-          "y": 0.1065
-        },
-        "connections": []
-      },
-      {
-        "id": "wp44_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.9204,
-          "y": 0.1762
-        },
-        "connections": []
-      },
-      {
-        "id": "wp45_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.8979,
-          "y": 0.1704
-        },
-        "connections": []
-      },
-      {
-        "id": "wp46_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.8737,
-          "y": 0.1065
-        },
-        "connections": []
-      },
-      {
-        "id": "wp47_H5",
-        "type": "door",
-        "floor": "H5",
-        "position": {
-          "x": 0.8495,
-          "y": 0.1084
-        },
-        "connections": []
+        "connections": [
+          "wp77_H51"
+        ]
       },
       {
         "id": "wp48_H5",
@@ -1312,7 +1301,9 @@
           "x": 0.2215,
           "y": 0.2614
         },
-        "connections": []
+        "connections": [
+          "wp61_H5"
+        ]
       },
       {
         "id": "wp49_H5",
@@ -1322,7 +1313,9 @@
           "x": 0.2768,
           "y": 0.4937
         },
-        "connections": []
+        "connections": [
+          "wp78_H511"
+        ]
       },
       {
         "id": "wp50_H5",
@@ -1332,7 +1325,9 @@
           "x": 0.5017,
           "y": 0.6408
         },
-        "connections": []
+        "connections": [
+          "wp75_H5"
+        ]
       },
       {
         "id": "wp51_H5",
@@ -1342,7 +1337,9 @@
           "x": 0.5052,
           "y": 0.6989
         },
-        "connections": []
+        "connections": [
+          "wp75_H5"
+        ]
       },
       {
         "id": "wp52_H5",
@@ -1352,7 +1349,9 @@
           "x": 0.5052,
           "y": 0.7396
         },
-        "connections": []
+        "connections": [
+          "wp59_H5"
+        ]
       },
       {
         "id": "wp53_H5",
@@ -1362,7 +1361,9 @@
           "x": 0.7318,
           "y": 0.635
         },
-        "connections": []
+        "connections": [
+          "wp79_H522"
+        ]
       },
       {
         "id": "wp54_H5",
@@ -1372,7 +1373,9 @@
           "x": 0.2889,
           "y": 0.7493
         },
-        "connections": []
+        "connections": [
+          "wp58_H5"
+        ]
       },
       {
         "id": "wp55_H5",
@@ -1382,7 +1385,9 @@
           "x": 0.7024,
           "y": 0.3117
         },
-        "connections": []
+        "connections": [
+          "wp73_H5"
+        ]
       },
       {
         "id": "wp56_H5",
@@ -1392,131 +1397,160 @@
           "x": 0.2924,
           "y": 0.2962
         },
-        "connections": []
+        "connections": [
+          "wp63_H5"
+        ]
       },
       {
         "id": "wp57_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.1815,
           "y": 0.7587
         },
         "connections": [
-          "wp58_H5"
+          "wp58_H5",
+          "wp78_H511"
         ]
       },
       {
         "id": "wp58_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.179,
           "y": 0.78
         },
         "connections": [
-          "wp57_H5"
+          "wp57_H5",
+          "wp60_H5",
+          "wp6_H5",
+          "wp7_H5",
+          "wp8_H5",
+          "wp9_H5",
+          "wp19_H5",
+          "wp54_H5"
         ]
       },
       {
         "id": "wp59_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.4788,
           "y": 0.7575
         },
         "connections": [
-          "wp60_H5"
+          "wp60_H5",
+          "wp75_H5",
+          "wp52_H5"
         ]
       },
       {
         "id": "wp60_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.4788,
           "y": 0.7732
         },
         "connections": [
-          "wp59_H5"
+          "wp59_H5",
+          "wp58_H5",
+          "wp20_H5",
+          "wp10_H5",
+          "wp11_H5",
+          "wp21_H5"
         ]
       },
       {
         "id": "wp61_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.2018,
           "y": 0.41
         },
         "connections": [
-          "wp62_H5"
+          "wp62_H5",
+          "wp78_H511",
+          "wp1_H5",
+          "wp48_H5",
+          "wp2_H5",
+          "wp3_H5"
         ]
       },
       {
         "id": "wp62_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.2099,
           "y": 0.4092
         },
         "connections": [
-          "wp61_H5"
+          "wp61_H5",
+          "wp63_H5"
         ]
       },
       {
         "id": "wp63_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.4449,
           "y": 0.4039
         },
         "connections": [
-          "wp64_H5"
+          "wp64_H5",
+          "wp62_H5",
+          "wp56_H5"
         ]
       },
       {
         "id": "wp64_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.4683,
           "y": 0.3965
         },
         "connections": [
-          "wp63_H5"
+          "wp63_H5",
+          "wp75_H5",
+          "wp65_H5"
         ]
       },
       {
         "id": "wp65_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.4916,
           "y": 0.3423
         },
         "connections": [
-          "wp66_H5"
+          "wp66_H5",
+          "wp64_H5"
         ]
       },
       {
         "id": "wp66_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.5116,
           "y": 0.3367
         },
         "connections": [
-          "wp65_H5"
+          "wp65_H5",
+          "wp68_H5"
         ]
       },
       {
         "id": "wp67_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.525,
@@ -1528,134 +1562,218 @@
       },
       {
         "id": "wp68_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.535,
           "y": 0.333
         },
         "connections": [
-          "wp67_H5"
-        ]
-      },
-      {
-        "id": "wp69_H5",
-        "type": "intersection",
-        "floor": "H5",
-        "position": {
-          "x": 0.6566,
-          "y": 0.2235
-        },
-        "connections": [
-          "wp70_H5"
-        ]
-      },
-      {
-        "id": "wp70_H5",
-        "type": "intersection",
-        "floor": "H5",
-        "position": {
-          "x": 0.6676,
-          "y": 0.3346
-        },
-        "connections": [
-          "wp69_H5"
+          "wp67_H5",
+          "wp66_H5",
+          "wp73_H5",
+          "wp29_H5",
+          "wp80_H53"
         ]
       },
       {
         "id": "wp71_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.8147,
           "y": 0.7729
         },
         "connections": [
-          "wp72_H5"
+          "wp72_H5",
+          "wp12_H5",
+          "wp13_H5"
         ]
       },
       {
         "id": "wp72_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.8147,
           "y": 0.7482
         },
         "connections": [
-          "wp71_H5"
+          "wp71_H5",
+          "wp78_H5"
         ]
       },
       {
         "id": "wp73_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.7761,
           "y": 0.3387
         },
         "connections": [
-          "wp74_H5"
+          "wp74_H5",
+          "wp68_H5",
+          "wp55_H5",
+          "wp30_H5"
         ]
       },
       {
         "id": "wp74_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.8055,
           "y": 0.3428
         },
         "connections": [
-          "wp73_H5"
+          "wp73_H5",
+          "wp78_H5",
+          "wp16_H5",
+          "wp28_H5"
         ]
       },
       {
         "id": "wp75_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.4896,
           "y": 0.606
         },
         "connections": [
-          "wp76_H5"
+          "wp76_H5",
+          "wp59_H5",
+          "wp64_H5",
+          "wp50_H5",
+          "wp51_H5"
         ]
       },
       {
         "id": "wp76_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
           "x": 0.5069,
           "y": 0.6118
         },
         "connections": [
-          "wp75_H5"
+          "wp75_H5",
+          "wp77_H51",
+          "wp36_H5",
+          "wp33_H5",
+          "wp34_H5",
+          "wp35_H5",
+          "wp79_H522"
         ]
       },
       {
         "id": "wp77_H5",
-        "type": "intersection",
+        "type": "elevator",
         "floor": "H5",
+        "floorsReachable": [
+          "H-4",
+          "H-6"
+        ],
         "position": {
-          "x": 0.7855,
-          "y": 0.6137
+          "x": 0.6619,
+          "y": 0.6404
         },
-        "connections": [
-          "wp78_H5"
-        ]
+        "connections": []
       },
       {
         "id": "wp78_H5",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H5",
         "position": {
-          "x": 0.8097,
-          "y": 0.6176
+          "x": 0.8091,
+          "y": 0.6167
         },
         "connections": [
-          "wp77_H5"
+          "wp74_H5",
+          "wp77_H51",
+          "wp72_H5",
+          "wp14_H5",
+          "wp15_H5"
+        ]
+      },
+      {
+        "id": "wp77_H51",
+        "type": "corridor",
+        "floor": "H5",
+        "position": {
+          "x": 0.7808,
+          "y": 0.6163
+        },
+        "connections": [
+          "wp78_H5",
+          "wp76_H5",
+          "wp38_H5",
+          "wp37_H5",
+          "wp79_H522"
+        ]
+      },
+      {
+        "id": "wp78_H511",
+        "type": "corridor",
+        "floor": "H5",
+        "position": {
+          "x": 0.186,
+          "y": 0.5398
+        },
+        "connections": [
+          "wp61_H5",
+          "wp57_H5",
+          "wp4_H5",
+          "wp5_H5",
+          "wp49_H5"
+        ]
+      },
+      {
+        "id": "wp79_H522",
+        "type": "corridor",
+        "floor": "H5",
+        "position": {
+          "x": 0.6755,
+          "y": 0.6048
+        },
+        "connections": [
+          "wp31_H5",
+          "wp32_H5",
+          "wp77_H51",
+          "wp76_H5",
+          "wp53_H5"
+        ]
+      },
+      {
+        "id": "wp80_H53",
+        "type": "corridor",
+        "floor": "H5",
+        "position": {
+          "x": 0.5996,
+          "y": 0.3386
+        },
+        "connections": [
+          "wp68_H5",
+          "wp81_H54"
+        ]
+      },
+      {
+        "id": "wp81_H54",
+        "type": "corridor",
+        "floor": "H5",
+        "position": {
+          "x": 0.6359,
+          "y": 0.1641
+        },
+        "connections": [
+          "wp80_H53",
+          "wp23_H5",
+          "wp22_H5",
+          "wp24_H5",
+          "wp25_H5",
+          "wp26_H5",
+          "wp27_H5"
         ]
       }
     ]

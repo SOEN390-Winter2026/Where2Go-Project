@@ -1,4 +1,9 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "MB3": {
     "floor": "MB3",
     "rooms": [
@@ -445,7 +450,12 @@
           "y": 0.2281
         },
         "connections": [
-          "wp2_MB3"
+          "wp2_MB3",
+          "wp20_MB3",
+          "wp18_MB3",
+          "wp19_MB3",
+          "wp17_MB3",
+          "wp43_MB3"
         ]
       },
       {
@@ -457,7 +467,9 @@
           "y": 0.2212
         },
         "connections": [
-          "wp1_MB3"
+          "wp1_MB3",
+          "wp3_MB3",
+          "wp22_MB3"
         ]
       },
       {
@@ -469,7 +481,9 @@
           "y": 0.2212
         },
         "connections": [
-          "wp4_MB3"
+          "wp4_MB3",
+          "wp2_MB3",
+          "wp23_MB3"
         ]
       },
       {
@@ -481,7 +495,10 @@
           "y": 0.2258
         },
         "connections": [
-          "wp3_MB3"
+          "wp3_MB3",
+          "wp6_MB3",
+          "wp7_MB3",
+          "wp44_MB3"
         ]
       },
       {
@@ -493,7 +510,10 @@
           "y": 0.4579
         },
         "connections": [
-          "wp6_MB3"
+          "wp6_MB3",
+          "wp16_MB3",
+          "wp42_MB3",
+          "wp41_MB3"
         ]
       },
       {
@@ -505,7 +525,10 @@
           "y": 0.4579
         },
         "connections": [
-          "wp5_MB3"
+          "wp5_MB3",
+          "wp4_MB3",
+          "wp7_MB3",
+          "wp8_MB3"
         ]
       },
       {
@@ -517,7 +540,10 @@
           "y": 0.5062
         },
         "connections": [
-          "wp8_MB3"
+          "wp8_MB3",
+          "wp4_MB3",
+          "wp6_MB3",
+          "wp29_MB3"
         ]
       },
       {
@@ -529,7 +555,9 @@
           "y": 0.4947
         },
         "connections": [
-          "wp7_MB3"
+          "wp7_MB3",
+          "wp9_MB3",
+          "wp6_MB3"
         ]
       },
       {
@@ -541,7 +569,9 @@
           "y": 0.5315
         },
         "connections": [
-          "wp10_MB3"
+          "wp10_MB3",
+          "wp40_MB3",
+          "wp8_MB3"
         ]
       },
       {
@@ -553,7 +583,11 @@
           "y": 0.5487
         },
         "connections": [
-          "wp9_MB3"
+          "wp9_MB3",
+          "wp11_MB3",
+          "wp24_MB3",
+          "wp25_MB3",
+          "wp27_MB3"
         ]
       },
       {
@@ -565,7 +599,10 @@
           "y": 0.805
         },
         "connections": [
-          "wp12_MB3"
+          "wp12_MB3",
+          "wp10_MB3",
+          "wp28_MB3",
+          "wp26_MB3"
         ]
       },
       {
@@ -577,7 +614,13 @@
           "y": 0.828
         },
         "connections": [
-          "wp11_MB3"
+          "wp11_MB3",
+          "wp13_MB3",
+          "wp38_MB3",
+          "wp31_MB3",
+          "wp37_MB3",
+          "wp39_MB3",
+          "wp30_MB3"
         ]
       },
       {
@@ -589,7 +632,10 @@
           "y": 0.8315
         },
         "connections": [
-          "wp14_MB3"
+          "wp14_MB3",
+          "wp12_MB3",
+          "wp34_MB3",
+          "wp36_MB3"
         ]
       },
       {
@@ -601,7 +647,9 @@
           "y": 0.8211
         },
         "connections": [
-          "wp13_MB3"
+          "wp13_MB3",
+          "wp35_MB3",
+          "wp15_MB3"
         ]
       },
       {
@@ -613,7 +661,8 @@
           "y": 0.4556
         },
         "connections": [
-          "wp16_MB3"
+          "wp16_MB3",
+          "wp14_MB3"
         ]
       },
       {
@@ -625,7 +674,9 @@
           "y": 0.4556
         },
         "connections": [
-          "wp15_MB3"
+          "wp15_MB3",
+          "wp5_MB3",
+          "wp21_MB3"
         ]
       },
       {
@@ -636,7 +687,9 @@
           "x": 0.2331,
           "y": 0.2141
         },
-        "connections": []
+        "connections": [
+          "wp1_MB3"
+        ]
       },
       {
         "id": "wp18_MB3",
@@ -646,7 +699,9 @@
           "x": 0.2331,
           "y": 0.2625
         },
-        "connections": []
+        "connections": [
+          "wp1_MB3"
+        ]
       },
       {
         "id": "wp19_MB3",
@@ -656,7 +711,9 @@
           "x": 0.2739,
           "y": 0.202
         },
-        "connections": []
+        "connections": [
+          "wp1_MB3"
+        ]
       },
       {
         "id": "wp20_MB3",
@@ -666,7 +723,9 @@
           "x": 0.3866,
           "y": 0.2705
         },
-        "connections": []
+        "connections": [
+          "wp1_MB3"
+        ]
       },
       {
         "id": "wp21_MB3",
@@ -676,7 +735,9 @@
           "x": 0.3654,
           "y": 0.4076
         },
-        "connections": []
+        "connections": [
+          "wp16_MB3"
+        ]
       },
       {
         "id": "wp22_MB3",
@@ -686,7 +747,9 @@
           "x": 0.4699,
           "y": 0.2396
         },
-        "connections": []
+        "connections": [
+          "wp2_MB3"
+        ]
       },
       {
         "id": "wp23_MB3",
@@ -696,7 +759,9 @@
           "x": 0.4944,
           "y": 0.2423
         },
-        "connections": []
+        "connections": [
+          "wp3_MB3"
+        ]
       },
       {
         "id": "wp24_MB3",
@@ -706,7 +771,9 @@
           "x": 0.7573,
           "y": 0.5474
         },
-        "connections": []
+        "connections": [
+          "wp10_MB3"
+        ]
       },
       {
         "id": "wp25_MB3",
@@ -716,7 +783,9 @@
           "x": 0.7377,
           "y": 0.628
         },
-        "connections": []
+        "connections": [
+          "wp10_MB3"
+        ]
       },
       {
         "id": "wp26_MB3",
@@ -726,7 +795,9 @@
           "x": 0.7426,
           "y": 0.7503
         },
-        "connections": []
+        "connections": [
+          "wp11_MB3"
+        ]
       },
       {
         "id": "wp27_MB3",
@@ -736,7 +807,9 @@
           "x": 0.7426,
           "y": 0.6495
         },
-        "connections": []
+        "connections": [
+          "wp10_MB3"
+        ]
       },
       {
         "id": "wp28_MB3",
@@ -746,7 +819,9 @@
           "x": 0.7475,
           "y": 0.7677
         },
-        "connections": []
+        "connections": [
+          "wp11_MB3"
+        ]
       },
       {
         "id": "wp29_MB3",
@@ -756,7 +831,9 @@
           "x": 0.5956,
           "y": 0.5702
         },
-        "connections": []
+        "connections": [
+          "wp7_MB3"
+        ]
       },
       {
         "id": "wp30_MB3",
@@ -766,7 +843,9 @@
           "x": 0.6185,
           "y": 0.7946
         },
-        "connections": []
+        "connections": [
+          "wp12_MB3"
+        ]
       },
       {
         "id": "wp31_MB3",
@@ -776,7 +855,9 @@
           "x": 0.7654,
           "y": 0.8363
         },
-        "connections": []
+        "connections": [
+          "wp12_MB3"
+        ]
       },
       {
         "id": "wp32_MB3",
@@ -810,7 +891,9 @@
           "x": 0.3637,
           "y": 0.8591
         },
-        "connections": []
+        "connections": [
+          "wp13_MB3"
+        ]
       },
       {
         "id": "wp35_MB3",
@@ -820,7 +903,9 @@
           "x": 0.2935,
           "y": 0.8564
         },
-        "connections": []
+        "connections": [
+          "wp14_MB3"
+        ]
       },
       {
         "id": "wp36_MB3",
@@ -830,7 +915,9 @@
           "x": 0.3915,
           "y": 0.8981
         },
-        "connections": []
+        "connections": [
+          "wp13_MB3"
+        ]
       },
       {
         "id": "wp37_MB3",
@@ -840,7 +927,9 @@
           "x": 0.6838,
           "y": 0.8847
         },
-        "connections": []
+        "connections": [
+          "wp12_MB3"
+        ]
       },
       {
         "id": "wp38_MB3",
@@ -850,7 +939,9 @@
           "x": 0.656,
           "y": 0.8645
         },
-        "connections": []
+        "connections": [
+          "wp12_MB3"
+        ]
       },
       {
         "id": "wp39_MB3",
@@ -860,7 +951,9 @@
           "x": 0.5384,
           "y": 0.8753
         },
-        "connections": []
+        "connections": [
+          "wp12_MB3"
+        ]
       },
       {
         "id": "wp40_MB3",
@@ -870,7 +963,9 @@
           "x": 0.6658,
           "y": 0.5836
         },
-        "connections": []
+        "connections": [
+          "wp9_MB3"
+        ]
       },
       {
         "id": "wp41_MB3",
@@ -880,7 +975,9 @@
           "x": 0.4797,
           "y": 0.4802
         },
-        "connections": []
+        "connections": [
+          "wp5_MB3"
+        ]
       },
       {
         "id": "wp42_MB3",
@@ -890,7 +987,9 @@
           "x": 0.4846,
           "y": 0.4251
         },
-        "connections": []
+        "connections": [
+          "wp5_MB3"
+        ]
       },
       {
         "id": "wp43_MB3",
@@ -900,7 +999,9 @@
           "x": 0.3686,
           "y": 0.1577
         },
-        "connections": []
+        "connections": [
+          "wp1_MB3"
+        ]
       },
       {
         "id": "wp44_MB3",
@@ -910,7 +1011,9 @@
           "x": 0.6625,
           "y": 0.3404
         },
-        "connections": []
+        "connections": [
+          "wp4_MB3"
+        ]
       }
     ]
   }

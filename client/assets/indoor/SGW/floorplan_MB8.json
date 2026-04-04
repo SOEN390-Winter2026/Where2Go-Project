@@ -1,4 +1,9 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "MB8": {
     "floor": "MB8",
     "rooms": [
@@ -592,7 +597,9 @@
           "x": 0.388,
           "y": 0.0525
         },
-        "connections": []
+        "connections": [
+          "wp47_MB8"
+        ]
       },
       {
         "id": "wp2_MB-8_8.255",
@@ -602,7 +609,9 @@
           "x": 0.3735,
           "y": 0.2929
         },
-        "connections": []
+        "connections": [
+          "wp47_MB8"
+        ]
       },
       {
         "id": "wp3_MB-8_8.245",
@@ -612,7 +621,9 @@
           "x": 0.3759,
           "y": 0.3711
         },
-        "connections": []
+        "connections": [
+          "wp47_MB8"
+        ]
       },
       {
         "id": "wp4_MB-8_8.207",
@@ -622,7 +633,10 @@
           "x": 0.3322,
           "y": 0.5098
         },
-        "connections": []
+        "connections": [
+          "wp8_MB-8_8.209",
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp5_MB-8_8.205",
@@ -632,7 +646,9 @@
           "x": 0.2789,
           "y": 0.5068
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp6_MB-8_8.203",
@@ -642,7 +658,9 @@
           "x": 0.2111,
           "y": 0.5098
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp7_MB-8_8.201",
@@ -652,7 +670,9 @@
           "x": 0.1602,
           "y": 0.5083
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp8_MB-8_8.209",
@@ -662,7 +682,9 @@
           "x": 0.3928,
           "y": 0.5378
         },
-        "connections": []
+        "connections": [
+          "wp4_MB-8_8.207"
+        ]
       },
       {
         "id": "wp9_MB-8_8.208",
@@ -672,7 +694,9 @@
           "x": 0.3371,
           "y": 0.5703
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp10_MB-8_8.206",
@@ -682,7 +706,9 @@
           "x": 0.2814,
           "y": 0.5703
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp11_MB-8_8.204",
@@ -692,7 +718,9 @@
           "x": 0.2111,
           "y": 0.5717
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp12_MB-8_8.202",
@@ -702,7 +730,9 @@
           "x": 0.1553,
           "y": 0.5732
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp13_MB-8_8.135",
@@ -712,7 +742,9 @@
           "x": 0.2014,
           "y": 0.7576
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp14_MB-8_8.101",
@@ -722,7 +754,9 @@
           "x": 0.245,
           "y": 0.7812
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8"
+        ]
       },
       {
         "id": "wp15_MB-8_8.340",
@@ -732,7 +766,9 @@
           "x": 0.6691,
           "y": 0.8004
         },
-        "connections": []
+        "connections": [
+          "wp43_MB8"
+        ]
       },
       {
         "id": "wp16_MB-8_T1",
@@ -772,7 +808,9 @@
           "x": 0.6376,
           "y": 0.1749
         },
-        "connections": []
+        "connections": [
+          "wp45_MB8"
+        ]
       },
       {
         "id": "wp20_MB-8_8.250",
@@ -782,7 +820,9 @@
           "x": 0.4486,
           "y": 0.3033
         },
-        "connections": []
+        "connections": [
+          "wp47_MB8"
+        ]
       },
       {
         "id": "wp22_MB-8_8.244",
@@ -802,7 +842,9 @@
           "x": 0.4486,
           "y": 0.4183
         },
-        "connections": []
+        "connections": [
+          "wp47_MB8"
+        ]
       },
       {
         "id": "wp24_MB-8_8.240",
@@ -812,7 +854,10 @@
           "x": 0.451,
           "y": 0.4523
         },
-        "connections": []
+        "connections": [
+          "wp41_MB8",
+          "wp47_MB8"
+        ]
       },
       {
         "id": "wp25_MB-8_8.330",
@@ -822,7 +867,9 @@
           "x": 0.657,
           "y": 0.4582
         },
-        "connections": []
+        "connections": [
+          "wp44_MB8"
+        ]
       },
       {
         "id": "wp26_MB-8_8.424",
@@ -852,7 +899,9 @@
           "x": 0.6885,
           "y": 0.144
         },
-        "connections": []
+        "connections": [
+          "wp45_MB8"
+        ]
       },
       {
         "id": "wp28_MB-8_8.303",
@@ -862,7 +911,9 @@
           "x": 0.737,
           "y": 0.1587
         },
-        "connections": []
+        "connections": [
+          "wp46_MB8"
+        ]
       },
       {
         "id": "wp29_MB-8_8.305",
@@ -872,7 +923,9 @@
           "x": 0.7152,
           "y": 0.2089
         },
-        "connections": []
+        "connections": [
+          "wp46_MB8"
+        ]
       },
       {
         "id": "wp30_MB-8_8.307",
@@ -882,7 +935,9 @@
           "x": 0.72,
           "y": 0.2634
         },
-        "connections": []
+        "connections": [
+          "wp46_MB8"
+        ]
       },
       {
         "id": "wp31_MB-8_8.309",
@@ -892,7 +947,9 @@
           "x": 0.7152,
           "y": 0.2974
         },
-        "connections": []
+        "connections": [
+          "wp46_MB8"
+        ]
       },
       {
         "id": "wp32_MB-8_8.311",
@@ -902,7 +959,9 @@
           "x": 0.7103,
           "y": 0.3387
         },
-        "connections": []
+        "connections": [
+          "wp46_MB8"
+        ]
       },
       {
         "id": "wp33_MB-8_8.313",
@@ -912,7 +971,9 @@
           "x": 0.7152,
           "y": 0.3755
         },
-        "connections": []
+        "connections": [
+          "wp46_MB8"
+        ]
       },
       {
         "id": "wp34_MB-8_8.317",
@@ -932,7 +993,9 @@
           "x": 0.7079,
           "y": 0.4862
         },
-        "connections": []
+        "connections": [
+          "wp44_MB8"
+        ]
       },
       {
         "id": "wp36_MB-8_8.325",
@@ -942,7 +1005,9 @@
           "x": 0.7152,
           "y": 0.6529
         },
-        "connections": []
+        "connections": [
+          "wp44_MB8"
+        ]
       },
       {
         "id": "wp37_MB-8_8.335",
@@ -952,7 +1017,9 @@
           "x": 0.7249,
           "y": 0.7768
         },
-        "connections": []
+        "connections": [
+          "wp44_MB8"
+        ]
       },
       {
         "id": "wp38_MB-8_8.345",
@@ -962,7 +1029,9 @@
           "x": 0.7176,
           "y": 0.8122
         },
-        "connections": []
+        "connections": [
+          "wp44_MB8"
+        ]
       },
       {
         "id": "wp39_Exit2",
@@ -972,7 +1041,9 @@
           "x": 0.6987,
           "y": 0.8814
         },
-        "connections": []
+        "connections": [
+          "wp44_MB8"
+        ]
       },
       {
         "id": "wp40_Exit1",
@@ -982,7 +1053,146 @@
           "x": 0.4695,
           "y": 0.1529
         },
-        "connections": []
+        "connections": [
+          "wp48_MB8"
+        ]
+      },
+      {
+        "id": "wp41_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.4313,
+          "y": 0.7741
+        },
+        "connections": [
+          "wp47_MB8",
+          "wp42_MB8",
+          "wp14_MB-8_8.101",
+          "wp13_MB-8_8.135",
+          "wp9_MB-8_8.208",
+          "wp10_MB-8_8.206",
+          "wp11_MB-8_8.204",
+          "wp12_MB-8_8.202",
+          "wp4_MB-8_8.207",
+          "wp5_MB-8_8.205",
+          "wp6_MB-8_8.203",
+          "wp7_MB-8_8.201",
+          "wp24_MB-8_8.240"
+        ]
+      },
+      {
+        "id": "wp42_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.4503,
+          "y": 0.7732
+        },
+        "connections": [
+          "wp41_MB8",
+          "wp43_MB8"
+        ]
+      },
+      {
+        "id": "wp43_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.6731,
+          "y": 0.779
+        },
+        "connections": [
+          "wp42_MB8",
+          "wp44_MB8",
+          "wp15_MB-8_8.340"
+        ]
+      },
+      {
+        "id": "wp44_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.6934,
+          "y": 0.7765
+        },
+        "connections": [
+          "wp43_MB8",
+          "wp46_MB8",
+          "wp37_MB-8_8.335",
+          "wp38_MB-8_8.345",
+          "wp39_Exit2",
+          "wp36_MB-8_8.325",
+          "wp35_MB-8_8.319",
+          "wp25_MB-8_8.330"
+        ]
+      },
+      {
+        "id": "wp45_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.6664,
+          "y": 0.1668
+        },
+        "connections": [
+          "wp46_MB8",
+          "wp48_MB8",
+          "wp19_MB-8_8.282",
+          "wp27_MB-8_8.301"
+        ]
+      },
+      {
+        "id": "wp46_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.6947,
+          "y": 0.1696
+        },
+        "connections": [
+          "wp45_MB8",
+          "wp44_MB8",
+          "wp28_MB-8_8.303",
+          "wp29_MB-8_8.305",
+          "wp30_MB-8_8.307",
+          "wp31_MB-8_8.309",
+          "wp32_MB-8_8.311",
+          "wp33_MB-8_8.313"
+        ]
+      },
+      {
+        "id": "wp47_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.4329,
+          "y": 0.1668
+        },
+        "connections": [
+          "wp48_MB8",
+          "wp41_MB8",
+          "wp2_MB-8_8.255",
+          "wp20_MB-8_8.250",
+          "wp1_MB-8_8.265",
+          "wp3_MB-8_8.245",
+          "wp23_MB-8_8.242",
+          "wp24_MB-8_8.240"
+        ]
+      },
+      {
+        "id": "wp48_MB8",
+        "type": "corridor",
+        "floor": "MB8",
+        "position": {
+          "x": 0.4636,
+          "y": 0.1682
+        },
+        "connections": [
+          "wp47_MB8",
+          "wp45_MB8",
+          "wp40_Exit1"
+        ]
       }
     ]
   }
