@@ -58,4 +58,26 @@ describe("OutdoorDirection helper coverage", () => {
     expect(isWalkingLongForAccessibilityNote({ mode: "transit", duration: { value: 99 * 60 } })).toBe(false);
     expect(isWalkingLongForAccessibilityNote({ mode: "walking", duration: {} })).toBe(false);
   });
+
+  test("getEmptyStateCopy uses accessibility strings for NO_ACCESSIBLE_ROUTES", () => {
+    const { getEmptyStateCopy } = __test__;
+    const copy = getEmptyStateCopy("NO_ACCESSIBLE_ROUTES", null);
+    expect(copy.icon).toBe("accessibility-outline");
+    expect(copy.title).toBe("No accessible route available");
+    expect(copy.body).toContain("wheelchair-accessible");
+  });
+
+  test("getEmptyStateCopy uses connection hint when error is set", () => {
+    const { getEmptyStateCopy } = __test__;
+    const copy = getEmptyStateCopy("NO_ROUTES", "Network failed");
+    expect(copy.icon).toBe("map-outline");
+    expect(copy.title).toBe("No routes found");
+    expect(copy.body).toBe("Try selecting different locations or check your connection.");
+  });
+
+  test("getEmptyStateCopy uses default hint when no accessible flag and no error", () => {
+    const { getEmptyStateCopy } = __test__;
+    const copy = getEmptyStateCopy("NO_ROUTES", null);
+    expect(copy.body).toBe("Try selecting different locations or another mode.");
+  });
 });

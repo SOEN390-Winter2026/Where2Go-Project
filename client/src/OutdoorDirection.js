@@ -56,6 +56,26 @@ export function isWalkingLongForAccessibilityNote(route) {
   return secs > ACCESSIBLE_MODE_MAX_WALK_SECONDS;
 }
 
+/** Copy for the empty routes panel (avoids nested ternaries for static analysis). */
+export function getEmptyStateCopy(errorCode, error) {
+  if (errorCode === "NO_ACCESSIBLE_ROUTES") {
+    return {
+      icon: "accessibility-outline",
+      title: "No accessible route available",
+      body: "No wheelchair-accessible route could be found for this trip. Try different locations or disable accessibility mode for more options.",
+    };
+  }
+  let body = "Try selecting different locations or another mode.";
+  if (error) {
+    body = "Try selecting different locations or check your connection.";
+  }
+  return {
+    icon: "map-outline",
+    title: "No routes found",
+    body,
+  };
+}
+
 const RetryButton = ({ onPress, loading }) => (
   <Pressable
     style={[styles.retryButton, loading && { opacity: 0.6 }]}
@@ -337,6 +357,8 @@ export default function OutdoorDirection({
   const showSelectLocationsState = !loading &&
     !hasValidEndpoints && (originQuery.trim().length > 0 || destQuery.trim().length > 0);
 
+  const emptyStateCopy = showEmptyState ? getEmptyStateCopy(errorCode, error) : null;
+
   return (
     <ImageBackground
       source={require("../assets/background.png")}
@@ -454,26 +476,16 @@ export default function OutdoorDirection({
               <Text style={styles.loadingText}>Loading routes...</Text>
             </View>
           )}
-          {showEmptyState && (
+          {showEmptyState && emptyStateCopy && (
             <View style={styles.emptyStateContainer}>
               <Ionicons
-                name={errorCode === "NO_ACCESSIBLE_ROUTES" ? "accessibility-outline" : "map-outline"}
+                name={emptyStateCopy.icon}
                 size={40}
                 color="#7C2B38"
                 style={{ marginBottom: 10 }}
               />
-              <Text style={styles.emptyStateTitle}>
-                {errorCode === "NO_ACCESSIBLE_ROUTES"
-                  ? "No accessible route available"
-                  : "No routes found"}
-              </Text>
-              <Text style={styles.emptyStateText}>
-                {errorCode === "NO_ACCESSIBLE_ROUTES"
-                  ? "No wheelchair-accessible route could be found for this trip. Try different locations or disable accessibility mode for more options."
-                  : error
-                    ? "Try selecting different locations or check your connection."
-                    : "Try selecting different locations or another mode."}
-              </Text>
+              <Text style={styles.emptyStateTitle}>{emptyStateCopy.title}</Text>
+              <Text style={styles.emptyStateText}>{emptyStateCopy.body}</Text>
               <RetryButton onPress={handleRetry} loading={loading} />
             </View>
           )}
@@ -587,4 +599,5 @@ export const __test__ = {
   decodePolylineToCoords,
   stepsToSegments,
   isWalkingLongForAccessibilityNote,
+  getEmptyStateCopy,
 };
