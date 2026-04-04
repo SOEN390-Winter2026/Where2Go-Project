@@ -40,7 +40,7 @@ const INDOOR_ROUTE_STROKE_DASH = [8, 6];
 const clamp = (value, max) => Math.min(Math.max(value, -max), max);
 
 const getMaxTranslate = (containerSize, s) => ({
-    x: (containerSize.width  * (s - 1)) / 2,
+    x: (containerSize.width * (s - 1)) / 2,
     y: (containerSize.height * (s - 1)) / 2,
 });
 
@@ -74,12 +74,18 @@ function getContainBounds(containerW, containerH, imageAspect) {
 }
 
 function ZoomButton({ iconName, onPress, accessibilityLabel }) {
+    // Add testID for testability
+    let testID = undefined;
+    if (iconName === 'add') testID = 'zoom-in-btn';
+    else if (iconName === 'remove') testID = 'zoom-out-btn';
+    else if (iconName === 'locate-outline') testID = 'recenter-btn';
     return (
         <Pressable
             style={({ pressed }) => [styles.zoomBtn, pressed && styles.zoomBtnPressed]}
             onPress={onPress}
             accessibilityLabel={accessibilityLabel}
             accessibilityRole="button"
+            testID={testID}
         >
             <Ionicons name={iconName} size={22} color="#912338" />
         </Pressable>
@@ -181,7 +187,7 @@ IndoorRouteOverlay.defaultProps = {
     routePolylines: [],
 };
 
-function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, routePolylines }) {
+function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, targetRoom, routePolylines }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
     const translateX = useRef(new Animated.Value(0)).current;
@@ -208,13 +214,32 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
         }
     }, [source]);
 
+    const hasShownInitialHighlight = useRef(false);
+    const [highlightedRoomId, setHighlightedRoomId] = useState(null);
+
     useEffect(() => {
+    if (!targetRoom || !rooms || rooms.length === 0 || hasShownInitialHighlight.current) return;
+
+    const normalizedTarget = String(targetRoom).toLowerCase();
+    const matchedRoom = rooms.find(r => {
+        const rId = String(r.id).toLowerCase();
+        return rId === normalizedTarget || rId.endsWith(normalizedTarget);
+    });
+
+    if (matchedRoom) {
+        hasShownInitialHighlight.current = true; // Lock it immediately
+        setHighlightedRoomId(matchedRoom.id);
+
+        const timer = setTimeout(() => {
+            setHighlightedRoomId(null);
+        }, 6000);
+
         return () => {
-            scale.stopAnimation();
-            translateX.stopAnimation();
-            translateY.stopAnimation();
+            clearTimeout(timer);
+            setHighlightedRoomId(null); 
         };
-    }, [scale, translateX, translateY]);
+    }
+}, [targetRoom, rooms.length]);
 
     const commitTranslation = (tx, ty, s, animated = false) => {
         const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
@@ -264,7 +289,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
     };
 
     const handleZoomIn = () => applyScale(Math.min(lastScale.current + ZOOM_STEP, MAX_SCALE), true);
-    const handleZoomOut  = () => applyScale(Math.max(lastScale.current - ZOOM_STEP, MIN_SCALE), true);
+    const handleZoomOut = () => applyScale(Math.max(lastScale.current - ZOOM_STEP, MIN_SCALE), true);
     const handleRecenter = () => {
         lastScale.current = MIN_SCALE;
         lastTranslateX.current = 0;
@@ -350,6 +375,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
                         />
                     )}
 
+                    {/* maestro poi loaded */}
                     {isPOIEnabled && (
                         <Text
                             style={{ position: 'absolute', color: 'transparent', fontSize: 1 }}
@@ -364,16 +390,33 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
                             {rooms.map((room, index) => {
                                 const { x, y, w, h } = room.bounds;
                                 const cx = containBounds.left + (x + w / 2) * containBounds.width;
-                                const cy = containBounds.top  + (y + h / 2) * containBounds.height;
+                                const cy = containBounds.top + (y + h / 2) * containBounds.height;
+
+                                // Determine if this specific label should change color
+                                const isTarget = room.id === highlightedRoomId;
+
                                 return (
                                     <TouchableOpacity
                                         key={`${roomLabelKey(room)}-${index}`}
                                         testID={`room-label-${room.id}`}
-                                        style={[styles.roomLabel, { left: cx, top: cy }]}
+                                        style={[
+                                            styles.roomLabel,
+                                            { left: cx, top: cy },
+                                            // CHANGE: Conditional Background Color
+                                            isTarget && {
+                                                backgroundColor: '#FFD700', // Bright Gold/Yellow
+                                                borderColor: '#912338',
+                                                borderWidth: 2,
+                                                zIndex: 10 // Ensure it sits above other labels
+                                            }
+                                        ]}
                                         onPress={() => onRoomPress?.(room.id)}
-                                        activeOpacity={0.7}
                                     >
-                                        <Text style={styles.roomLabelText} numberOfLines={1}>
+                                        <Text style={[
+                                            styles.roomLabelText,
+                                            // CHANGE: Conditional Text Style
+                                            isTarget && { color: '#912338', fontWeight: 'bold' }
+                                        ]}>
                                             {room.id}
                                         </Text>
                                     </TouchableOpacity>
@@ -391,11 +434,11 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
                 </Animated.View>
             </GestureDetector>
             <View style={styles.zoomControls}>
-                <ZoomButton iconName="add" onPress={handleZoomIn}   accessibilityLabel="Zoom in" />
+                <ZoomButton iconName="add" onPress={handleZoomIn} accessibilityLabel="Zoom in" />
                 <View style={styles.divider} />
-                <ZoomButton iconName="remove" onPress={handleZoomOut}  accessibilityLabel="Zoom out" />
+                <ZoomButton iconName="remove" onPress={handleZoomOut} accessibilityLabel="Zoom out" />
                 <View style={styles.divider} />
-                <ZoomButton iconName="locate-outline" onPress={handleRecenter} accessibilityLabel="Recenter map"/>
+                <ZoomButton iconName="locate-outline" onPress={handleRecenter} accessibilityLabel="Recenter map" />
             </View>
         </View>
     );
@@ -407,6 +450,7 @@ ZoomableImage.propTypes = {
     onRoomPress: PropTypes.func,
     poiOverlay: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     isPOIEnabled: PropTypes.bool,
+    targetRoom: PropTypes.string,
     routePolylines: PropTypes.arrayOf(
         PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))
     ),
@@ -417,6 +461,7 @@ ZoomableImage.defaultProps = {
     onRoomPress: null,
     poiOverlay: null,
     isPOIEnabled: false,
+    targetRoom: null,
     routePolylines: [],
 };
 
@@ -434,12 +479,12 @@ Placeholder.propTypes = {
     text: PropTypes.string.isRequired,
 };
 
-function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled, routeByFloor }) {
+function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled, targetRoom, routeByFloor }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
     const routePolylines = getPolylinesForFloor(routeByFloor, selectedFloor);
 
     if (!selectedFloor) return <Placeholder width={width} text="Select a floor" />;
-    if (!buildingData)  return <Placeholder width={width} text="No map available." />;
+    if (!buildingData) return <Placeholder width={width} text="No map available." />;
 
     return (
         <View style={styles.floorLayersContainer}>
@@ -468,6 +513,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                                     onRoomPress={onRoomPress}
                                     poiOverlay={poiOverlay}
                                     isPOIEnabled={isPOIEnabled}
+                                    targetRoom={targetRoom}
                                     routePolylines={isActive ? routePolylines : []}
                                 />
 
@@ -494,6 +540,7 @@ FloorMapImage.propTypes = {
     width: PropTypes.number.isRequired,
     onRoomPress: PropTypes.func,
     isPOIEnabled: PropTypes.bool,
+    targetRoom: PropTypes.string,
     routeByFloor: PropTypes.object,
 };
 
@@ -501,6 +548,7 @@ FloorMapImage.defaultProps = {
     onRoomPress: null,
     routeByFloor: null,
     isPOIEnabled: false,
+    targetRoom: null,
 };
 
 function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
@@ -541,18 +589,9 @@ RoomActionModal.propTypes = {
 
 RoomActionModal.defaultProps = { roomId: '' };
 
-export default function IndoorMaps({
-    building,
-    onPressBack,
-    campus,
-    buildings = [],
-    isAccessibilityEnabled = false,
-    onToggleAccessibility = () => {},
-    onPersistCombinedRoute = () => {},
-    persistedCombinedSegments = [],
-    persistedDirectionsFrom = null,
-    persistedDirectionsTo = null,
-}) {
+export default function IndoorMaps({ building, onPressBack, campus, buildings = [], isAccessibilityEnabled = false,
+    onToggleAccessibility = () => {}, onPersistCombinedRoute = () => {}, persistedCombinedSegments = [],
+    persistedDirectionsFrom = null, persistedDirectionsTo = null, targetFloor = null, targetRoom = null }) {
     const { width, height } = useWindowDimensions();
     const SHEET_COLLAPSED = height * 0.11;
 
@@ -574,7 +613,8 @@ export default function IndoorMaps({
     const FONT_SM = Math.round(width * 0.03);
     const FONT_MD = Math.round(width * 0.038);
 
-    const [roomModal,    setRoomModal]    = useState({ visible: false, roomId: null });
+    const [roomModal, setRoomModal] = useState({ visible: false, roomId: null });
+    //poi state is here so that the sidebar btn and the map can read it
     const [isPOIEnabled, setIsPOIEnabled] = useState(false);
     const [generatingDirections, setGeneratingDirections] = useState(false);
     const [indoorRouteByFloor, setIndoorRouteByFloor] = useState(null);
@@ -689,6 +729,23 @@ export default function IndoorMaps({
 
     const handleRoomPress = (roomId) => setRoomModal({ visible: true, roomId });
 
+    // Navigate to target floor and optionally focus on room when passed as props
+    useEffect(() => {
+        if (targetFloor) {
+            setSelectedFloor(targetFloor);
+            // Open room modal after floor is set
+            if (targetRoom) {
+                const timer = setTimeout(() => {
+                    handleRoomPress(targetRoom);
+                }, 100);
+                return () => clearTimeout(timer);
+            }
+        } else if (targetRoom) {
+            // If only room is specified without floor, open it immediately
+            handleRoomPress(targetRoom);
+        }
+    }, [targetFloor, targetRoom]);
+
     const handleSetFrom = () => {
         setDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
         setRoomModal({ visible: false, roomId: null });
@@ -720,6 +777,7 @@ export default function IndoorMaps({
                     width={width}
                     onRoomPress={handleRoomPress}
                     isPOIEnabled={isPOIEnabled}
+                    targetRoom={targetRoom}
                     routeByFloor={indoorRouteByFloor}
                 />
                 {routeError ? (
@@ -788,6 +846,8 @@ IndoorMaps.propTypes = {
     })),
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
+    targetFloor: PropTypes.string,
+    targetRoom: PropTypes.string,
     onPersistCombinedRoute: PropTypes.func,
     persistedCombinedSegments: PropTypes.array,
     persistedDirectionsFrom: PropTypes.shape({
