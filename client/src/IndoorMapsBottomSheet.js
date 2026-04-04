@@ -281,6 +281,13 @@ function SheetContent({
                 showsVerticalScrollIndicator
             >
                 <View style={styles.sheetContent}>
+                    <Text style={[styles.directionsSectionTitle, { fontSize: FONT_MD + 2 }]}>
+                        Select a Floor
+                    </Text>
+
+                    <Text style={[styles.floorsHelperText, { fontSize: FONT_SM }]}>
+                        Choose a floor to explore classrooms and indoor navigation options.
+                    </Text>
                     <View style={styles.classroomRow}>
                         <Text style={[styles.classroomLabel, { fontSize: FONT_MD }]}>Classroom # :</Text>
                         <TextInput

@@ -545,6 +545,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden',
     },
+    floorsHelperText: {
+        color: "#666",
+        textAlign: "center",
+        marginBottom: 12,
+        lineHeight: 18,
+    },
     container: {
         flex: 1,
         borderWidth: 0,

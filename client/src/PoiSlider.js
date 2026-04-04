@@ -21,9 +21,13 @@ const POI_TYPES = [
 ];
 
 function resolveOriginLabel(selectedBuilding, userLocation) {
-  if (selectedBuilding) return `From: ${selectedBuilding.name ?? "Selected building"}`;
-  if (userLocation) return "From: Your location";
-  return "No location. Enable GPS or tap a building";
+  if (selectedBuilding) {
+    return `Starting point: ${selectedBuilding.name ?? "Selected building"}`;
+  }
+  if (userLocation) {
+    return "Starting point: Your location";
+  }
+  return "Choose a building or enable GPS to search for nearby POIs";
 }
 
 export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding }) {
@@ -124,8 +128,10 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
   return (
     <View style={styles.poiSliderView}>
 
+      <Text style={styles.title}>Points of Interest</Text>
+
       <Text style={styles.radiusLabel}>
-        Radius Range: {radiusM} m
+        Search Radius: {radiusM} m
       </Text>
 
       <Slider
@@ -158,7 +164,7 @@ export default function PoiSlider({ onPoisChange, userLocation, selectedBuilding
           disabled={!hasOrigin || loading}
         >
           <Text style={styles.loadButtonText}>
-            {loading ? "..." : "Load"}
+            {loading ? "..." : "Show POIs"}
           </Text>
         </Pressable>
       </View>
@@ -249,5 +255,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
     fontSize: 13,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#912338",
+    marginBottom: 6,
+    textAlign: "center",
   }
 });
