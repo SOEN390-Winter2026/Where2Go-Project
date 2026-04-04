@@ -187,7 +187,7 @@ IndoorRouteOverlay.defaultProps = {
     routePolylines: [],
 };
 
-function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, routePolylines }) {
+function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, targetRoom, routePolylines }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
     const translateX = useRef(new Animated.Value(0)).current;
@@ -232,7 +232,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, r
 
         const timer = setTimeout(() => {
             setHighlightedRoomId(null);
-        }, 3000);
+        }, 6000);
 
         return () => {
             clearTimeout(timer);
