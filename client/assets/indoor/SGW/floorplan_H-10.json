@@ -1188,7 +1188,8 @@
           "y": 0.3889
         },
         "connections": [
-          "wp25_H-25"
+          "wp25_H-25",
+          "wp_exit_H10"
         ]
       },
       {
@@ -1730,6 +1731,18 @@
           "y": 0.2411
         },
         "connections": []
+      },
+      {
+        "id": "wp_exit_H10",
+        "type": "exit",
+        "floor": "H-10",
+        "position": {
+          "x": 0.55,
+          "y": 0.95
+        },
+        "connections": [
+          "wp26_H-26"
+        ]
       }
     ]
   }

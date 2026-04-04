@@ -1877,7 +1877,20 @@
           "y": 0.7785
         },
         "connections": [
-          "wp83_H-8-BR1"
+          "wp83_H-8-BR1",
+          "wp_exit_H8"
+        ]
+      },
+      {
+        "id": "wp_exit_H8",
+        "type": "exit",
+        "floor": "H-8",
+        "position": {
+          "x": 0.82,
+          "y": 0.92
+        },
+        "connections": [
+          "wp84_H-8-BR2"
         ]
       }
     ]
