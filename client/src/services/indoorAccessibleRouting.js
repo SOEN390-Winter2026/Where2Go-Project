@@ -617,6 +617,29 @@ function ensureExitWaypointLink(wp, waypoints) {
   if (!neighbor.connections.includes(String(wp.id))) neighbor.connections.push(String(wp.id));
 }
 
+// Ensure staircase/elevator waypoints that have no authored connections get wired to the
+// nearest non-transfer waypoint, bypassing the hallway check.  Without this, manually-added
+// transfer waypoints placed inside staircase/elevator rooms (which are not hallway polygons)
+// would remain isolated from the rest of the floor graph.
+function ensureTransferWaypointLink(wp, waypoints) {
+  if (!wp?.id) return;
+  const t = String(wp.type || "").toLowerCase();
+  if (t !== "staircase" && t !== "elevator") return;
+  if (Array.isArray(wp.connections) && wp.connections.length > 0) return;
+  const TRANSFER_TYPES = new Set(["staircase", "elevator", "escalator"]);
+  const nonTransfer = waypoints.filter(
+    (w) => w?.id && w?.position && !TRANSFER_TYPES.has(String(w.type || "").toLowerCase())
+  );
+  const nearest = nearestWaypointIdByPosition(nonTransfer, wp.position, null);
+  if (!nearest) return;
+  if (!Array.isArray(wp.connections)) wp.connections = [];
+  wp.connections.push(nearest);
+  const neighbor = waypoints.find((x) => String(x?.id) === nearest);
+  if (!neighbor) return;
+  if (!Array.isArray(neighbor.connections)) neighbor.connections = [];
+  if (!neighbor.connections.includes(String(wp.id))) neighbor.connections.push(String(wp.id));
+}
+
 function populateMissingWaypointConnections(floorPlan) {
   const waypoints = Array.isArray(floorPlan?.waypoints) ? floorPlan.waypoints : [];
   if (waypoints.length < 2) return;
@@ -669,9 +692,10 @@ function ensureRoomAndExitConnectivity(floorPlan, floorId) {
     ensureRoomDoorwayWaypoint(room, floorPlan, floorId, idSet, syntheticState);
   }
 
-  // Ensure exits have at least one walkable link.
+  // Ensure exits and transfer waypoints have at least one walkable link.
   for (const wp of waypoints) {
     ensureExitWaypointLink(wp, waypoints);
+    ensureTransferWaypointLink(wp, waypoints);
   }
 
   // Deterministically fill empty waypoint connections from floor geometry.
@@ -965,4 +989,16 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to, a
     .filter(Boolean);
 
   return { success: true, path, cost: result.cost };
+}
+
+/**
+ * Pre-builds and caches the multi-floor graph for a building so the first call to
+ * generateAccessibleIndoorPath is instant. Safe to call speculatively.
+ */
+export function warmupIndoorGraph(campus, buildingCode) {
+  if (!campus || !buildingCode) return;
+  const rulesA = { avoidStairs: true, stairsPenalty: 2, elevatorBonus: -0.1, floorTransferCost: 1 };
+  const rulesB = { avoidStairs: false, stairsPenalty: 2, elevatorBonus: -0.1, floorTransferCost: 1 };
+  getCachedMultiFloorGraph({ campus, buildingCode, rules: rulesA });
+  getCachedMultiFloorGraph({ campus, buildingCode, rules: rulesB });
 }

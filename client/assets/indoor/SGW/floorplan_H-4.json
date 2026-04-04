@@ -1596,6 +1596,56 @@
           "y": 0.2964
         },
         "connections": []
+      },
+      {
+        "id": "wp71_H4",
+        "type": "staircase",
+        "floor": "H4",
+        "position": {
+          "x": 0.307,
+          "y": 0.3029
+        },
+        "connections": []
+      },
+      {
+        "id": "wp72_H4",
+        "type": "staircase",
+        "floor": "H4",
+        "position": {
+          "x": 0.2967,
+          "y": 0.7114
+        },
+        "connections": []
+      },
+      {
+        "id": "wp73_H4",
+        "type": "staircase",
+        "floor": "H4",
+        "position": {
+          "x": 0.719,
+          "y": 0.6909
+        },
+        "connections": []
+      },
+      {
+        "id": "wp74_H4",
+        "type": "elevator",
+        "floor": "H4",
+        "position": {
+          "x": 0.6504,
+          "y": 0.6592
+        },
+        "connections": []
+      },
+      {
+        "id": "wp75_H4",
+        "type": "elevator",
+        "floor": "H4",
+        "position": {
+          "x": 0.7489,
+          "y": 0.2556
+        },
+        "connections": []
       }
     ]
   }

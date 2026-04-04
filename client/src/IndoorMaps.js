@@ -12,6 +12,7 @@ import {
     Pressable,
     Modal,
     TouchableOpacity,
+    InteractionManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -24,6 +25,7 @@ import { indoorMaps } from './data/indoorData';
 import { extractFloorPlan } from './utils/floorPlanUtils';
 import { getPOIOverlay } from './data/indoorPoisLogic';
 import { buildInterBuildingDirections } from './services/interBuildingDirections';
+import { warmupIndoorGraph } from './services/indoorAccessibleRouting';
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import { BURGUNDY_LIGHT } from './styles/Map_styles';
 import {
@@ -509,6 +511,53 @@ FloorMapImage.defaultProps = {
     isPOIEnabled: false,
 };
 
+function RouteFloorSwitcher({ routeFloors, selectedFloor, setSelectedFloor }) {
+    if (!routeFloors || routeFloors.length < 2) return null;
+
+    const sorted = [...routeFloors].sort((a, b) => {
+        const na = parseFloat(a);
+        const nb = parseFloat(b);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return String(a).localeCompare(String(b));
+    });
+
+    return (
+        <View style={styles.routeFloorSwitcher} pointerEvents="box-none">
+            <Text style={styles.routeFloorSwitcherLabel}>Floor</Text>
+            {sorted.map((floor) => {
+                const isActive = selectedFloor === floor ||
+                    (!isNaN(parseFloat(floor)) && parseFloat(selectedFloor) === parseFloat(floor));
+                return (
+                    <Pressable
+                        key={floor}
+                        testID={`route-floor-btn-${floor}`}
+                        style={[styles.routeFloorBtn, isActive && styles.routeFloorBtnActive]}
+                        onPress={() => setSelectedFloor(floor)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`View floor ${floor}`}
+                        accessibilityState={{ selected: isActive }}
+                    >
+                        <Text style={[styles.routeFloorBtnText, isActive && styles.routeFloorBtnTextActive]}>
+                            {floor}
+                        </Text>
+                    </Pressable>
+                );
+            })}
+        </View>
+    );
+}
+
+RouteFloorSwitcher.propTypes = {
+    routeFloors: PropTypes.arrayOf(PropTypes.string),
+    selectedFloor: PropTypes.string,
+    setSelectedFloor: PropTypes.func.isRequired,
+};
+
+RouteFloorSwitcher.defaultProps = {
+    routeFloors: [],
+    selectedFloor: null,
+};
+
 function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
     return (
         <Modal
@@ -581,6 +630,14 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
     const [routeSegments, setRouteSegments] = useState(null);
 
     useEffect(() => {
+        if (!campus || !building?.code) return;
+        const task = InteractionManager.runAfterInteractions(() => {
+            warmupIndoorGraph(campus, building.code);
+        });
+        return () => task.cancel();
+    }, [campus, building?.code]);
+
+    useEffect(() => {
         if (!Array.isArray(persistedCombinedSegments) || !persistedCombinedSegments.length) return;
         setRouteError(null);
         setRouteSegments(persistedCombinedSegments);
@@ -598,6 +655,9 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
         setRouteError(null);
         setRouteSegments(null);
         setGeneratingDirections(true);
+        // Yield to the event loop so React can render the loading state before
+        // the synchronous graph-build blocks the JS thread.
+        await new Promise(resolve => setTimeout(resolve, 0));
         try {
             const result = await buildInterBuildingDirections({
                 campus,
@@ -611,6 +671,9 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                 setIndoorRouteByFloor(
                     buildIndoorRoutePolylinesByFloor(result.segments, building?.code, campus)
                 );
+                if (directionsFrom?.floor) {
+                    setSelectedFloor(String(directionsFrom.floor));
+                }
                 onPersistCombinedRoute(result.segments || [], {
                     from: directionsFrom,
                     to: directionsTo,
@@ -628,16 +691,26 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
         }
     };
 
+    const clearRoute = () => {
+        setRouteSegments(null);
+        setRouteError(null);
+        setIndoorRouteByFloor(null);
+    };
+
+    const handleSetDirectionsFrom = (v) => { setDirectionsFrom(v); clearRoute(); };
+    const handleSetDirectionsTo = (v) => { setDirectionsTo(v); clearRoute(); };
+    const handleSwapAndClear = () => { handleSwapDirections(); clearRoute(); };
+
     const handleRoomPress = (roomId) => setRoomModal({ visible: true, roomId });
 
     const handleSetFrom = () => {
-        setDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
+        handleSetDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
         setRoomModal({ visible: false, roomId: null });
         handleTabPress('directions');
     };
 
     const handleSetTo = () => {
-        setDirectionsTo({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
+        handleSetDirectionsTo({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
         setRoomModal({ visible: false, roomId: null });
         handleTabPress('directions');
     };
@@ -662,6 +735,11 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                     onRoomPress={handleRoomPress}
                     isPOIEnabled={isPOIEnabled}
                     routeByFloor={indoorRouteByFloor}
+                />
+                <RouteFloorSwitcher
+                    routeFloors={indoorRouteByFloor ? Object.keys(indoorRouteByFloor) : []}
+                    selectedFloor={selectedFloor}
+                    setSelectedFloor={setSelectedFloor}
                 />
                 {routeError ? (
                     <View style={styles.routeErrorBanner} pointerEvents="none">
@@ -690,10 +768,10 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                 getFloors={getFloors}
                 getRooms={getRooms}
                 directionsFrom={directionsFrom}
-                setDirectionsFrom={setDirectionsFrom}
+                setDirectionsFrom={handleSetDirectionsFrom}
                 directionsTo={directionsTo}
-                setDirectionsTo={setDirectionsTo}
-                handleSwapDirections={handleSwapDirections}
+                setDirectionsTo={handleSetDirectionsTo}
+                handleSwapDirections={handleSwapAndClear}
                 onGenerateDirections={handleGenerateDirections}
                 generatingDirections={generatingDirections}
                 routeError={routeError}

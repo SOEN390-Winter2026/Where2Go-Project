@@ -1333,6 +1333,46 @@
           "y": 0.1116
         },
         "connections": []
+      },
+      {
+        "id": "wp60_H6",
+        "type": "staircase",
+        "floor": "H6",
+        "position": {
+          "x": 0.3323,
+          "y": 0.3054
+        },
+        "connections": []
+      },
+      {
+        "id": "wp61_H6",
+        "type": "staircase",
+        "floor": "H6",
+        "position": {
+          "x": 0.3056,
+          "y": 0.701
+        },
+        "connections": []
+      },
+      {
+        "id": "wp62_H6",
+        "type": "staircase",
+        "floor": "H6",
+        "position": {
+          "x": 0.7221,
+          "y": 0.6809
+        },
+        "connections": []
+      },
+      {
+        "id": "wp63_H6",
+        "type": "elevator",
+        "floor": "H6",
+        "position": {
+          "x": 0.6527,
+          "y": 0.6514
+        },
+        "connections": []
       }
     ]
   }
