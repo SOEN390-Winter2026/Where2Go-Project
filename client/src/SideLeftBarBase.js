@@ -44,7 +44,7 @@ export default function SideLeftBarBase({
 
       {/* Concrete: disability */}
       <Pressable
-        testID="disability-btn"
+        testID="disPress"
         style={[
           sideLeftBarSharedStyles.barItem,
           leftBarIconState("disability", leftBarActiveInputs),
@@ -59,7 +59,7 @@ export default function SideLeftBarBase({
 
       {/* Concrete: pois */}
       <Pressable
-        testID="poi-btn"
+        testID="poiPress"
         style={[
           sideLeftBarSharedStyles.barItem,
           leftBarIconState("poi", leftBarActiveInputs),
