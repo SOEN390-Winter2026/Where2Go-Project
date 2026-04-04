@@ -584,6 +584,91 @@ describe("Route fetching and mode display", () => {
     expect(getByText("Try Again")).toBeTruthy();
   });
 
+  it("with isAccessibilityEnabled, request URL includes accessible=true", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", duration: { text: "5 mins", value: 300 }, polyline: "x" }],
+      }),
+    });
+
+    render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+        isAccessibilityEnabled
+      />
+    );
+
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
+    expect(globalThis.fetch.mock.calls[0][0]).toContain("accessible=true");
+  });
+
+  it("shows accessibility banner when isAccessibilityEnabled", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", duration: { text: "5 mins", value: 300 }, polyline: "x" }],
+      }),
+    });
+
+    const { getByTestId } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+        isAccessibilityEnabled
+      />
+    );
+
+    await waitFor(() => expect(getByTestId("accessibilityBanner")).toBeTruthy());
+  });
+
+  it("empty routes with accessibility shows No accessible route available", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: [] }),
+    });
+
+    const { findByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+        isAccessibilityEnabled
+      />
+    );
+
+    expect(await findByText("No accessible route available")).toBeTruthy();
+  });
+
+  it("shows long-walk accessibility note for walking routes over 30 minutes", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ mode: "walking", duration: { text: "40 mins", value: 40 * 60 }, polyline: "x" }],
+      }),
+    });
+
+    const { findByText } = render(
+      <OutdoorDirection
+        onPressBack={() => {}}
+        origin={origin}
+        destination={destination}
+        buildings={[]}
+        isAccessibilityEnabled
+      />
+    );
+
+    expect(
+      await findByText(/Over 30 minutes of walking — access may be limited/)
+    ).toBeTruthy();
+  });
+
   it("fetchRoutes early-return path when user edits origin after valid fetch (no second fetch call)", async () => {
     globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
