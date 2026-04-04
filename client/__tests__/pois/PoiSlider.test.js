@@ -34,14 +34,14 @@ describe('PoiSlider', () => {
         const { getByText } = render(
             <PoiSlider onPoisChange={jest.fn()} userLocation={USER_LOCATION} selectedBuilding={null} />
         );
-        expect(getByText('From: Your location')).toBeTruthy();
+        expect(getByText('Starting point: Your location')).toBeTruthy();
     });
 
     it('shows no location message when both location and building are absent', () => {
         const { getByText } = render(
             <PoiSlider onPoisChange={jest.fn()} userLocation={null} selectedBuilding={null} />
         );
-        expect(getByText(/No location/)).toBeTruthy();
+        expect(getByText('Choose a building or enable GPS to search for nearby POIs')).toBeTruthy();
     });
 
     it('does not fetch on mount', () => {
@@ -67,12 +67,19 @@ describe('PoiSlider', () => {
         expect(globalThis.fetch).toHaveBeenCalledTimes(5); // one per POI_TYPE
     });
 
+    it('displays POI panel title', () => {
+    const { getByText } = render(
+        <PoiSlider onPoisChange={jest.fn()} userLocation={USER_LOCATION} selectedBuilding={null} />
+    );
+    expect(getByText('Points of Interest')).toBeTruthy();
+    });
+
     it('updates displayed radius while sliding without triggering a fetch', () => {
         const { getByTestId, getByText } = render(
             <PoiSlider onPoisChange={jest.fn()} userLocation={USER_LOCATION} selectedBuilding={null} />
         );
         act(() => { fireEvent(getByTestId('poiSlider'), 'onValueChange', 300); });
-        expect(getByText('Radius Range: 300 m')).toBeTruthy();
+        expect(getByText('Search Radius: 300 m')).toBeTruthy();
         expect(globalThis.fetch).not.toHaveBeenCalled();
     });
 
