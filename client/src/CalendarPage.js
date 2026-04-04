@@ -24,6 +24,7 @@ import { getValidCalendarIds, fetchCalendarsIfPermitted } from './utils/calendar
 import CalendarAddEvent from "./CalendarAddEvent";
 import styles from "./styles/CalendarPage_styles";
 
+
 WebBrowser.maybeCompleteAuthSession();
 
 const SAVED_CALENDAR_IDS_KEY = "where2go_saved_calendar_ids";
@@ -307,11 +308,6 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
         </Pressable>
       </View>
 
-      {/* Arrow-up bottom sheet button */}
-      <Pressable testID="openModalBtn" style={styles.buttonModalUp} onPress={open}>
-        <Ionicons name="arrow-up" size={26} color="white" />
-      </Pressable>
-
       {isCalendarConnected ? (
         isCalendarsChosen ? (
           <View style={styles.pageWrap}>
@@ -371,7 +367,8 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
             <Text style={styles.upcomingTitle}>Upcoming Events</Text>
 
             <View style={styles.upcomingBox}>
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 140 }}>
                 {events.length === 0 ? (
                   <View style={styles.emptyWrap}>
                     <Text style={styles.emptyTitle}>No events for this day</Text>
@@ -597,6 +594,14 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
       ) : (
         notConnectedView
       )}
+      
+      <Pressable
+        testID="openModalBtn"
+        style={[styles.buttonModalUp, { bottom: 24 }]}
+        onPress={open}
+      >
+        <Ionicons name="arrow-up" size={26} color="white" />
+      </Pressable>
 
       <Modal transparent visible={visible} animationType="none">
         <View style={styles.overlay}>
