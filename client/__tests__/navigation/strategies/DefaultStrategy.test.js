@@ -76,4 +76,15 @@ describe("DefaultStrategy", () => {
     expect(calledUrl).toContain(`destLat=${DESTINATION.lat}`);
     expect(calledUrl).toContain(`destLng=${DESTINATION.lng}`);
   });
+
+  it("appends accessible=true when options.accessible is true", async () => {
+    globalThis.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ routes: [] }),
+    });
+
+    await strategy.getRoutes(ORIGIN, DESTINATION, { accessible: true });
+
+    expect(globalThis.fetch.mock.calls[0][0]).toContain("accessible=true");
+  });
 });

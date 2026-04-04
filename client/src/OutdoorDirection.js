@@ -46,6 +46,36 @@ function stepsToSegments(route) {
     .filter(Boolean);
 }
 
+/** Walking longer than this (seconds) shows an accessibility note when accessibility mode is on. */
+const ACCESSIBLE_MODE_MAX_WALK_SECONDS = 30 * 60;
+
+export function isWalkingLongForAccessibilityNote(route) {
+  if (route?.mode !== "walking") return false;
+  const secs = route.duration?.value;
+  if (typeof secs !== "number" || !Number.isFinite(secs)) return false;
+  return secs > ACCESSIBLE_MODE_MAX_WALK_SECONDS;
+}
+
+/** Copy for the empty routes panel (avoids nested ternaries for static analysis). */
+export function getEmptyStateCopy(errorCode, error) {
+  if (errorCode === "NO_ACCESSIBLE_ROUTES") {
+    return {
+      icon: "accessibility-outline",
+      title: "No accessible route available",
+      body: "No wheelchair-accessible route could be found for this trip. Try different locations or disable accessibility mode for more options.",
+    };
+  }
+  let body = "Try selecting different locations or another mode.";
+  if (error) {
+    body = "Try selecting different locations or check your connection.";
+  }
+  return {
+    icon: "map-outline",
+    title: "No routes found",
+    body,
+  };
+}
+
 const RetryButton = ({ onPress, loading }) => (
   <Pressable
     style={[styles.retryButton, loading && { opacity: 0.6 }]}
@@ -74,6 +104,7 @@ export default function OutdoorDirection({
   onPressBack,
   __testMapRef,
   userLocation,
+  isAccessibilityEnabled = false,
 }) {
   const [origin, setOrigin] = useState(originProp ?? null);
   const [destination, setDestination] = useState(destProp ?? null);
@@ -161,10 +192,14 @@ export default function OutdoorDirection({
     setErrorCode(null);
 
     try {
-      const newRoutes = await navContext.current.getRoutes(origin, destination);
+      const newRoutes = await navContext.current.getRoutes(origin, destination, {
+        accessible: isAccessibilityEnabled,
+      });
       setRoutes(newRoutes);
       setSelectedRouteIndex(newRoutes.length > 0 ? 0 : -1);
-      if (newRoutes.length === 0) setErrorCode("NO_ROUTES");
+      if (newRoutes.length === 0) {
+        setErrorCode(isAccessibilityEnabled ? "NO_ACCESSIBLE_ROUTES" : "NO_ROUTES");
+      }
     } catch (e) {
       setRoutes([]);
       setError(e?.message || "Failed to fetch directions");
@@ -172,7 +207,7 @@ export default function OutdoorDirection({
     } finally {
       setLoading(false);
     }
-  }, [origin, destination]);
+  }, [origin, destination, isAccessibilityEnabled]);
 
   // fetches routes whenever fetchroute changes. Since the user can decide to change either start or end or both inputs anytime, this keeps it up
   useEffect(() => {
@@ -318,9 +353,11 @@ export default function OutdoorDirection({
 
   const hasValidEndpoints = origin?.lat != null && destination?.lat != null;
   const showEmptyState = hasValidEndpoints && !loading && routes.length === 0 &&
-      (errorCode === "NO_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
+      (errorCode === "NO_ROUTES" || errorCode === "NO_ACCESSIBLE_ROUTES" || !!error || errorCode === "UPSTREAM_FAILED");
   const showSelectLocationsState = !loading &&
     !hasValidEndpoints && (originQuery.trim().length > 0 || destQuery.trim().length > 0);
+
+  const emptyStateCopy = showEmptyState ? getEmptyStateCopy(errorCode, error) : null;
 
   return (
     <ImageBackground
@@ -411,6 +448,15 @@ export default function OutdoorDirection({
           </Pressable>
         )}
 
+        {isAccessibilityEnabled && (
+          <View style={styles.accessibilityBanner} testID="accessibilityBanner">
+            <Ionicons name="accessibility" size={18} color="#912338" />
+            <Text style={styles.accessibilityBannerText}>
+              Accessibility mode enabled
+            </Text>
+          </View>
+        )}
+
 {/*routes count*/}
         <View style={styles.routesHeader}>
           <Text style={styles.routesTitle}>
@@ -430,15 +476,16 @@ export default function OutdoorDirection({
               <Text style={styles.loadingText}>Loading routes...</Text>
             </View>
           )}
-          {showEmptyState && (
+          {showEmptyState && emptyStateCopy && (
             <View style={styles.emptyStateContainer}>
-              <Ionicons name="map-outline" size={40} color="#7C2B38" style={{ marginBottom: 10 }} />
-              <Text style={styles.emptyStateTitle}>No routes found</Text>
-              <Text style={styles.emptyStateText}>
-                {error
-                  ? "Try selecting different locations or check your connection."
-                  : "Try selecting different locations or another mode."}
-              </Text>
+              <Ionicons
+                name={emptyStateCopy.icon}
+                size={40}
+                color="#7C2B38"
+                style={{ marginBottom: 10 }}
+              />
+              <Text style={styles.emptyStateTitle}>{emptyStateCopy.title}</Text>
+              <Text style={styles.emptyStateText}>{emptyStateCopy.body}</Text>
               <RetryButton onPress={handleRetry} loading={loading} />
             </View>
           )}
@@ -456,6 +503,8 @@ export default function OutdoorDirection({
               const { label, icon } = getModeDisplay(r.mode);
               const isSelected = i === selectedRouteIndex;
               const routeKey = `${r.mode}-${r.duration?.text ?? i}`;
+              const showLongWalkNote =
+                isAccessibilityEnabled && isWalkingLongForAccessibilityNote(r);
 
               return (
                 <Pressable
@@ -501,6 +550,13 @@ export default function OutdoorDirection({
                           {r.scheduleNote}
                         </Text>
                       )}
+                      {showLongWalkNote && (
+                        <Text
+                          style={[styles.routeAccessibilityNote, isSelected && styles.routeSubTextSelected]}
+                        >
+                          Over 30 minutes of walking — access may be limited. This option is still available.
+                        </Text>
+                      )}
                     </View>
                   </View>
                 </Pressable>
@@ -532,6 +588,7 @@ OutdoorDirection.propTypes = {
   buildings: PropTypes.array,
   __testMapRef: PropTypes.object,
   userLocation: PropTypes.shape({ latitude: PropTypes.number, longitude: PropTypes.number }),
+  isAccessibilityEnabled: PropTypes.bool,
 };
 
 export const __test__ = {
@@ -541,4 +598,6 @@ export const __test__ = {
   getModeDisplay,
   decodePolylineToCoords,
   stepsToSegments,
+  isWalkingLongForAccessibilityNote,
+  getEmptyStateCopy,
 };
