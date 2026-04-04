@@ -112,7 +112,12 @@ export default function App() {
     if (building?.id === destinationBuilding?.id) return "destination";
     return null;
   };
-
+  useEffect(() => {
+    if (departureBuilding && destinationBuilding) {
+      setModalVisible(false);
+      setShowOutdoorDirection(true);
+    }
+  }, [departureBuilding, destinationBuilding]);
   function fitRoute(coords) {
     if (!mapRef.current || !coords?.length) return;
     mapRef.current.fitToCoordinates(coords, {
