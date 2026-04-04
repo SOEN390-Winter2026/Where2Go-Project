@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import {
     View,
     Text,
@@ -12,6 +12,7 @@ import {
     Pressable,
     Modal,
     TouchableOpacity,
+    Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -34,7 +35,6 @@ import {
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const ZOOM_STEP = 0.75;
-// reference for svg Polyline, avoids allocating a new array every render
 const INDOOR_ROUTE_STROKE_DASH = [8, 6];
 
 const clamp = (value, max) => Math.min(Math.max(value, -max), max);
@@ -52,7 +52,7 @@ const clampTranslation = (containerSize, tx, ty, s) => {
 const routePolylineKey = (pts) => {
     if (!Array.isArray(pts) || pts.length === 0) return 'indoor-route-empty';
     const first = pts[0];
-    const last = pts[pts.length - 1];
+    const last = pts.at(-1);
     return `indoor-route-${pts.length}-${first?.x}-${first?.y}-${last?.x}-${last?.y}`;
 };
 
@@ -387,7 +387,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                     {/* Classroom label overlay */}
                     {containBounds && rooms?.length > 0 && (
                         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-                            {rooms.map((room) => {
+                            {rooms.map((room, index) => {
                                 const { x, y, w, h } = room.bounds;
                                 const cx = containBounds.left + (x + w / 2) * containBounds.width;
                                 const cy = containBounds.top + (y + h / 2) * containBounds.height;
@@ -397,7 +397,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
 
                                 return (
                                     <TouchableOpacity
-                                        key={roomLabelKey(room)}
+                                        key={`${roomLabelKey(room)}-${index}`}
                                         testID={`room-label-${room.id}`}
                                         style={[
                                             styles.roomLabel,
@@ -495,12 +495,8 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
 
             {Object.entries(buildingData).map(([floor, entry]) => {
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
-
                 const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
-        
                 const allRooms = (floorPlan?.rooms ?? []).filter(r => r.bounds);
-
-                // look up the POI overlay PNG for this specific floor
                 const poiOverlay = isActive ? getPOIOverlay(campus, buildingCode, floor) : null;
 
                 return (
@@ -513,7 +509,6 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                             <>
                                 <ZoomableImage
                                     source={entry.image}
-                                    //rooms={classrooms}
                                     rooms={allRooms}
                                     onRoomPress={onRoomPress}
                                     poiOverlay={poiOverlay}
@@ -621,11 +616,62 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
     const [roomModal, setRoomModal] = useState({ visible: false, roomId: null });
     //poi state is here so that the sidebar btn and the map can read it
     const [isPOIEnabled, setIsPOIEnabled] = useState(false);
-
     const [generatingDirections, setGeneratingDirections] = useState(false);
     const [indoorRouteByFloor, setIndoorRouteByFloor] = useState(null);
     const [routeError, setRouteError] = useState(null);
     const [routeSegments, setRouteSegments] = useState(null);
+
+    const keyboardAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+        const onShow = (e) => {
+            Animated.timing(keyboardAnim, {
+                toValue: e.endCoordinates.height,
+                duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 150,
+                useNativeDriver: false, 
+            }).start();
+        };
+
+        const onHide = (e) => {
+            Animated.timing(keyboardAnim, {
+                toValue: 0,
+                duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 150,
+                useNativeDriver: false,
+            }).start();
+        };
+
+        const showSub = Keyboard.addListener(showEvent, onShow);
+        const hideSub = Keyboard.addListener(hideEvent, onHide);
+
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, [keyboardAnim]);
+
+    const allRoomsForBuilding = useMemo(() => {
+        if (!building?.code || !campus) return [];
+        const buildingData = indoorMaps?.[campus]?.[building.code];
+        if (!buildingData) return [];
+
+        const seen = new Set();
+        return Object.entries(buildingData)
+            .flatMap(([floor, entry]) => {
+                const floorPlan = extractFloorPlan(entry?.data, floor);
+                return (floorPlan?.rooms ?? [])
+                    .filter((r) => r.bounds && r.id)
+                    .map((r) => ({ room: r.id, floor }));
+            })
+            .filter(({ room, floor }) => {
+                const key = `${floor}-${room}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+    }, [building?.code, campus]);
 
     useEffect(() => {
         if (!Array.isArray(persistedCombinedSegments) || !persistedCombinedSegments.length) return;
@@ -639,6 +685,12 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
             setDirectionsTo(persistedDirectionsTo);
         }
     }, [persistedCombinedSegments, building?.code, campus]);
+
+    const handleSelectRoom = (room, floor) => {
+        setSelectedFloor(floor);
+        setClassroomInput(room);
+        Keyboard.dismiss();
+    };
 
     const handleGenerateDirections = async () => {
         setIndoorRouteByFloor(null);
@@ -763,6 +815,9 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                 generatingDirections={generatingDirections}
                 routeError={routeError}
                 routeSegments={routeSegments}
+                allRooms={allRoomsForBuilding}
+                onSelectRoom={handleSelectRoom}
+                keyboardOffset={keyboardAnim}
             />
 
             <RoomActionModal
