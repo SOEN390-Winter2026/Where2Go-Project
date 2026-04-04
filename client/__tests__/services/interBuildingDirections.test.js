@@ -25,8 +25,8 @@ describe("formatIndoorPathSteps", () => {
       { floor: "7", type: "elevator", id: "e2" },
     ]);
     expect(lines.some((l) => l.includes("Start on floor 2"))).toBe(true);
-    expect(lines.some((l) => l.includes("Use the elevator"))).toBe(true);
-    expect(lines.some((l) => l.includes("Continue to floor 7"))).toBe(true);
+    expect(lines.some((l) => l.includes("Walk to the elevator"))).toBe(true);
+    expect(lines.some((l) => l.includes("Take the elevator to floor 7"))).toBe(true);
   });
 });
 

@@ -359,11 +359,26 @@ function SheetContent({
                                             {[seg.distanceText, seg.durationText].filter(Boolean).join(' · ')}
                                         </Text>
                                     ) : null}
-                                    {(seg.steps || []).map((line, j) => (
-                                        <Text key={`summary-step-${idx}-${j}`} style={styles.routeSummaryLine}>
-                                            • {line}
-                                        </Text>
-                                    ))}
+                                    {(seg.steps || []).map((line, j) => {
+                                        const targetFloor = seg.stepFloors?.[j];
+                                        return (
+                                            <View key={`summary-step-${idx}-${j}`} style={styles.routeStepRow}>
+                                                <Text style={styles.routeSummaryLine}>• {line}</Text>
+                                                {targetFloor ? (
+                                                    <Pressable
+                                                        style={styles.viewFloorBtn}
+                                                        onPress={() => setSelectedFloor(String(targetFloor))}
+                                                        accessibilityRole="button"
+                                                        accessibilityLabel={`View floor ${targetFloor} map`}
+                                                    >
+                                                        <Text style={styles.viewFloorBtnText}>
+                                                            View Floor {targetFloor} Map
+                                                        </Text>
+                                                    </Pressable>
+                                                ) : null}
+                                            </View>
+                                        );
+                                    })}
                                 </View>
                             ))}
                         </View>
@@ -416,6 +431,7 @@ const sharedSheetPropTypes = {
     routeSegments: PropTypes.arrayOf(PropTypes.shape({
         kind: PropTypes.oneOf(['indoor', 'outdoor']),
         steps: PropTypes.arrayOf(PropTypes.string),
+        stepFloors: PropTypes.arrayOf(PropTypes.string),
         distanceText: PropTypes.string,
         durationText: PropTypes.string,
     })),
