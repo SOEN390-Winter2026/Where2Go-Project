@@ -6,7 +6,7 @@
         "id": "MB-S2_210",
         "label": "MB-S2_210",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S2",
         "nearestWaypoint": "wp1_MB-S2_210",
         "bounds": {
           "x": 0.5398,
@@ -202,6 +202,7 @@
         "label": "MB-S2_Elevator",
         "type": "elevator",
         "floor": "MB-S2",
+        "nearestWaypoint": "wp30_MB-S2",
         "bounds": {
           "x": 0.5705,
           "y": 0.4663,
@@ -384,7 +385,9 @@
           "x": 0.5414,
           "y": 0.4751
         },
-        "connections": []
+        "connections": [
+          "wp29_MB-S2"
+        ]
       },
       {
         "id": "wp2_MB-S2_330",
@@ -394,7 +397,9 @@
           "x": 0.7829,
           "y": 0.4702
         },
-        "connections": []
+        "connections": [
+          "wp32_MB-S2"
+        ]
       },
       {
         "id": "wp3_MB-S2_273",
@@ -404,7 +409,9 @@
           "x": 0.6116,
           "y": 0.1712
         },
-        "connections": []
+        "connections": [
+          "wp27_MB-S2"
+        ]
       },
       {
         "id": "wp4_MB-S2_275",
@@ -414,7 +421,9 @@
           "x": 0.6524,
           "y": 0.1679
         },
-        "connections": []
+        "connections": [
+          "wp27_MB-S2"
+        ]
       },
       {
         "id": "wp5_MB-S2_279",
@@ -424,7 +433,9 @@
           "x": 0.6883,
           "y": 0.1679
         },
-        "connections": []
+        "connections": [
+          "wp27_MB-S2"
+        ]
       },
       {
         "id": "wp6_MB-S2_285",
@@ -434,7 +445,9 @@
           "x": 0.7046,
           "y": 0.2207
         },
-        "connections": []
+        "connections": [
+          "wp26_MB-S2"
+        ]
       },
       {
         "id": "wp7_MB-S2_230",
@@ -444,7 +457,9 @@
           "x": 0.7487,
           "y": 0.4917
         },
-        "connections": []
+        "connections": [
+          "wp32_MB-S2"
+        ]
       },
       {
         "id": "wp8_MB-S2_135",
@@ -454,7 +469,9 @@
           "x": 0.5317,
           "y": 0.6271
         },
-        "connections": []
+        "connections": [
+          "wp30_MB-S2"
+        ]
       },
       {
         "id": "wp9_MB-S2_115",
@@ -464,7 +481,9 @@
           "x": 0.5268,
           "y": 0.8435
         },
-        "connections": []
+        "connections": [
+          "wp33_MB-S2"
+        ]
       },
       {
         "id": "wp10_MB-S2_105",
@@ -474,7 +493,9 @@
           "x": 0.5512,
           "y": 0.8683
         },
-        "connections": []
+        "connections": [
+          "wp33_MB-S2"
+        ]
       },
       {
         "id": "wp11_MB-S2_401",
@@ -484,7 +505,9 @@
           "x": 0.5871,
           "y": 0.7841
         },
-        "connections": []
+        "connections": [
+          "wp33_MB-S2"
+        ]
       },
       {
         "id": "wp12_MB-S2_465",
@@ -494,7 +517,9 @@
           "x": 0.8237,
           "y": 0.8568
         },
-        "connections": []
+        "connections": [
+          "wp36_MB-S2"
+        ]
       },
       {
         "id": "wp13_MB-S2_455",
@@ -504,7 +529,9 @@
           "x": 0.8319,
           "y": 0.8303
         },
-        "connections": []
+        "connections": [
+          "wp36_MB-S2"
+        ]
       },
       {
         "id": "wp14_MB-S2_445",
@@ -514,7 +541,9 @@
           "x": 0.8564,
           "y": 0.8171
         },
-        "connections": []
+        "connections": [
+          "wp36_MB-S2"
+        ]
       },
       {
         "id": "wp15_MB-S2_435",
@@ -524,7 +553,9 @@
           "x": 0.8352,
           "y": 0.7081
         },
-        "connections": []
+        "connections": [
+          "wp36_MB-S2"
+        ]
       },
       {
         "id": "wp16_MB-S2_428",
@@ -534,7 +565,9 @@
           "x": 0.734,
           "y": 0.756
         },
-        "connections": []
+        "connections": [
+          "wp35_MB-S2"
+        ]
       },
       {
         "id": "wp17_MB-S2_T1",
@@ -544,7 +577,9 @@
           "x": 0.6165,
           "y": 0.7395
         },
-        "connections": []
+        "connections": [
+          "wp34_MB-S2"
+        ]
       },
       {
         "id": "wp18_MB-S2_T2",
@@ -554,7 +589,9 @@
           "x": 0.6491,
           "y": 0.7312
         },
-        "connections": []
+        "connections": [
+          "wp34_MB-S2"
+        ]
       },
       {
         "id": "wp19_MB-S2_Exit296",
@@ -564,7 +601,9 @@
           "x": 0.3962,
           "y": 0.267
         },
-        "connections": []
+        "connections": [
+          "wp25_MB-S2"
+        ]
       },
       {
         "id": "wp20_MB-S2_Exit195",
@@ -574,7 +613,10 @@
           "x": 0.4191,
           "y": 0.4537
         },
-        "connections": []
+        "connections": [
+          "wp24_MB-S2_Entrance",
+          "wp25_MB-S2"
+        ]
       },
       {
         "id": "wp21_MB-S2_Exit494",
@@ -584,7 +626,9 @@
           "x": 0.6965,
           "y": 0.8039
         },
-        "connections": []
+        "connections": [
+          "wp35_MB-S2"
+        ]
       },
       {
         "id": "wp22_MB-S2_Exit394",
@@ -594,7 +638,9 @@
           "x": 0.7144,
           "y": 0.5809
         },
-        "connections": []
+        "connections": [
+          "wp31_MB-S2"
+        ]
       },
       {
         "id": "wp23_MB-S2_Exit294",
@@ -604,7 +650,9 @@
           "x": 0.5741,
           "y": 0.2158
         },
-        "connections": []
+        "connections": [
+          "wp25_MB-S2"
+        ]
       },
       {
         "id": "wp24_MB-S2_Entrance",
@@ -614,7 +662,186 @@
           "x": 0.1058,
           "y": 0.4553
         },
-        "connections": []
+        "connections": [
+          "wp20_MB-S2_Exit195"
+        ]
+      },
+      {
+        "id": "wp25_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.4691,
+          "y": 0.2322
+        },
+        "connections": [
+          "wp19_MB-S2_Exit296",
+          "wp20_MB-S2_Exit195",
+          "wp23_MB-S2_Exit294",
+          "wp26_MB-S2",
+          "wp28_MB-S2"
+        ]
+      },
+      {
+        "id": "wp26_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.6527,
+          "y": 0.2203
+        },
+        "connections": [
+          "wp25_MB-S2",
+          "wp6_MB-S2_285",
+          "wp27_MB-S2"
+        ]
+      },
+      {
+        "id": "wp27_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.654,
+          "y": 0.1834
+        },
+        "connections": [
+          "wp26_MB-S2",
+          "wp5_MB-S2_279",
+          "wp4_MB-S2_275",
+          "wp3_MB-S2_273"
+        ]
+      },
+      {
+        "id": "wp28_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.512,
+          "y": 0.2651
+        },
+        "connections": [
+          "wp29_MB-S2",
+          "wp25_MB-S2"
+        ]
+      },
+      {
+        "id": "wp29_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.4938,
+          "y": 0.5117
+        },
+        "connections": [
+          "wp28_MB-S2",
+          "wp1_MB-S2_210",
+          "wp30_MB-S2"
+        ]
+      },
+      {
+        "id": "wp30_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.5602,
+          "y": 0.5354
+        },
+        "connections": [
+          "wp29_MB-S2",
+          "wp31_MB-S2",
+          "wp8_MB-S2_135",
+          "wp33_MB-S2"
+        ]
+      },
+      {
+        "id": "wp31_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.7048,
+          "y": 0.546
+        },
+        "connections": [
+          "wp22_MB-S2_Exit394",
+          "wp30_MB-S2",
+          "wp32_MB-S2"
+        ]
+      },
+      {
+        "id": "wp32_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.792,
+          "y": 0.517
+        },
+        "connections": [
+          "wp31_MB-S2",
+          "wp2_MB-S2_330",
+          "wp7_MB-S2_230"
+        ]
+      },
+      {
+        "id": "wp33_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.5433,
+          "y": 0.7688
+        },
+        "connections": [
+          "wp30_MB-S2",
+          "wp34_MB-S2",
+          "wp11_MB-S2_401",
+          "wp9_MB-S2_115",
+          "wp10_MB-S2_105"
+        ]
+      },
+      {
+        "id": "wp34_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.6344,
+          "y": 0.7688
+        },
+        "connections": [
+          "wp33_MB-S2",
+          "wp17_MB-S2_T1",
+          "wp18_MB-S2_T2",
+          "wp35_MB-S2"
+        ]
+      },
+      {
+        "id": "wp35_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.7131,
+          "y": 0.7694
+        },
+        "connections": [
+          "wp34_MB-S2",
+          "wp21_MB-S2_Exit494",
+          "wp16_MB-S2_428",
+          "wp36_MB-S2"
+        ]
+      },
+      {
+        "id": "wp36_MB-S2",
+        "type": "corridor",
+        "floor": "MB-S2",
+        "position": {
+          "x": 0.8243,
+          "y": 0.7709
+        },
+        "connections": [
+          "wp35_MB-S2",
+          "wp13_MB-S2_455",
+          "wp12_MB-S2_465",
+          "wp14_MB-S2_445",
+          "wp15_MB-S2_435"
+        ]
       }
     ]
   }
