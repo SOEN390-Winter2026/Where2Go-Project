@@ -75,7 +75,7 @@ function getContainBounds(containerW, containerH, imageAspect) {
 
 function ZoomButton({ iconName, onPress, accessibilityLabel }) {
     // Add testID for testability
-    let testID = undefined;
+    let testID;
     if (iconName === 'add') testID = 'zoom-in-btn';
     else if (iconName === 'remove') testID = 'zoom-out-btn';
     else if (iconName === 'locate-outline') testID = 'recenter-btn';

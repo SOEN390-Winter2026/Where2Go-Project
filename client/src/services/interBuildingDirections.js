@@ -98,7 +98,7 @@ function buildIndoorNarrative({ path, buildingCode, startRoom, endRoom, endFloor
   for (const line of core) {
     // Skip "Start on floor X" when the start room already gives that context.
     if (startRoom && line.startsWith("Start on floor")) continue;
-    const m = line.match(FLOOR_CHANGE_RE);
+    const m = line.exec(FLOOR_CHANGE_RE);
     push(line, m ? m[1] : null);
   }
 

@@ -47,7 +47,7 @@ function parseDateTime(dateStr, timeStr) {
 }
 
 function formatTimeInput(raw) {
-  const digits = raw.replace(/\D/g, "").slice(0, 4);
+  const digits = raw.toString().replaceAll(/\D/g, "").slice(0, 4);
   if (digits.length < 4) return digits;
   const firstTwo = Number.parseInt(digits.slice(0, 2), 10);
   if (firstTwo > 23) {
