@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { View, Image, Pressable } from "react-native";
+import { useState } from "react";
+import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import {
     LEFT_BAR_BURGUNDY,
     LEFT_BAR_GREY,
-    leftBarIconSource,
-    leftBarIconState,
 } from "./utils/leftBarItemActive";
 import { sideLeftBarSharedStyles } from "./styles/sideLeftBarStyles";
+import SideLeftBarBase from "./SideLeftBarBase";
 
 export default function IndoorSideLeftBar({
     onPressBack,
@@ -17,74 +16,48 @@ export default function IndoorSideLeftBar({
     onToggleAccessibility = () => {},
     isPOIEnabled = false,
     onTogglePOI = () => {},
-}) {
-
-    const firstDisabilityIcon = require("../assets/hugeicons--disability-02.png");
-    const secondDisabilityIcon = require("../assets/hugeicons--disability-02-2.png");
-    const firstPOIIcon = require("../assets/gis--poi-alt.png");
-    const secondPOIIcon = require("../assets/gis--poi-alt-2.png");
+    }) {
     const [activeSearch, setActiveSearch] = useState(false);
-    const [internalPOIEnabled, setInternalPOIEnabled] = useState(isPOIEnabled);
 
-    useEffect(() => {
-        setInternalPOIEnabled(isPOIEnabled);
-    }, [isPOIEnabled]);
+    // back btn + search 
+    const topSection = (
+        <>
+        <Pressable
+            testID="back-btn"
+            style={[sideLeftBarSharedStyles.barItem, { backgroundColor: LEFT_BAR_BURGUNDY }]}
+            onPress={onPressBack}
+        >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+        </Pressable>
 
-    const handlePOIPress = () => {
-        setInternalPOIEnabled(prev => !prev);
-        onTogglePOI();
-    };
-
-    const activePOI = internalPOIEnabled ? "poi" : null;
-    const leftBarActiveInputs = { isAccessibilityEnabled, activePOI };
-    const iconPairs = {
-        disability: [firstDisabilityIcon, secondDisabilityIcon],
-        poi: [firstPOIIcon, secondPOIIcon],
-    };
-
-    const handleSearchPress = () => {
-        setActiveSearch((prev) => !prev);
-        onOpenDirections?.();
-    };
+        <Pressable
+            testID="search-btn"
+            style={[
+            sideLeftBarSharedStyles.barItem,
+            { backgroundColor: activeSearch ? LEFT_BAR_BURGUNDY : LEFT_BAR_GREY },
+            ]}
+            onPress={() => {
+            setActiveSearch((prev) => !prev);
+            onOpenDirections?.();
+            }}
+        >
+            <Ionicons
+            name="search"
+            size={24}
+            color={activeSearch ? "#fff" : LEFT_BAR_BURGUNDY}
+            />
+        </Pressable>
+        </>
+    );
 
     return (
-        <View style={sideLeftBarSharedStyles.floatLeftBar}>
-            {/* Back btn */}
-            <Pressable testID="back-btn"
-                style={[sideLeftBarSharedStyles.barItem, { backgroundColor: LEFT_BAR_BURGUNDY }]}
-                onPress={onPressBack}
-            >
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-            </Pressable>
-
-            {/* Directions or search (?) to be changed if needed */}
-            <Pressable testID="search-btn"
-                style={[sideLeftBarSharedStyles.barItem, { backgroundColor: activeSearch ? LEFT_BAR_BURGUNDY : LEFT_BAR_GREY }]}
-                onPress={handleSearchPress}
-            >
-                <Ionicons
-                    name="search"
-                    size={24}
-                    color={activeSearch ? "#fff" : LEFT_BAR_BURGUNDY}
-                />
-            </Pressable>
-
-            {/* Disability btn */}
-            <Pressable testID="disability-btn"
-                style={[sideLeftBarSharedStyles.barItem, leftBarIconState("disability", leftBarActiveInputs)]}
-                onPress={onToggleAccessibility}
-            >
-                <Image source={leftBarIconSource("disability", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
-            </Pressable>
-
-            {/* POIs */}
-            <Pressable testID="poi-btn"
-                style={[sideLeftBarSharedStyles.barItem, leftBarIconState("poi", leftBarActiveInputs)]}
-                onPress={handlePOIPress}
-            >
-                <Image source={leftBarIconSource("poi", leftBarActiveInputs, iconPairs)} style={sideLeftBarSharedStyles.icon} />
-            </Pressable>
-        </View>
+        <SideLeftBarBase
+        topSection={topSection}
+        isAccessibilityEnabled={isAccessibilityEnabled}
+        onToggleAccessibility={onToggleAccessibility}
+        isPOIEnabled={isPOIEnabled}
+        onTogglePOI={onTogglePOI}
+        />
     );
 }
 

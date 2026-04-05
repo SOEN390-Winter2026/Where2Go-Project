@@ -190,6 +190,12 @@ export const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: "italic",
   },
+  routeAccessibilityNote: {
+    fontSize: 12,
+    color: "#8a5a00",
+    marginTop: 6,
+    fontStyle: "italic",
+  },
   emptyStateContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -217,5 +223,23 @@ export const styles = StyleSheet.create({
   retryButtonText: {
     color: "white",
     fontWeight: "600",
+  },
+  accessibilityBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(145,35,56,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(145,35,56,0.25)",
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    gap: 8,
+  },
+  accessibilityBannerText: {
+    fontSize: 13,
+    color: "#912338",
+    fontWeight: "500",
+    flex: 1,
   },
 });

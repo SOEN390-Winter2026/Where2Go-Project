@@ -204,6 +204,47 @@ LocationSelector.propTypes = {
     FONT_SM: PropTypes.number.isRequired,
 };
 
+function RoomAutocomplete({ query, allRooms, onSelect, FONT_MD }) {
+    const trimmed = query.trim();
+    if (!trimmed) return null;
+
+    const filtered = allRooms
+        .filter(({ room }) => room.toLowerCase().includes(trimmed.toLowerCase()))
+        .slice(0, 8);
+
+    if (filtered.length === 0) return null;
+
+    return (
+        <View style={styles.container}>
+            {filtered.map(({ room, floor }) => (
+                <Pressable
+                    key={`${floor}-${room}`}
+                    style={styles.item}
+                    onPress={() => onSelect(room, floor)}
+                    testID={`room-suggestion-${room}`}
+                >
+                    <Text style={[styles.roomText, { fontSize: FONT_MD }]}>
+                        {room}
+                    </Text>
+                    <Text style={[styles.floorText, { fontSize: FONT_MD - 2 }]}>
+                        Floor {floor}
+                    </Text>
+                </Pressable>
+            ))}
+        </View>
+    );
+}
+
+RoomAutocomplete.propTypes = {
+    query: PropTypes.string.isRequired,
+    allRooms: PropTypes.arrayOf(PropTypes.shape({
+        room: PropTypes.string.isRequired,
+        floor: PropTypes.string.isRequired,
+    })).isRequired,
+    onSelect: PropTypes.func.isRequired,
+    FONT_MD: PropTypes.number.isRequired,
+};
+
 function SheetContent({
     activeTab,
     building,
@@ -227,6 +268,8 @@ function SheetContent({
     generatingDirections,
     routeError,
     routeSegments,
+    allRooms,
+    onSelectRoom,
 }) {
     if (activeTab === 'floors') {
         return (
@@ -253,8 +296,22 @@ function SheetContent({
                             value={classroomInput}
                             onChangeText={setClassroomInput}
                             keyboardType="default"
+                            placeholder="e.g. H-110"
+                            returnKeyType="search"
+                            autoCorrect={false}
+                            autoCapitalize="characters"
                         />
                     </View>
+
+                    {/* autocomplete dropdown*/}
+                    <RoomAutocomplete
+                        query={classroomInput}
+                        allRooms={allRooms}
+                        onSelect={onSelectRoom}
+                        FONT_MD={FONT_MD}
+                    />
+
+                    {/*Floor selector btns */}
                     <View style={styles.floorBtnsWrap}>
                         {getFloors(building?.code).map((floor) => (
                             <Pressable
@@ -435,6 +492,11 @@ const sharedSheetPropTypes = {
         distanceText: PropTypes.string,
         durationText: PropTypes.string,
     })),
+    allRooms: PropTypes.arrayOf(PropTypes.shape({
+        room: PropTypes.string.isRequired,
+        floor: PropTypes.string.isRequired,
+    })),
+    onSelectRoom: PropTypes.func,
 };
 
 SheetContent.propTypes = {
@@ -445,6 +507,11 @@ SheetContent.propTypes = {
     generatingDirections: PropTypes.bool,
     routeError: PropTypes.string,
     routeSegments: PropTypes.array,
+    allRooms: PropTypes.arrayOf(PropTypes.shape({
+        room: PropTypes.string.isRequired,
+        floor: PropTypes.string.isRequired,
+    })),
+    onSelectRoom: PropTypes.func,
 };
 
 SheetContent.defaultProps = {
@@ -453,6 +520,8 @@ SheetContent.defaultProps = {
     generatingDirections: false,
     routeError: null,
     routeSegments: null,
+    allRooms: [],
+    onSelectRoom: () => {},
 };
 
 export default function IndoorMapsBottomSheet({
@@ -483,74 +552,93 @@ export default function IndoorMapsBottomSheet({
     generatingDirections,
     routeError,
     routeSegments,
+    allRooms,
+    onSelectRoom,
+    keyboardOffset,
 }) {
     return (
-        <Animated.View style={[styles.sheet, { height: sheetHeight }]}>
-            <View {...panResponder.panHandlers} style={styles.dragArea}>
-                <View style={styles.dragHandle} />
+        <>
+            <Animated.View
+                style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: keyboardOffset,
+                    backgroundColor: '#912338',
+                    zIndex: 10,
+                    elevation: 10,
+                }}
+            />
+            <Animated.View style={[styles.sheet, { height: sheetHeight, bottom: keyboardOffset }]}>
+                <View {...panResponder.panHandlers} style={styles.dragArea}>
+                    <View style={styles.dragHandle} />
 
-                <View style={styles.barRow}>
-                    <View style={styles.barSide}>
-                        <Pressable testID="tab-info" style={styles.tabBtn} onPress={() => handleTabPress('info')}>
-                            <Ionicons
-                                name="information-circle"
-                                size={ICON_SIZE}
-                                color={activeTab === 'info' ? '#fff' : 'rgba(255,255,255,0.55)'}
-                            />
-                        </Pressable>
-                    </View>
+                    <View style={styles.barRow}>
+                        <View style={styles.barSide}>
+                            <Pressable testID="tab-info" style={styles.tabBtn} onPress={() => handleTabPress('info')}>
+                                <Ionicons
+                                    name="information-circle"
+                                    size={ICON_SIZE}
+                                    color={activeTab === 'info' ? '#fff' : 'rgba(255,255,255,0.55)'}
+                                />
+                            </Pressable>
+                        </View>
 
-                    <View style={styles.barCenter}>
-                        <Text style={[styles.sheetCampus, { fontSize: FONT_SM }]}>
-                            {campus ?? ''}
-                        </Text>
-                        <Text style={[styles.sheetSubtitle, { fontSize: FONT_SM }]}>
-                            Current Building:
-                        </Text>
-                        <Text style={[styles.sheetTitle, { fontSize: FONT_LG }]}>
-                            {building?.code ?? '—'}
-                        </Text>
-                    </View>
+                        <View style={styles.barCenter}>
+                            <Text style={[styles.sheetCampus, { fontSize: FONT_SM }]}>
+                                {campus ?? ''}
+                            </Text>
+                            <Text style={[styles.sheetSubtitle, { fontSize: FONT_SM }]}>
+                                Current Building:
+                            </Text>
+                            <Text style={[styles.sheetTitle, { fontSize: FONT_LG }]}>
+                                {building?.code ?? '—'}
+                            </Text>
+                        </View>
 
-                    <View style={[styles.barSide, styles.barSideRight]}>
-                        <Pressable testID="tab-floors" style={styles.tabBtn} onPress={() => handleTabPress('floors')}>
-                            <Ionicons
-                                name="layers"
-                                size={ICON_SIZE}
-                                color={activeTab === 'floors' ? '#fff' : 'rgba(255,255,255,0.55)'}
-                            />
-                        </Pressable>
+                        <View style={[styles.barSide, styles.barSideRight]}>
+                            <Pressable testID="tab-floors" style={styles.tabBtn} onPress={() => handleTabPress('floors')}>
+                                <Ionicons
+                                    name="layers"
+                                    size={ICON_SIZE}
+                                    color={activeTab === 'floors' ? '#fff' : 'rgba(255,255,255,0.55)'}
+                                />
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
-            </View>
 
-            <View style={styles.sheetBody}>
-                <SheetContent
-                    activeTab={activeTab}
-                    building={building}
-                    FONT_SM={FONT_SM}
-                    FONT_MD={FONT_MD}
-                    FLOOR_BTN={FLOOR_BTN}
-                    classroomInput={classroomInput}
-                    setClassroomInput={setClassroomInput}
-                    selectedFloor={selectedFloor}
-                    setSelectedFloor={setSelectedFloor}
-                    BUILDINGS_LIST={BUILDINGS_LIST}
-                    getFloors={getFloors}
-                    getRooms={getRooms}
-                    directionsFrom={directionsFrom}
-                    setDirectionsFrom={setDirectionsFrom}
-                    directionsTo={directionsTo}
-                    setDirectionsTo={setDirectionsTo}
-                    handleSwapDirections={handleSwapDirections}
-                    handleTabPress={handleTabPress}
-                    onGenerateDirections={onGenerateDirections}
-                    generatingDirections={generatingDirections}
-                    routeError={routeError}
-                    routeSegments={routeSegments}
-                />
-            </View>
-        </Animated.View>
+                <View style={styles.sheetBody}>
+                    <SheetContent
+                        activeTab={activeTab}
+                        building={building}
+                        FONT_SM={FONT_SM}
+                        FONT_MD={FONT_MD}
+                        FLOOR_BTN={FLOOR_BTN}
+                        classroomInput={classroomInput}
+                        setClassroomInput={setClassroomInput}
+                        selectedFloor={selectedFloor}
+                        setSelectedFloor={setSelectedFloor}
+                        BUILDINGS_LIST={BUILDINGS_LIST}
+                        getFloors={getFloors}
+                        getRooms={getRooms}
+                        directionsFrom={directionsFrom}
+                        setDirectionsFrom={setDirectionsFrom}
+                        directionsTo={directionsTo}
+                        setDirectionsTo={setDirectionsTo}
+                        handleSwapDirections={handleSwapDirections}
+                        handleTabPress={handleTabPress}
+                        onGenerateDirections={onGenerateDirections}
+                        generatingDirections={generatingDirections}
+                        routeError={routeError}
+                        routeSegments={routeSegments}
+                        allRooms={allRooms}
+                        onSelectRoom={onSelectRoom}
+                    />
+                </View>
+            </Animated.View>
+        </>
     );
 }
 
@@ -567,6 +655,12 @@ IndoorMapsBottomSheet.propTypes = {
     generatingDirections: PropTypes.bool,
     routeError: PropTypes.string,
     routeSegments: PropTypes.array,
+    keyboardOffset: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    allRooms: PropTypes.arrayOf(PropTypes.shape({
+        room: PropTypes.string.isRequired,
+        floor: PropTypes.string.isRequired,
+    })),
+    onSelectRoom: PropTypes.func,
 };
 
 IndoorMapsBottomSheet.defaultProps = {
@@ -576,4 +670,7 @@ IndoorMapsBottomSheet.defaultProps = {
     generatingDirections: false,
     routeError: null,
     routeSegments: null,
+    allRooms: [],
+    onSelectRoom: () => {},
+    keyboardOffset: 0,
 };

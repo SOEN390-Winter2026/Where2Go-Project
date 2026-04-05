@@ -1,6 +1,6 @@
 export default class NavigationStrategy {
 
-  async getRoutes(origin, destination) {
+  async getRoutes(origin, destination, options = {}) {
     throw new Error(`getRoutes() must be implemented by ${this.constructor.name}`);
   }
   

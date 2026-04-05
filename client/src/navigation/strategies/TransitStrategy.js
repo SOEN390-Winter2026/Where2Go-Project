@@ -6,13 +6,14 @@ export default class TransitStrategy extends NavigationStrategy {
     return "transit";
   }
 
-  async getRoutes(origin, destination) {
+  async getRoutes(origin, destination, options = {}) {
     const clientTime = encodeURIComponent(new Date().toISOString());
-    const res = await fetch(
+    let url =
       `${API_BASE_URL}/directions?originLat=${origin.lat}&originLng=${origin.lng}` +
       `&destLat=${destination.lat}&destLng=${destination.lng}` +
-      `&clientTime=${clientTime}&mode=transit`
-    );
+      `&clientTime=${clientTime}&mode=transit`;
+    if (options.accessible) url += "&accessible=true";
+    const res = await fetch(url);
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error?.message || "Failed to fetch transit routes");
     return (data.routes || []).filter((r) => r.mode === "transit");

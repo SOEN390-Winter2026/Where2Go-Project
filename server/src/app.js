@@ -44,7 +44,8 @@ app.get("/directions", async (req, res) => {
 
     const origin = { lat: originLat, lng: originLng };
     const destination = { lat: destLat, lng: destLng };
-    const opts = clientTime ? { clientTime } : {};
+    const accessible = req.query.accessible === "true";
+    const opts = { ...(clientTime ? { clientTime } : {}), accessible };
 
     try {
     const result = await getTransportOptionsResult(origin, destination, opts);

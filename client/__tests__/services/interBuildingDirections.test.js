@@ -128,4 +128,57 @@ describe("buildInterBuildingDirections", () => {
     expect(r.segments[1].kind).toBe("outdoor");
     expect(global.fetch).toHaveBeenCalled();
   });
+
+  it("outdoor /directions fetch includes accessible=true when avoidStairs is true", async () => {
+    generateAccessibleIndoorPath
+      .mockReturnValueOnce({
+        success: true,
+        path: [{ floor: "1", type: "exit", id: "x1" }],
+        cost: 1,
+      })
+      .mockReturnValueOnce({
+        success: true,
+        path: [{ floor: "1", type: "door", id: "d1" }],
+        cost: 1,
+      });
+
+    findClosestExitPair.mockReturnValue({
+      from: { buildingCode: "CC", floor: "1", waypointId: "e1", position: { x: 0, y: 0 } },
+      to: { buildingCode: "VE", floor: "1", waypointId: "e2", position: { x: 0, y: 0 } },
+      distanceMeters: 100,
+    });
+
+    exitPositionToLatLng
+      .mockReturnValueOnce({ latitude: 45.5, longitude: -73.58 })
+      .mockReturnValueOnce({ latitude: 45.49, longitude: -73.57 });
+
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [
+          {
+            mode: "walking",
+            duration: { text: "5 min" },
+            distance: { text: "400 m" },
+            steps: [{ instruction: "Head north", distance: { text: "400 m" } }],
+          },
+        ],
+      }),
+    });
+
+    await buildInterBuildingDirections({
+      campus: "Loyola",
+      from: { building: "CC", floor: "1", room: "A" },
+      to: { building: "VE", floor: "1", room: "B" },
+      buildings: [
+        { code: "CC", coordinates: [{ latitude: 45, longitude: -73 }] },
+        { code: "VE", coordinates: [{ latitude: 45.01, longitude: -73.01 }] },
+      ],
+      avoidStairs: true,
+    });
+
+    const directionsCall = global.fetch.mock.calls.find((c) => String(c[0]).includes("/directions"));
+    expect(directionsCall).toBeDefined();
+    expect(String(directionsCall[0])).toContain("accessible=true");
+  });
 });

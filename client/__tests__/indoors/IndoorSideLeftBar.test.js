@@ -2,7 +2,6 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import IndoorSideLeftBar from '../../src/IndoorSideLeftBar';
 
-//mocking icons
 jest.mock('../../assets/hugeicons--disability-02.png', () => 'disability-icon-1');
 jest.mock('../../assets/hugeicons--disability-02-2.png', () => 'disability-icon-2');
 jest.mock('../../assets/gis--poi-alt.png', () => 'poi-icon-1');
@@ -23,12 +22,14 @@ describe('IndoorSideLeftBar', () => {
         expect(root).toBeTruthy();
     });
 
+    // disability and POI buttons are rendered by SideLeftBarBase and use
+    // testIDs 'disPress' / 'poiPress' — consistent with the outdoor bar.
     it('renders back, search, disability and POI buttons', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
         expect(getByTestId('back-btn')).toBeTruthy();
         expect(getByTestId('search-btn')).toBeTruthy();
-        expect(getByTestId('disability-btn')).toBeTruthy();
-        expect(getByTestId('poi-btn')).toBeTruthy();
+        expect(getByTestId('disPress')).toBeTruthy();
+        expect(getByTestId('poiPress')).toBeTruthy();
     });
 
     it('calls onPressBack when back button is pressed', () => {
@@ -43,9 +44,7 @@ describe('IndoorSideLeftBar', () => {
     it('back button has maroon background', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
         const btn = getByTestId('back-btn');
-        const bg = btn.props.style.flat
-            ? btn.props.style.flat().find(s => s?.backgroundColor)?.backgroundColor
-            : [btn.props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
+        const bg = [btn.props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#912338');
     });
 
@@ -78,7 +77,7 @@ describe('IndoorSideLeftBar', () => {
                 onToggleAccessibility={jest.fn()}
             />
         );
-        let btn = getByTestId('disability-btn');
+        let btn = getByTestId('disPress');
         let bg = [btn.props.style].flat().find((s) => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#ccc');
         rerender(
@@ -88,16 +87,15 @@ describe('IndoorSideLeftBar', () => {
                 onToggleAccessibility={jest.fn()}
             />
         );
-        btn = getByTestId('disability-btn');
+        btn = getByTestId('disPress');
         bg = [btn.props.style].flat().find((s) => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#912338');
     });
 
     it('disability button starts with grey background', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        const btn = getByTestId('disability-btn');
-        const styles = [btn.props.style].flat();
-        const bg = styles.find(s => s?.backgroundColor)?.backgroundColor;
+        const btn = getByTestId('disPress');
+        const bg = [btn.props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#ccc');
     });
 
@@ -110,7 +108,7 @@ describe('IndoorSideLeftBar', () => {
                 onToggleAccessibility={onToggleAccessibility}
             />
         );
-        fireEvent.press(getByTestId('disability-btn'));
+        fireEvent.press(getByTestId('disPress'));
         expect(onToggleAccessibility).toHaveBeenCalledTimes(1);
     });
 
@@ -119,34 +117,31 @@ describe('IndoorSideLeftBar', () => {
         const { getByTestId } = render(
             <IndoorSideLeftBar onPressBack={onPressBack} />
         );
-        fireEvent.press(getByTestId('disability-btn'));
+        fireEvent.press(getByTestId('disPress'));
         expect(onPressBack).not.toHaveBeenCalled();
     });
 
     it('POI button starts with grey background', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        const btn = getByTestId('poi-btn');
-        const styles = [btn.props.style].flat();
-        const bg = styles.find(s => s?.backgroundColor)?.backgroundColor;
+        const btn = getByTestId('poiPress');
+        const bg = [btn.props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#ccc');
     });
 
     it('POI button turns maroon when pressed', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('poi-btn'));
-        const btn = getByTestId('poi-btn');
-        const styles = [btn.props.style].flat();
-        const bg = styles.find(s => s?.backgroundColor)?.backgroundColor;
+        fireEvent.press(getByTestId('poiPress'));
+        const btn = getByTestId('poiPress');
+        const bg = [btn.props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#912338');
     });
 
     it('POI button deactivates when pressed again', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('poi-btn'));
-        fireEvent.press(getByTestId('poi-btn'));
-        const btn = getByTestId('poi-btn');
-        const styles = [btn.props.style].flat();
-        const bg = styles.find(s => s?.backgroundColor)?.backgroundColor;
+        fireEvent.press(getByTestId('poiPress'));
+        fireEvent.press(getByTestId('poiPress'));
+        const btn = getByTestId('poiPress');
+        const bg = [btn.props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#ccc');
     });
 
@@ -155,7 +150,7 @@ describe('IndoorSideLeftBar', () => {
         const { getByTestId } = render(
             <IndoorSideLeftBar onPressBack={onPressBack} />
         );
-        fireEvent.press(getByTestId('poi-btn'));
+        fireEvent.press(getByTestId('poiPress'));
         expect(onPressBack).not.toHaveBeenCalled();
     });
 
@@ -167,11 +162,11 @@ describe('IndoorSideLeftBar', () => {
                 onToggleAccessibility={jest.fn()}
             />
         );
-        fireEvent.press(getByTestId('poi-btn'));
+        fireEvent.press(getByTestId('poiPress'));
 
-        const disBg = [getByTestId('disability-btn').props.style].flat()
+        const disBg = [getByTestId('disPress').props.style].flat()
             .find(s => s?.backgroundColor)?.backgroundColor;
-        const poiBg = [getByTestId('poi-btn').props.style].flat()
+        const poiBg = [getByTestId('poiPress').props.style].flat()
             .find(s => s?.backgroundColor)?.backgroundColor;
 
         expect(disBg).toBe('#912338');
@@ -186,33 +181,31 @@ describe('IndoorSideLeftBar', () => {
                 onToggleAccessibility={jest.fn()}
             />
         );
-
-        const poiBg = [getByTestId('poi-btn').props.style].flat()
+        const poiBg = [getByTestId('poiPress').props.style].flat()
             .find(s => s?.backgroundColor)?.backgroundColor;
         expect(poiBg).toBe('#ccc');
     });
 
     it('activating POI does not affect disability state', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('poi-btn'));
-
-        const disBg = [getByTestId('disability-btn').props.style].flat()
+        fireEvent.press(getByTestId('poiPress'));
+        const disBg = [getByTestId('disPress').props.style].flat()
             .find(s => s?.backgroundColor)?.backgroundColor;
         expect(disBg).toBe('#ccc');
     });
 
     it('iconState returns maroon for poi when poi is active', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('poi-btn'));
-        const bg = [getByTestId('poi-btn').props.style].flat().find(s => s?.backgroundColor)?.backgroundColor;
+        fireEvent.press(getByTestId('poiPress'));
+        const bg = [getByTestId('poiPress').props.style].flat()
+            .find(s => s?.backgroundColor)?.backgroundColor;
         expect(bg).toBe('#912338');
     });
 
     it('POI image source switches to active icon when poi is active', () => {
         const { getByTestId } = render(<IndoorSideLeftBar {...defaultProps} />);
-        fireEvent.press(getByTestId('poi-btn'));
-        render(<IndoorSideLeftBar {...defaultProps} />);
-        expect(getByTestId('poi-btn')).toBeTruthy();
+        fireEvent.press(getByTestId('poiPress'));
+        expect(getByTestId('poiPress')).toBeTruthy();
     });
 
     it('iconState returns undefined for unknown button name', () => {

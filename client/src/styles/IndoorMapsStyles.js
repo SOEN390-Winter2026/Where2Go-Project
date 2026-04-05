@@ -1,10 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f9f9f9',
-    },
     sheetCampus: {
         color: 'rgba(255,255,255,0.5)',
         letterSpacing: 1,
@@ -619,6 +615,39 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         lineHeight: 18,
     },
+    container: {
+        flex: 1,
+        borderWidth: 0,
+        borderColor: '#e0e0e0',
+        borderRadius: 8,
+        marginTop: 4,
+        marginBottom: 3,
+        backgroundColor: '#fff',
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
+    },
+    item: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 14,
+        paddingVertical: 11,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: '#f0f0f0',
+    },
+    roomText: {
+        color: '#222',
+        fontWeight: '500',
+    },
+    floorText: {
+        color: '#912338',
+        fontWeight: '400',
+    },
+
+
 });
 
 export default styles;
