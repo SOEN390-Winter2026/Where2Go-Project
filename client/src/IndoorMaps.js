@@ -32,8 +32,6 @@ import {
     buildIndoorRoutePolylinesByFloor,
     getPolylinesForFloor,
 } from './utils/indoorRouteOverlay';
-import { Alert } from "react-native";
-import { generateAccessibleIndoorPath } from './services/indoorAccessibleRouting';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -339,54 +337,6 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
 
     const composed = Gesture.Simultaneous(pinchGesture, panGesture);
     const containBounds = getContainBounds(containerDims.width, containerDims.height, imageAspect);
-    // Add this inside your IndoorMaps component, before the return statement
-    const testInterFloorRoute = async () => {
-  console.log("Testing inter-floor route...");
-  
-  const result = generateAccessibleIndoorPath({
-    campus: campus,
-    buildingCode: building?.code,
-    from: { 
-      floor: "H-5", 
-      room: "H-531"
-    },
-    to: { 
-      floor: "H-6", 
-      room: "H-631"
-    },
-    avoidStairs: true
-  });
-
-  if (result.success) {
-    console.log("✅ Route found!");
-    console.log("Path length:", result.path.length);
-    console.log("Cost:", result.cost);
-    
-    // Show alert on phone
-    Alert.alert(
-      "Route Found",
-      `Path has ${result.path.length} waypoints across ${getUniqueFloors(result.path).length} floors`
-    );
-    
-    // Display the route on map
-    setIndoorRouteByFloor(
-      buildIndoorRoutePolylinesByFloor([{
-        kind: "indoor",
-        path: result.path
-      }], building?.code, campus)
-    );
-    
-  } else {
-    console.log("❌ No route:", result.meta?.reason);
-    Alert.alert("No Route", result.meta?.reason || "Could not find path");
-  }
-};
-
-const getUniqueFloors = (path) => {
-  const floors = new Set();
-  path.forEach(node => floors.add(node.floor));
-  return Array.from(floors);
-};
 
     return (
         <View
@@ -840,29 +790,6 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
     const handleSetDirectionsFrom = (v) => { setDirectionsFrom(v); clearRoute(); };
     const handleSetDirectionsTo = (v) => { setDirectionsTo(v); clearRoute(); };
     const handleSwapAndClear = () => { handleSwapDirections(); clearRoute(); };
-      const testInterFloorRoute = () => {
-
-  const result = generateAccessibleIndoorPath({
-    campus: campus,
-    buildingCode: building?.code,
-    from: { floor: "H-5", room: "H-531" },  // Room on H-5
-    to: { floor: "H-6", room: "H-631" },    // Room on H-6
-    avoidStairs: true  // Force elevator usage
-  });
-    
-    if (result.success) {
-      Alert.alert("Route Found", `${result.path.length} waypoints`);
-      const routeByFloor = buildIndoorRoutePolylinesByFloor(
-        [{ kind: "indoor", path: result.path }], 
-        building?.code, 
-        campus
-      );
-      setIndoorRouteByFloor(routeByFloor);
-      setSelectedFloor(String(result.path[0]?.floor || "H-5"));
-    } else {
-      Alert.alert("No Route", result.meta?.reason || "Path not found");
-    }
-  };
 
     const handleRoomPress = (roomId) => setRoomModal({ visible: true, roomId });
 
@@ -922,24 +849,6 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                     selectedFloor={selectedFloor}
                     setSelectedFloor={setSelectedFloor}
                 />
-                <TouchableOpacity 
-    style={{
-      position: 'absolute',
-      bottom: 100,
-      right: 10,
-      backgroundColor: '#912338',
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 8,
-      zIndex: 100,
-    }}
-    onPress={testInterFloorRoute}
-  >
-    <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-      Test H2→H4
-    </Text>
-  </TouchableOpacity>
-                
                 {routeError ? (
                     <View style={styles.routeErrorBanner} pointerEvents="none">
                         <Text style={styles.routeErrorText}>{routeError}</Text>
