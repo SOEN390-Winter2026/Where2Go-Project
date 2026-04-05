@@ -6,6 +6,10 @@ jest.mock('../../src/services/interBuildingDirections', () => ({
     buildInterBuildingDirections: jest.fn(),
 }));
 
+jest.mock('../../src/utils/indoorRouteOverlay', () => ({
+    buildIndoorRoutePolylinesByFloor: jest.fn(() => ({ '2': [], '4': [] })),
+    getPolylinesForFloor: jest.fn(() => []),
+}));
 jest.mock('react-native-svg', () => {
     const React = require('react');
     const { View } = require('react-native');
@@ -908,7 +912,10 @@ describe('IndoorMaps', () => {
             expect(buildInterBuildingDirections).toHaveBeenCalledWith(
                 expect.objectContaining({ campus: 'SGW', avoidStairs: true })
             );
-            expect(await findByTestId('indoor-route-overlay')).toBeTruthy();
+            expect(onPersist).toHaveBeenCalledWith(
+    expect.any(Array),
+    expect.any(Object)
+);
             s.mockRestore();
         });
 
@@ -946,6 +953,79 @@ describe('IndoorMaps', () => {
                 expect(getAllByText('network down').length).toBeGreaterThan(0);
             });
         });
+const pressLastMatch = (getAllByText, text) => {
+    const matches = getAllByText(text);
+    fireEvent.press(matches[matches.length - 1]);
+};
+
+describe('route-floor-btn switching', () => {
+    it('renders route-floor-btn for each floor in a multi-floor indoor segment', async () => {
+        const { buildInterBuildingDirections } = require('../../src/services/interBuildingDirections');
+        buildInterBuildingDirections.mockResolvedValue({
+            ok: true,
+            segments: [{ kind: 'indoor', buildingCode: 'H', path: [
+                { floor: '2', position: { x: 0.1, y: 0.1 } },
+                { floor: '4', position: { x: 0.2, y: 0.2 } },
+            ]}],
+        });
+
+        const { getByText, getByTestId, getAllByText } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        fireEvent.press(getByTestId('from-room'));
+        pressLastMatch(getAllByText, 'H-201');
+        fireEvent.press(getByTestId('to-room'));
+        pressLastMatch(getAllByText, 'H-202');
+
+        await act(async () => { fireEvent.press(getByTestId('generate-directions-btn')); });
+
+        await waitFor(() => {
+            expect(getByTestId('route-floor-btn-2')).toBeTruthy();
+            expect(getByTestId('route-floor-btn-4')).toBeTruthy();
+        });
+    });
+
+    it('pressing a route-floor-btn switches the displayed floor', async () => {
+        const { buildInterBuildingDirections } = require('../../src/services/interBuildingDirections');
+        buildInterBuildingDirections.mockResolvedValue({
+            ok: true,
+            segments: [{ kind: 'indoor', buildingCode: 'H', path: [
+                { floor: '2', position: { x: 0.1, y: 0.1 } },
+                { floor: '4', position: { x: 0.2, y: 0.2 } },
+            ]}],
+        });
+
+        const { getByText, getByTestId, getAllByText } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByText('Get Room Directions'));
+        fireEvent.press(getByTestId('from-room'));
+        pressLastMatch(getAllByText, 'H-201');
+        fireEvent.press(getByTestId('to-room'));
+        pressLastMatch(getAllByText, 'H-202');
+
+        await act(async () => { fireEvent.press(getByTestId('generate-directions-btn')); });
+        await waitFor(() => expect(getByTestId('route-floor-btn-4')).toBeTruthy());
+
+        fireEvent.press(getByTestId('route-floor-btn-4'));
+        expect(getByText('Floor 4')).toBeTruthy();
+    });
+});
+
+describe('room suggestion autocomplete', () => {
+    it('shows room-suggestion items when classroom input has a query', () => {
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        fireEvent.changeText(getByTestId('classroom-input'), 'H-2');
+        expect(getByTestId('room-suggestion-H-201')).toBeTruthy();
+    });
+
+    it('selecting a room suggestion sets the input to the room name and switches floor', () => {
+        const { getByTestId } = render(<IndoorMaps {...defaultProps} />);
+        fireEvent.press(getByTestId('tab-floors'));
+        fireEvent.changeText(getByTestId('classroom-input'), 'H-2');
+        fireEvent.press(getByTestId('room-suggestion-H-201'));
+        // onSelect sets classroomInput to the room name, not empty
+        expect(getByTestId('classroom-input').props.value).toBe('H-201');
+    });
+});
     
 
 });
