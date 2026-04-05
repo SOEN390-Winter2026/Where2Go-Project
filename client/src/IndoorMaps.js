@@ -555,9 +555,9 @@ function RouteFloorSwitcher({ routeFloors, selectedFloor, setSelectedFloor }) {
     if (!routeFloors || routeFloors.length < 2) return null;
 
     const sorted = [...routeFloors].sort((a, b) => {
-        const na = parseFloat(a);
-        const nb = parseFloat(b);
-        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        const na = Number.parseFloat(a);
+        const nb = Number.parseFloat(b);
+        if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
         return String(a).localeCompare(String(b));
     });
 
@@ -566,7 +566,7 @@ function RouteFloorSwitcher({ routeFloors, selectedFloor, setSelectedFloor }) {
             <Text style={styles.routeFloorSwitcherLabel}>Floor</Text>
             {sorted.map((floor) => {
                 const isActive = selectedFloor === floor ||
-                    (!isNaN(parseFloat(floor)) && parseFloat(selectedFloor) === parseFloat(floor));
+                    (!Number.isNaN(Number.parseFloat(floor)) && Number.parseFloat(selectedFloor) === Number.parseFloat(floor));
                 return (
                     <Pressable
                         key={floor}
