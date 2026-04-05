@@ -1,10 +1,4 @@
 {
-  "H": {
-    "floor": "H-7",
-    "building": "Hall",
-    "rooms": [],
-    "waypoints": []
-  },
   "H-7": {
     "floor": "H-7",
     "rooms": [

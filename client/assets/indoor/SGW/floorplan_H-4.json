@@ -1,10 +1,4 @@
 {
-  "CC3": {
-    "floor": "CC3",
-    "building": "Hall",
-    "rooms": [],
-    "waypoints": []
-  },
   "H-4": {
     "floor": "H-4",
     "building": "Hall",
