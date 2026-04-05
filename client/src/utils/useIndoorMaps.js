@@ -2,25 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
-import { API_BASE_URL } from '../config';
-
 // Indoor JSON for this campus only 
 function getBuildingIndoorData(campus, bCode) {
     if (!campus || !bCode) return null;
     return indoorMaps?.[campus]?.[bCode] ?? null;
-}
-
-// Fetches building codes for one campus, falls back to indoorData keys on failure.
-async function fetchCampusBuildings(campus) {
-    try {
-        const res = await fetch(`${API_BASE_URL}/campus/${campus}/buildings`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : (data.buildings ?? []);
-        return list.map(b => String(b?.code ?? "").trim()).filter(Boolean);
-    } catch {
-        return Object.keys(indoorMaps?.[campus] ?? {});
-    }
 }
 
 function normalizeCode(code) {
@@ -40,23 +25,6 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
     const [classroomInput, setClassroomInput] = useState('');
     const [directionsFrom, setDirectionsFrom] = useState({ building: null, floor: null, room: null });
     const [directionsTo,   setDirectionsTo]   = useState({ building: null, floor: null, room: null });
-
-    //all buildings for this campus fetched from the server to be displayed after
-    const [allBuildings, setAllBuildings] = useState([]);
-
-    useEffect(() => {
-        let cancelled = false;
-        async function loadForCampus() {
-            if (!campus) {
-                setAllBuildings([]);
-                return;
-            }
-            const codes = await fetchCampusBuildings(campus);
-            if (!cancelled) setAllBuildings(codes);
-        }
-        loadForCampus();
-        return () => { cancelled = true; };
-    }, [campus]);
 
     // Auto-select first available floor when building or campus changes
     useEffect(() => {

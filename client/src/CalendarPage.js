@@ -68,6 +68,138 @@ function toDateString(date) {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
 
+/** Put the current/next event first when viewing today's list. */
+function reorderEventsWithNextUpFirst(dayEvents, selectedDateString) {
+  if (selectedDateString !== todayString()) return dayEvents;
+  const now = new Date();
+  const nextIndex = dayEvents.findIndex((e) => new Date(e.endDate) > now);
+  if (nextIndex < 0) return dayEvents;
+  const nextEvent = dayEvents[nextIndex];
+  const otherEvents = dayEvents.filter((_, i) => i !== nextIndex);
+  return [nextEvent, ...otherEvents];
+}
+
+const calendarEventPropType = PropTypes.shape({
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  title: PropTypes.string,
+  startDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
+  endDate: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
+  location: PropTypes.string,
+});
+
+function NotConnectedCalendarPlaceholder({ isRestoring }) {
+  if (isRestoring) {
+    return (
+      <View style={styles.noCalContainer}>
+        <Text style={styles.txtNoCal}>Loading…</Text>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.noCalContainer}>
+      <Image
+        testID="calendar-icon"
+        source={require("../assets/calendar.png")}
+        style={styles.calendar}
+      />
+      <Text style={styles.txtNoCal}>No Calendar Yet</Text>
+    </View>
+  );
+}
+
+NotConnectedCalendarPlaceholder.propTypes = {
+  isRestoring: PropTypes.bool,
+};
+
+function promptDirectionsForEvent(event, parsed, onGenerateDirections) {
+  if (!onGenerateDirections) return;
+  if (!parsed?.building) {
+    console.log("Event location is missing or not a Concordia building. Skipping directions.");
+    Alert.alert(
+      "Cannot Generate Directions",
+      "This event has no location or the location is not a Concordia building.",
+      [{ text: "OK" }]
+    );
+    return;
+  }
+  onGenerateDirections({
+    event,
+    buildingCode: parsed.building,
+    room: parsed.room ?? null,
+    rawLocation: event.location ?? null,
+  });
+}
+
+function CalendarEventRow({ event, index, selectedDate, onGenerateDirections, onLocateRoom }) {
+  const { day, mon } = getDatePartsFromEvent(event);
+  const timeRange = formatTimeRange(event);
+  const now = new Date();
+  const isViewingToday = selectedDate === todayString();
+  const isNextEvent = isViewingToday && index === 0 && new Date(event.endDate) > now;
+  const parsed = parseEventLocation(event.location);
+  const hasValidBuilding = parsed?.building;
+
+  return (
+    <Pressable
+      testID={`event-item-${event.id}`}
+      style={styles.eventRow}
+      onPress={() => promptDirectionsForEvent(event, parsed, onGenerateDirections)}
+    >
+      <View style={styles.leftAccent} />
+
+      <View style={styles.dateCol}>
+        <Text style={styles.dateDay}>{day}</Text>
+        <Text style={styles.dateMonth}>{mon}</Text>
+      </View>
+
+      <View style={styles.eventInfo}>
+        <Text numberOfLines={1} style={styles.eventName}>
+          {event.title || "Untitled"}
+        </Text>
+
+        <Text style={styles.eventTime}>{timeRange}</Text>
+
+        {isNextEvent ? (
+          <View style={styles.nextEventTag}>
+            <Text style={styles.nextEventTagText}>Coming up</Text>
+          </View>
+        ) : null}
+        <Text numberOfLines={1} style={styles.eventLoc}>
+          {getLocation(event)}
+        </Text>
+      </View>
+
+      {hasValidBuilding && onLocateRoom && (
+        <Pressable
+          testID={`locate-room-btn-${event.id}`}
+          onPress={(e) => {
+            e.stopPropagation();
+            onLocateRoom({
+              event,
+              buildingCode: parsed.building,
+              room: parsed.room ?? null,
+            });
+          }}
+          style={{ marginRight: 8, padding: 8 }}
+          accessibilityLabel="Locate room in building"
+        >
+          <Ionicons name="location" size={20} color="#912338" />
+        </Pressable>
+      )}
+
+      <Ionicons name="chevron-forward" size={18} color="#888" />
+    </Pressable>
+  );
+}
+
+CalendarEventRow.propTypes = {
+  event: calendarEventPropType.isRequired,
+  index: PropTypes.number.isRequired,
+  selectedDate: PropTypes.string.isRequired,
+  onGenerateDirections: PropTypes.func,
+  onLocateRoom: PropTypes.func,
+};
+
 export default function CalendarPage({ onPressBack, onGenerateDirections, onLocateRoom }) {
   const [visible, setVisible] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -171,24 +303,8 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
 
     try {
       const dayEvents = await Calendar.getEventsAsync(selectedCalendarIds, start, end);
-
       dayEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
-      const isToday = selectedDateString === todayString();
-      let ordered = dayEvents;
-
-      if (isToday) {
-        const now = new Date();
-        const nextIndex = dayEvents.findIndex((e) => new Date(e.endDate) > now);
-
-        if (nextIndex >= 0) {
-          const nextEvent = dayEvents[nextIndex];
-          const otherEvents = dayEvents.filter((_, i) => i !== nextIndex);
-          ordered = [nextEvent, ...otherEvents];
-        }
-      }
-
-      setEvents(ordered);
+      setEvents(reorderEventsWithNextUpFirst(dayEvents, selectedDateString));
     } catch (e) {
       console.error(e);
       setEvents([]);
@@ -274,21 +390,6 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
     [selectedDate]: { selected: true, selectedColor: "#912338" },
   };
 
-  const notConnectedView = isRestoring ? (
-    <View style={styles.noCalContainer}>
-      <Text style={styles.txtNoCal}>Loading…</Text>
-    </View>
-  ) : (
-    <View style={styles.noCalContainer}>
-      <Image
-        testID="calendar-icon"
-        source={require("../assets/calendar.png")}
-        style={styles.calendar}
-      />
-      <Text style={styles.txtNoCal}>No Calendar Yet</Text>
-    </View>
-  );
-
   if (showAddEvent) {
     return (
       <CalendarAddEvent
@@ -299,17 +400,10 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
     );
   }
 
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable testID="pressBack" style={styles.headerBtn} onPress={onPressBack}>
-          <Ionicons name="arrow-back" size={26} color="white" />
-        </Pressable>
-      </View>
-
-      {isCalendarConnected ? (
-        isCalendarsChosen ? (
+  let calendarMainPanel;
+  if (isCalendarConnected) {
+    if (isCalendarsChosen) {
+      calendarMainPanel = (
           <View style={styles.pageWrap}>
             <View style={styles.calendarCard}>
               <View style={styles.calendarTopRow}>
@@ -375,86 +469,16 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
                     <Text style={styles.emptySub}>Select another date to view events.</Text>
                   </View>
                 ) : (
-                  events.map((event, index) => {
-                    const { day, mon } = getDatePartsFromEvent(event);
-                    const timeRange = formatTimeRange(event);
-                    const now = new Date();
-                    const isViewingToday = selectedDate === todayString();
-                    const isNextEvent = isViewingToday && index === 0 && new Date(event.endDate) > now;
-                    const parsed = parseEventLocation(event.location);
-                    const hasValidBuilding = parsed?.building;
-
-                    return (
-                      <Pressable
-                        key={event.id}
-                        testID={`event-item-${event.id}`}
-                        style={styles.eventRow}
-                        onPress={() => {
-                          if (!onGenerateDirections) return;
-                          if (!parsed?.building) {
-                            console.log("Event location is missing or not a Concordia building. Skipping directions.");
-                            Alert.alert(
-                              "Cannot Generate Directions",
-                              "This event has no location or the location is not a Concordia building.",
-                              [{ text: "OK" }]
-                            );
-                            return;
-                          }
-                          onGenerateDirections({
-                            event,
-                            buildingCode: parsed.building,
-                            room: parsed.room ?? null,
-                            rawLocation: event.location ?? null,
-                          });
-                        }}
-                      >
-                        <View style={styles.leftAccent} />
-
-                        <View style={styles.dateCol}>
-                          <Text style={styles.dateDay}>{day}</Text>
-                          <Text style={styles.dateMonth}>{mon}</Text>
-                        </View>
-
-                        <View style={styles.eventInfo}>
-                          <Text numberOfLines={1} style={styles.eventName}>
-                            {event.title || "Untitled"}
-                          </Text>
-
-                          {/* show timing */}
-                          <Text style={styles.eventTime}>{timeRange}</Text>
-
-                          {isNextEvent ? (
-                            <View style={styles.nextEventTag}>
-                              <Text style={styles.nextEventTagText}>Coming up</Text>
-                            </View>
-                          ) : null}
-                          <Text numberOfLines={1} style={styles.eventLoc}>
-                            {getLocation(event)}
-                          </Text>
-                        </View>
-
-                        {hasValidBuilding && onLocateRoom && (
-                          <Pressable
-                            testID={`locate-room-btn-${event.id}`}
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              onLocateRoom({
-                                event,
-                                buildingCode: parsed.building,
-                                room: parsed.room ?? null,
-                              });
-                            }}
-                            style={{ marginRight: 8, padding: 8 }}
-                            accessibilityLabel="Locate room in building"
-                          >
-                            <Ionicons name="location" size={20} color="#912338" />
-                          </Pressable>
-                        )}
-
-                        <Ionicons name="chevron-forward" size={18} color="#888" />
-                      </Pressable>
-                    );
-                  })
+                  events.map((event, index) => (
+                    <CalendarEventRow
+                      key={event.id}
+                      event={event}
+                      index={index}
+                      selectedDate={selectedDate}
+                      onGenerateDirections={onGenerateDirections}
+                      onLocateRoom={onLocateRoom}
+                    />
+                  ))
                 )}
               </ScrollView>
             </View>
@@ -546,7 +570,9 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
               </Pressable>
             </Modal>
           </View>
-        ) : (
+      );
+    } else {
+      calendarMainPanel = (
           <>
             <View style={styles.titleView}>
               <Text style={styles.txtTitle}> Extracting Calendars</Text>
@@ -590,18 +616,29 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
               </Pressable>
             </View>
           </>
-        )
-      ) : (
-        notConnectedView
-      )}
-      
-      <Pressable
-        testID="openModalBtn"
-        style={[styles.buttonModalUp, { bottom: 24 }]}
-        onPress={open}
-      >
+      );
+    }
+  } else {
+    calendarMainPanel = (
+        <NotConnectedCalendarPlaceholder isRestoring={isRestoring} />
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable testID="pressBack" style={styles.headerBtn} onPress={onPressBack}>
+          <Ionicons name="arrow-back" size={26} color="white" />
+        </Pressable>
+      </View>
+
+      {/* Arrow-up bottom sheet button */}
+      <Pressable testID="openModalBtn" style={styles.buttonModalUp} onPress={open}>
         <Ionicons name="arrow-up" size={26} color="white" />
       </Pressable>
+
+      {calendarMainPanel}
 
       <Modal transparent visible={visible} animationType="none">
         <View style={styles.overlay}>

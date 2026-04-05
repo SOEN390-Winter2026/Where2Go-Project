@@ -6,7 +6,7 @@
         "id": "MB-S1.235",
         "label": "MB-S1.235",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp5_MB-S1_235",
         "bounds": {
           "x": 0.3538,
@@ -19,7 +19,7 @@
         "id": "MB-S1.234",
         "label": "MB-S1.234",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp10_MB-S1_234",
         "bounds": {
           "x": 0.527,
@@ -32,7 +32,7 @@
         "id": "MB-S1.224",
         "label": "MB-S1.224",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp11_MB-S1_224",
         "bounds": {
           "x": 0.523,
@@ -45,7 +45,7 @@
         "id": "MB-S1.212",
         "label": "MB-S1.212",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp12_MB-S1_212",
         "bounds": {
           "x": 0.5284,
@@ -58,7 +58,7 @@
         "id": "MB-S1.216",
         "label": "MB-S1.216",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp13_MB-S1_216",
         "bounds": {
           "x": 0.5673,
@@ -71,7 +71,7 @@
         "id": "MB-S1.208",
         "label": "MB-S1.208",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp14_MB-S1_208",
         "bounds": {
           "x": 0.5217,
@@ -84,7 +84,7 @@
         "id": "MB-S1.202",
         "label": "MB-S1.202",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp15_MB-S1_202",
         "bounds": {
           "x": 0.5338,
@@ -97,7 +97,7 @@
         "id": "MB-S1.210",
         "label": "MB-S1.210",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp16_MB-S1_210",
         "bounds": {
           "x": 0.5955,
@@ -110,7 +110,7 @@
         "id": "MB-S1.265",
         "label": "MB-S1.265",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp17_MB-S1_265",
         "bounds": {
           "x": 0.7821,
@@ -123,7 +123,7 @@
         "id": "MB-S1.275",
         "label": "MB-S1.275",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp18_MB-S1_275",
         "bounds": {
           "x": 0.7862,
@@ -136,7 +136,7 @@
         "id": "MB-S1.319",
         "label": "MB-S1.319",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp19_MB-S1_319",
         "bounds": {
           "x": 0.7781,
@@ -149,7 +149,7 @@
         "id": "MB-S1.320",
         "label": "MB-S1.320",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp21_MB-S1_320",
         "bounds": {
           "x": 0.7405,
@@ -162,7 +162,7 @@
         "id": "MB-S1.315",
         "label": "MB-S1.315",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp20_MB-S1_315",
         "bounds": {
           "x": 0.7754,
@@ -175,7 +175,7 @@
         "id": "MB-S1.430",
         "label": "MB-S1.430",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp22_MB-S1_430",
         "bounds": {
           "x": 0.7083,
@@ -188,7 +188,7 @@
         "id": "MB-S1.435",
         "label": "MB-S1.435",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp23_MB-S1_435",
         "bounds": {
           "x": 0.8305,
@@ -201,7 +201,7 @@
         "id": "MB-S1.115",
         "label": "MB-S1.115",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp32_MB-S1_115",
         "bounds": {
           "x": 0.421,
@@ -214,7 +214,7 @@
         "id": "MB-S1.241",
         "label": "MB-S1.241",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp6_MB-S1_241",
         "bounds": {
           "x": 0.6022,
@@ -227,7 +227,7 @@
         "id": "MB-S1.243",
         "label": "MB-S1.243",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp7_MB-S1_243",
         "bounds": {
           "x": 0.6345,
@@ -240,7 +240,7 @@
         "id": "MB-S1.245",
         "label": "MB-S1.245",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp8_MB-S1_245",
         "bounds": {
           "x": 0.668,
@@ -253,7 +253,7 @@
         "id": "MB-S1.255",
         "label": "MB-S1.255",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp9_MB-S1_255",
         "bounds": {
           "x": 0.7123,
@@ -266,7 +266,7 @@
         "id": "MB-S1.105",
         "label": "MB-S1.105",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp31_MB-S1_105",
         "bounds": {
           "x": 0.4398,
@@ -279,7 +279,7 @@
         "id": "MB-S1.401",
         "label": "MB-S1.401",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp30_MB-S1_401",
         "bounds": {
           "x": 0.5915,
@@ -292,7 +292,7 @@
         "id": "MB-S1.465",
         "label": "MB-S1.465",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp29_MB-S1_465",
         "bounds": {
           "x": 0.7083,
@@ -305,7 +305,7 @@
         "id": "MB-S1.467",
         "label": "MB-S1.467",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp28_MB-S1_467",
         "bounds": {
           "x": 0.8345,
@@ -318,7 +318,7 @@
         "id": "MB-S1.455",
         "label": "MB-S1.455",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp27_MB-S1_455",
         "bounds": {
           "x": 0.8587,
@@ -331,7 +331,7 @@
         "id": "MB-S1.443",
         "label": "MB-S1.443",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp24_MB-S1_443",
         "bounds": {
           "x": 0.8775,
@@ -344,7 +344,7 @@
         "id": "MB-S1.447",
         "label": "MB-S1.447",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp25_MB-S1_447",
         "bounds": {
           "x": 0.8775,
@@ -357,7 +357,7 @@
         "id": "MB-S1.451",
         "label": "MB-S1.451",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp26_MB-S1_451",
         "bounds": {
           "x": 0.8775,
@@ -370,7 +370,7 @@
         "id": "MB-S1.T1",
         "label": "MB-S1.T1",
         "type": "other",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp33_MB-S1_T1",
         "bounds": {
           "x": 0.5928,
@@ -383,7 +383,7 @@
         "id": "MB-S1.T2",
         "label": "MB-S1.T2",
         "type": "other",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp34_MB-S1_T2",
         "bounds": {
           "x": 0.6519,
@@ -396,8 +396,8 @@
         "id": "MB-S1.Elevator",
         "label": "MB-S1.Elevator",
         "type": "elevator",
-        "floor": "CC3",
-        "nearestWaypoint": "wp49_MB-S1",
+        "floor": "MB-S1",
+        "nearestWaypoint": "wp41_MB-S1",
         "bounds": {
           "x": 0.5807,
           "y": 0.501,
@@ -409,7 +409,7 @@
         "id": "MB-S2_Exit",
         "label": "MB-S2_Exit",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp4_MB-S1_to_S2",
         "bounds": {
           "x": 0.3725,
@@ -422,7 +422,7 @@
         "id": "MB-S1_294",
         "label": "MB-S1_294",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "nearestWaypoint": "wp1_MB-S1_Exit294",
         "bounds": {
           "x": 0.5289,
@@ -435,8 +435,8 @@
         "id": "MB-S1_394",
         "label": "MB-S1_394",
         "type": "staircase",
-        "floor": "CC3",
-        "nearestWaypoint": "wp50_MB-S1",
+        "floor": "MB-S1",
+        "nearestWaypoint": "wp2_MB-S1_Exit394",
         "bounds": {
           "x": 0.7304,
           "y": 0.5898,
@@ -448,8 +448,8 @@
         "id": "MB-S1_494",
         "label": "MB-S1_494",
         "type": "staircase",
-        "floor": "CC3",
-        "nearestWaypoint": "wp53_MB-S1",
+        "floor": "MB-S1",
+        "nearestWaypoint": "wp3_MB-S1_Exit494",
         "bounds": {
           "x": 0.7304,
           "y": 0.8181,
@@ -522,12 +522,14 @@
       {
         "id": "wp1_MB-S1_Exit294",
         "type": "exit",
-        "floor": "CC3",
+        "floor": "MB-S1",
         "position": {
           "x": 0.5215,
           "y": 0.1832
         },
-        "connections": []
+        "connections": [
+          "wp36_MB-S1"
+        ]
       },
       {
         "id": "wp2_MB-S1_Exit394",
@@ -537,7 +539,9 @@
           "x": 0.7261,
           "y": 0.6081
         },
-        "connections": []
+        "connections": [
+          "wp42_MB-S1"
+        ]
       },
       {
         "id": "wp3_MB-S1_Exit494",
@@ -547,7 +551,9 @@
           "x": 0.7296,
           "y": 0.8717
         },
-        "connections": []
+        "connections": [
+          "wp45_MB-S1"
+        ]
       },
       {
         "id": "wp4_MB-S1_to_S2",
@@ -558,7 +564,8 @@
           "y": 0.2944
         },
         "connections": [
-          "wp45_MB-S1"
+          "wp5_MB-S1_235",
+          "wp35_MB-S1"
         ]
       },
       {
@@ -570,7 +577,8 @@
           "y": 0.2012
         },
         "connections": [
-          "wp45_MB-S1"
+          "wp4_MB-S1_to_S2",
+          "wp35_MB-S1"
         ]
       },
       {
@@ -582,7 +590,7 @@
           "y": 0.1599
         },
         "connections": [
-          "wp43_MB-S1"
+          "wp38_MB-S1"
         ]
       },
       {
@@ -594,7 +602,7 @@
           "y": 0.1599
         },
         "connections": [
-          "wp43_MB-S1"
+          "wp38_MB-S1"
         ]
       },
       {
@@ -606,7 +614,7 @@
           "y": 0.1545
         },
         "connections": [
-          "wp43_MB-S1"
+          "wp38_MB-S1"
         ]
       },
       {
@@ -618,7 +626,7 @@
           "y": 0.1832
         },
         "connections": [
-          "wp42_MB-S1"
+          "wp37_MB-S1"
         ]
       },
       {
@@ -630,7 +638,7 @@
           "y": 0.2514
         },
         "connections": [
-          "wp41_MB-S1"
+          "wp36_MB-S1"
         ]
       },
       {
@@ -642,7 +650,7 @@
           "y": 0.289
         },
         "connections": [
-          "wp41_MB-S1"
+          "wp36_MB-S1"
         ]
       },
       {
@@ -654,7 +662,7 @@
           "y": 0.3446
         },
         "connections": [
-          "wp48_MB-S1"
+          "wp14_MB-S1_208"
         ]
       },
       {
@@ -666,7 +674,7 @@
           "y": 0.3482
         },
         "connections": [
-          "wp48_MB-S1"
+          "wp14_MB-S1_208"
         ]
       },
       {
@@ -678,7 +686,9 @@
           "y": 0.4432
         },
         "connections": [
-          "wp47_MB-S1"
+          "wp15_MB-S1_202",
+          "wp12_MB-S1_212",
+          "wp13_MB-S1_216"
         ]
       },
       {
@@ -690,7 +700,8 @@
           "y": 0.4952
         },
         "connections": [
-          "wp47_MB-S1"
+          "wp40_MB-S1",
+          "wp14_MB-S1_208"
         ]
       },
       {
@@ -702,7 +713,7 @@
           "y": 0.2137
         },
         "connections": [
-          "wp42_MB-S1"
+          "wp37_MB-S1"
         ]
       },
       {
@@ -714,7 +725,7 @@
           "y": 0.2065
         },
         "connections": [
-          "wp42_MB-S1"
+          "wp37_MB-S1"
         ]
       },
       {
@@ -726,7 +737,7 @@
           "y": 0.2747
         },
         "connections": [
-          "wp44_MB-S1"
+          "wp39_MB-S1"
         ]
       },
       {
@@ -738,7 +749,8 @@
           "y": 0.4988
         },
         "connections": [
-          "wp51_MB-S1"
+          "wp39_MB-S1",
+          "wp20_MB-S1_315"
         ]
       },
       {
@@ -750,7 +762,8 @@
           "y": 0.5669
         },
         "connections": [
-          "wp50_MB-S1"
+          "wp19_MB-S1_319",
+          "wp42_MB-S1"
         ]
       },
       {
@@ -762,7 +775,7 @@
           "y": 0.5472
         },
         "connections": [
-          "wp50_MB-S1"
+          "wp42_MB-S1"
         ]
       },
       {
@@ -774,7 +787,7 @@
           "y": 0.7856
         },
         "connections": [
-          "wp53_MB-S1"
+          "wp45_MB-S1"
         ]
       },
       {
@@ -786,7 +799,7 @@
           "y": 0.7784
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -798,7 +811,7 @@
           "y": 0.8053
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -810,7 +823,7 @@
           "y": 0.8448
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -822,7 +835,7 @@
           "y": 0.8663
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -834,7 +847,7 @@
           "y": 0.8896
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -846,7 +859,7 @@
           "y": 0.9075
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -858,7 +871,7 @@
           "y": 0.9057
         },
         "connections": [
-          "wp38_MB-S1_C4"
+          "wp46_MB-S1"
         ]
       },
       {
@@ -870,7 +883,7 @@
           "y": 0.8215
         },
         "connections": [
-          "wp37_MB-S1_C3"
+          "wp43_MB-S1"
         ]
       },
       {
@@ -882,7 +895,7 @@
           "y": 0.8878
         },
         "connections": [
-          "wp36_MB-S1"
+          "wp43_MB-S1"
         ]
       },
       {
@@ -894,7 +907,7 @@
           "y": 0.8752
         },
         "connections": [
-          "wp36_MB-S1"
+          "wp43_MB-S1"
         ]
       },
       {
@@ -906,7 +919,7 @@
           "y": 0.7784
         },
         "connections": [
-          "wp52_MB-S1"
+          "wp44_MB-S1"
         ]
       },
       {
@@ -918,73 +931,95 @@
           "y": 0.7731
         },
         "connections": [
-          "wp52_MB-S1"
+          "wp44_MB-S1"
         ]
       },
       {
-        "id": "wp35_MB-S1_C1",
+        "id": "wp35_MB-S1",
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.5146,
-          "y": 0.7211
-        },
-        "connections": []
-      },
-      {
-        "id": "wp37_MB-S1_C3",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.5857,
-          "y": 0.8089
+          "x": 0.3778,
+          "y": 0.2121
         },
         "connections": [
-          "wp30_MB-S1_401",
           "wp36_MB-S1",
-          "wp52_MB-S1"
+          "wp5_MB-S1_235",
+          "wp4_MB-S1_to_S2"
         ]
       },
       {
-        "id": "wp38_MB-S1_C4",
+        "id": "wp36_MB-S1",
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.8371,
-          "y": 0.8035
+          "x": 0.5085,
+          "y": 0.2121
         },
         "connections": [
-          "wp23_MB-S1_435",
-          "wp24_MB-S1_443",
-          "wp25_MB-S1_447",
-          "wp26_MB-S1_451",
-          "wp27_MB-S1_455",
-          "wp28_MB-S1_467",
-          "wp29_MB-S1_465",
-          "wp53_MB-S1"
+          "wp37_MB-S1",
+          "wp1_MB-S1_Exit294",
+          "wp35_MB-S1",
+          "wp10_MB-S1_234",
+          "wp11_MB-S1_224",
+          "wp40_MB-S1"
         ]
       },
       {
-        "id": "wp39_MB-S1_C5",
+        "id": "wp37_MB-S1",
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.5388,
-          "y": 0.2119
+          "x": 0.6602,
+          "y": 0.2121
         },
         "connections": [
-          "wp41_MB-S1"
+          "wp9_MB-S1_255",
+          "wp38_MB-S1",
+          "wp16_MB-S1_210",
+          "wp17_MB-S1_265",
+          "wp36_MB-S1"
         ]
       },
       {
-        "id": "wp40_MB-S1_C1",
+        "id": "wp38_MB-S1",
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.4989,
-          "y": 0.1832
+          "x": 0.656,
+          "y": 0.1641
         },
         "connections": [
+          "wp37_MB-S1",
+          "wp8_MB-S1_245",
+          "wp7_MB-S1_243",
+          "wp6_MB-S1_241"
+        ]
+      },
+      {
+        "id": "wp39_MB-S1",
+        "type": "corridor",
+        "floor": "MB-S1",
+        "position": {
+          "x": 0.8014,
+          "y": 0.4003
+        },
+        "connections": [
+          "wp18_MB-S1_275",
+          "wp19_MB-S1_319"
+        ]
+      },
+      {
+        "id": "wp40_MB-S1",
+        "type": "corridor",
+        "floor": "MB-S1",
+        "position": {
+          "x": 0.5009,
+          "y": 0.5181
+        },
+        "connections": [
+          "wp36_MB-S1",
+          "wp15_MB-S1_202",
           "wp41_MB-S1"
         ]
       },
@@ -993,16 +1028,13 @@
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.4975,
-          "y": 0.212
+          "x": 0.5692,
+          "y": 0.5706
         },
         "connections": [
-          "wp40_MB-S1_C1",
-          "wp39_MB-S1_C5",
-          "wp45_MB-S1",
-          "wp10_MB-S1_234",
-          "wp11_MB-S1_224",
-          "wp46_MB-S1"
+          "wp42_MB-S1",
+          "wp40_MB-S1",
+          "wp43_MB-S1"
         ]
       },
       {
@@ -1010,15 +1042,14 @@
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.6284,
-          "y": 0.212
+          "x": 0.714,
+          "y": 0.5706
         },
         "connections": [
-          "wp9_MB-S1_255",
-          "wp43_MB-S1",
-          "wp16_MB-S1_210",
-          "wp17_MB-S1_265",
-          "wp44_MB-S1"
+          "wp21_MB-S1_320",
+          "wp2_MB-S1_Exit394",
+          "wp20_MB-S1_315",
+          "wp41_MB-S1"
         ]
       },
       {
@@ -1026,14 +1057,15 @@
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.6276,
-          "y": 0.1652
+          "x": 0.5642,
+          "y": 0.8082
         },
         "connections": [
-          "wp42_MB-S1",
-          "wp7_MB-S1_243",
-          "wp6_MB-S1_241",
-          "wp8_MB-S1_245"
+          "wp41_MB-S1",
+          "wp32_MB-S1_115",
+          "wp31_MB-S1_105",
+          "wp30_MB-S1_401",
+          "wp44_MB-S1"
         ]
       },
       {
@@ -1041,12 +1073,14 @@
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.794,
-          "y": 0.2086
+          "x": 0.6458,
+          "y": 0.8056
         },
         "connections": [
-          "wp42_MB-S1",
-          "wp18_MB-S1_275"
+          "wp43_MB-S1",
+          "wp34_MB-S1_T2",
+          "wp33_MB-S1_T1",
+          "wp45_MB-S1"
         ]
       },
       {
@@ -1054,13 +1088,14 @@
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.3747,
-          "y": 0.2145
+          "x": 0.7207,
+          "y": 0.8031
         },
         "connections": [
-          "wp41_MB-S1",
-          "wp5_MB-S1_235",
-          "wp4_MB-S1_to_S2"
+          "wp44_MB-S1",
+          "wp3_MB-S1_Exit494",
+          "wp22_MB-S1_430",
+          "wp46_MB-S1"
         ]
       },
       {
@@ -1068,130 +1103,18 @@
         "type": "corridor",
         "floor": "MB-S1",
         "position": {
-          "x": 0.504,
-          "y": 0.5169
+          "x": 0.8415,
+          "y": 0.8091
         },
         "connections": [
-          "wp41_MB-S1",
-          "wp47_MB-S1",
-          "wp49_MB-S1"
-        ]
-      },
-      {
-        "id": "wp47_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.546,
-          "y": 0.5169
-        },
-        "connections": [
-          "wp48_MB-S1",
-          "wp14_MB-S1_208",
-          "wp15_MB-S1_202",
-          "wp46_MB-S1",
-          "wp49_MB-S1"
-        ]
-      },
-      {
-        "id": "wp48_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.5476,
-          "y": 0.3932
-        },
-        "connections": [
-          "wp13_MB-S1_216",
-          "wp12_MB-S1_212",
-          "wp47_MB-S1"
-        ]
-      },
-      {
-        "id": "wp49_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.563,
-          "y": 0.572
-        },
-        "connections": [
-          "wp47_MB-S1",
-          "wp50_MB-S1",
-          "wp46_MB-S1",
-          "wp36_MB-S1"
-        ]
-      },
-      {
-        "id": "wp50_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.7189,
-          "y": 0.5712
-        },
-        "connections": [
-          "wp49_MB-S1",
-          "wp20_MB-S1_315",
-          "wp21_MB-S1_320",
-          "wp51_MB-S1"
-        ]
-      },
-      {
-        "id": "wp51_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.8007,
-          "y": 0.5528
-        },
-        "connections": [
-          "wp50_MB-S1",
-          "wp19_MB-S1_319"
-        ]
-      },
-      {
-        "id": "wp36_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.5608,
-          "y": 0.8014
-        },
-        "connections": [
-          "wp49_MB-S1",
-          "wp37_MB-S1_C3",
-          "wp32_MB-S1_115",
-          "wp31_MB-S1_105"
-        ]
-      },
-      {
-        "id": "wp52_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.6418,
-          "y": 0.799
-        },
-        "connections": [
-          "wp37_MB-S1_C3",
-          "wp33_MB-S1_T1",
-          "wp34_MB-S1_T2",
-          "wp53_MB-S1"
-        ]
-      },
-      {
-        "id": "wp53_MB-S1",
-        "type": "corridor",
-        "floor": "MB-S1",
-        "position": {
-          "x": 0.7141,
-          "y": 0.8047
-        },
-        "connections": [
-          "wp52_MB-S1",
-          "wp22_MB-S1_430",
-          "wp38_MB-S1_C4"
+          "wp45_MB-S1",
+          "wp23_MB-S1_435",
+          "wp24_MB-S1_443",
+          "wp29_MB-S1_465",
+          "wp28_MB-S1_467",
+          "wp25_MB-S1_447",
+          "wp26_MB-S1_451",
+          "wp27_MB-S1_455"
         ]
       }
     ]

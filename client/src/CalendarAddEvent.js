@@ -98,32 +98,32 @@ export default function CalendarAddEvent({
   const validate = () => {
     if (!title.trim()) {
       Alert.alert("Missing title", "Please enter an event title.");
-      return false;
+      return { ok: false };
     }
     const start = parseDateTime(dateStr, formatTimeInput(startTimeStr));
     const end = parseDateTime(dateStr, formatTimeInput(endTimeStr));
     if (!start) {
       Alert.alert("Invalid date/time", "Please check the date and start time.");
-      return false;
+      return { ok: false };
     }
     if (!end) {
       Alert.alert("Invalid end time", "Please check the end time.");
-      return false;
+      return { ok: false };
     }
     if (end <= start) {
       Alert.alert("Invalid time range", "End time must be after start time.");
-      return false;
+      return { ok: false };
     }
     if (!selectedCalendarIds?.length) {
       Alert.alert("No calendar selected", "Please select a calendar first.");
-      return false;
+      return { ok: false };
     }
-    return { start, end };
+    return { ok: true, start, end };
   };
 
   const handleSave = async () => {
-    const times = validate();
-    if (!times) return;
+    const { ok, start, end } = validate();
+    if (!ok) return;
 
     setIsSaving(true);
     try {
@@ -134,8 +134,8 @@ export default function CalendarAddEvent({
 
       const newEventId = await Calendar.createEventAsync(calendarId, {
         title: title.trim(),
-        startDate: times.start,
-        endDate: times.end,
+        startDate: start,
+        endDate: end,
         location: locationStr,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });

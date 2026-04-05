@@ -136,7 +136,7 @@ export function getPolylinesForFloor(routeByFloor, selectedFloor) {
 
   const uniqueCanonicalForAlias = (alias) => {
     const set = aliasIndex.get(alias);
-    if (!set || set.size !== 1) return null;
+    if (set?.size !== 1) return null;
     return [...set][0];
   };
 
