@@ -135,6 +135,16 @@ describe("receive data from google API", () => {
         });
     });
 
+    it("normalizeRoute sets accessible when third argument is true", () => {
+        const result = normalizeRoute(mockRaw, "walking", true);
+        expect(result.accessible).toBe(true);
+    });
+
+    it("normalizeRoute defaults accessible to false", () => {
+        const result = normalizeRoute(mockRaw, "walking");
+        expect(result.accessible).toBe(false);
+    });
+
     it("generate a transit route correctly", () => {
         const result = normalizeRoute(mockRaw, "transit");
         expect(result.mode).toBe("transit");
@@ -225,6 +235,55 @@ describe("receiving transportation options", () => {
         const modes = routes.map((r) => r.mode);
         expect(modes).toContain("walking");
         expect(modes).toContain("transit");
+    });
+
+    it("getTransportOptionsResult returns NO_ACCESSIBLE_ROUTES when accessible and API has no routes", async () => {
+        https.get.mockImplementation((url, callback) => {
+            const res = {
+                statusCode: 200,
+                on: jest.fn((event, handler) => {
+                    if (event === "data") handler(JSON.stringify({ status: "ZERO_RESULTS", routes: [] }));
+                    if (event === "end") handler();
+                    return res;
+                }),
+            };
+            callback(res);
+            return { on: jest.fn() };
+        });
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination, { accessible: true });
+        expect(result.ok).toBe(false);
+        expect(result.error.code).toBe("NO_ACCESSIBLE_ROUTES");
+    });
+
+    it("marks routes accessible when opts.accessible is true", async () => {
+        mockHttpsGet(makeMockDirectionsResponse("0.5 km", "6 mins"));
+        const result = await getTransportOptionsResult(sgwOrigin, offCampusDestination, { accessible: true });
+        expect(result.ok).toBe(true);
+        result.routes.forEach((route) => {
+            expect(route.accessible).toBe(true);
+        });
+    });
+
+    it("adds transit_routing_preference and transit_mode to transit request when accessible", async () => {
+        const urls = [];
+        https.get.mockImplementation((url, callback) => {
+            urls.push(String(url));
+            const res = {
+                statusCode: 200,
+                on: jest.fn((event, handler) => {
+                    if (event === "data") handler(JSON.stringify(makeMockDirectionsResponse("1 km", "10 mins")));
+                    if (event === "end") handler();
+                    return res;
+                }),
+            };
+            callback(res);
+            return { on: jest.fn() };
+        });
+        await getTransportOptions(sgwOrigin, offCampusDestination, { accessible: true });
+        const transitUrl = urls.find((u) => u.includes("mode=transit"));
+        expect(transitUrl).toBeDefined();
+        expect(transitUrl).toContain("transit_routing_preference=less_walking");
+        expect(transitUrl).toContain("transit_mode=bus");
     });
 
     it("returns shuttle route when trip is SGW to Loyola on a weekday", async () => {

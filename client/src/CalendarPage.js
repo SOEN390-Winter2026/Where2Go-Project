@@ -24,6 +24,7 @@ import { getValidCalendarIds, fetchCalendarsIfPermitted } from './utils/calendar
 import CalendarAddEvent from "./CalendarAddEvent";
 import styles from "./styles/CalendarPage_styles";
 
+
 WebBrowser.maybeCompleteAuthSession();
 
 const SAVED_CALENDAR_IDS_KEY = "where2go_saved_calendar_ids";
@@ -399,10 +400,17 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
     );
   }
 
-  let calendarMainPanel = null;
-  if (isCalendarConnected) {
-    if (isCalendarsChosen) {
-      calendarMainPanel = (
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable testID="pressBack" style={styles.headerBtn} onPress={onPressBack}>
+          <Ionicons name="arrow-back" size={26} color="white" />
+        </Pressable>
+      </View>
+
+      {isCalendarConnected ? (
+        isCalendarsChosen ? (
           <View style={styles.pageWrap}>
             <View style={styles.calendarCard}>
               <View style={styles.calendarTopRow}>
@@ -460,7 +468,8 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
             <Text style={styles.upcomingTitle}>Upcoming Events</Text>
 
             <View style={styles.upcomingBox}>
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 140 }}>
                 {events.length === 0 ? (
                   <View style={styles.emptyWrap}>
                     <Text style={styles.emptyTitle}>No events for this day</Text>

@@ -95,4 +95,16 @@ describe("NavigationContext", () => {
     const transitResult = await ctx.getRoutes(ORIGIN, DESTINATION);
     expect(transitResult.every((r) => r.mode === "transit")).toBe(true);
   });
+
+  it("forwards options to strategy (accessible=true in fetch URL)", async () => {
+    globalThis.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ routes: [{ mode: "walking" }] }),
+    });
+
+    const ctx = new NavigationContext("walking");
+    await ctx.getRoutes(ORIGIN, DESTINATION, { accessible: true });
+
+    expect(globalThis.fetch.mock.calls[0][0]).toContain("accessible=true");
+  });
 });

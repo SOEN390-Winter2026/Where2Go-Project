@@ -135,7 +135,7 @@ function getNextDeparture(fromCampus, refDate = new Date()) {
   return next == null ? null : minsToTimeStr(next);
 }
 
-function buildDirectionsUrl(origin, destination, mode) {
+function buildDirectionsUrl(origin, destination, mode, accessibleOpts = {}) {
   const base = "https://maps.googleapis.com/maps/api/directions/json";
   const params = new URLSearchParams({
     origin: `${origin.lat},${origin.lng}`,
@@ -143,12 +143,16 @@ function buildDirectionsUrl(origin, destination, mode) {
     mode,
     key: API_KEY || "",
   });
+  if (accessibleOpts.accessible && mode === "transit") {
+    params.set("transit_routing_preference", "less_walking");
+    params.set("transit_mode", "bus");
+  }
   return `${base}?${params.toString()}`;
 }
 
-function fetchDirections(origin, destination, mode) {
+function fetchDirections(origin, destination, mode, accessibleOpts = {}) {
   return new Promise((resolve) => {
-    const url = buildDirectionsUrl(origin, destination, mode);
+    const url = buildDirectionsUrl(origin, destination, mode, accessibleOpts);
 
     const req = https.get(url, (res) => {
       let data = "";
@@ -292,12 +296,13 @@ function normalizeSteps(leg) {
     .filter(Boolean);
 }
 
-function normalizeRoute(raw, mode) {
+function normalizeRoute(raw, mode, accessible = false) {
   const leg = raw.legs?.[0];
   if (!leg) return null;
 
   return {
     mode,
+    accessible,
     duration: {
       value: leg.duration?.value ?? 0,
       text: leg.duration?.text ?? "",
@@ -310,7 +315,6 @@ function normalizeRoute(raw, mode) {
 
     steps: normalizeSteps(leg),
 
-    // ✅ Optional (nice for "Arrive 14:10")
     departureTime: leg.departure_time?.text ?? "",
     arrivalTime: leg.arrival_time?.text ?? "",
   };
@@ -347,7 +351,7 @@ function getNearestCampus(point) {
  * Shuttle ~30 min, ~11 km. Uses driving directions for polyline.
  * Schedule uses refDate (user device time when clientTime provided).
  */
-async function getShuttleRouteIfApplicable(origin, destination, refDate = new Date()) {
+async function getShuttleRouteIfApplicable(origin, destination, refDate = new Date(), accessible = false) {
   const fromCampus = getNearestCampus(origin);
   const toCampus = getNearestCampus(destination);
   
@@ -357,7 +361,6 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
   const startStop = SHUTTLE_STOPS[fromCampus];
   const endStop = SHUTTLE_STOPS[toCampus];
 
-  // Fetch segments: Walk to Stop -> Shuttle Ride -> Walk to Destination
   const [walkToRes, shuttleRes, walkFromRes] = await Promise.all([
     fetchDirections(origin, startStop, "walking"),
     fetchDirections(startStop, endStop, "driving"),
@@ -366,9 +369,9 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
 
   if (!walkToRes.ok || !shuttleRes.ok || !walkFromRes.ok) return null;
 
-  const walkTo = normalizeRoute(walkToRes.json.routes[0], "walking");
-  const shuttleRide = normalizeRoute(shuttleRes.json.routes[0], "transit"); // driving polyline
-  const walkFrom = normalizeRoute(walkFromRes.json.routes[0], "walking");
+  const walkTo = normalizeRoute(walkToRes.json.routes[0], "walking", accessible);
+  const shuttleRide = normalizeRoute(shuttleRes.json.routes[0], "transit", accessible);
+  const walkFrom = normalizeRoute(walkFromRes.json.routes[0], "walking", accessible);
 
   // Compute total duration and distance
   const totalSeconds =
@@ -389,6 +392,7 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
 
   return {
     mode: "concordia_shuttle",
+    accessible,
     duration: { value: totalSeconds, text: `${Math.round(totalSeconds / 60)} min` },
     distance: { value: totalMeters, text: `${Math.round(totalMeters / 1000)} km` },
     polyline: combinedPolyline,
@@ -410,6 +414,31 @@ async function getShuttleRouteIfApplicable(origin, destination, refDate = new Da
   };
 }
 
+function transportOptionsOk(routes) {
+  return { ok: true, routes };
+}
+
+function transportOptionsErr(code, message) {
+  return { ok: false, error: makeError(code, message) };
+}
+
+/** When no routes were built, pick the same error priority as before: accessible → upstream → invalid → none. */
+function resolveEmptyTransportOptionsResult(fetchErrors, accessible) {
+  if (accessible) {
+    return transportOptionsErr("NO_ACCESSIBLE_ROUTES", "No accessible routes found for this trip.");
+  }
+  const byCode = [
+    ["UPSTREAM_FAILED", "Failed to fetch directions"],
+    ["INVALID_RESPONSE", "Directions response invalid"],
+  ];
+  for (const [code, message] of byCode) {
+    if (fetchErrors.some((e) => e.code === code)) {
+      return transportOptionsErr(code, message);
+    }
+  }
+  return transportOptionsErr("NO_ROUTES", "No routes found");
+}
+
 /**
  * Get transport options (walking, transit, and Concordia shuttle when applicable) between origin and destination.
  * @param {{ lat: number, lng: number }} origin - Start coordinates
@@ -424,38 +453,33 @@ async function getTransportOptionsResult(origin, destination, opts = {}) {
     if (!Number.isNaN(parsed.getTime())) refDate = parsed;
   }
 
+  const accessible = !!opts.accessible;
+  const accessibleOpts = { accessible };
+
   const [walkingRes, transitRes, shuttleRoute] = await Promise.all([
-    fetchDirections(origin, destination, "walking"),
-    fetchDirections(origin, destination, "transit"),
-    getShuttleRouteIfApplicable(origin, destination, refDate),
+    fetchDirections(origin, destination, "walking", accessibleOpts),
+    fetchDirections(origin, destination, "transit", accessibleOpts),
+    getShuttleRouteIfApplicable(origin, destination, refDate, accessible),
   ]);
 
   const routes = [];
 
   if (walkingRes.ok && walkingRes.json?.routes?.[0]) {
-    const normalized = normalizeRoute(walkingRes.json.routes[0], "walking");
+    const normalized = normalizeRoute(walkingRes.json.routes[0], "walking", accessible);
     if (normalized) routes.push(normalized);
   }
 
   if (transitRes.ok && transitRes.json?.routes?.[0]) {
-    const normalized = normalizeRoute(transitRes.json.routes[0], "transit");
+    const normalized = normalizeRoute(transitRes.json.routes[0], "transit", accessible);
     if (normalized) routes.push(normalized);
   }
 
   if (shuttleRoute) routes.push(shuttleRoute);
 
-  if (routes.length > 0) return { ok: true, routes };
+  if (routes.length > 0) return transportOptionsOk(routes);
 
-  // If we have no routes at all, choose the best error to report
-  const errors = [walkingRes.error, transitRes.error].filter(Boolean);
-
-  if (errors.some((e) => e.code === "UPSTREAM_FAILED")) {
-    return { ok: false, error: makeError("UPSTREAM_FAILED", "Failed to fetch directions") };
-  }
-  if (errors.some((e) => e.code === "INVALID_RESPONSE")) {
-    return { ok: false, error: makeError("INVALID_RESPONSE", "Directions response invalid") };
-  }
-  return { ok: false, error: makeError("NO_ROUTES", "No routes found") };
+  const fetchErrors = [walkingRes.error, transitRes.error].filter(Boolean);
+  return resolveEmptyTransportOptionsResult(fetchErrors, accessible);
 }
 
 async function getTransportOptions(origin, destination, opts = {}) {

@@ -74,4 +74,16 @@ describe("WalkingStrategy", () => {
     const calledUrl = globalThis.fetch.mock.calls[0][0];
     expect(calledUrl).toContain("mode=walking");
   });
+
+  it("appends accessible=true when options.accessible is true", async () => {
+    globalThis.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ routes: [] }),
+    });
+
+    await strategy.getRoutes(ORIGIN, DESTINATION, { accessible: true });
+
+    expect(globalThis.fetch.mock.calls[0][0]).toContain("accessible=true");
+    expect(globalThis.fetch.mock.calls[0][0]).toContain("mode=walking");
+  });
 });

@@ -96,6 +96,16 @@ describe("App endpoints", () => {
             expect(res.body).toEqual({ routes: mockRoutes });
         });
 
+        it("passes accessible true to getTransportOptionsResult when query accessible=true", async () => {
+            getTransportOptionsResult.mockResolvedValue({ ok: true, routes: [] });
+            await request(app).get("/directions").query({ ...validQuery, accessible: "true" });
+            expect(getTransportOptionsResult).toHaveBeenCalledWith(
+                { lat: 45.4973, lng: -73.5789 },
+                { lat: 45.4582, lng: -73.6405 },
+                expect.objectContaining({ accessible: true })
+            );
+        });
+
         it("returns 400 if coordinates are missing", async () => {
             const res = await request(app).get("/directions");
             expect(res.status).toBe(400);
