@@ -25,7 +25,6 @@ import { indoorMaps } from './data/indoorData';
 import { extractFloorPlan } from './utils/floorPlanUtils';
 import { getPOIOverlay } from './data/indoorPoisLogic';
 import { buildInterBuildingDirections } from './services/interBuildingDirections';
-import { warmupIndoorGraph } from './services/indoorAccessibleRouting';
 import Svg, { Polyline, Circle } from 'react-native-svg';
 import { BURGUNDY_LIGHT } from './styles/Map_styles';
 import {
