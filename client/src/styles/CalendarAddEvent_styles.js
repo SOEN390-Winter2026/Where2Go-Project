@@ -110,6 +110,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
+  inputError: {
+    borderColor: "#c0392b",
+  },
+  errorText: {
+    color: "#c0392b",
+    fontSize: 12,
+    marginTop: 4,
+  },
 });
 
 export default styles;

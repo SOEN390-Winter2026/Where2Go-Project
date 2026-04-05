@@ -29,7 +29,7 @@ const DEFAULT_PROPS = {
 
 async function fillAndSave(getByPlaceholderText, getAllByPlaceholderText, getByText, overrides = {}) {
     fireEvent.changeText(getByPlaceholderText("Event title"), overrides.title ?? "Lecture");
-    fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), overrides.date ?? "2026-04-01");
+    fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), overrides.date ?? "2036-04-01");
     const timeInputs = getAllByPlaceholderText("HH:MM, 24h");
     fireEvent.changeText(timeInputs[0], overrides.start ?? "09:00");
     fireEvent.changeText(timeInputs[1], overrides.end ?? "10:15");
@@ -102,7 +102,7 @@ describe("CalendarAddEvent", () => {
       fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
       fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "not-a-date");
       fireEvent.press(getByText("Save Event"));
-      expect(Alert.alert).toHaveBeenCalledWith("Invalid date/time", expect.any(String));
+      expect(Alert.alert).toHaveBeenCalledWith("Invalid date", "Invalid date. Use YYYY-MM-DD format.");
     });
 
     it("shows alert when end time is before start time", () => {
@@ -110,12 +110,48 @@ describe("CalendarAddEvent", () => {
         <CalendarAddEvent {...DEFAULT_PROPS} />
       );
       fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
-      fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2026-04-01");
+      fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2036-04-01");
       const timeInputs = getAllByPlaceholderText("HH:MM, 24h");
       fireEvent.changeText(timeInputs[0], "10:00");
       fireEvent.changeText(timeInputs[1], "09:00");
       fireEvent.press(getByText("Save Event"));
-      expect(Alert.alert).toHaveBeenCalledWith("Invalid time range", expect.any(String));
+      expect(Alert.alert).toHaveBeenCalledWith("Invalid time range", "End time must be after start time.");
+    });
+
+    it("shows alert when date has wrong numbers", () => {
+      const { getByText, getByPlaceholderText } = render(<CalendarAddEvent {...DEFAULT_PROPS} />);
+      fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
+      fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2050-30-40");
+      fireEvent.press(getByText("Save Event"));
+      expect(Alert.alert).toHaveBeenCalledWith("Invalid date", "Invalid date. Please use valid numbers and YYYY-MM-DD format.");
+    });
+
+    it("shows alert when date is in past", () => {
+      const { getByText, getByPlaceholderText } = render(<CalendarAddEvent {...DEFAULT_PROPS} />);
+      fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
+      fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2000-03-20");
+      fireEvent.press(getByText("Save Event"));
+      expect(Alert.alert).toHaveBeenCalledWith("Invalid date", "Invalid date. Cannot add events in the past.");
+    });
+
+    it("doesn't normalize when date format is invalid", () => {
+      const { getByPlaceholderText } = render(<CalendarAddEvent {...DEFAULT_PROPS} />);
+      const input = getByPlaceholderText("YYYY-MM-DD");
+
+      fireEvent.changeText(input, "2036-04");
+      fireEvent(input, "blur");
+
+      expect(input.props.value).toBe("2036-04");
+    });
+
+    it("pads and normalizes date on blur", () => {
+      const { getByPlaceholderText } = render(<CalendarAddEvent {...DEFAULT_PROPS} />);
+      const input = getByPlaceholderText("YYYY-MM-DD");
+
+      fireEvent.changeText(input, "2036-4-1");
+      fireEvent(input, "blur");
+
+      expect(input.props.value).toBe("2036-04-01");
     });
 
     it("shows alert when no calendar is selected", () => {
@@ -126,12 +162,12 @@ describe("CalendarAddEvent", () => {
         />
       );
       fireEvent.changeText(getByPlaceholderText("Event title"), "Lecture");
-      fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2026-04-01");
+      fireEvent.changeText(getByPlaceholderText("YYYY-MM-DD"), "2036-04-01");
       const timeInputs = getAllByPlaceholderText("HH:MM, 24h");
       fireEvent.changeText(timeInputs[0], "09:00");
       fireEvent.changeText(timeInputs[1], "10:00");
       fireEvent.press(getByText("Save Event"));
-      expect(Alert.alert).toHaveBeenCalledWith("No calendar selected", expect.any(String));
+      expect(Alert.alert).toHaveBeenCalledWith("No calendar selected", "Please select a calendar first.");
     });
   });
 

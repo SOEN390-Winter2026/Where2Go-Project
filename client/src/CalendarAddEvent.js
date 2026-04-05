@@ -47,13 +47,25 @@ function parseDateTime(dateStr, timeStr) {
 }
 
 function formatTimeInput(raw) {
-  const digits = raw.replace(/\D/g, "").slice(0, 4);
+  const digits = raw.replaceAll(/\D/g, "").slice(0, 4);
   if (digits.length < 4) return digits;
   const firstTwo = Number.parseInt(digits.slice(0, 2), 10);
   if (firstTwo > 23) {
     return `0${digits[0]}:${digits.slice(1, 3)}`;
   }
   return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+}
+
+function validateDate(dateStr) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return "Invalid date. Use YYYY-MM-DD format.";
+  const [year, month, day] = dateStr.split("-").map(Number);
+  if (month < 1 || month > 12 || day < 1 || day > 31)
+    return "Invalid date. Please use valid numbers and YYYY-MM-DD format.";
+  const d = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (d < today) return "Invalid date. Cannot add events in the past.";
+  return null;
 }
 
 export default function CalendarAddEvent({
@@ -70,6 +82,7 @@ export default function CalendarAddEvent({
   const [dateStr, setDateStr] = useState(toDateString(today));
   const [startTimeStr, setStartTimeStr] = useState(toTimeString(roundedStart));
   const [endTimeStr, setEndTimeStr] = useState(toTimeString(roundedEnd));
+  const [dateError, setDateError] = useState(null);
 
   const [locationInput, setLocationInput] = useState("");
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -100,10 +113,16 @@ export default function CalendarAddEvent({
       Alert.alert("Missing title", "Please enter an event title.");
       return { ok: false };
     }
+    const dateValidationError = validateDate(dateStr);
+    if (dateValidationError) {
+      setDateError(dateValidationError);
+      Alert.alert("Invalid date", dateValidationError);
+      return { ok: false };
+    }
     const start = parseDateTime(dateStr, formatTimeInput(startTimeStr));
     const end = parseDateTime(dateStr, formatTimeInput(endTimeStr));
     if (!start) {
-      Alert.alert("Invalid date/time", "Please check the date and start time.");
+      Alert.alert("Invalid start time", "Please check the start time.");
       return { ok: false };
     }
     if (!end) {
@@ -156,7 +175,6 @@ export default function CalendarAddEvent({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
     <ScrollView
-      style={styles.container}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
     >
@@ -181,15 +199,29 @@ export default function CalendarAddEvent({
 
         <Text style={styles.label}>Date</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, dateError && styles.inputError]}
           placeholder="YYYY-MM-DD"
           placeholderTextColor="#aaa"
           value={dateStr}
-          onChangeText={setDateStr}
+          onChangeText={(v) => { setDateStr(v); setDateError(null); }}
+          onBlur={() => {
+            const parts = dateStr.split("-");
+            const normalized = parts.length === 3 
+            && parts[0].length === 4 
+            && parts[1] >= 1 && parts[1] <= 12
+            && parts[2] >= 1 && parts[2] <= 31
+              ? toDateString(new Date(parts[0], parts[1] - 1, parts[2]))
+              : dateStr;
+            setDateStr(normalized);
+            setDateError(validateDate(normalized));
+          }}
           keyboardType="numeric"
           maxLength={10}
           returnKeyType="done"
         />
+        {dateError && (
+          <Text style={styles.errorText}>{dateError}</Text>
+        )}
 
         <Text style={styles.label}>Time</Text>
         <View style={styles.timeRow}>
