@@ -1,4 +1,9 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "MB4": {
     "floor": "MB4",
     "rooms": [
@@ -805,7 +810,13 @@
           "y": 0.2226
         },
         "connections": [
-          "wp2_MB4"
+          "wp2_MB4",
+          "wp3_MB4",
+          "wp18_MB4",
+          "wp17_MB4",
+          "wp19_MB4",
+          "wp29_MB4",
+          "wp72_MB4"
         ]
       },
       {
@@ -817,7 +828,12 @@
           "y": 0.2468
         },
         "connections": [
-          "wp1_MB4"
+          "wp1_MB4",
+          "wp7_MB4",
+          "wp25_MB4",
+          "wp26_MB4",
+          "wp27_MB4",
+          "wp28_MB4"
         ]
       },
       {
@@ -829,7 +845,13 @@
           "y": 0.2226
         },
         "connections": [
-          "wp4_MB4"
+          "wp4_MB4",
+          "wp1_MB4",
+          "wp20_MB4",
+          "wp32_MB4",
+          "wp21_MB4",
+          "wp31_MB4",
+          "wp30_MB4"
         ]
       },
       {
@@ -841,7 +863,12 @@
           "y": 0.2502
         },
         "connections": [
-          "wp3_MB4"
+          "wp3_MB4",
+          "wp6_MB4",
+          "wp22_MB4",
+          "wp23_MB4",
+          "wp24_MB4",
+          "wp73_MB4"
         ]
       },
       {
@@ -853,7 +880,9 @@
           "y": 0.4469
         },
         "connections": [
-          "wp6_MB4"
+          "wp6_MB4",
+          "wp8_MB4",
+          "wp44_MB4"
         ]
       },
       {
@@ -865,7 +894,16 @@
           "y": 0.4435
         },
         "connections": [
-          "wp5_MB4"
+          "wp5_MB4",
+          "wp4_MB4",
+          "wp12_MB4",
+          "wp33_MB4",
+          "wp45_MB4",
+          "wp74_MB4",
+          "wp34_MB4",
+          "wp35_MB4",
+          "wp36_MB4",
+          "wp37_MB4"
         ]
       },
       {
@@ -877,7 +915,16 @@
           "y": 0.4469
         },
         "connections": [
-          "wp8_MB4"
+          "wp8_MB4",
+          "wp2_MB4",
+          "wp9_MB4",
+          "wp42_MB4",
+          "wp41_MB4",
+          "wp39_MB4",
+          "wp40_MB4",
+          "wp46_MB4",
+          "wp38_MB4",
+          "wp47_MB4"
         ]
       },
       {
@@ -889,7 +936,8 @@
           "y": 0.4418
         },
         "connections": [
-          "wp7_MB4"
+          "wp7_MB4",
+          "wp5_MB4"
         ]
       },
       {
@@ -901,7 +949,17 @@
           "y": 0.8231
         },
         "connections": [
-          "wp10_MB4"
+          "wp10_MB4",
+          "wp7_MB4",
+          "wp70_MB4",
+          "wp69_MB4",
+          "wp68_MB4",
+          "wp63_MB4",
+          "wp62_MB4",
+          "wp65_MB4",
+          "wp64_MB4",
+          "wp67_MB4",
+          "wp66_MB4"
         ]
       },
       {
@@ -913,7 +971,8 @@
           "y": 0.8283
         },
         "connections": [
-          "wp9_MB4"
+          "wp9_MB4",
+          "wp11_MB4"
         ]
       },
       {
@@ -925,7 +984,9 @@
           "y": 0.8283
         },
         "connections": [
-          "wp12_MB4"
+          "wp12_MB4",
+          "wp10_MB4",
+          "wp71_MB4"
         ]
       },
       {
@@ -937,7 +998,10 @@
           "y": 0.8248
         },
         "connections": [
-          "wp11_MB4"
+          "wp11_MB4",
+          "wp6_MB4",
+          "wp13_MB4",
+          "wp75_MB4"
         ]
       },
       {
@@ -949,7 +1013,8 @@
           "y": 0.8766
         },
         "connections": [
-          "wp14_MB4"
+          "wp14_MB4",
+          "wp12_MB4"
         ]
       },
       {
@@ -961,7 +1026,13 @@
           "y": 0.8697
         },
         "connections": [
-          "wp13_MB4"
+          "wp13_MB4",
+          "wp15_MB4",
+          "wp57_MB4",
+          "wp58_MB4",
+          "wp56_MB4",
+          "wp55_MB4",
+          "wp54_MB4"
         ]
       },
       {
@@ -973,7 +1044,8 @@
           "y": 0.8749
         },
         "connections": [
-          "wp16_MB4"
+          "wp16_MB4",
+          "wp14_MB4"
         ]
       },
       {
@@ -985,7 +1057,15 @@
           "y": 0.8628
         },
         "connections": [
-          "wp15_MB4"
+          "wp15_MB4",
+          "wp53_MB4",
+          "wp52_MB4",
+          "wp51_MB4",
+          "wp59_MB4",
+          "wp50_MB4",
+          "wp49_MB4",
+          "wp48_MB4",
+          "wp54_MB4"
         ]
       },
       {
@@ -996,7 +1076,9 @@
           "x": 0.3013,
           "y": 0.1864
         },
-        "connections": []
+        "connections": [
+          "wp1_MB4"
+        ]
       },
       {
         "id": "wp18_MB4",
@@ -1006,7 +1088,9 @@
           "x": 0.3253,
           "y": 0.1928
         },
-        "connections": []
+        "connections": [
+          "wp1_MB4"
+        ]
       },
       {
         "id": "wp19_MB4",
@@ -1016,7 +1100,9 @@
           "x": 0.4239,
           "y": 0.1992
         },
-        "connections": []
+        "connections": [
+          "wp1_MB4"
+        ]
       },
       {
         "id": "wp20_MB4",
@@ -1026,7 +1112,9 @@
           "x": 0.4888,
           "y": 0.196
         },
-        "connections": []
+        "connections": [
+          "wp3_MB4"
+        ]
       },
       {
         "id": "wp21_MB4",
@@ -1036,7 +1124,9 @@
           "x": 0.5369,
           "y": 0.1576
         },
-        "connections": []
+        "connections": [
+          "wp3_MB4"
+        ]
       },
       {
         "id": "wp22_MB4",
@@ -1046,7 +1136,9 @@
           "x": 0.6331,
           "y": 0.2205
         },
-        "connections": []
+        "connections": [
+          "wp4_MB4"
+        ]
       },
       {
         "id": "wp23_MB4",
@@ -1056,7 +1148,9 @@
           "x": 0.6571,
           "y": 0.2259
         },
-        "connections": []
+        "connections": [
+          "wp4_MB4"
+        ]
       },
       {
         "id": "wp24_MB4",
@@ -1066,7 +1160,9 @@
           "x": 0.6415,
           "y": 0.276
         },
-        "connections": []
+        "connections": [
+          "wp4_MB4"
+        ]
       },
       {
         "id": "wp25_MB4",
@@ -1076,7 +1172,9 @@
           "x": 0.3458,
           "y": 0.2611
         },
-        "connections": []
+        "connections": [
+          "wp2_MB4"
+        ]
       },
       {
         "id": "wp26_MB4",
@@ -1086,7 +1184,9 @@
           "x": 0.347,
           "y": 0.2952
         },
-        "connections": []
+        "connections": [
+          "wp2_MB4"
+        ]
       },
       {
         "id": "wp27_MB4",
@@ -1096,7 +1196,9 @@
           "x": 0.347,
           "y": 0.341
         },
-        "connections": []
+        "connections": [
+          "wp2_MB4"
+        ]
       },
       {
         "id": "wp28_MB4",
@@ -1106,7 +1208,9 @@
           "x": 0.347,
           "y": 0.3655
         },
-        "connections": []
+        "connections": [
+          "wp2_MB4"
+        ]
       },
       {
         "id": "wp29_MB4",
@@ -1116,7 +1220,9 @@
           "x": 0.4588,
           "y": 0.2344
         },
-        "connections": []
+        "connections": [
+          "wp1_MB4"
+        ]
       },
       {
         "id": "wp30_MB4",
@@ -1126,7 +1232,9 @@
           "x": 0.4924,
           "y": 0.2397
         },
-        "connections": []
+        "connections": [
+          "wp3_MB4"
+        ]
       },
       {
         "id": "wp31_MB4",
@@ -1136,7 +1244,9 @@
           "x": 0.5309,
           "y": 0.1438
         },
-        "connections": []
+        "connections": [
+          "wp3_MB4"
+        ]
       },
       {
         "id": "wp32_MB4",
@@ -1146,7 +1256,9 @@
           "x": 0.5886,
           "y": 0.1875
         },
-        "connections": []
+        "connections": [
+          "wp3_MB4"
+        ]
       },
       {
         "id": "wp33_MB4",
@@ -1156,7 +1268,9 @@
           "x": 0.6367,
           "y": 0.4487
         },
-        "connections": []
+        "connections": [
+          "wp6_MB4"
+        ]
       },
       {
         "id": "wp34_MB4",
@@ -1166,7 +1280,9 @@
           "x": 0.704,
           "y": 0.5148
         },
-        "connections": []
+        "connections": [
+          "wp6_MB4"
+        ]
       },
       {
         "id": "wp35_MB4",
@@ -1176,7 +1292,9 @@
           "x": 0.7064,
           "y": 0.5596
         },
-        "connections": []
+        "connections": [
+          "wp6_MB4"
+        ]
       },
       {
         "id": "wp36_MB4",
@@ -1186,7 +1304,9 @@
           "x": 0.7064,
           "y": 0.6086
         },
-        "connections": []
+        "connections": [
+          "wp6_MB4"
+        ]
       },
       {
         "id": "wp37_MB4",
@@ -1196,7 +1316,9 @@
           "x": 0.7112,
           "y": 0.6342
         },
-        "connections": []
+        "connections": [
+          "wp6_MB4"
+        ]
       },
       {
         "id": "wp38_MB4",
@@ -1206,7 +1328,9 @@
           "x": 0.3494,
           "y": 0.6481
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp39_MB4",
@@ -1216,7 +1340,9 @@
           "x": 0.3506,
           "y": 0.5766
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp40_MB4",
@@ -1226,7 +1352,9 @@
           "x": 0.3482,
           "y": 0.5585
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp41_MB4",
@@ -1236,7 +1364,9 @@
           "x": 0.3494,
           "y": 0.4956
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp42_MB4",
@@ -1246,7 +1376,9 @@
           "x": 0.3458,
           "y": 0.4551
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp43_MB4",
@@ -1266,7 +1398,9 @@
           "x": 0.4708,
           "y": 0.4135
         },
-        "connections": []
+        "connections": [
+          "wp5_MB4"
+        ]
       },
       {
         "id": "wp45_MB4",
@@ -1276,7 +1410,9 @@
           "x": 0.5345,
           "y": 0.5372
         },
-        "connections": []
+        "connections": [
+          "wp6_MB4"
+        ]
       },
       {
         "id": "wp46_MB4",
@@ -1286,7 +1422,9 @@
           "x": 0.4167,
           "y": 0.5383
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp47_MB4",
@@ -1296,7 +1434,9 @@
           "x": 0.4167,
           "y": 0.6491
         },
-        "connections": []
+        "connections": [
+          "wp7_MB4"
+        ]
       },
       {
         "id": "wp48_MB4",
@@ -1306,7 +1446,9 @@
           "x": 0.7091,
           "y": 0.6897
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp49_MB4",
@@ -1316,7 +1458,9 @@
           "x": 0.7059,
           "y": 0.7111
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp50_MB4",
@@ -1326,7 +1470,9 @@
           "x": 0.707,
           "y": 0.7698
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp51_MB4",
@@ -1336,7 +1482,9 @@
           "x": 0.707,
           "y": 0.7903
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp52_MB4",
@@ -1346,7 +1494,9 @@
           "x": 0.7059,
           "y": 0.8555
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp53_MB4",
@@ -1356,7 +1506,9 @@
           "x": 0.7091,
           "y": 0.875
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp54_MB4",
@@ -1366,7 +1518,10 @@
           "x": 0.6944,
           "y": 0.9095
         },
-        "connections": []
+        "connections": [
+          "wp14_MB4",
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp55_MB4",
@@ -1376,7 +1531,9 @@
           "x": 0.6471,
           "y": 0.8881
         },
-        "connections": []
+        "connections": [
+          "wp14_MB4"
+        ]
       },
       {
         "id": "wp56_MB4",
@@ -1386,7 +1543,9 @@
           "x": 0.6261,
           "y": 0.8881
         },
-        "connections": []
+        "connections": [
+          "wp14_MB4"
+        ]
       },
       {
         "id": "wp57_MB4",
@@ -1396,7 +1555,9 @@
           "x": 0.624,
           "y": 0.8536
         },
-        "connections": []
+        "connections": [
+          "wp14_MB4"
+        ]
       },
       {
         "id": "wp58_MB4",
@@ -1406,7 +1567,9 @@
           "x": 0.6429,
           "y": 0.8527
         },
-        "connections": []
+        "connections": [
+          "wp14_MB4"
+        ]
       },
       {
         "id": "wp59_MB4",
@@ -1416,7 +1579,9 @@
           "x": 0.666,
           "y": 0.7847
         },
-        "connections": []
+        "connections": [
+          "wp16_MB4"
+        ]
       },
       {
         "id": "wp60_MB4",
@@ -1446,7 +1611,9 @@
           "x": 0.4497,
           "y": 0.7502
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp63_MB4",
@@ -1456,7 +1623,9 @@
           "x": 0.4256,
           "y": 0.7521
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp64_MB4",
@@ -1466,7 +1635,9 @@
           "x": 0.4476,
           "y": 0.7102
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp65_MB4",
@@ -1476,7 +1647,9 @@
           "x": 0.4235,
           "y": 0.7092
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp66_MB4",
@@ -1486,7 +1659,9 @@
           "x": 0.3531,
           "y": 0.6822
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp67_MB4",
@@ -1496,7 +1671,9 @@
           "x": 0.352,
           "y": 0.7092
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp68_MB4",
@@ -1506,7 +1683,9 @@
           "x": 0.351,
           "y": 0.753
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp69_MB4",
@@ -1516,7 +1695,9 @@
           "x": 0.352,
           "y": 0.7959
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp70_MB4",
@@ -1526,7 +1707,9 @@
           "x": 0.3909,
           "y": 0.8443
         },
-        "connections": []
+        "connections": [
+          "wp9_MB4"
+        ]
       },
       {
         "id": "wp71_MB4",
@@ -1536,7 +1719,9 @@
           "x": 0.518,
           "y": 0.8657
         },
-        "connections": []
+        "connections": [
+          "wp11_MB4"
+        ]
       },
       {
         "id": "wp72_MB4",
@@ -1546,7 +1731,9 @@
           "x": 0.3739,
           "y": 0.1141
         },
-        "connections": []
+        "connections": [
+          "wp1_MB4"
+        ]
       },
       {
         "id": "wp73_MB4",
@@ -1556,7 +1743,33 @@
           "x": 0.6062,
           "y": 0.3068
         },
-        "connections": []
+        "connections": [
+          "wp4_MB4"
+        ]
+      },
+      {
+        "id": "wp74_MB4",
+        "type": "door",
+        "floor": "MB4",
+        "position": {
+          "x": 0.5955,
+          "y": 0.5441
+        },
+        "connections": [
+          "wp6_MB4"
+        ]
+      },
+      {
+        "id": "wp75_MB4",
+        "type": "door",
+        "floor": "MB4",
+        "position": {
+          "x": 0.5919,
+          "y": 0.7135
+        },
+        "connections": [
+          "wp12_MB4"
+        ]
       }
     ]
   }

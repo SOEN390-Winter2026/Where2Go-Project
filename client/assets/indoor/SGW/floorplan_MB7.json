@@ -1,4 +1,9 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "MB7": {
     "floor": "MB7",
     "rooms": [
@@ -6,7 +11,7 @@
         "id": "elevator",
         "label": "elevator",
         "type": "elevator",
-        "floor": "MB7",
+        "floor": "CC3",
         "bounds": {
           "x": 0.4,
           "y": 0.5021,
@@ -18,7 +23,7 @@
         "id": "elevator",
         "label": "elevator",
         "type": "elevator",
-        "floor": "MB7",
+        "floor": "CC3",
         "bounds": {
           "x": 0.4025,
           "y": 0.5769,
@@ -30,7 +35,7 @@
         "id": "MB-7.394",
         "label": "MB-7.394",
         "type": "staircase",
-        "floor": "MB7",
+        "floor": "CC3",
         "bounds": {
           "x": 0.645,
           "y": 0.5769,
@@ -277,7 +282,14 @@
           "y": 0.565
         },
         "connections": [
-          "wp2_MB7"
+          "wp2_MB7",
+          "wp3_MB7",
+          "wp8_MB7",
+          "wp9_MB7",
+          "wp20_MB7",
+          "wp10_MB7",
+          "wp22_MB7",
+          "wp7_MB7"
         ]
       },
       {
@@ -289,7 +301,12 @@
           "y": 0.565
         },
         "connections": [
-          "wp1_MB7"
+          "wp1_MB7",
+          "wp17_MB7",
+          "wp18_MB7",
+          "wp19_MB7",
+          "wp13_MB7",
+          "wp25_MB7"
         ]
       },
       {
@@ -301,7 +318,10 @@
           "y": 0.7859
         },
         "connections": [
-          "wp4_MB7"
+          "wp4_MB7",
+          "wp1_MB7",
+          "wp23_MB7",
+          "wp11_MB7"
         ]
       },
       {
@@ -313,7 +333,9 @@
           "y": 0.7876
         },
         "connections": [
-          "wp3_MB7"
+          "wp3_MB7",
+          "wp5_MB7",
+          "wp12_MB7"
         ]
       },
       {
@@ -325,7 +347,9 @@
           "y": 0.7876
         },
         "connections": [
-          "wp6_MB7"
+          "wp6_MB7",
+          "wp4_MB7",
+          "wp15_MB7"
         ]
       },
       {
@@ -337,7 +361,10 @@
           "y": 0.8165
         },
         "connections": [
-          "wp5_MB7"
+          "wp5_MB7",
+          "wp21_MB7",
+          "wp24_MB7",
+          "wp14_MB7"
         ]
       },
       {
@@ -348,7 +375,9 @@
           "x": 0.4325,
           "y": 0.1164
         },
-        "connections": []
+        "connections": [
+          "wp1_MB7"
+        ]
       },
       {
         "id": "wp8_MB7",
@@ -358,7 +387,9 @@
           "x": 0.31,
           "y": 0.0994
         },
-        "connections": []
+        "connections": [
+          "wp1_MB7"
+        ]
       },
       {
         "id": "wp9_MB7",
@@ -368,7 +399,9 @@
           "x": 0.3125,
           "y": 0.3645
         },
-        "connections": []
+        "connections": [
+          "wp1_MB7"
+        ]
       },
       {
         "id": "wp10_MB7",
@@ -378,7 +411,9 @@
           "x": 0.265,
           "y": 0.6058
         },
-        "connections": []
+        "connections": [
+          "wp1_MB7"
+        ]
       },
       {
         "id": "wp11_MB7",
@@ -388,7 +423,9 @@
           "x": 0.2925,
           "y": 0.7842
         },
-        "connections": []
+        "connections": [
+          "wp3_MB7"
+        ]
       },
       {
         "id": "wp12_MB7",
@@ -398,7 +435,9 @@
           "x": 0.44,
           "y": 0.7587
         },
-        "connections": []
+        "connections": [
+          "wp4_MB7"
+        ]
       },
       {
         "id": "wp13_MB7",
@@ -408,7 +447,9 @@
           "x": 0.655,
           "y": 0.6024
         },
-        "connections": []
+        "connections": [
+          "wp2_MB7"
+        ]
       },
       {
         "id": "wp14_MB7",
@@ -418,7 +459,9 @@
           "x": 0.645,
           "y": 0.9133
         },
-        "connections": []
+        "connections": [
+          "wp6_MB7"
+        ]
       },
       {
         "id": "wp15_MB7",
@@ -428,7 +471,9 @@
           "x": 0.68,
           "y": 0.791
         },
-        "connections": []
+        "connections": [
+          "wp5_MB7"
+        ]
       },
       {
         "id": "wp17_MB7",
@@ -438,7 +483,9 @@
           "x": 0.645,
           "y": 0.5565
         },
-        "connections": []
+        "connections": [
+          "wp2_MB7"
+        ]
       },
       {
         "id": "wp18_MB7",
@@ -448,7 +495,9 @@
           "x": 0.6275,
           "y": 0.5276
         },
-        "connections": []
+        "connections": [
+          "wp2_MB7"
+        ]
       },
       {
         "id": "wp19_MB7",
@@ -458,7 +507,9 @@
           "x": 0.74,
           "y": 0.5276
         },
-        "connections": []
+        "connections": [
+          "wp2_MB7"
+        ]
       },
       {
         "id": "wp20_MB7",
@@ -468,7 +519,9 @@
           "x": 0.4125,
           "y": 0.2438
         },
-        "connections": []
+        "connections": [
+          "wp1_MB7"
+        ]
       },
       {
         "id": "wp21_MB7",
@@ -478,7 +531,9 @@
           "x": 0.6125,
           "y": 0.8199
         },
-        "connections": []
+        "connections": [
+          "wp6_MB7"
+        ]
       },
       {
         "id": "wp22_MB7",
@@ -488,7 +543,9 @@
           "x": 0.6213,
           "y": 0.6283
         },
-        "connections": []
+        "connections": [
+          "wp1_MB7"
+        ]
       },
       {
         "id": "wp23_MB7",
@@ -498,7 +555,9 @@
           "x": 0.3183,
           "y": 0.7158
         },
-        "connections": []
+        "connections": [
+          "wp3_MB7"
+        ]
       },
       {
         "id": "wp24_MB7",
@@ -508,7 +567,21 @@
           "x": 0.6775,
           "y": 0.8116
         },
-        "connections": []
+        "connections": [
+          "wp6_MB7"
+        ]
+      },
+      {
+        "id": "wp25_MB7",
+        "type": "elevator",
+        "floor": "MB7",
+        "position": {
+          "x": 0.5115,
+          "y": 0.5309
+        },
+        "connections": [
+          "wp2_MB7"
+        ]
       }
     ]
   }

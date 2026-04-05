@@ -1,9 +1,14 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "LB5": {
     "floor": "LB5",
     "rooms": [
       {
-        "id": "LB-585",
+        "id": "LB5-585",
         "label": "Nepal Reading room",
         "type": "other",
         "floor": "CC3",
@@ -15,7 +20,7 @@
         }
       },
       {
-        "id": "LB-583",
+        "id": "LB5-583",
         "label": "Poland Group Study Room",
         "type": "other",
         "floor": "CC3",
@@ -27,7 +32,7 @@
         }
       },
       {
-        "id": "LB-573-T1",
+        "id": "LB5-573-T1",
         "label": "Bathroom",
         "type": "other",
         "floor": "CC3",
@@ -51,7 +56,7 @@
         }
       },
       {
-        "id": "LB-561",
+        "id": "LB5-561",
         "label": "Iceland Dissertation Writer's room",
         "type": "other",
         "floor": "CC3",
@@ -63,7 +68,7 @@
         }
       },
       {
-        "id": "LB-562",
+        "id": "LB5-562",
         "label": "Venezuela Dissertation Writer's room",
         "type": "other",
         "floor": "CC3",
@@ -75,7 +80,7 @@
         }
       },
       {
-        "id": "LB-564",
+        "id": "LB5-564",
         "label": "Mali Dissertation Writer's room",
         "type": "other",
         "floor": "CC3",
@@ -87,7 +92,7 @@
         }
       },
       {
-        "id": "LB-555",
+        "id": "LB5-555",
         "label": "Argentina Reading Room",
         "type": "other",
         "floor": "CC3",
@@ -123,7 +128,7 @@
         }
       },
       {
-        "id": "LB-549-T2",
+        "id": "LB5-549-T2",
         "label": "washroom",
         "type": "other",
         "floor": "CC3",
@@ -135,7 +140,7 @@
         }
       },
       {
-        "id": "LB-547",
+        "id": "LB5-547",
         "label": "Lithuania Group Study Room",
         "type": "other",
         "floor": "CC3",
@@ -171,7 +176,7 @@
         }
       },
       {
-        "id": "LB-518",
+        "id": "LB5-518",
         "label": "Ukraine study room",
         "type": "other",
         "floor": "CC3",
@@ -195,7 +200,7 @@
         }
       },
       {
-        "id": "LB-522",
+        "id": "LB5-522",
         "label": "Peru Group Study Room",
         "type": "other",
         "floor": "CC3",
@@ -219,7 +224,7 @@
         }
       },
       {
-        "id": "LB-524-T3",
+        "id": "LB5-524-T3",
         "label": "Washroom",
         "type": "other",
         "floor": "CC3",
@@ -243,7 +248,7 @@
         }
       },
       {
-        "id": "LB-527",
+        "id": "LB5-527",
         "label": "Information system and technology",
         "type": "other",
         "floor": "CC3",
@@ -255,7 +260,7 @@
         }
       },
       {
-        "id": "LB-505",
+        "id": "LB5-505",
         "label": "Librarian's office and information services",
         "type": "other",
         "floor": "CC3",
@@ -385,7 +390,11 @@
           "y": 0.216
         },
         "connections": [
-          "wp2_LB5"
+          "wp2_LB5",
+          "wp15_LB5",
+          "wp17_LB5",
+          "wp33_LB5",
+          "wp30_LB5"
         ]
       },
       {
@@ -397,7 +406,8 @@
           "y": 0.2508
         },
         "connections": [
-          "wp1_LB5"
+          "wp1_LB5",
+          "wp7_LB5"
         ]
       },
       {
@@ -409,7 +419,8 @@
           "y": 0.5527
         },
         "connections": [
-          "wp4_LB5"
+          "wp4_LB5",
+          "wp6_LB5"
         ]
       },
       {
@@ -421,7 +432,10 @@
           "y": 0.5547
         },
         "connections": [
-          "wp3_LB5"
+          "wp3_LB5",
+          "wp20_LB5",
+          "wp19_LB5",
+          "wp18_LB5"
         ]
       },
       {
@@ -433,7 +447,9 @@
           "y": 0.5876
         },
         "connections": [
-          "wp6_LB5"
+          "wp6_LB5",
+          "wp22_LB5",
+          "wp21_LB5"
         ]
       },
       {
@@ -445,7 +461,8 @@
           "y": 0.5547
         },
         "connections": [
-          "wp5_LB5"
+          "wp5_LB5",
+          "wp3_LB5"
         ]
       },
       {
@@ -457,7 +474,8 @@
           "y": 0.6573
         },
         "connections": [
-          "wp8_LB5"
+          "wp8_LB5",
+          "wp2_LB5"
         ]
       },
       {
@@ -469,7 +487,10 @@
           "y": 0.694
         },
         "connections": [
-          "wp7_LB5"
+          "wp7_LB5",
+          "wp9_LB5",
+          "wp32_LB5",
+          "wp23_LB5"
         ]
       },
       {
@@ -481,7 +502,9 @@
           "y": 0.7115
         },
         "connections": [
-          "wp10_LB5"
+          "wp10_LB5",
+          "wp8_LB5",
+          "wp25_LB5"
         ]
       },
       {
@@ -493,7 +516,10 @@
           "y": 0.6882
         },
         "connections": [
-          "wp9_LB5"
+          "wp9_LB5",
+          "wp11_LB5",
+          "wp27_LB5",
+          "wp26_LB5"
         ]
       },
       {
@@ -505,7 +531,9 @@
           "y": 0.5779
         },
         "connections": [
-          "wp12_LB5"
+          "wp12_LB5",
+          "wp13_LB5",
+          "wp10_LB5"
         ]
       },
       {
@@ -517,7 +545,9 @@
           "y": 0.5721
         },
         "connections": [
-          "wp11_LB5"
+          "wp11_LB5",
+          "wp39_LB5",
+          "wp40_LB5"
         ]
       },
       {
@@ -529,7 +559,9 @@
           "y": 0.3534
         },
         "connections": [
-          "wp14_LB5"
+          "wp14_LB5",
+          "wp16_LB5",
+          "wp11_LB5"
         ]
       },
       {
@@ -541,7 +573,8 @@
           "y": 0.3398
         },
         "connections": [
-          "wp13_LB5"
+          "wp13_LB5",
+          "wp36_LB5"
         ]
       },
       {
@@ -553,7 +586,8 @@
           "y": 0.1908
         },
         "connections": [
-          "wp16_LB5"
+          "wp16_LB5",
+          "wp1_LB5"
         ]
       },
       {
@@ -565,7 +599,11 @@
           "y": 0.2005
         },
         "connections": [
-          "wp15_LB5"
+          "wp15_LB5",
+          "wp13_LB5",
+          "wp29_LB5",
+          "wp28_LB5",
+          "wp41_LB5"
         ]
       },
       {
@@ -576,7 +614,9 @@
           "x": 0.2724,
           "y": 0.2082
         },
-        "connections": []
+        "connections": [
+          "wp1_LB5"
+        ]
       },
       {
         "id": "wp18_LB5",
@@ -586,7 +626,9 @@
           "x": 0.323,
           "y": 0.394
         },
-        "connections": []
+        "connections": [
+          "wp4_LB5"
+        ]
       },
       {
         "id": "wp19_LB5",
@@ -596,7 +638,9 @@
           "x": 0.3307,
           "y": 0.454
         },
-        "connections": []
+        "connections": [
+          "wp4_LB5"
+        ]
       },
       {
         "id": "wp20_LB5",
@@ -606,7 +650,9 @@
           "x": 0.3307,
           "y": 0.5044
         },
-        "connections": []
+        "connections": [
+          "wp4_LB5"
+        ]
       },
       {
         "id": "wp21_LB5",
@@ -616,7 +662,9 @@
           "x": 0.2218,
           "y": 0.605
         },
-        "connections": []
+        "connections": [
+          "wp5_LB5"
+        ]
       },
       {
         "id": "wp22_LB5",
@@ -626,7 +674,9 @@
           "x": 0.2237,
           "y": 0.6495
         },
-        "connections": []
+        "connections": [
+          "wp5_LB5"
+        ]
       },
       {
         "id": "wp23_LB5",
@@ -636,7 +686,9 @@
           "x": 0.3152,
           "y": 0.7173
         },
-        "connections": []
+        "connections": [
+          "wp8_LB5"
+        ]
       },
       {
         "id": "wp24_LB5",
@@ -656,7 +708,9 @@
           "x": 0.5486,
           "y": 0.7386
         },
-        "connections": []
+        "connections": [
+          "wp9_LB5"
+        ]
       },
       {
         "id": "wp26_LB5",
@@ -666,7 +720,9 @@
           "x": 0.7257,
           "y": 0.7057
         },
-        "connections": []
+        "connections": [
+          "wp10_LB5"
+        ]
       },
       {
         "id": "wp27_LB5",
@@ -676,7 +732,9 @@
           "x": 0.7296,
           "y": 0.6418
         },
-        "connections": []
+        "connections": [
+          "wp10_LB5"
+        ]
       },
       {
         "id": "wp28_LB5",
@@ -686,7 +744,9 @@
           "x": 0.7296,
           "y": 0.2798
         },
-        "connections": []
+        "connections": [
+          "wp16_LB5"
+        ]
       },
       {
         "id": "wp29_LB5",
@@ -696,7 +756,9 @@
           "x": 0.7257,
           "y": 0.2082
         },
-        "connections": []
+        "connections": [
+          "wp16_LB5"
+        ]
       },
       {
         "id": "wp30_LB5",
@@ -706,7 +768,9 @@
           "x": 0.5467,
           "y": 0.1695
         },
-        "connections": []
+        "connections": [
+          "wp1_LB5"
+        ]
       },
       {
         "id": "wp31_LB5",
@@ -716,7 +780,10 @@
           "x": 0.8872,
           "y": 0.5392
         },
-        "connections": []
+        "connections": [
+          "wp39_LB5",
+          "wp37_LB5"
+        ]
       },
       {
         "id": "wp32_LB5",
@@ -726,7 +793,9 @@
           "x": 0.4572,
           "y": 0.7463
         },
-        "connections": []
+        "connections": [
+          "wp8_LB5"
+        ]
       },
       {
         "id": "wp33_LB5",
@@ -736,7 +805,9 @@
           "x": 0.4572,
           "y": 0.1618
         },
-        "connections": []
+        "connections": [
+          "wp1_LB5"
+        ]
       },
       {
         "id": "wp34_LB5",
@@ -746,7 +817,10 @@
           "x": 0.7997,
           "y": 0.4397
         },
-        "connections": []
+        "connections": [
+          "wp38_LB5",
+          "wp37_LB5"
+        ]
       },
       {
         "id": "wp35_LB5",
@@ -756,7 +830,9 @@
           "x": 0.8029,
           "y": 0.4791
         },
-        "connections": []
+        "connections": [
+          "wp37_LB5"
+        ]
       },
       {
         "id": "wp36_LB5",
@@ -767,7 +843,8 @@
           "y": 0.3404
         },
         "connections": [
-          "wp37_LB5"
+          "wp37_LB5",
+          "wp14_LB5"
         ]
       },
       {
@@ -779,7 +856,11 @@
           "y": 0.364
         },
         "connections": [
-          "wp36_LB5"
+          "wp36_LB5",
+          "wp38_LB5",
+          "wp31_LB5",
+          "wp34_LB5",
+          "wp35_LB5"
         ]
       },
       {
@@ -791,7 +872,9 @@
           "y": 0.5359
         },
         "connections": [
-          "wp39_LB5"
+          "wp39_LB5",
+          "wp37_LB5",
+          "wp34_LB5"
         ]
       },
       {
@@ -803,7 +886,9 @@
           "y": 0.5595
         },
         "connections": [
-          "wp38_LB5"
+          "wp38_LB5",
+          "wp12_LB5",
+          "wp31_LB5"
         ]
       },
       {
@@ -814,7 +899,9 @@
           "x": 0.8188,
           "y": 0.6052
         },
-        "connections": []
+        "connections": [
+          "wp12_LB5"
+        ]
       },
       {
         "id": "wp41_LB5",
@@ -824,7 +911,9 @@
           "x": 0.8203,
           "y": 0.2505
         },
-        "connections": []
+        "connections": [
+          "wp16_LB5"
+        ]
       }
     ]
   }
