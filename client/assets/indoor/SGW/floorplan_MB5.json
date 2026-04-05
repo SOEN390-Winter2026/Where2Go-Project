@@ -1,4 +1,9 @@
 {
+  "CC3": {
+    "floor": "CC3",
+    "rooms": [],
+    "waypoints": []
+  },
   "MB5": {
     "floor": "MB5",
     "rooms": [
@@ -6,7 +11,7 @@
         "id": "MB-5.245",
         "label": "MB-5.245",
         "type": "classroom",
-        "floor": "MB5",
+        "floor": "CC3",
         "bounds": {
           "x": 0.2229,
           "y": 0.5446,
@@ -565,7 +570,16 @@
           "y": 0.2185
         },
         "connections": [
-          "wp2_MB5"
+          "wp2_MB5",
+          "wp19_MB5",
+          "wp20_MB5",
+          "wp21_MB5",
+          "wp22_MB5",
+          "wp23_MB5",
+          "wp24_MB5",
+          "wp25_MB5",
+          "wp26_MB5",
+          "wp50_MB5"
         ]
       },
       {
@@ -577,7 +591,10 @@
           "y": 0.2156
         },
         "connections": [
-          "wp1_MB5"
+          "wp1_MB5",
+          "wp7_MB5",
+          "wp27_MB5",
+          "wp28_MB5"
         ]
       },
       {
@@ -589,7 +606,8 @@
           "y": 0.1935
         },
         "connections": [
-          "wp7_MB5"
+          "wp7_MB5",
+          "wp6_MB5"
         ]
       },
       {
@@ -600,7 +618,9 @@
           "x": 0.5213,
           "y": 0.2097
         },
-        "connections": []
+        "connections": [
+          "wp7_MB5"
+        ]
       },
       {
         "id": "wp5_MB5",
@@ -611,7 +631,11 @@
           "y": 0.1538
         },
         "connections": [
-          "wp6_MB5"
+          "wp6_MB5",
+          "wp16_MB5",
+          "wp17_MB5",
+          "wp18_MB5",
+          "wp15_MB5"
         ]
       },
       {
@@ -623,7 +647,8 @@
           "y": 0.1685
         },
         "connections": [
-          "wp5_MB5"
+          "wp5_MB5",
+          "wp3_MB5"
         ]
       },
       {
@@ -636,7 +661,12 @@
         },
         "connections": [
           "wp3_MB5",
-          "wp8_MB5"
+          "wp8_MB5",
+          "wp2_MB5",
+          "wp4_MB5",
+          "wp29_MB5",
+          "wp28_MB5",
+          "wp27_MB5"
         ]
       },
       {
@@ -648,7 +678,9 @@
           "y": 0.2406
         },
         "connections": [
-          "wp7_MB5"
+          "wp7_MB5",
+          "wp9_MB5",
+          "wp46_MB5"
         ]
       },
       {
@@ -660,7 +692,10 @@
           "y": 0.4128
         },
         "connections": [
-          "wp10_MB5"
+          "wp10_MB5",
+          "wp8_MB5",
+          "wp12_MB5",
+          "wp32_MB5"
         ]
       },
       {
@@ -672,7 +707,8 @@
           "y": 0.4157
         },
         "connections": [
-          "wp9_MB5"
+          "wp9_MB5",
+          "wp31_MB5"
         ]
       },
       {
@@ -684,7 +720,13 @@
           "y": 0.4555
         },
         "connections": [
-          "wp12_MB5"
+          "wp12_MB5",
+          "wp47_MB5",
+          "wp30_MB5",
+          "wp48_MB5",
+          "wp38_MB5",
+          "wp37_MB5",
+          "wp36_MB5"
         ]
       },
       {
@@ -696,7 +738,13 @@
           "y": 0.4599
         },
         "connections": [
-          "wp11_MB5"
+          "wp11_MB5",
+          "wp9_MB5",
+          "wp33_MB5",
+          "wp34_MB5",
+          "wp14_MB5",
+          "wp35_MB5",
+          "wp49_MB5"
         ]
       },
       {
@@ -708,7 +756,9 @@
           "y": 0.8411
         },
         "connections": [
-          "wp14_MB5"
+          "wp14_MB5",
+          "wp41_MB5",
+          "wp42_MB5"
         ]
       },
       {
@@ -720,7 +770,13 @@
           "y": 0.8528
         },
         "connections": [
-          "wp13_MB5"
+          "wp13_MB5",
+          "wp12_MB5",
+          "wp43_MB5",
+          "wp40_MB5",
+          "wp45_MB5",
+          "wp44_MB5",
+          "wp39_MB5"
         ]
       },
       {
@@ -731,7 +787,9 @@
           "x": 0.4259,
           "y": 0.1349
         },
-        "connections": []
+        "connections": [
+          "wp5_MB5"
+        ]
       },
       {
         "id": "wp16_MB5",
@@ -741,7 +799,9 @@
           "x": 0.4521,
           "y": 0.1342
         },
-        "connections": []
+        "connections": [
+          "wp5_MB5"
+        ]
       },
       {
         "id": "wp17_MB5",
@@ -751,7 +811,9 @@
           "x": 0.4623,
           "y": 0.1678
         },
-        "connections": []
+        "connections": [
+          "wp5_MB5"
+        ]
       },
       {
         "id": "wp18_MB5",
@@ -761,7 +823,9 @@
           "x": 0.4115,
           "y": 0.1699
         },
-        "connections": []
+        "connections": [
+          "wp5_MB5"
+        ]
       },
       {
         "id": "wp19_MB5",
@@ -771,7 +835,9 @@
           "x": 0.2837,
           "y": 0.1559
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp20_MB5",
@@ -781,7 +847,9 @@
           "x": 0.2676,
           "y": 0.1692
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp21_MB5",
@@ -791,7 +859,9 @@
           "x": 0.2642,
           "y": 0.1874
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp22_MB5",
@@ -801,7 +871,9 @@
           "x": 0.2634,
           "y": 0.2463
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp23_MB5",
@@ -811,7 +883,9 @@
           "x": 0.2583,
           "y": 0.2722
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp24_MB5",
@@ -821,7 +895,9 @@
           "x": 0.2617,
           "y": 0.3045
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp25_MB5",
@@ -831,7 +907,9 @@
           "x": 0.2794,
           "y": 0.3584
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp26_MB5",
@@ -841,7 +919,9 @@
           "x": 0.3108,
           "y": 0.3479
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       },
       {
         "id": "wp27_MB5",
@@ -851,7 +931,10 @@
           "x": 0.425,
           "y": 0.24
         },
-        "connections": []
+        "connections": [
+          "wp2_MB5",
+          "wp7_MB5"
+        ]
       },
       {
         "id": "wp28_MB5",
@@ -861,7 +944,10 @@
           "x": 0.453,
           "y": 0.2435
         },
-        "connections": []
+        "connections": [
+          "wp7_MB5",
+          "wp2_MB5"
+        ]
       },
       {
         "id": "wp29_MB5",
@@ -871,7 +957,9 @@
           "x": 0.5478,
           "y": 0.2169
         },
-        "connections": []
+        "connections": [
+          "wp7_MB5"
+        ]
       },
       {
         "id": "wp30_MB5",
@@ -881,7 +969,10 @@
           "x": 0.3192,
           "y": 0.4047
         },
-        "connections": []
+        "connections": [
+          "wp32_MB5",
+          "wp11_MB5"
+        ]
       },
       {
         "id": "wp31_MB5",
@@ -891,7 +982,9 @@
           "x": 0.5774,
           "y": 0.4306
         },
-        "connections": []
+        "connections": [
+          "wp10_MB5"
+        ]
       },
       {
         "id": "wp32_MB5",
@@ -901,7 +994,10 @@
           "x": 0.7069,
           "y": 0.4208
         },
-        "connections": []
+        "connections": [
+          "wp30_MB5",
+          "wp9_MB5"
+        ]
       },
       {
         "id": "wp33_MB5",
@@ -911,7 +1007,9 @@
           "x": 0.5061,
           "y": 0.5515
         },
-        "connections": []
+        "connections": [
+          "wp12_MB5"
+        ]
       },
       {
         "id": "wp34_MB5",
@@ -921,7 +1019,9 @@
           "x": 0.5001,
           "y": 0.5707
         },
-        "connections": []
+        "connections": [
+          "wp12_MB5"
+        ]
       },
       {
         "id": "wp35_MB5",
@@ -931,7 +1031,9 @@
           "x": 0.5033,
           "y": 0.6418
         },
-        "connections": []
+        "connections": [
+          "wp12_MB5"
+        ]
       },
       {
         "id": "wp36_MB5",
@@ -941,7 +1043,9 @@
           "x": 0.2565,
           "y": 0.4847
         },
-        "connections": []
+        "connections": [
+          "wp11_MB5"
+        ]
       },
       {
         "id": "wp37_MB5",
@@ -951,7 +1055,9 @@
           "x": 0.2796,
           "y": 0.486
         },
-        "connections": []
+        "connections": [
+          "wp11_MB5"
+        ]
       },
       {
         "id": "wp38_MB5",
@@ -961,7 +1067,9 @@
           "x": 0.3412,
           "y": 0.4835
         },
-        "connections": []
+        "connections": [
+          "wp11_MB5"
+        ]
       },
       {
         "id": "wp39_MB5",
@@ -971,7 +1079,9 @@
           "x": 0.5822,
           "y": 0.6988
         },
-        "connections": []
+        "connections": [
+          "wp14_MB5"
+        ]
       },
       {
         "id": "wp40_MB5",
@@ -981,7 +1091,9 @@
           "x": 0.4521,
           "y": 0.6976
         },
-        "connections": []
+        "connections": [
+          "wp14_MB5"
+        ]
       },
       {
         "id": "wp41_MB5",
@@ -991,7 +1103,9 @@
           "x": 0.3404,
           "y": 0.8392
         },
-        "connections": []
+        "connections": [
+          "wp13_MB5"
+        ]
       },
       {
         "id": "wp42_MB5",
@@ -1001,7 +1115,9 @@
           "x": 0.3735,
           "y": 0.8979
         },
-        "connections": []
+        "connections": [
+          "wp13_MB5"
+        ]
       },
       {
         "id": "wp43_MB5",
@@ -1011,7 +1127,9 @@
           "x": 0.5836,
           "y": 0.8386
         },
-        "connections": []
+        "connections": [
+          "wp14_MB5"
+        ]
       },
       {
         "id": "wp44_MB5",
@@ -1021,7 +1139,9 @@
           "x": 0.5014,
           "y": 0.8036
         },
-        "connections": []
+        "connections": [
+          "wp14_MB5"
+        ]
       },
       {
         "id": "wp45_MB5",
@@ -1031,7 +1151,9 @@
           "x": 0.494,
           "y": 0.7156
         },
-        "connections": []
+        "connections": [
+          "wp14_MB5"
+        ]
       },
       {
         "id": "wp46_MB5",
@@ -1041,7 +1163,9 @@
           "x": 0.5816,
           "y": 0.311
         },
-        "connections": []
+        "connections": [
+          "wp8_MB5"
+        ]
       },
       {
         "id": "wp47_MB5",
@@ -1051,7 +1175,9 @@
           "x": 0.4312,
           "y": 0.421
         },
-        "connections": []
+        "connections": [
+          "wp11_MB5"
+        ]
       },
       {
         "id": "wp48_MB5",
@@ -1061,7 +1187,9 @@
           "x": 0.436,
           "y": 0.4898
         },
-        "connections": []
+        "connections": [
+          "wp11_MB5"
+        ]
       },
       {
         "id": "wp49_MB5",
@@ -1071,7 +1199,9 @@
           "x": 0.4248,
           "y": 0.6462
         },
-        "connections": []
+        "connections": [
+          "wp12_MB5"
+        ]
       },
       {
         "id": "wp50_MB5",
@@ -1081,7 +1211,9 @@
           "x": 0.3382,
           "y": 0.1126
         },
-        "connections": []
+        "connections": [
+          "wp1_MB5"
+        ]
       }
     ]
   }

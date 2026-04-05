@@ -16,6 +16,10 @@ const VEVL = {
 export const indoorMaps = {
   SGW: {
     H: {
+      1: {
+        image: require('../../assets/indoor/SGW/H-1.png'),
+        data: require('../../assets/indoor/SGW/floorplan_H-1.json'),
+      },
       2: {
         image: require('../../assets/indoor/SGW/H-2.png'),
         data: require('../../assets/indoor/SGW/floorplan_H-2.json'),
@@ -59,6 +63,10 @@ export const indoorMaps = {
     },
 
     MB: {
+      2: {
+        image: require('../../assets/indoor/SGW/MB-2.png'),
+        data: require('../../assets/indoor/SGW/floorplan_MB2.json'),
+      },
       3: {
         image: require('../../assets/indoor/SGW/MB-3.png'),
         data: require('../../assets/indoor/SGW/floorplan_MB3.json'), // you'll add later

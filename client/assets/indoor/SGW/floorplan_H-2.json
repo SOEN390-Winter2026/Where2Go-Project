@@ -1,6 +1,13 @@
 {
-  "H2": {
-    "floor": "H2",
+  "CC3": {
+    "floor": "CC3",
+    "building": "Hall",
+    "rooms": [],
+    "waypoints": []
+  },
+  "H-2": {
+    "floor": "H-2",
+    "building": "Hall",
     "rooms": [
       {
         "id": "H-210",
@@ -55,6 +62,7 @@
         "label": "H-275",
         "type": "staircase",
         "floor": "CC3",
+        "nearestWaypoint": "wp32_H29999",
         "bounds": {
           "x": 0.3333,
           "y": 0.0593,
@@ -366,242 +374,241 @@
     "waypoints": [
       {
         "id": "wp1_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.2126,
           "y": 0.3992
         },
         "connections": [
-          "wp2_H2"
+          "wp2_H2",
+          "wp30_H2"
         ]
       },
       {
         "id": "wp2_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.2422,
           "y": 0.3971
         },
         "connections": [
-          "wp1_H2"
+          "wp1_H2",
+          "wp3_H2"
         ]
       },
       {
         "id": "wp3_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.4052,
           "y": 0.4013
         },
         "connections": [
-          "wp4_H2"
+          "wp4_H2",
+          "wp2_H2"
         ]
       },
       {
         "id": "wp4_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.4274,
           "y": 0.4225
         },
         "connections": [
-          "wp3_H2"
-        ]
-      },
-      {
-        "id": "wp5_H2",
-        "type": "intersection",
-        "floor": "H2",
-        "position": {
-          "x": 0.4737,
-          "y": 0.5092
-        },
-        "connections": [
-          "wp21_H2"
+          "wp3_H2",
+          "wp32_H29",
+          "wp23_H2",
+          "wp25_H2",
+          "wp22_H2"
         ]
       },
       {
         "id": "wp7_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9014,
           "y": 0.5071
         },
         "connections": [
-          "wp8_H2"
+          "wp8_H2",
+          "wp10_H2"
         ]
       },
       {
         "id": "wp8_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.8791,
           "y": 0.5346
         },
         "connections": [
-          "wp7_H2"
+          "wp7_H2",
+          "wp33_H2-Entrence-main"
         ]
       },
       {
         "id": "wp9_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9199,
           "y": 0.4415
         },
         "connections": [
-          "wp10_H2"
+          "wp10_H2",
+          "wp11_H2"
         ]
       },
       {
         "id": "wp10_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9273,
           "y": 0.4669
         },
         "connections": [
-          "wp9_H2"
+          "wp9_H2",
+          "wp7_H2"
         ]
       },
       {
         "id": "wp11_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.8847,
           "y": 0.4267
         },
         "connections": [
-          "wp12_H2"
+          "wp12_H2",
+          "wp9_H2",
+          "wp32_H29"
         ]
       },
       {
         "id": "wp12_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9051,
           "y": 0.4034
         },
         "connections": [
-          "wp11_H2"
+          "wp11_H2",
+          "wp13_H2"
         ]
       },
       {
         "id": "wp13_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9328,
           "y": 0.3949
         },
         "connections": [
-          "wp15_H2"
+          "wp15_H2",
+          "wp12_H2"
         ]
       },
       {
         "id": "wp14_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9125,
           "y": 0.323
         },
         "connections": [
-          "wp16_H2"
+          "wp16_H2",
+          "wp15_H2"
         ]
       },
       {
         "id": "wp15_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.8939,
           "y": 0.3653
         },
         "connections": [
-          "wp13_H2"
+          "wp13_H2",
+          "wp14_H2"
         ]
       },
       {
         "id": "wp16_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.8884,
           "y": 0.2955
         },
         "connections": [
-          "wp14_H2"
+          "wp14_H2",
+          "wp18_H2",
+          "wp33_H299"
         ]
       },
       {
         "id": "wp17_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9143,
           "y": 0.2277
         },
         "connections": [
-          "wp18_H2"
+          "wp18_H2",
+          "wp19_H2"
         ]
       },
       {
         "id": "wp18_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.9236,
           "y": 0.2425
         },
         "connections": [
-          "wp17_H2"
+          "wp17_H2",
+          "wp16_H2"
         ]
       },
       {
         "id": "wp19_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.8699,
           "y": 0.1748
         },
         "connections": [
-          "wp20_H2"
+          "wp20_H2",
+          "wp17_H2"
         ]
       },
       {
         "id": "wp20_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.8758,
           "y": 0.1417
         },
         "connections": [
-          "wp19_H2"
-        ]
-      },
-      {
-        "id": "wp21_H2",
-        "type": "intersection",
-        "floor": "H2",
-        "position": {
-          "x": 0.7374,
-          "y": 0.4917
-        },
-        "connections": [
-          "wp5_H2"
+          "wp19_H2",
+          "wp32_H2-Entrance-side"
         ]
       },
       {
@@ -612,7 +619,9 @@
           "x": 0.4445,
           "y": 0.9337
         },
-        "connections": []
+        "connections": [
+          "wp4_H2"
+        ]
       },
       {
         "id": "wp23_H2",
@@ -622,7 +631,9 @@
           "x": 0.418,
           "y": 0.4575
         },
-        "connections": []
+        "connections": [
+          "wp4_H2"
+        ]
       },
       {
         "id": "wp24_H2",
@@ -632,7 +643,9 @@
           "x": 0.8271,
           "y": 0.6624
         },
-        "connections": []
+        "connections": [
+          "wp33_H2-Entrence-main"
+        ]
       },
       {
         "id": "wp25_H2",
@@ -642,30 +655,35 @@
           "x": 0.4067,
           "y": 0.7033
         },
-        "connections": []
+        "connections": [
+          "wp4_H2"
+        ]
       },
       {
         "id": "wp26_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.549,
           "y": 0.1423
         },
         "connections": [
-          "wp27_H2"
+          "wp27_H2",
+          "wp32_H29999"
         ]
       },
       {
         "id": "wp27_H2",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "H2",
         "position": {
           "x": 0.549,
           "y": 0.1623
         },
         "connections": [
-          "wp26_H2"
+          "wp26_H2",
+          "wp33_H299",
+          "wp28_H2"
         ]
       },
       {
@@ -676,27 +694,9 @@
           "x": 0.5951,
           "y": 0.1415
         },
-        "connections": []
-      },
-      {
-        "id": "wp29_H2",
-        "type": "door",
-        "floor": "H2",
-        "position": {
-          "x": 0.3084,
-          "y": 0.1124
-        },
-        "connections": []
-      },
-      {
-        "id": "wp29_H2",
-        "type": "exit",
-        "floor": "H2",
-        "position": {
-          "x": 0.4036,
-          "y": 0.0953
-        },
-        "connections": []
+        "connections": [
+          "wp27_H2"
+        ]
       },
       {
         "id": "wp30_H2",
@@ -706,7 +706,9 @@
           "x": 0.2403,
           "y": 0.7737
         },
-        "connections": []
+        "connections": [
+          "wp1_H2"
+        ]
       },
       {
         "id": "wp31_H2",
@@ -716,7 +718,88 @@
           "x": 0.6473,
           "y": 0.1139
         },
-        "connections": []
+        "connections": [
+          "wp33_H288"
+        ]
+      },
+      {
+        "id": "wp32_H2-Entrance-side",
+        "type": "door",
+        "floor": "H2",
+        "position": {
+          "x": 0.8754,
+          "y": 0.1103
+        },
+        "connections": [
+          "wp20_H2"
+        ]
+      },
+      {
+        "id": "wp33_H2-Entrence-main",
+        "type": "door",
+        "floor": "H2",
+        "position": {
+          "x": 0.9258,
+          "y": 0.6853
+        },
+        "connections": [
+          "wp8_H2",
+          "wp24_H2"
+        ]
+      },
+      {
+        "id": "wp32_H29",
+        "type": "corridor",
+        "floor": "H2",
+        "position": {
+          "x": 0.5035,
+          "y": 0.4326
+        },
+        "connections": [
+          "wp11_H2",
+          "wp33_H299",
+          "wp4_H2"
+        ]
+      },
+      {
+        "id": "wp33_H299",
+        "type": "corridor",
+        "floor": "H2",
+        "position": {
+          "x": 0.5171,
+          "y": 0.265
+        },
+        "connections": [
+          "wp16_H2",
+          "wp32_H29",
+          "wp27_H2",
+          "wp33_H288"
+        ]
+      },
+      {
+        "id": "wp32_H29999",
+        "type": "corridor",
+        "floor": "H2",
+        "position": {
+          "x": 0.4081,
+          "y": 0.0969
+        },
+        "connections": [
+          "wp26_H2"
+        ]
+      },
+      {
+        "id": "wp33_H288",
+        "type": "corridor",
+        "floor": "H2",
+        "position": {
+          "x": 0.6935,
+          "y": 0.2097
+        },
+        "connections": [
+          "wp33_H299",
+          "wp31_H2"
+        ]
       }
     ]
   }
