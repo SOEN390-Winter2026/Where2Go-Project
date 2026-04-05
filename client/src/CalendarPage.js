@@ -400,17 +400,10 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
     );
   }
 
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable testID="pressBack" style={styles.headerBtn} onPress={onPressBack}>
-          <Ionicons name="arrow-back" size={26} color="white" />
-        </Pressable>
-      </View>
-
-      {isCalendarConnected ? (
-        isCalendarsChosen ? (
+  let calendarMainPanel;
+  if (isCalendarConnected) {
+    if (isCalendarsChosen) {
+      calendarMainPanel = (
           <View style={styles.pageWrap}>
             <View style={styles.calendarCard}>
               <View style={styles.calendarTopRow}>
@@ -577,7 +570,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
               </Pressable>
             </Modal>
           </View>
-        );
+      );
     } else {
       calendarMainPanel = (
           <>
@@ -623,7 +616,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
               </Pressable>
             </View>
           </>
-        );
+      );
     }
   } else {
     calendarMainPanel = (
