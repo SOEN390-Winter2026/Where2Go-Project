@@ -924,7 +924,7 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to, a
   const rules = {
     avoidStairs: !!avoidStairs,
     stairsPenalty: 2,
-    elevatorBonus: -0.1,
+    elevatorBonus: 0,
     floorTransferCost: 1,
   };
 
@@ -997,8 +997,8 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to, a
  */
 export function warmupIndoorGraph(campus, buildingCode) {
   if (!campus || !buildingCode) return;
-  const rulesA = { avoidStairs: true, stairsPenalty: 2, elevatorBonus: -0.1, floorTransferCost: 1 };
-  const rulesB = { avoidStairs: false, stairsPenalty: 2, elevatorBonus: -0.1, floorTransferCost: 1 };
+  const rulesA = { avoidStairs: true, stairsPenalty: 2, elevatorBonus: 0, floorTransferCost: 1 };
+  const rulesB = { avoidStairs: false, stairsPenalty: 2, elevatorBonus: 0, floorTransferCost: 1 };
   getCachedMultiFloorGraph({ campus, buildingCode, rules: rulesA });
   getCachedMultiFloorGraph({ campus, buildingCode, rules: rulesB });
 }
