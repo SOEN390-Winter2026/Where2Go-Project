@@ -120,9 +120,9 @@ describe("interBuildingDirections (coverage)", () => {
         { floor: "1", type: "staircase" },
         { floor: "1", type: "exit" },
       ]);
-      expect(lines.some((l) => l.includes("Use the stairs"))).toBe(true);
+      expect(lines.some((l) => l.includes("stairs"))).toBe(true);
       expect(lines.some((l) => l.includes("Go through the exit"))).toBe(true);
-      const stairCount = lines.filter((l) => l.includes("Use the stairs")).length;
+      const stairCount = lines.filter((l) => l.includes("stairs")).length;
       expect(stairCount).toBe(1);
     });
   });

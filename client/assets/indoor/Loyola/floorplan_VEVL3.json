@@ -2401,7 +2401,9 @@
           "x": 0.4153,
           "y": 0.245
         },
-        "connections": []
+        "connections": [
+          "wp105_VEVL3"
+        ]
       },
       {
         "id": "wp94_VEVL3",
@@ -2505,6 +2507,19 @@
           "wp11_VEVL3",
           "wp9_VEVL3",
           "wp2_VEVL3"
+        ]
+      },
+      {
+        "id": "wp105_VEVL3",
+        "type": "corridor",
+        "floor": "VEVL3",
+        "position": {
+          "x": 0.3584,
+          "y": 0.2317
+        },
+        "connections": [
+          "wp104_VEVL3",
+          "wp93_VEVL3"
         ]
       }
     ]

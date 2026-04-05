@@ -1775,6 +1775,56 @@
           "wp26_H5",
           "wp27_H5"
         ]
+      },
+      {
+        "id": "wp79_H5",
+        "type": "staircase",
+        "floor": "H5",
+        "position": {
+          "x": 0.3296,
+          "y": 0.2943
+        },
+        "connections": []
+      },
+      {
+        "id": "wp80_H5",
+        "type": "staircase",
+        "floor": "H5",
+        "position": {
+          "x": 0.3036,
+          "y": 0.7009
+        },
+        "connections": []
+      },
+      {
+        "id": "wp81_H5",
+        "type": "staircase",
+        "floor": "H5",
+        "position": {
+          "x": 0.7015,
+          "y": 0.2837
+        },
+        "connections": []
+      },
+      {
+        "id": "wp82_H5",
+        "type": "staircase",
+        "floor": "H5",
+        "position": {
+          "x": 0.7353,
+          "y": 0.6776
+        },
+        "connections": []
+      },
+      {
+        "id": "wp83_H5",
+        "type": "elevator",
+        "floor": "H5",
+        "position": {
+          "x": 0.6617,
+          "y": 0.6573
+        },
+        "connections": []
       }
     ]
   }

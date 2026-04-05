@@ -27,20 +27,32 @@ export function formatIndoorPathSteps(path) {
   for (let i = 0; i < path.length; i += 1) {
     const wp = path[i];
     const typeLow = String(wp.type || "area").toLowerCase();
+    const floorChanged = i > 0 && String(wp.floor) !== String(prevFloor);
 
     if (i === 0) {
       lines.push(`Start on floor ${wp.floor}.`);
       continue;
     }
 
-    if (String(wp.floor) !== String(prevFloor)) {
+    if (typeLow === "elevator") {
+      if (floorChanged) {
+        lines.push(`Take the elevator to floor ${wp.floor}.`);
+      } else {
+        lines.push("Walk to the elevator.");
+      }
+    } else if (typeLow === "staircase") {
+      if (floorChanged) {
+        lines.push(`Take the stairs to floor ${wp.floor}.`);
+      } else {
+        lines.push("Walk to the stairs.");
+      }
+    } else if (floorChanged) {
       lines.push(`Continue to floor ${wp.floor}.`);
-      prevFloor = wp.floor;
+    } else if (typeLow === "exit") {
+      lines.push("Go through the exit.");
     }
 
-    if (typeLow === "elevator") lines.push("Use the elevator.");
-    else if (typeLow === "staircase") lines.push("Use the stairs.");
-    else if (typeLow === "exit") lines.push("Go through the exit.");
+    if (floorChanged) prevFloor = wp.floor;
   }
 
   return lines.filter((line, idx) => idx === 0 || line !== lines[idx - 1]);
@@ -68,26 +80,42 @@ function computeApproxIndoorMeters(path) {
   return Math.max(5, Math.round(meters / 5) * 5);
 }
 
+// Regex that extracts the floor number from a floor-change step.
+const FLOOR_CHANGE_RE = /^(?:Take the (?:elevator|stairs) to|Continue to) floor (\S+?)\.?$/;
+
 function buildIndoorNarrative({ path, buildingCode, startRoom, endRoom, endFloor, heading }) {
   const core = formatIndoorPathSteps(path);
-  const lines = [];
-  if (heading) lines.push(heading);
-  if (startRoom) {
-    lines.push(`Start in room ${startRoom} in ${buildingCode}.`);
-  }
+  const steps = [];
+  const stepFloors = [];
+
+  const push = (text, floor = null) => { steps.push(text); stepFloors.push(floor); };
+
+  if (heading) push(heading);
+  if (startRoom) push(`Start in room ${startRoom} in ${buildingCode}.`);
   const approxMeters = computeApproxIndoorMeters(path);
-  if (approxMeters > 0) {
-    lines.push(`Walk about ${approxMeters} m inside ${buildingCode}.`);
+  if (approxMeters > 0) push(`Walk about ${approxMeters} m inside ${buildingCode}.`);
+
+  for (const line of core) {
+    // Skip "Start on floor X" when the start room already gives that context.
+    if (startRoom && line.startsWith("Start on floor")) continue;
+    const m = line.match(FLOOR_CHANGE_RE);
+    push(line, m ? m[1] : null);
   }
-  lines.push(...core);
-  if (endRoom) {
-    lines.push(`Continue to room ${endRoom} on floor ${endFloor}.`);
-  }
-  return lines;
+
+  if (endRoom) push(`Continue to room ${endRoom} on floor ${endFloor}.`);
+
+  return { steps, stepFloors };
 }
 
 /** Single-segment success: indoor routing within one building between two rooms. */
 function indoorRoomToRoomOk(buildingCode, path, { startRoom, endRoom, endFloor }) {
+  const { steps, stepFloors } = buildIndoorNarrative({
+    path,
+    buildingCode,
+    startRoom,
+    endRoom,
+    endFloor,
+  });
   return {
     ok: true,
     segments: [
@@ -95,13 +123,8 @@ function indoorRoomToRoomOk(buildingCode, path, { startRoom, endRoom, endFloor }
         kind: "indoor",
         buildingCode,
         summary: `Inside ${buildingCode} — room to room`,
-        steps: buildIndoorNarrative({
-          path,
-          buildingCode,
-          startRoom,
-          endRoom,
-          endFloor,
-        }),
+        steps,
+        stepFloors,
         path,
       },
     ],
@@ -462,16 +485,25 @@ function buildCandidateExitPairs({ fromB, toB, campus, buildings, from, to }) {
 }
 
 function buildCombinedSegments({ fromB, toB, from, to, legOut, legIn, outdoor }) {
+  const narrativeOut = buildIndoorNarrative({
+    path: legOut.path,
+    buildingCode: fromB,
+    startRoom: from.room,
+  });
+  const narrativeIn = buildIndoorNarrative({
+    path: legIn.path,
+    buildingCode: toB,
+    endRoom: to.room,
+    endFloor: to.floor,
+    heading: `From the entrance of ${toB}, continue inside.`,
+  });
   return [
     {
       kind: "indoor",
       buildingCode: fromB,
       summary: `Inside ${fromB} — to exit`,
-      steps: buildIndoorNarrative({
-        path: legOut.path,
-        buildingCode: fromB,
-        startRoom: from.room,
-      }),
+      steps: narrativeOut.steps,
+      stepFloors: narrativeOut.stepFloors,
       path: legOut.path,
     },
     {
@@ -491,13 +523,8 @@ function buildCombinedSegments({ fromB, toB, from, to, legOut, legIn, outdoor })
       kind: "indoor",
       buildingCode: toB,
       summary: `Inside ${toB} — from entrance to room`,
-      steps: buildIndoorNarrative({
-        path: legIn.path,
-        buildingCode: toB,
-        endRoom: to.room,
-        endFloor: to.floor,
-        heading: `From the entrance of ${toB}, continue inside.`,
-      }),
+      steps: narrativeIn.steps,
+      stepFloors: narrativeIn.stepFloors,
       path: legIn.path,
     },
   ];
