@@ -1,0 +1,54 @@
+appId: host.exp.exponent
+---
+- tapOn:
+    text: "Continue"
+    optional: true
+- waitForAnimationToEnd    
+    
+# readjust
+- tapOn: SGW
+- waitForAnimationToEnd    
+- tapOn: Loyola
+- waitForAnimationToEnd
+
+# looking for JMSB
+- tapOn:
+    point: 30%,60%
+- tapOn:
+    id: "go-inside"
+- waitForAnimationToEnd
+
+# open the floors tab in the bottom sheet
+- tapOn:
+    id: "tab-floors"
+- waitForAnimationToEnd
+
+# room number
+- tapOn:
+    id: "classroom-input"
+- inputText: "MB-6.425"
+- waitForAnimationToEnd
+
+# tap on room nb in suggestions
+- tapOn:
+    id: "room-suggestion-MB-6.425"
+- waitForAnimationToEnd
+
+# verify the correct floor is now active
+- assertVisible:
+    id: "floor-btn-6"
+
+# verify the highlighted room label appears on the map
+- assertVisible:
+    id: "room-label-MB-6.425"
+
+# tap the room label
+- tapOn:
+    id: "room-label-MB-6.425"
+- waitForAnimationToEnd
+
+# confirm the modal appeared with the correct room
+- assertVisible: "MB-6.425"
+- assertVisible: "Set as departure"
+- assertVisible: "Set as destination"
+- tapOn: "Cancel"
