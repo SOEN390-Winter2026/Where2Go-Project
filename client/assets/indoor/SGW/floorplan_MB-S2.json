@@ -241,7 +241,7 @@
         "label": "MB-S2_296",
         "type": "staircase",
         "floor": "MB-S2",
-        "nearestWaypoint": "wp19_MB-S2_Exit296",
+        "nearestWaypoint": "wp19_MB-S2",
         "bounds": {
           "x": 0.3713,
           "y": 0.2754,
@@ -293,7 +293,7 @@
         "label": "MB-S2_494",
         "type": "staircase",
         "floor": "MB-S2",
-        "nearestWaypoint": "wp21_MB-S2_Exit494",
+        "nearestWaypoint": "wp34_MB-S2",
         "bounds": {
           "x": 0.6995,
           "y": 0.7848,
