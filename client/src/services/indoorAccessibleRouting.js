@@ -792,9 +792,9 @@ function connectTransferWaypoints({
 
   // If no floorsReachable specified, infer adjacent floors
   if (floorsReachable.length === 0) {
-    const allFloorIds = Array.from(floorGraphs.keys()).map(id => parseInt(id)).filter(id => !isNaN(id)).sort((a, b) => a - b);
-    const currentFloorNum = parseInt(floorId);
-    if (!isNaN(currentFloorNum)) {
+    const allFloorIds = Array.from(floorGraphs.keys()).map(id =>  Number.parseInt(id)).filter(id => !Number.isNaN(id)).sort((a, b) => a - b);
+    const currentFloorNum =  Number.parseInt(floorId);
+    if (!Number.isNaN(currentFloorNum)) {
       const prevFloor = allFloorIds.find(f => f === currentFloorNum - 1);
       const nextFloor = allFloorIds.find(f => f === currentFloorNum + 1);
       floorsReachable = [prevFloor, nextFloor].filter(f => f != null).map(f => f.toString());
