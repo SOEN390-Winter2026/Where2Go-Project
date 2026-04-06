@@ -1,0 +1,118 @@
+
+
+appId: host.exp.exponent
+---
+- launchApp:
+    clearState: true
+
+- tapOn:
+    id: continue-guest
+- extendedWaitUntil:
+    visible:
+      id: mapRef
+    timeout: 60000
+
+# Enable accessible routing before entering the building (state is app-wide)
+- tapOn:
+    id: disPress
+- waitForAnimationToEnd
+
+# Hall (H) → indoor maps
+- extendedWaitUntil:
+    visible:
+      text: "H"
+    timeout: 90000
+- tapOn:
+    text: "H"
+- extendedWaitUntil:
+    visible:
+      id: go-inside
+    timeout: 15000
+- tapOn:
+    id: go-inside
+
+- extendedWaitUntil:
+    visible:
+      id: search-btn
+    timeout: 20000
+- tapOn:
+    id: search-btn
+
+# Directions sheet should show that accessible routing is active
+- scrollUntilVisible:
+    element:
+      id: indoor-accessible-routing-active
+    direction: DOWN
+    timeout: 15000
+    speed: 60
+    visibilityPercentage: 50
+- assertVisible:
+    id: indoor-accessible-routing-active
+- assertVisible:
+    text: ".*[Aa]ccessible routing on.*"
+
+- scrollUntilVisible:
+    element:
+      id: generate-directions-btn
+    direction: DOWN
+    timeout: 10000
+    speed: 60
+    visibilityPercentage: 50
+
+# Same Hall route as shortest-path flow; routing uses avoidStairs when toggle is on
+- tapOn:
+    id: from-floor
+- extendedWaitUntil:
+    visible:
+      text: "^7$"
+    timeout: 8000
+- tapOn:
+    text: "^7$"
+
+- tapOn:
+    id: from-room
+- scrollUntilVisible:
+    element:
+      text: "H-769"
+    direction: DOWN
+    timeout: 15000
+    speed: 70
+- tapOn:
+    text: "H-769"
+
+- tapOn:
+    id: to-floor
+- extendedWaitUntil:
+    visible:
+      text: "^8$"
+    timeout: 8000
+- tapOn:
+    text: "^8$"
+
+- tapOn:
+    id: to-room
+- scrollUntilVisible:
+    element:
+      text: "H-823"
+    direction: DOWN
+    timeout: 15000
+    speed: 70
+- tapOn:
+    text: "H-823"
+
+- tapOn:
+    id: generate-directions-btn
+
+- extendedWaitUntil:
+    visible:
+      id: directions-summary-card
+    timeout: 120000
+
+- assertVisible:
+    id: directions-summary-card
+- assertVisible:
+    text: "Directions Summary"
+
+# Banner remains visible after generation — toggle state still applied
+- assertVisible:
+    id: indoor-accessible-routing-active
