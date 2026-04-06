@@ -5,7 +5,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
-import * as Location from "expo-location";
 import ErrorModal from "./ErrorModal";
 import AutocompleteDropdown from "./AutocompleteDropdown";
 import { getBuildingDisplayName, filterLocations, resolveLocationByName } from "./utils/locationSearch";

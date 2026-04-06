@@ -200,6 +200,284 @@ CalendarEventRow.propTypes = {
   onLocateRoom: PropTypes.func,
 };
 
+// --- Extracted sub-components to reduce cognitive complexity ---
+
+function BottomSheetModal({ visible, translateY, panResponder, onClose, onConnect, onManualAdd }) {
+  return (
+    <Modal transparent visible={visible} animationType="none">
+      <View style={styles.overlay}>
+        <Animated.View
+          testID="bottom-sheet-view"
+          style={[styles.sheet, { transform: [{ translateY }] }]}
+          {...panResponder.panHandlers}
+        >
+          <View style={styles.handle} />
+
+          <Pressable testID="closeModalBtn" style={styles.closeBtn} onPress={onClose}>
+            <Ionicons name="close" size={26} color="black" />
+          </Pressable>
+
+          <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={onConnect}>
+            <Text style={styles.btnTxt}>Connect to Google Calendar</Text>
+          </Pressable>
+
+          <Pressable testID="manualAddBtn" style={styles.manualBtn} onPress={onManualAdd}>
+            <Text style={styles.btnTxt}>Manually Add Events</Text>
+          </Pressable>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+}
+
+BottomSheetModal.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  translateY: PropTypes.object.isRequired,
+  panResponder: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onConnect: PropTypes.func.isRequired,
+  onManualAdd: PropTypes.func.isRequired,
+};
+
+function SelectedCalsModal({ visible, chosenCalendars, onClose, onChange, onDisconnect }) {
+  return (
+    <Modal
+      testID="selectedCalsModal"
+      transparent
+      visible={visible}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable testID="selectedCalsOverlay" style={styles.modalOverlay} onPress={onClose}>
+        <Pressable testID="selectedCalsContent" style={styles.selectedCalsModal} onPress={() => {}}>
+          <View style={styles.selectedCalsHeader}>
+            <Text style={styles.selectedCalsTitle} testID="selectedCalendarsModalTitle">Selected Calendars</Text>
+            <Pressable testID="selectedCalsCloseBtn" onPress={onClose}>
+              <Ionicons name="close" size={20} color="#333" />
+            </Pressable>
+          </View>
+
+          <ScrollView style={styles.selectedCalsList} showsVerticalScrollIndicator={false}>
+            {chosenCalendars.length === 0 ? (
+              <Text style={styles.selectedCalsEmpty}>
+                No calendars selected. Tap "Change" to choose calendars.
+              </Text>
+            ) : (
+              chosenCalendars.map((cal) => (
+                <View key={cal.id} style={styles.calRow}>
+                  <View style={[styles.colorDot, { backgroundColor: cal.color || "#912338" }]} />
+                  <Text style={styles.calName} numberOfLines={1}>{cal.title}</Text>
+                </View>
+              ))
+            )}
+          </ScrollView>
+
+          <View style={styles.modalActions}>
+            <Pressable testID="selectedCalsChangeBtn" style={styles.changeBtn} onPress={onChange}>
+              <Text style={styles.changeBtnTxt}>Change</Text>
+            </Pressable>
+            <Pressable testID="selectedCalsDisconnectBtn" style={styles.disconnectBtn} onPress={onDisconnect}>
+              <Text style={styles.disconnectBtnTxt}>Disconnect</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+SelectedCalsModal.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  chosenCalendars: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      title: PropTypes.string,
+      color: PropTypes.string,
+    })
+  ).isRequired,
+  onClose: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onDisconnect: PropTypes.func.isRequired,
+};
+
+function CalendarSelectionPanel({ calendars, selectedCalendarIds, onToggle, onDone }) {
+  return (
+    <>
+      <View style={styles.titleView}>
+        <Text style={styles.txtTitle}> Extracting Calendars</Text>
+      </View>
+
+      <View style={styles.selectCalView}>
+        <Text style={styles.txtSelectCal}>Select Desired Calendars to Extract</Text>
+
+        {calendars.map((calendar) => (
+          <View key={calendar.id} style={styles.checkboxRow}>
+            <Checkbox
+              testID={`checkbox-${calendar.id}`}
+              value={selectedCalendarIds.includes(calendar.id)}
+              onValueChange={() => onToggle(calendar.id)}
+              color={calendar.color}
+            />
+            <Text style={styles.checkboxLabel}>{calendar.title}</Text>
+          </View>
+        ))}
+
+        <Pressable style={styles.saveBtn} onPress={onDone}>
+          <Text testID="saveBtn" style={styles.btnTxt}>Done</Text>
+        </Pressable>
+      </View>
+    </>
+  );
+}
+
+CalendarSelectionPanel.propTypes = {
+  calendars: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      title: PropTypes.string,
+      color: PropTypes.string,
+    })
+  ).isRequired,
+  selectedCalendarIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  onToggle: PropTypes.func.isRequired,
+  onDone: PropTypes.func.isRequired,
+};
+
+function ConnectedCalendarPanel({
+  selectedDate,
+  isFullCalendarView,
+  markedDates,
+  events,
+  onDayPress,
+  onMonthChange,
+  onToggleView,
+  onShowCalsModal,
+  onGenerateDirections,
+  onLocateRoom,
+  selectedCalsModalVisible,
+  chosenCalendars,
+  onCloseCalsModal,
+  onChangeCals,
+  onDisconnect,
+}) {
+  return (
+    <View style={styles.pageWrap}>
+      <View style={styles.calendarCard}>
+        <View style={styles.calendarTopRow}>
+          <Pressable
+            style={styles.iconBtn}
+            onPress={onShowCalsModal}
+            accessibilityLabel="Selected calendars"
+          >
+            <Ionicons name="menu" size={18} color="#555" />
+          </Pressable>
+
+          <Pressable
+            style={styles.iconBtn}
+            onPress={onToggleView}
+            accessibilityLabel="Toggle full calendar view"
+          >
+            <Ionicons
+              name={isFullCalendarView ? "contract-outline" : "calendar-outline"}
+              size={18}
+              color="#555"
+            />
+          </Pressable>
+        </View>
+
+        {isFullCalendarView ? (
+          <CalendarList
+            testID="full-calendar-list"
+            current={selectedDate}
+            pastScrollRange={12}
+            futureScrollRange={12}
+            scrollEnabled
+            showScrollIndicator={false}
+            onDayPress={(day) => onDayPress(day.dateString)}
+            onVisibleMonthsChange={(months) => { if (months?.[0]) onMonthChange(months[0]); }}
+            markedDates={markedDates}
+            theme={{
+              arrowColor: "#18A0FB",
+              todayTextColor: "#18A0FB",
+            }}
+          />
+        ) : (
+          <CalendarUI
+            testID="mock-calendar"
+            onDayPress={(day) => onDayPress(day.dateString)}
+            onMonthChange={onMonthChange}
+            markedDates={markedDates}
+            theme={{
+              arrowColor: "#18A0FB",
+              todayTextColor: "#18A0FB",
+            }}
+          />
+        )}
+      </View>
+
+      <Text style={styles.upcomingTitle}>Upcoming Events</Text>
+
+      <View style={styles.upcomingBox}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 140 }}>
+          {events.length === 0 ? (
+            <View style={styles.emptyWrap}>
+              <Text style={styles.emptyTitle}>No events for this day</Text>
+              <Text style={styles.emptySub}>Select another date to view events.</Text>
+            </View>
+          ) : (
+            events.map((event, index) => (
+              <CalendarEventRow
+                key={event.id}
+                event={event}
+                index={index}
+                selectedDate={selectedDate}
+                onGenerateDirections={onGenerateDirections}
+                onLocateRoom={onLocateRoom}
+              />
+            ))
+          )}
+        </ScrollView>
+      </View>
+
+      <SelectedCalsModal
+        visible={selectedCalsModalVisible}
+        chosenCalendars={chosenCalendars}
+        onClose={onCloseCalsModal}
+        onChange={onChangeCals}
+        onDisconnect={onDisconnect}
+      />
+    </View>
+  );
+}
+
+ConnectedCalendarPanel.propTypes = {
+  selectedDate: PropTypes.string.isRequired,
+  isFullCalendarView: PropTypes.bool.isRequired,
+  markedDates: PropTypes.object.isRequired,
+  events: PropTypes.arrayOf(calendarEventPropType).isRequired,
+  onDayPress: PropTypes.func.isRequired,
+  onMonthChange: PropTypes.func.isRequired,
+  onToggleView: PropTypes.func.isRequired,
+  onShowCalsModal: PropTypes.func.isRequired,
+  onGenerateDirections: PropTypes.func,
+  onLocateRoom: PropTypes.func,
+  selectedCalsModalVisible: PropTypes.bool.isRequired,
+  chosenCalendars: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      title: PropTypes.string,
+      color: PropTypes.string,
+    })
+  ).isRequired,
+  onCloseCalsModal: PropTypes.func.isRequired,
+  onChangeCals: PropTypes.func.isRequired,
+  onDisconnect: PropTypes.func.isRequired,
+};
+
+// --- Main component ---
+
 export default function CalendarPage({ onPressBack, onGenerateDirections, onLocateRoom }) {
   const [visible, setVisible] = useState(false);
   const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
@@ -366,7 +644,7 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
 
   useEffect(() => {
     console.log("CalendarPage events:", events.map(event => event.title));
-    // Turn each event’s location string into { building, room } for nav/routing later
+    // Turn each event's location string into { building, room } for nav/routing later
     const parsedLocations = events.map((e) => parseEventLocation(e.location));
     console.log("CalendarPage parsed locations:", parsedLocations);
   }, [events]);
@@ -385,6 +663,31 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
     }
   };
 
+  const handleSaveCals = async () => {
+    if (selectedCalendarIds.length > 0) {
+      try {
+        const idsToSave = selectedCalendarIds.map(String);
+        await AsyncStorage.setItem(SAVED_CALENDAR_IDS_KEY, JSON.stringify(idsToSave));
+      } catch (e) {
+        console.error("Error saving calendar IDs to storage:", e);
+      }
+    }
+    setIsCalendarsChosen(true);
+  };
+
+  const handleDisconnect = async () => {
+    setSelectedCalsModalVisible(false);
+    try {
+      await AsyncStorage.removeItem(SAVED_CALENDAR_IDS_KEY);
+    } catch (e) {
+      console.error("Failed to clear saved calendar IDs:", e);
+    }
+    setCalendars([]);
+    setSelectedCalendarIds([]);
+    setIsCalendarConnected(false);
+    setIsCalendarsChosen(false);
+  };
+
   const chosenCalendars = calendars.filter((c) => selectedCalendarIds.includes(c.id));
   const markedDates = {
     [selectedDate]: { selected: true, selectedColor: "#912338" },
@@ -400,229 +703,40 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
     );
   }
 
-  let calendarMainPanel;
-  if (isCalendarConnected) {
-    if (isCalendarsChosen) {
-      calendarMainPanel = (
-          <View style={styles.pageWrap}>
-            <View style={styles.calendarCard}>
-              <View style={styles.calendarTopRow}>
-                <Pressable
-                  style={styles.iconBtn}
-                  onPress={() => setSelectedCalsModalVisible(true)}
-                  accessibilityLabel="Selected calendars"
-                >
-                  <Ionicons name="menu" size={18} color="#555" />
-                </Pressable>
-
-                <Pressable
-                  style={styles.iconBtn}
-                  onPress={() => setIsFullCalendarView((v) => !v)}
-                  accessibilityLabel="Toggle full calendar view"
-                >
-                  <Ionicons
-                    name={isFullCalendarView ? "contract-outline" : "calendar-outline"}
-                    size={18}
-                    color="#555"
-                  />
-                </Pressable>
-              </View>
-
-              {isFullCalendarView ? (
-                <CalendarList
-                  testID="full-calendar-list"
-                  current={selectedDate}
-                  pastScrollRange={12}
-                  futureScrollRange={12}
-                  scrollEnabled
-                  showScrollIndicator={false}
-                  onDayPress={(day) => getEventsForDay(day.dateString)}
-                  onVisibleMonthsChange={(months) => { if (months?.[0]) handleMonthChange(months[0]); }}
-                  markedDates={markedDates}
-                  theme={{
-                    arrowColor: "#18A0FB",
-                    todayTextColor: "#18A0FB",
-                  }}
-                />
-              ) : (
-                <CalendarUI
-                  testID="mock-calendar"
-                  onDayPress={(day) => getEventsForDay(day.dateString)}
-                  onMonthChange={handleMonthChange}
-                  markedDates={markedDates}
-                  theme={{
-                    arrowColor: "#18A0FB",
-                    todayTextColor: "#18A0FB",
-                  }}
-                />
-              )}
-            </View>
-
-            <Text style={styles.upcomingTitle}>Upcoming Events</Text>
-
-            <View style={styles.upcomingBox}>
-              <ScrollView showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: 140 }}>
-                {events.length === 0 ? (
-                  <View style={styles.emptyWrap}>
-                    <Text style={styles.emptyTitle}>No events for this day</Text>
-                    <Text style={styles.emptySub}>Select another date to view events.</Text>
-                  </View>
-                ) : (
-                  events.map((event, index) => (
-                    <CalendarEventRow
-                      key={event.id}
-                      event={event}
-                      index={index}
-                      selectedDate={selectedDate}
-                      onGenerateDirections={onGenerateDirections}
-                      onLocateRoom={onLocateRoom}
-                    />
-                  ))
-                )}
-              </ScrollView>
-            </View>
-
-            <Modal
-              testID="selectedCalsModal"
-              transparent
-              visible={selectedCalsModalVisible}
-              animationType="fade"
-              onRequestClose={() => setSelectedCalsModalVisible(false)}
-            >
-              <Pressable
-                testID="selectedCalsOverlay"
-                style={styles.modalOverlay}
-                onPress={() => setSelectedCalsModalVisible(false)}
-              >
-                <Pressable
-                  testID="selectedCalsContent"
-                  style={styles.selectedCalsModal}
-                  onPress={() => { }}
-                >
-                  <View style={styles.selectedCalsHeader}>
-                    <Text style={styles.selectedCalsTitle} testID="selectedCalendarsModalTitle">Selected Calendars</Text>
-
-                    <Pressable
-                      testID="selectedCalsCloseBtn"
-                      onPress={() => setSelectedCalsModalVisible(false)}
-                    >
-                      <Ionicons name="close" size={20} color="#333" />
-                    </Pressable>
-                  </View>
-
-                  <ScrollView
-                    style={styles.selectedCalsList}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {chosenCalendars.length === 0 ? (
-                      <Text style={styles.selectedCalsEmpty}>
-                        No calendars selected. Tap "Change" to choose calendars.
-                      </Text>
-                    ) : (
-                      chosenCalendars.map((cal) => (
-                        <View key={cal.id} style={styles.calRow}>
-                          <View
-                            style={[
-                              styles.colorDot,
-                              { backgroundColor: cal.color || "#912338" },
-                            ]}
-                          />
-                          <Text style={styles.calName} numberOfLines={1}>
-                            {cal.title}
-                          </Text>
-                        </View>
-                      ))
-                    )}
-                  </ScrollView>
-
-                  <View style={styles.modalActions}>
-                    <Pressable
-                      testID="selectedCalsChangeBtn"
-                      style={styles.changeBtn}
-                      onPress={() => {
-                        setSelectedCalsModalVisible(false);
-                        setIsCalendarsChosen(false);
-                      }}
-                    >
-                      <Text style={styles.changeBtnTxt}>Change</Text>
-                    </Pressable>
-                    <Pressable
-                      testID="selectedCalsDisconnectBtn"
-                      style={styles.disconnectBtn}
-                      onPress={async () => {
-                        setSelectedCalsModalVisible(false);
-                        try {
-                          await AsyncStorage.removeItem(SAVED_CALENDAR_IDS_KEY);
-                        } catch (e) {
-                          console.error("Failed to clear saved calendar IDs:", e);
-                        }
-                        setCalendars([]);
-                        setSelectedCalendarIds([]);
-                        setIsCalendarConnected(false);
-                        setIsCalendarsChosen(false);
-                      }}
-                    >
-                      <Text style={styles.disconnectBtnTxt}>Disconnect</Text>
-                    </Pressable>
-                  </View>
-                </Pressable>
-              </Pressable>
-            </Modal>
-          </View>
-      );
-    } else {
-      calendarMainPanel = (
-          <>
-            <View style={styles.titleView}>
-              <Text style={styles.txtTitle}> Extracting Calendars</Text>
-            </View>
-
-            <View style={styles.selectCalView}>
-              <Text style={styles.txtSelectCal}>Select Desired Calendars to Extract</Text>
-
-              {calendars.map((calendar) => (
-                <View key={calendar.id} style={styles.checkboxRow}>
-                  <Checkbox
-                    testID={`checkbox-${calendar.id}`}
-                    value={selectedCalendarIds.includes(calendar.id)}
-                    onValueChange={() => toggleCalendar(calendar.id)}
-                    color={calendar.color}
-                  />
-                  <Text style={styles.checkboxLabel}>{calendar.title}</Text>
-                </View>
-              ))}
-
-              <Pressable
-                style={styles.saveBtn}
-                onPress={async () => {
-                  if (selectedCalendarIds.length > 0) {
-                    try {
-                      const idsToSave = selectedCalendarIds.map(String);
-                      await AsyncStorage.setItem(
-                        SAVED_CALENDAR_IDS_KEY,
-                        JSON.stringify(idsToSave)
-                      );
-                    } catch (e) {
-                      console.error("Error saving calendar IDs to storage:", e);
-                    }
-                  }
-                  setIsCalendarsChosen(true);
-                }}
-              >
-                <Text testID="saveBtn" style={styles.btnTxt}>
-                  Done
-                </Text>
-              </Pressable>
-            </View>
-          </>
+  const renderMainPanel = () => {
+    if (!isCalendarConnected) {
+      return <NotConnectedCalendarPlaceholder isRestoring={isRestoring} />;
+    }
+    if (!isCalendarsChosen) {
+      return (
+        <CalendarSelectionPanel
+          calendars={calendars}
+          selectedCalendarIds={selectedCalendarIds}
+          onToggle={toggleCalendar}
+          onDone={handleSaveCals}
+        />
       );
     }
-  } else {
-    calendarMainPanel = (
-        <NotConnectedCalendarPlaceholder isRestoring={isRestoring} />
+    return (
+      <ConnectedCalendarPanel
+        selectedDate={selectedDate}
+        isFullCalendarView={isFullCalendarView}
+        markedDates={markedDates}
+        events={events}
+        onDayPress={getEventsForDay}
+        onMonthChange={handleMonthChange}
+        onToggleView={() => setIsFullCalendarView((v) => !v)}
+        onShowCalsModal={() => setSelectedCalsModalVisible(true)}
+        onGenerateDirections={onGenerateDirections}
+        onLocateRoom={onLocateRoom}
+        selectedCalsModalVisible={selectedCalsModalVisible}
+        chosenCalendars={chosenCalendars}
+        onCloseCalsModal={() => setSelectedCalsModalVisible(false)}
+        onChangeCals={() => { setSelectedCalsModalVisible(false); setIsCalendarsChosen(false); }}
+        onDisconnect={handleDisconnect}
+      />
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -638,50 +752,22 @@ export default function CalendarPage({ onPressBack, onGenerateDirections, onLoca
         <Ionicons name="arrow-up" size={26} color="white" />
       </Pressable>
 
-      {calendarMainPanel}
+      {renderMainPanel()}
 
-      <Modal transparent visible={visible} animationType="none">
-        <View style={styles.overlay}>
-          <Animated.View
-            testID="bottom-sheet-view"
-            style={[styles.sheet, { transform: [{ translateY }] }]}
-            {...panResponder.panHandlers}
-          >
-            <View style={styles.handle} />
-
-            <Pressable
-              testID="closeModalBtn"
-              style={styles.closeBtn}
-              onPress={() => setVisible(false)}
-            >
-              <Ionicons name="close" size={26} color="black" />
-            </Pressable>
-
-            <Pressable testID="calBtn" style={styles.googleCalBtn} onPress={getCalendars}>
-              <Text style={styles.btnTxt}>Connect to Google Calendar</Text>
-            </Pressable>
-
-            <Pressable
-              testID="manualAddBtn"
-              style={styles.manualBtn}
-              onPress={() => {
-                close();
-                setShowAddEvent(true);
-              }}
-            >
-              <Text style={styles.btnTxt}>Manually Add Events</Text>
-            </Pressable>
-          </Animated.View>
-        </View>
-      </Modal>
+      <BottomSheetModal
+        visible={visible}
+        translateY={translateY}
+        panResponder={panResponder}
+        onClose={() => setVisible(false)}
+        onConnect={getCalendars}
+        onManualAdd={() => { close(); setShowAddEvent(true); }}
+      />
     </View>
   );
 }
 
 CalendarPage.propTypes = {
   onPressBack: PropTypes.func.isRequired,
-  onPressCalendar: PropTypes.func,
-  title: PropTypes.string,
   onGenerateDirections: PropTypes.func,
   onLocateRoom: PropTypes.func,
 };

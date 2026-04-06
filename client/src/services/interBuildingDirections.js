@@ -17,7 +17,17 @@ function hasIndoorFloorPlans(campus, buildingCode) {
 function blank(v) {
   return v == null || (typeof v === "string" && v.trim() === "");
 }
-
+function getWaypointLine(typeLow, floorChanged, floor) {
+  if (typeLow === "elevator") {
+    return floorChanged ? `Take the elevator to floor ${floor}.` : "Walk to the elevator.";
+  }
+  if (typeLow === "staircase") {
+    return floorChanged ? `Take the stairs to floor ${floor}.` : "Walk to the stairs.";
+  }
+  if (floorChanged) return `Continue to floor ${floor}.`;
+  if (typeLow === "exit") return "Go through the exit.";
+  return null;
+}
 /** Turn indoor graph path into short instruction lines. */
 export function formatIndoorPathSteps(path) {
   if (!path?.length) return [];
@@ -34,28 +44,13 @@ export function formatIndoorPathSteps(path) {
       continue;
     }
 
-    if (typeLow === "elevator") {
-      if (floorChanged) {
-        lines.push(`Take the elevator to floor ${wp.floor}.`);
-      } else {
-        lines.push("Walk to the elevator.");
-      }
-    } else if (typeLow === "staircase") {
-      if (floorChanged) {
-        lines.push(`Take the stairs to floor ${wp.floor}.`);
-      } else {
-        lines.push("Walk to the stairs.");
-      }
-    } else if (floorChanged) {
-      lines.push(`Continue to floor ${wp.floor}.`);
-    } else if (typeLow === "exit") {
-      lines.push("Go through the exit.");
-    }
+    const line = getWaypointLine(typeLow, floorChanged, wp.floor);
+    if (line && line !== lines.at(-1)) lines.push(line);
 
     if (floorChanged) prevFloor = wp.floor;
   }
 
-  return lines.filter((line, idx) => idx === 0 || line !== lines[idx - 1]);
+  return lines;
 }
 
 function computeApproxIndoorMeters(path) {
@@ -98,7 +93,7 @@ function buildIndoorNarrative({ path, buildingCode, startRoom, endRoom, endFloor
   for (const line of core) {
     // Skip "Start on floor X" when the start room already gives that context.
     if (startRoom && line.startsWith("Start on floor")) continue;
-    const m = line.match(FLOOR_CHANGE_RE);
+    const m = FLOOR_CHANGE_RE.exec(line);
     push(line, m ? m[1] : null);
   }
 
