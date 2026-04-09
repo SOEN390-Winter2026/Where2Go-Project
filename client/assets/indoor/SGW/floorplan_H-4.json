@@ -1,10 +1,4 @@
 {
-  "CC3": {
-    "floor": "CC3",
-    "building": "Hall",
-    "rooms": [],
-    "waypoints": []
-  },
   "H-4": {
     "floor": "H-4",
     "building": "Hall",
@@ -13,7 +7,7 @@
         "id": "H-431",
         "label": "Lecture hall",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "H-4",
         "bounds": {
           "x": 0.0346,
           "y": 0.0425,
@@ -25,7 +19,7 @@
         "id": "H-429",
         "label": "Lecture Hall",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.0328,
@@ -38,7 +32,7 @@
         "id": "H-423",
         "label": "Lecture Room",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.0286,
@@ -51,7 +45,7 @@
         "id": "H-421",
         "label": "Lecture Room",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.0349,
@@ -64,7 +58,7 @@
         "id": "H-435",
         "label": "Lecture Hall",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2015,
@@ -77,7 +71,7 @@
         "id": "H-411",
         "label": "Lecture Hall",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2015,
@@ -90,7 +84,7 @@
         "id": "H-485",
         "label": "H-485",
         "type": "staircase",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "nearestWaypoint": "wp74_H49",
         "bounds": {
@@ -104,7 +98,7 @@
         "id": "H-420",
         "label": "Lecture Hall",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2532,
@@ -117,7 +111,7 @@
         "id": "H-407",
         "label": "H-407",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.4948,
@@ -130,7 +124,7 @@
         "id": "H-405",
         "label": "H-405",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.6232,
@@ -143,7 +137,7 @@
         "id": "H-412-T1",
         "label": "Bathroom",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.3282,
@@ -156,7 +150,7 @@
         "id": "H-406-T2",
         "label": "Bathroom",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5545,
@@ -169,7 +163,7 @@
         "id": "H-498",
         "label": "H-498",
         "type": "staircase",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.6961,
@@ -182,7 +176,7 @@
         "id": "H-406.8",
         "label": "bathroom",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.4906,
@@ -195,7 +189,7 @@
         "id": "H-406.06",
         "label": "Bathroom",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5108,
@@ -208,7 +202,7 @@
         "id": "H-406.04",
         "label": "Bathroom",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5364,
@@ -221,7 +215,7 @@
         "id": "H-409",
         "label": "Study area/Lounge",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.4122,
@@ -234,7 +228,7 @@
         "id": "H-499.42",
         "label": "Entrance",
         "type": "exit",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.4974,
@@ -247,7 +241,7 @@
         "id": "H-459.06",
         "label": "H-459.06",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7441,
@@ -260,7 +254,7 @@
         "id": "H-459.04",
         "label": "H-459.04",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7854,
@@ -273,7 +267,7 @@
         "id": "H-459.02",
         "label": "H-459.02",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8267,
@@ -286,7 +280,7 @@
         "id": "H-499.41",
         "label": "H-499.41",
         "type": "exit",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.4875,
@@ -299,7 +293,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.1552,
@@ -312,7 +306,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2013,
@@ -325,7 +319,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.1993,
@@ -338,7 +332,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.4218,
@@ -351,7 +345,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7907,
@@ -364,7 +358,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.48,
@@ -377,7 +371,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5621,
@@ -390,7 +384,7 @@
         "id": "H-439",
         "label": "Lounge/Study area",
         "type": "other",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7526,
@@ -403,7 +397,7 @@
         "id": "H-439.14",
         "label": "H-439.14",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7847,
@@ -416,7 +410,7 @@
         "id": "H-438.16",
         "label": "H-438.16",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8308,
@@ -429,7 +423,7 @@
         "id": "H-439.18",
         "label": "H-439.18",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8809,
@@ -442,7 +436,7 @@
         "id": "H-455.01",
         "label": "H-455.01",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8228,
@@ -455,7 +449,7 @@
         "id": "H-455.03",
         "label": "H-455.03",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.901,
@@ -468,7 +462,7 @@
         "id": "H-455.04",
         "label": "H-455.04",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8168,
@@ -481,7 +475,7 @@
         "id": "H-455.08",
         "label": "H-455.08",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8248,
@@ -494,7 +488,7 @@
         "id": "H-455.10",
         "label": "H-455.10",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8268,
@@ -507,7 +501,7 @@
         "id": "H-455.16",
         "label": "H-455.16",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8288,
@@ -520,7 +514,7 @@
         "id": "H-455.12",
         "label": "H-455.12",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8228,
@@ -533,7 +527,7 @@
         "id": "H-455.18",
         "label": "H-455.18",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8308,
@@ -546,7 +540,7 @@
         "id": "H-455.20",
         "label": "H-455.20",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8328,
@@ -559,7 +553,7 @@
         "id": "H-455.22",
         "label": "H-455.22",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8248,
@@ -572,7 +566,7 @@
         "id": "H-459.00",
         "label": "H-459.00",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8228,
@@ -585,7 +579,7 @@
         "id": "H-442",
         "label": "H-442",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5581,
@@ -598,7 +592,7 @@
         "id": "H-448",
         "label": "H-448",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5501,
@@ -611,7 +605,7 @@
         "id": "Elevator",
         "label": "Elevator",
         "type": "elevator",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.6183,
@@ -624,7 +618,7 @@
         "id": "H-436",
         "label": "H-436",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2113,
@@ -637,7 +631,7 @@
         "id": "H-424",
         "label": "H-424",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2133,
@@ -650,7 +644,7 @@
         "id": "H-422",
         "label": "H-422",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2133,
@@ -663,7 +657,7 @@
         "id": "H-418",
         "label": "H-418",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2113,
@@ -676,7 +670,7 @@
         "id": "H-408",
         "label": "H-408",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5,
@@ -689,7 +683,7 @@
         "id": "H-499",
         "label": "H-499",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.5484,
@@ -702,7 +696,7 @@
         "id": "Elevator",
         "label": "Elevator",
         "type": "elevator",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7188,
@@ -715,7 +709,7 @@
         "id": "h-447",
         "label": "h-447",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7137,
@@ -728,7 +722,7 @@
         "id": "h-449",
         "label": "h-449",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7604,
@@ -741,7 +735,7 @@
         "id": "H-445",
         "label": "H-445",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.6903,
@@ -754,7 +748,7 @@
         "id": "H-443",
         "label": "H-443",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.6669,
@@ -767,7 +761,7 @@
         "id": "H-477",
         "label": "H-477",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.6419,
@@ -780,7 +774,7 @@
         "id": "H-439.20",
         "label": "H-439.20",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8245,
@@ -793,7 +787,7 @@
         "id": "H-439.12",
         "label": "H-439.12",
         "type": "classroom",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7861,
@@ -806,7 +800,7 @@
         "id": "H-488",
         "label": "H-488",
         "type": "staircase",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.2758,
@@ -819,7 +813,7 @@
         "id": "H-455",
         "label": "H-455",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8166,
@@ -832,7 +826,7 @@
         "id": "H-455",
         "label": "H-455",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.8737,
@@ -845,7 +839,7 @@
         "id": "H-455",
         "label": "H-455",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "building": "Hall",
         "bounds": {
           "x": 0.7439,
@@ -858,7 +852,7 @@
         "id": "H-445",
         "label": "H-445",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "bounds": {
           "x": 0.9275,
           "y": 0.134,
@@ -870,12 +864,24 @@
         "id": "Halway",
         "label": "Halway",
         "type": "hallway",
-        "floor": "H4",
+        "floor": "H-4",
         "bounds": {
           "x": 0.7489,
           "y": 0.1332,
           "w": 0.1771,
           "h": 0.0119
+        }
+      },
+      {
+        "id": "escalator",
+        "label": "escalator",
+        "type": "escalator",
+        "floor": "H-4",
+        "bounds": {
+          "x": 0.4903,
+          "y": 0.372,
+          "w": 0.0548,
+          "h": 0.2841
         }
       }
     ],
@@ -883,7 +889,7 @@
       {
         "id": "wp1_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2136,
           "y": 0.253
@@ -895,7 +901,7 @@
       {
         "id": "wp2_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2526,
           "y": 0.3671
@@ -905,7 +911,7 @@
       {
         "id": "wp3_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2115,
           "y": 0.5377
@@ -917,7 +923,7 @@
       {
         "id": "wp4_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2137,
           "y": 0.5653
@@ -929,7 +935,7 @@
       {
         "id": "wp5_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.1457,
           "y": 0.253
@@ -941,7 +947,7 @@
       {
         "id": "wp6_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.1391,
           "y": 0.4872
@@ -953,7 +959,7 @@
       {
         "id": "wp7_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.1413,
           "y": 0.7202
@@ -965,7 +971,7 @@
       {
         "id": "wp8_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.1418,
           "y": 0.7496
@@ -977,7 +983,7 @@
       {
         "id": "wp9_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2139,
           "y": 0.8306
@@ -989,7 +995,7 @@
       {
         "id": "wp10_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.5144,
           "y": 0.8489
@@ -1001,7 +1007,7 @@
       {
         "id": "wp11_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7308,
           "y": 0.8568
@@ -1013,7 +1019,7 @@
       {
         "id": "wp12_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7933,
           "y": 0.8594
@@ -1025,7 +1031,7 @@
       {
         "id": "wp13_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7524,
           "y": 0.8672
@@ -1037,7 +1043,7 @@
       {
         "id": "wp14_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8654,
           "y": 0.8332
@@ -1049,7 +1055,7 @@
       {
         "id": "wp15_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8558,
           "y": 0.6294
@@ -1059,7 +1065,7 @@
       {
         "id": "wp16_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8678,
           "y": 0.6686
@@ -1071,7 +1077,7 @@
       {
         "id": "wp17_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.863,
           "y": 0.747
@@ -1083,7 +1089,7 @@
       {
         "id": "wp18_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.863,
           "y": 0.7888
@@ -1095,7 +1101,7 @@
       {
         "id": "wp19_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8558,
           "y": 0.5405
@@ -1107,7 +1113,7 @@
       {
         "id": "wp20_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8582,
           "y": 0.5719
@@ -1119,7 +1125,7 @@
       {
         "id": "wp21_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.863,
           "y": 0.3863
@@ -1131,7 +1137,7 @@
       {
         "id": "wp22_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8678,
           "y": 0.3314
@@ -1143,7 +1149,7 @@
       {
         "id": "wp23_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.9038,
           "y": 0.334
@@ -1155,7 +1161,7 @@
       {
         "id": "wp24_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7885,
           "y": 0.1459
@@ -1167,7 +1173,7 @@
       {
         "id": "wp25_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8341,
           "y": 0.1485
@@ -1179,7 +1185,7 @@
       {
         "id": "wp26_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8822,
           "y": 0.1485
@@ -1191,7 +1197,7 @@
       {
         "id": "wp27_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.9183,
           "y": 0.206
@@ -1203,7 +1209,7 @@
       {
         "id": "wp28_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7788,
           "y": 0.2007
@@ -1213,7 +1219,7 @@
       {
         "id": "wp29_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7643,
           "y": 0.3329
@@ -1225,7 +1231,7 @@
       {
         "id": "wp30_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7309,
           "y": 0.3314
@@ -1237,7 +1243,7 @@
       {
         "id": "wp31_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.6739,
           "y": 0.3344
@@ -1249,7 +1255,7 @@
       {
         "id": "wp32_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7031,
           "y": 0.3329
@@ -1261,7 +1267,7 @@
       {
         "id": "wp33_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.6488,
           "y": 0.3298
@@ -1273,7 +1279,7 @@
       {
         "id": "wp34_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4875,
           "y": 0.6686
@@ -1285,7 +1291,7 @@
       {
         "id": "wp35_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.493,
           "y": 0.3419
@@ -1297,7 +1303,7 @@
       {
         "id": "wp36_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.6071,
           "y": 0.767
@@ -1309,7 +1315,7 @@
       {
         "id": "wp38_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.543,
           "y": 0.774
@@ -1321,7 +1327,7 @@
       {
         "id": "wp39_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.52,
           "y": 0.7722
@@ -1333,7 +1339,7 @@
       {
         "id": "wp40_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.5019,
           "y": 0.774
@@ -1345,7 +1351,7 @@
       {
         "id": "wp41_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4995,
           "y": 0.7052
@@ -1357,7 +1363,7 @@
       {
         "id": "wp42_H4",
         "type": "door",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4756,
           "y": 0.8294
@@ -1369,7 +1375,7 @@
       {
         "id": "wp43_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.193,
           "y": 0.3377
@@ -1387,7 +1393,7 @@
       {
         "id": "wp44_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2059,
           "y": 0.3386
@@ -1401,7 +1407,7 @@
       {
         "id": "wp45_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.1883,
           "y": 0.8024
@@ -1415,7 +1421,7 @@
       {
         "id": "wp46_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2099,
           "y": 0.8024
@@ -1429,7 +1435,7 @@
       {
         "id": "wp47_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4139,
           "y": 0.3417
@@ -1443,7 +1449,7 @@
       {
         "id": "wp48_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.432,
           "y": 0.3443
@@ -1460,7 +1466,7 @@
       {
         "id": "wp49_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4454,
           "y": 0.759
@@ -1473,7 +1479,7 @@
       {
         "id": "wp50_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4454,
           "y": 0.7856
@@ -1496,7 +1502,7 @@
       {
         "id": "wp51_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4718,
           "y": 0.2987
@@ -1509,7 +1515,7 @@
       {
         "id": "wp52_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.4963,
           "y": 0.2987
@@ -1522,7 +1528,7 @@
       {
         "id": "wp53_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.5878,
           "y": 0.3147
@@ -1535,7 +1541,7 @@
       {
         "id": "wp54_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.5914,
           "y": 0.3466
@@ -1553,7 +1559,7 @@
       {
         "id": "wp55_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7845,
           "y": 0.3496
@@ -1566,7 +1572,7 @@
       {
         "id": "wp56_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7962,
           "y": 0.3469
@@ -1580,7 +1586,7 @@
       {
         "id": "wp57_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7786,
           "y": 0.6166
@@ -1594,7 +1600,7 @@
       {
         "id": "wp58_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7903,
           "y": 0.6139
@@ -1606,7 +1612,7 @@
       {
         "id": "wp59_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8019,
           "y": 0.788
@@ -1619,7 +1625,7 @@
       {
         "id": "wp60_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7967,
           "y": 0.7577
@@ -1631,7 +1637,7 @@
       {
         "id": "wp61_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7636,
           "y": 0.2766
@@ -1641,7 +1647,7 @@
       {
         "id": "wp62_H4",
         "type": "elevator",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.6573,
           "y": 0.6441
@@ -1653,7 +1659,7 @@
       {
         "id": "wp63_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.3681,
           "y": 0.7483
@@ -1665,7 +1671,7 @@
       {
         "id": "wp64_H4",
         "type": "staircase",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.2984,
           "y": 0.7596
@@ -1677,7 +1683,7 @@
       {
         "id": "wp65_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8287,
           "y": 0.349
@@ -1691,7 +1697,7 @@
       {
         "id": "wp66_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.808,
           "y": 0.3585
@@ -1704,7 +1710,7 @@
       {
         "id": "wp67_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.9086,
           "y": 0.363
@@ -1720,7 +1726,7 @@
       {
         "id": "wp68_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.9197,
           "y": 0.3818
@@ -1738,7 +1744,7 @@
       {
         "id": "wp69_H4",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8619,
           "y": 0.925
@@ -1751,7 +1757,7 @@
       {
         "id": "wp71_H41",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.8035,
           "y": 0.3172
@@ -1763,7 +1769,7 @@
       {
         "id": "wp72_H4",
         "type": "staircase",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7153,
           "y": 0.6726
@@ -1775,7 +1781,7 @@
       {
         "id": "wp73_H44",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.9392,
           "y": 0.3291
@@ -1789,7 +1795,7 @@
       {
         "id": "wp74_H45",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.9369,
           "y": 0.1408
@@ -1804,7 +1810,7 @@
       {
         "id": "wp75_H46",
         "type": "corridor",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.7652,
           "y": 0.1366
@@ -1817,7 +1823,7 @@
       {
         "id": "wp74_H49",
         "type": "staircase",
-        "floor": "H4",
+        "floor": "H-4",
         "position": {
           "x": 0.3323,
           "y": 0.3082

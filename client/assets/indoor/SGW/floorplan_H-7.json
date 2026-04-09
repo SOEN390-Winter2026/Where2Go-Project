@@ -1,12 +1,7 @@
 {
-  "H": {
-    "floor": "H-7",
-    "building": "Hall",
-    "rooms": [],
-    "waypoints": []
-  },
   "H-7": {
     "floor": "H-7",
+    "building": "Hall",
     "rooms": [
       {
         "id": "H-7",
@@ -486,6 +481,19 @@
           "y": 0.4687,
           "w": 0.1949,
           "h": 0.0742
+        }
+      },
+      {
+        "id": "escalator",
+        "label": "escalator",
+        "type": "escalator",
+        "floor": "H-7",
+        "building": "Hall",
+        "bounds": {
+          "x": 0.4556,
+          "y": 0.4245,
+          "w": 0.0573,
+          "h": 0.1734
         }
       }
     ],

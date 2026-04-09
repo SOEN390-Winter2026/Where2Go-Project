@@ -1,20 +1,8 @@
 {
   "H-1": {
     "floor": "H-1",
+    "building": "Hall",
     "rooms": [
-      {
-        "id": "H-120",
-        "label": "H-120",
-        "type": "classroom",
-        "floor": "H-1",
-        "nearestWaypoint": "wp7_H-1",
-        "bounds": {
-          "x": 0.4837,
-          "y": 0.2304,
-          "w": 0.1266,
-          "h": 0.0606
-        }
-      },
       {
         "id": "H-122",
         "label": "H-122",
@@ -68,9 +56,9 @@
         }
       },
       {
-        "id": "H-196",
-        "label": "H-196",
-        "type": "elevator",
+        "id": "escalator",
+        "label": "escalator",
+        "type": "escalator",
         "floor": "H-1",
         "bounds": {
           "x": 0.5599,
@@ -222,18 +210,6 @@
         }
       },
       {
-        "id": "H-120",
-        "label": "H-120",
-        "type": "elevator",
-        "floor": "H-1",
-        "bounds": {
-          "x": 0.6089,
-          "y": 0.6197,
-          "w": 0.0599,
-          "h": 0.0367
-        }
-      },
-      {
         "id": "H-198",
         "label": "H-198",
         "type": "staircase",
@@ -244,6 +220,19 @@
           "y": 0.4666,
           "w": 0.0225,
           "h": 0.1264
+        }
+      },
+      {
+        "id": "elevator",
+        "label": "elevator",
+        "type": "elevator",
+        "floor": "H-1",
+        "nearestWaypoint": "wp16_H-1",
+        "bounds": {
+          "x": 0.6105,
+          "y": 0.6266,
+          "w": 0.0581,
+          "h": 0.0284
         }
       }
     ],
