@@ -3,311 +3,6 @@
     "floor": "VEVL3",
     "rooms": [
       {
-        "id": "VEVL-331-3",
-        "label": "VEVL-331-3",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2403,
-          "y": 0.038,
-          "w": 0.0425,
-          "h": 0.0411
-        }
-      },
-      {
-        "id": "VEVL-331-4",
-        "label": "VEVL-331-4",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2419,
-          "y": 0.0773,
-          "w": 0.027,
-          "h": 0.0525
-        }
-      },
-      {
-        "id": "VEVL-331-2",
-        "label": "VEVL-331-2",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2809,
-          "y": 0.0397,
-          "w": 0.0419,
-          "h": 0.0381
-        }
-      },
-      {
-        "id": "VEVL-331-1",
-        "label": "VEVL-331-1",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2955,
-          "y": 0.0773,
-          "w": 0.0279,
-          "h": 0.0546
-        }
-      },
-      {
-        "id": "VEVL-331",
-        "label": "VEVL-331",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp1_VEVL3",
-        "bounds": {
-          "x": 0.2689,
-          "y": 0.0769,
-          "w": 0.0267,
-          "h": 0.055
-        }
-      },
-      {
-        "id": "VEVL-329-2",
-        "label": "VEVL-329-2",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.3244,
-          "y": 0.0401,
-          "w": 0.0394,
-          "h": 0.0559
-        }
-      },
-      {
-        "id": "VEVL-329-1",
-        "label": "VEVL-329-1",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.3238,
-          "y": 0.0955,
-          "w": 0.04,
-          "h": 0.036
-        }
-      },
-      {
-        "id": "VEVL-329-3",
-        "label": "VEVL-329-3",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.3632,
-          "y": 0.0409,
-          "w": 0.0406,
-          "h": 0.0389
-        }
-      },
-      {
-        "id": "VEVL-327",
-        "label": "VEVL-327",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp11_VEVL3",
-        "bounds": {
-          "x": 0.3778,
-          "y": 0.079,
-          "w": 0.0264,
-          "h": 0.0542
-        }
-      },
-      {
-        "id": "VEVL-329",
-        "label": "VEVL-329",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp10_VEVL3",
-        "bounds": {
-          "x": 0.3638,
-          "y": 0.0799,
-          "w": 0.0143,
-          "h": 0.0529
-        }
-      },
-      {
-        "id": "VEVL-325-4",
-        "label": "VEVL-325-4",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.4038,
-          "y": 0.0795,
-          "w": 0.0267,
-          "h": 0.0533
-        }
-      },
-      {
-        "id": "VEVL-325-2",
-        "label": "VEVL-325-2",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.4444,
-          "y": 0.0418,
-          "w": 0.0406,
-          "h": 0.0394
-        }
-      },
-      {
-        "id": "VEVL-325-1",
-        "label": "VEVL-325-1",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.4587,
-          "y": 0.0807,
-          "w": 0.026,
-          "h": 0.0538
-        }
-      },
-      {
-        "id": "VEVL-325",
-        "label": "VEVL-325",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp12_VEVL3",
-        "bounds": {
-          "x": 0.4311,
-          "y": 0.0795,
-          "w": 0.0283,
-          "h": 0.0546
-        }
-      },
-      {
-        "id": "VEVL-323-4",
-        "label": "VEVL-323-4",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.4851,
-          "y": 0.0414,
-          "w": 0.041,
-          "h": 0.0567
-        }
-      },
-      {
-        "id": "VEVL-323-5",
-        "label": "VEVL-323-5",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.4854,
-          "y": 0.0985,
-          "w": 0.0416,
-          "h": 0.0364
-        }
-      },
-      {
-        "id": "VEVL-323-3",
-        "label": "VEVL-323-3",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.526,
-          "y": 0.0426,
-          "w": 0.0413,
-          "h": 0.0377
-        }
-      },
-      {
-        "id": "VEVL-323-2",
-        "label": "VEVL-323-2",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.5667,
-          "y": 0.0426,
-          "w": 0.0406,
-          "h": 0.0555
-        }
-      },
-      {
-        "id": "VEVL-323-1",
-        "label": "VEVL-323-1",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.5679,
-          "y": 0.0981,
-          "w": 0.0394,
-          "h": 0.0368
-        }
-      },
-      {
-        "id": "VEVL-323",
-        "label": "VEVL-323",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp16_VEVL3",
-        "bounds": {
-          "x": 0.5273,
-          "y": 0.0795,
-          "w": 0.039,
-          "h": 0.0559
-        }
-      },
-      {
-        "id": "VEVL-321-2",
-        "label": "VEVL-321-2",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.6079,
-          "y": 0.0426,
-          "w": 0.0415,
-          "h": 0.0381
-        }
-      },
-      {
-        "id": "VEVL-321-1",
-        "label": "VEVL-321-1",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.6071,
-          "y": 0.0817,
-          "w": 0.0286,
-          "h": 0.0539
-        }
-      },
-      {
-        "id": "VEVL-321",
-        "label": "VEVL-321",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp17_VEVL3",
-        "bounds": {
-          "x": 0.6353,
-          "y": 0.0812,
-          "w": 0.0137,
-          "h": 0.0549
-        }
-      },
-      {
         "id": "VEVL-319",
         "label": "VEVL-319",
         "type": "classroom",
@@ -394,10 +89,10 @@
       {
         "id": "VEVL-392",
         "label": "VEVL-392",
-        "type": "classroom",
+        "type": "staircase",
         "floor": "VEVL3",
         "building": "VEVL",
-        "nearestWaypoint": "wp28_VEVL3",
+        "nearestWaypoint": "wp99_VEVL3",
         "bounds": {
           "x": 0.4855,
           "y": 0.1605,
@@ -417,48 +112,6 @@
           "y": 0.1635,
           "w": 0.0393,
           "h": 0.0259
-        }
-      },
-      {
-        "id": "VEVL-328",
-        "label": "VEVL-328",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp9_VEVL3",
-        "bounds": {
-          "x": 0.3514,
-          "y": 0.1681,
-          "w": 0.0945,
-          "h": 0.156
-        }
-      },
-      {
-        "id": "VEVL-328-1",
-        "label": "VEVL-328-1",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp4_VEVL3",
-        "bounds": {
-          "x": 0.2976,
-          "y": 0.1625,
-          "w": 0.0541,
-          "h": 0.0798
-        }
-      },
-      {
-        "id": "VEVL-328-2",
-        "label": "VEVL-328-2",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp6_VEVL3",
-        "bounds": {
-          "x": 0.2984,
-          "y": 0.2413,
-          "w": 0.0526,
-          "h": 0.0818
         }
       },
       {
@@ -798,20 +451,6 @@
         }
       },
       {
-        "id": "VEVL-340",
-        "label": "VEVL-340",
-        "type": "classroom",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "nearestWaypoint": "wp75_VEVL3",
-        "bounds": {
-          "x": 0.6944,
-          "y": 0.7083,
-          "w": 0.0431,
-          "h": 0.0808
-        }
-      },
-      {
         "id": "VEVL-staircase1",
         "label": "VEVL-staircase1",
         "type": "staircase",
@@ -940,7 +579,7 @@
       {
         "id": "VEVL-393",
         "label": "VEVL-393",
-        "type": "classroom",
+        "type": "staircase",
         "floor": "VEVL3",
         "building": "VEVL",
         "nearestWaypoint": "wp67_VEVL3",
@@ -966,175 +605,6 @@
         }
       },
       {
-        "id": "hallway1",
-        "label": "hallway1",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2174,
-          "y": 0.1316,
-          "w": 0.4982,
-          "h": 0.0314
-        }
-      },
-      {
-        "id": "hallway2",
-        "label": "hallway2",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.6495,
-          "y": 0.1606,
-          "w": 0.0127,
-          "h": 0.1667
-        }
-      },
-      {
-        "id": "hallway3",
-        "label": "hallway3",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2174,
-          "y": 0.3225,
-          "w": 0.4565,
-          "h": 0.0266
-        }
-      },
-      {
-        "id": "hallway4",
-        "label": "hallway4",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2165,
-          "y": 0.1594,
-          "w": 0.0236,
-          "h": 0.1618
-        }
-      },
-      {
-        "id": "hallway5",
-        "label": "hallway5",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.5525,
-          "y": 0.3502,
-          "w": 0.0181,
-          "h": 0.349
-        }
-      },
-      {
-        "id": "hallway6",
-        "label": "hallway6",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.5697,
-          "y": 0.6787,
-          "w": 0.1667,
-          "h": 0.0217
-        }
-      },
-      {
-        "id": "hallway7",
-        "label": "hallway7",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.7201,
-          "y": 0.599,
-          "w": 0.0145,
-          "h": 0.0797
-        }
-      },
-      {
-        "id": "hallway8",
-        "label": "hallway8",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.6313,
-          "y": 0.7017,
-          "w": 0.0181,
-          "h": 0.0906
-        }
-      },
-      {
-        "id": "hallway9",
-        "label": "hallway9",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2446,
-          "y": 0.4541,
-          "w": 0.3071,
-          "h": 0.0362
-        }
-      },
-      {
-        "id": "hallway10",
-        "label": "hallway10",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.394,
-          "y": 0.3478,
-          "w": 0.0263,
-          "h": 0.1075
-        }
-      },
-      {
-        "id": "hallway11",
-        "label": "hallway11",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2908,
-          "y": 0.4903,
-          "w": 0.0145,
-          "h": 0.3599
-        }
-      },
-      {
-        "id": "hallway12",
-        "label": "hallway12",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.1168,
-          "y": 0.8261,
-          "w": 0.173,
-          "h": 0.0229
-        }
-      },
-      {
-        "id": "hallway13",
-        "label": "hallway13",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.4475,
-          "y": 0.163,
-          "w": 0.038,
-          "h": 0.0713
-        }
-      },
-      {
         "id": "VEVL-324",
         "label": "VEVL-324",
         "type": "classroom",
@@ -1149,55 +619,81 @@
         }
       },
       {
-        "id": "hallway14",
-        "label": "hallway14",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.3043,
-          "y": 0.5447,
-          "w": 0.2482,
-          "h": 0.0266
-        }
-      },
-      {
-        "id": "hallway19",
-        "label": "hallway19",
-        "type": "hallway",
-        "floor": "VEVL3",
-        "building": "VEVL",
-        "bounds": {
-          "x": 0.2863,
-          "y": 0.1613,
-          "w": 0.0096,
-          "h": 0.1584
-        }
-      },
-      {
-        "id": "VEVL-325-3",
-        "label": "VEVL-325-3",
+        "id": "VEVL-328",
+        "label": "VEVL-328",
         "type": "classroom",
         "floor": "VEVL3",
-        "building": "VEVL",
+        "nearestWaypoint": "wp9_VEVL3",
         "bounds": {
-          "x": 0.4036,
-          "y": 0.0413,
-          "w": 0.04,
-          "h": 0.038
+          "x": 0.3,
+          "y": 0.1701,
+          "w": 0.1435,
+          "h": 0.1502
         }
       },
       {
-        "id": "hallway20",
-        "label": "hallway20",
-        "type": "hallway",
+        "id": "VEVL-331",
+        "label": "VEVL-331",
+        "type": "classroom",
         "floor": "VEVL3",
-        "building": "VEVL",
+        "nearestWaypoint": "wp1_VEVL3",
         "bounds": {
-          "x": 0.5704,
-          "y": 0.4564,
-          "w": 0.1163,
-          "h": 0.0164
+          "x": 0.2414,
+          "y": 0.0402,
+          "w": 0.0794,
+          "h": 0.0888
+        }
+      },
+      {
+        "id": "VEVL-329",
+        "label": "VEVL-329",
+        "type": "classroom",
+        "floor": "VEVL3",
+        "nearestWaypoint": "wp10_VEVL3",
+        "bounds": {
+          "x": 0.3238,
+          "y": 0.0417,
+          "w": 0.0781,
+          "h": 0.0889
+        }
+      },
+      {
+        "id": "VEVL-325",
+        "label": "VEVL-325",
+        "type": "classroom",
+        "floor": "VEVL3",
+        "nearestWaypoint": "wp12_VEVL3",
+        "bounds": {
+          "x": 0.4043,
+          "y": 0.0421,
+          "w": 0.0795,
+          "h": 0.0893
+        }
+      },
+      {
+        "id": "VEVL-321",
+        "label": "VEVL-321",
+        "type": "classroom",
+        "floor": "VEVL3",
+        "nearestWaypoint": "wp17_VEVL3",
+        "bounds": {
+          "x": 0.6085,
+          "y": 0.0439,
+          "w": 0.0382,
+          "h": 0.0893
+        }
+      },
+      {
+        "id": "VEVL-323",
+        "label": "VEVL-323",
+        "type": "classroom",
+        "floor": "VEVL3",
+        "nearestWaypoint": "wp16_VEVL3",
+        "bounds": {
+          "x": 0.4867,
+          "y": 0.0424,
+          "w": 0.1196,
+          "h": 0.09
         }
       }
     ],
@@ -1240,21 +736,7 @@
         },
         "connections": [
           "wp2_VEVL3",
-          "wp4_VEVL3",
-          "wp5_VEVL3",
-          "wp6_VEVL3"
-        ]
-      },
-      {
-        "id": "wp4_VEVL3",
-        "type": "door",
-        "floor": "VEVL3",
-        "position": {
-          "x": 0.2941,
-          "y": 0.17
-        },
-        "connections": [
-          "wp3_VEVL3"
+          "wp5_VEVL3"
         ]
       },
       {
@@ -1264,18 +746,6 @@
         "position": {
           "x": 0.287,
           "y": 0.224
-        },
-        "connections": [
-          "wp3_VEVL3"
-        ]
-      },
-      {
-        "id": "wp6_VEVL3",
-        "type": "door",
-        "floor": "VEVL3",
-        "position": {
-          "x": 0.2948,
-          "y": 0.2485
         },
         "connections": [
           "wp3_VEVL3"
@@ -1331,18 +801,6 @@
         ]
       },
       {
-        "id": "wp11_VEVL3",
-        "type": "door",
-        "floor": "VEVL3",
-        "position": {
-          "x": 0.3857,
-          "y": 0.1353
-        },
-        "connections": [
-          "wp100_VEVL3"
-        ]
-      },
-      {
         "id": "wp12_VEVL3",
         "type": "door",
         "floor": "VEVL3",
@@ -1363,20 +821,7 @@
           "y": 0.2259
         },
         "connections": [
-          "wp14_VEVL3"
-        ]
-      },
-      {
-        "id": "wp14_VEVL3",
-        "type": "corridor",
-        "floor": "VEVL3",
-        "position": {
-          "x": 0.4654,
-          "y": 0.1651
-        },
-        "connections": [
-          "wp15_VEVL3",
-          "wp13_VEVL3"
+          "wp15_VEVL3"
         ]
       },
       {
@@ -1388,11 +833,11 @@
           "y": 0.1569
         },
         "connections": [
-          "wp14_VEVL3",
           "wp20_VEVL3",
           "wp16_VEVL3",
           "wp12_VEVL3",
-          "wp100_VEVL3"
+          "wp100_VEVL3",
+          "wp13_VEVL3"
         ]
       },
       {
@@ -1434,8 +879,11 @@
       },
       {
         "id": "wp19_VEVL3",
-        "type": "door",
+        "type": "staircase",
         "floor": "VEVL3",
+        "floorsReachable": [
+          "VEVL-2"
+        ],
         "position": {
           "x": 0.6959,
           "y": 0.1364
@@ -2128,8 +1576,11 @@
       },
       {
         "id": "wp72_VEVL3",
-        "type": "door",
+        "type": "staircase",
         "floor": "VEVL3",
+        "floorsReachable": [
+          "VEVL-2"
+        ],
         "position": {
           "x": 0.7293,
           "y": 0.6017
@@ -2371,8 +1822,11 @@
       },
       {
         "id": "wp91_VEVL3",
-        "type": "door",
+        "type": "staircase",
         "floor": "VEVL3",
+        "floorsReachable": [
+          "VEVL-2"
+        ],
         "position": {
           "x": 0.6622,
           "y": 0.7758
@@ -2391,18 +1845,6 @@
         },
         "connections": [
           "wp99_VEVL3"
-        ]
-      },
-      {
-        "id": "wp93_VEVL3",
-        "type": "door",
-        "floor": "VEVL3",
-        "position": {
-          "x": 0.4153,
-          "y": 0.245
-        },
-        "connections": [
-          "wp105_VEVL3"
         ]
       },
       {
@@ -2480,8 +1922,11 @@
       },
       {
         "id": "wp99_VEVL3",
-        "type": "corridor",
+        "type": "staircase",
         "floor": "VEVL3",
+        "floorsReachable": [
+          "VEVL-2"
+        ],
         "position": {
           "x": 0.5445,
           "y": 0.2274
@@ -2504,22 +1949,8 @@
         "connections": [
           "wp15_VEVL3",
           "wp10_VEVL3",
-          "wp11_VEVL3",
           "wp9_VEVL3",
           "wp2_VEVL3"
-        ]
-      },
-      {
-        "id": "wp105_VEVL3",
-        "type": "corridor",
-        "floor": "VEVL3",
-        "position": {
-          "x": 0.3584,
-          "y": 0.2317
-        },
-        "connections": [
-          "wp104_VEVL3",
-          "wp93_VEVL3"
         ]
       }
     ]
