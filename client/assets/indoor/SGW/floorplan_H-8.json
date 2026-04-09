@@ -1,18 +1,13 @@
 {
-  "H": {
-    "floor": "H-8",
-    "building": "Hall",
-    "rooms": [],
-    "waypoints": []
-  },
   "H-8": {
     "floor": "H-8",
+    "building": "Hall",
     "rooms": [
       {
         "id": "H-801",
         "label": "H-801",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp37_H-801",
         "bounds": {
           "x": 0.1656,
@@ -25,7 +20,7 @@
         "id": "H-803",
         "label": "H-803",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp36_H-803",
         "bounds": {
           "x": 0.2496,
@@ -38,7 +33,7 @@
         "id": "H-805.03",
         "label": "H-805.03",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp35_H-805.03",
         "bounds": {
           "x": 0.3412,
@@ -51,7 +46,7 @@
         "id": "H-805.02",
         "label": "H-805.02",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp34_H-805.02",
         "bounds": {
           "x": 0.3572,
@@ -64,7 +59,7 @@
         "id": "H-805.01",
         "label": "H-805.01",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp33_H-805.01",
         "bounds": {
           "x": 0.3572,
@@ -77,7 +72,7 @@
         "id": "H-807",
         "label": "H-807",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp32_H-807",
         "bounds": {
           "x": 0.4183,
@@ -90,7 +85,7 @@
         "id": "H-811",
         "label": "H-811",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp31_H-811",
         "bounds": {
           "x": 0.5825,
@@ -103,7 +98,7 @@
         "id": "H-813",
         "label": "H-813",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp30_H-813",
         "bounds": {
           "x": 0.6725,
@@ -116,7 +111,7 @@
         "id": "H-815",
         "label": "H-815",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp29_H-815",
         "bounds": {
           "x": 0.7504,
@@ -129,7 +124,7 @@
         "id": "H-817",
         "label": "H-817",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp28_H-817",
         "bounds": {
           "x": 0.842,
@@ -142,7 +137,7 @@
         "id": "H-819",
         "label": "H-819",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp27_H-819",
         "bounds": {
           "x": 0.842,
@@ -155,7 +150,7 @@
         "id": "H-821",
         "label": "H-821",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp26_H-821",
         "bounds": {
           "x": 0.8397,
@@ -168,7 +163,7 @@
         "id": "H-823",
         "label": "H-823",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp25_H-823",
         "bounds": {
           "x": 0.8397,
@@ -181,7 +176,7 @@
         "id": "H-825",
         "label": "H-825",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp24_H-825",
         "bounds": {
           "x": 0.8397,
@@ -194,7 +189,7 @@
         "id": "H-827",
         "label": "H-827",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp23_H-827",
         "bounds": {
           "x": 0.839,
@@ -207,7 +202,7 @@
         "id": "H-829",
         "label": "H-829",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp22_H-829",
         "bounds": {
           "x": 0.8405,
@@ -220,7 +215,7 @@
         "id": "H-831",
         "label": "H-831",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp21_H-831",
         "bounds": {
           "x": 0.8382,
@@ -233,7 +228,7 @@
         "id": "H-833",
         "label": "H-833",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp20_H-833",
         "bounds": {
           "x": 0.7535,
@@ -246,7 +241,7 @@
         "id": "H-835",
         "label": "H-835",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp19_H-835",
         "bounds": {
           "x": 0.6687,
@@ -259,7 +254,7 @@
         "id": "H-837",
         "label": "H-837",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp18_H-837",
         "bounds": {
           "x": 0.5832,
@@ -272,7 +267,7 @@
         "id": "H-841",
         "label": "H-841",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp17_H-841",
         "bounds": {
           "x": 0.4221,
@@ -285,7 +280,7 @@
         "id": "H-843",
         "label": "H-843",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp16_H-843",
         "bounds": {
           "x": 0.3305,
@@ -298,7 +293,7 @@
         "id": "H-845",
         "label": "H-845",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp15_H-845",
         "bounds": {
           "x": 0.2519,
@@ -311,7 +306,7 @@
         "id": "H-847",
         "label": "H-847",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp14_H-847",
         "bounds": {
           "x": 0.1633,
@@ -324,7 +319,7 @@
         "id": "H-849",
         "label": "H-849",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp13_H-849",
         "bounds": {
           "x": 0.0434,
@@ -337,7 +332,7 @@
         "id": "H-851.03",
         "label": "H-851.03",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp10_H-851.03",
         "bounds": {
           "x": 0.0442,
@@ -350,7 +345,7 @@
         "id": "H-851.02",
         "label": "H-851.02",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp11_H-851.02",
         "bounds": {
           "x": 0.0427,
@@ -363,7 +358,7 @@
         "id": "H-851.01",
         "label": "H-851.01",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp12_H-851.01",
         "bounds": {
           "x": 0.1228,
@@ -376,7 +371,7 @@
         "id": "H-853",
         "label": "H-853",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp9_H-853",
         "bounds": {
           "x": 0.0434,
@@ -389,7 +384,7 @@
         "id": "H-855",
         "label": "H-855",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp8_H-855",
         "bounds": {
           "x": 0.0419,
@@ -402,7 +397,7 @@
         "id": "H-865",
         "label": "H-865",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp3_H-865",
         "bounds": {
           "x": 0.0442,
@@ -415,7 +410,7 @@
         "id": "H-863",
         "label": "H-863",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp4_H-863",
         "bounds": {
           "x": 0.0404,
@@ -428,7 +423,7 @@
         "id": "H-861",
         "label": "H-861",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp5_H-861",
         "bounds": {
           "x": 0.0427,
@@ -441,7 +436,7 @@
         "id": "H-859",
         "label": "H-859",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp6_H-859",
         "bounds": {
           "x": 0.0427,
@@ -454,7 +449,7 @@
         "id": "H-857",
         "label": "H-857",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp7_H-857",
         "bounds": {
           "x": 0.0419,
@@ -467,7 +462,7 @@
         "id": "H-806.01",
         "label": "H-806.01",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp41_H-806.01",
         "bounds": {
           "x": 0.4565,
@@ -480,7 +475,7 @@
         "id": "H-806.02",
         "label": "H-806.02",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp42_H-806.02",
         "bounds": {
           "x": 0.4565,
@@ -493,7 +488,7 @@
         "id": "H-806.03",
         "label": "H-806.03",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp43_H-806.03",
         "bounds": {
           "x": 0.4565,
@@ -506,7 +501,7 @@
         "id": "H-898",
         "label": "H-898",
         "type": "staircase",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp38_H-898",
         "bounds": {
           "x": 0.2519,
@@ -519,7 +514,7 @@
         "id": "H-892",
         "label": "H-892",
         "type": "other",
-        "floor": "H8",
+        "floor": "H-8",
         "notes": "Bathroom",
         "nearestWaypoint": "wp40_H-892",
         "bounds": {
@@ -533,7 +528,7 @@
         "id": "H-860.01",
         "label": "H-860.01",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp44_H-860.01",
         "bounds": {
           "x": 0.2221,
@@ -546,7 +541,7 @@
         "id": "H-860.03",
         "label": "H-860.03",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp45_H-860.03",
         "bounds": {
           "x": 0.2236,
@@ -559,7 +554,7 @@
         "id": "H-860.05",
         "label": "H-860.05",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp46_H-860.05",
         "bounds": {
           "x": 0.2229,
@@ -572,7 +567,7 @@
         "id": "H-860.06",
         "label": "H-860.06",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp47_H-860.06",
         "bounds": {
           "x": 0.2862,
@@ -585,7 +580,7 @@
         "id": "H-860",
         "label": "H-860",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp48_H-860",
         "bounds": {
           "x": 0.2855,
@@ -598,7 +593,7 @@
         "id": "H862",
         "label": "H862",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp49_H-862",
         "bounds": {
           "x": 0.3328,
@@ -611,7 +606,7 @@
         "id": "H-854",
         "label": "H-854",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp56_H-854",
         "bounds": {
           "x": 0.2236,
@@ -624,7 +619,7 @@
         "id": "H-852",
         "label": "H-852",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp57_H-852",
         "bounds": {
           "x": 0.2213,
@@ -637,7 +632,7 @@
         "id": "H-881",
         "label": "H-881",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp52_H-881",
         "bounds": {
           "x": 0.3328,
@@ -650,7 +645,7 @@
         "id": "H-875",
         "label": "H-875",
         "type": "staircase",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp54_H-875",
         "bounds": {
           "x": 0.2839,
@@ -663,7 +658,7 @@
         "id": "H-842",
         "label": "H-842",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp53_H-842",
         "bounds": {
           "x": 0.3343,
@@ -676,7 +671,7 @@
         "id": "H-838",
         "label": "H-838",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp51_H-838",
         "bounds": {
           "x": 0.4214,
@@ -689,7 +684,7 @@
         "id": "H-840",
         "label": "H-840",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp50_H-840",
         "bounds": {
           "x": 0.4198,
@@ -699,11 +694,10 @@
         }
       },
       {
-        "id": "H-899.40",
-        "label": "Escalator",
-        "type": "other",
-        "floor": "H8",
-        "notes": "Escalator",
+        "id": "escalator",
+        "label": "escalator",
+        "type": "escalator",
+        "floor": "H-8",
         "bounds": {
           "x": 0.4527,
           "y": 0.4157,
@@ -715,7 +709,7 @@
         "id": "H-812",
         "label": "H-812",
         "type": "other",
-        "floor": "H8",
+        "floor": "H-8",
         "bounds": {
           "x": 0.6,
           "y": 0.2319,
@@ -727,7 +721,7 @@
         "id": "H-890",
         "label": "H-890",
         "type": "staircase",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp66_H-890",
         "bounds": {
           "x": 0.6741,
@@ -740,7 +734,7 @@
         "id": "H-885",
         "label": "H-885",
         "type": "staircase",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp55_H-885",
         "bounds": {
           "x": 0.6748,
@@ -753,7 +747,7 @@
         "id": "Elevator",
         "label": "Elevator",
         "type": "elevator",
-        "floor": "H8",
+        "floor": "H-8",
         "notes": "Elevator",
         "nearestWaypoint": "wp39_Elevator",
         "bounds": {
@@ -767,7 +761,7 @@
         "id": "H-886",
         "label": "H-886",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp65_H-886",
         "bounds": {
           "x": 0.7206,
@@ -780,7 +774,7 @@
         "id": "H-820",
         "label": "H-820",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp64_H-820",
         "bounds": {
           "x": 0.5924,
@@ -793,7 +787,7 @@
         "id": "H-822",
         "label": "H-822",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp63_H-822",
         "bounds": {
           "x": 0.6741,
@@ -806,7 +800,7 @@
         "id": "H-832.06",
         "label": "H-832.06",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp58_H-832.06",
         "bounds": {
           "x": 0.5847,
@@ -819,7 +813,7 @@
         "id": "H-832.05",
         "label": "H-832.05",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp59_H-832.05",
         "bounds": {
           "x": 0.5855,
@@ -832,7 +826,7 @@
         "id": "H-832.03",
         "label": "H-832.03",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp60_H-832.03",
         "bounds": {
           "x": 0.5847,
@@ -845,7 +839,7 @@
         "id": "H-832.01",
         "label": "H-832.01",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp61_H-832.01",
         "bounds": {
           "x": 0.584,
@@ -858,7 +852,7 @@
         "id": "H-8",
         "label": "H-8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "bounds": {
           "x": 0.6168,
           "y": 0.6686,
@@ -870,7 +864,7 @@
         "id": "H-832.02",
         "label": "H-832.02",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp62_H-832.02",
         "bounds": {
           "x": 0.6336,
@@ -883,7 +877,7 @@
         "id": "H-8",
         "label": "H-8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "bounds": {
           "x": 0.2702,
           "y": 0.4191,
@@ -895,7 +889,7 @@
         "id": "H-867",
         "label": "H-867",
         "type": "classroom",
-        "floor": "H8",
+        "floor": "H-8",
         "nearestWaypoint": "wp2_H-867",
         "bounds": {
           "x": 0.0427,
@@ -908,7 +902,7 @@
         "id": "H-802-T1",
         "label": "H-802-T1",
         "type": "other",
-        "floor": "H8",
+        "floor": "H-8",
         "notes": "Bathroom",
         "nearestWaypoint": "wp68_H-802-T1",
         "bounds": {
@@ -922,7 +916,7 @@
         "id": "H-8",
         "label": "H-8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "building": "Hall",
         "bounds": {
           "x": 0.1679,
@@ -935,7 +929,7 @@
         "id": "H-8",
         "label": "H8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "building": "Hall",
         "bounds": {
           "x": 0.1693,
@@ -948,7 +942,7 @@
         "id": "H-8",
         "label": "H8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "building": "Hall",
         "bounds": {
           "x": 0.2151,
@@ -961,7 +955,7 @@
         "id": "H-8",
         "label": "H-8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "building": "Hall",
         "bounds": {
           "x": 0.7852,
@@ -974,7 +968,7 @@
         "id": "H-8",
         "label": "H8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "building": "Hall",
         "bounds": {
           "x": 0.5077,
@@ -987,7 +981,7 @@
         "id": "H-8",
         "label": "H-8",
         "type": "hallway",
-        "floor": "H8",
+        "floor": "H-8",
         "building": "Hall",
         "bounds": {
           "x": 0.2165,
@@ -1016,7 +1010,7 @@
       {
         "id": "wp2_H-867",
         "type": "door",
-        "floor": "H8",
+        "floor": "H-8",
         "position": {
           "x": 0.1546,
           "y": 0.1358
