@@ -1,9 +1,4 @@
 {
-  "CC3": {
-    "floor": "CC3",
-    "rooms": [],
-    "waypoints": []
-  },
   "CC1": {
     "floor": "CC1",
     "rooms": [
