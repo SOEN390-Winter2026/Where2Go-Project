@@ -41,7 +41,7 @@
       {
         "id": "emergency exit",
         "label": "emergency exit",
-        "type": "exit",
+        "type": "other",
         "floor": "CC3",
         "bounds": {
           "x": 0.8132,
@@ -265,114 +265,6 @@
           "w": 0.2237,
           "h": 0.209
         }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.2977,
-          "y": 0.1792,
-          "w": 0.3911,
-          "h": 0.0503
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.6887,
-          "y": 0.1811,
-          "w": 0.0272,
-          "h": 0.5439
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.3288,
-          "y": 0.6805,
-          "w": 0.3658,
-          "h": 0.0523
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.3405,
-          "y": 0.2276,
-          "w": 0.0603,
-          "h": 0.4568
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.1829,
-          "y": 0.5411,
-          "w": 0.1576,
-          "h": 0.0252
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.1907,
-          "y": 0.5702,
-          "w": 0.0253,
-          "h": 0.0774
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.7218,
-          "y": 0.5508,
-          "w": 0.1712,
-          "h": 0.031
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.716,
-          "y": 0.3263,
-          "w": 0.1751,
-          "h": 0.0232
-        }
-      },
-      {
-        "id": "LB-500",
-        "label": "LB-500",
-        "type": "hallway",
-        "floor": "LB5",
-        "bounds": {
-          "x": 0.814,
-          "y": 0.3561,
-          "w": 0.0254,
-          "h": 0.1939
-        }
       }
     ],
     "waypoints": [
@@ -470,7 +362,8 @@
         },
         "connections": [
           "wp8_LB5",
-          "wp2_LB5"
+          "wp2_LB5",
+          "wp24_LB5"
         ]
       },
       {
@@ -687,13 +580,18 @@
       },
       {
         "id": "wp24_LB5",
-        "type": "door",
+        "type": "elevator",
         "floor": "LB5",
+        "floorsReachable": [
+          "LB-4"
+        ],
         "position": {
           "x": 0.3249,
           "y": 0.6282
         },
-        "connections": []
+        "connections": [
+          "wp7_LB5"
+        ]
       },
       {
         "id": "wp25_LB5",
@@ -784,6 +682,9 @@
         "id": "wp32_LB5",
         "type": "staircase",
         "floor": "LB5",
+        "floorsReachable": [
+          "LB-4"
+        ],
         "position": {
           "x": 0.4572,
           "y": 0.7463
@@ -796,6 +697,9 @@
         "id": "wp33_LB5",
         "type": "staircase",
         "floor": "LB5",
+        "floorsReachable": [
+          "LB-4"
+        ],
         "position": {
           "x": 0.4572,
           "y": 0.1618
@@ -888,7 +792,7 @@
       },
       {
         "id": "wp40_LB5",
-        "type": "exit",
+        "type": "door",
         "floor": "LB5",
         "position": {
           "x": 0.8188,
@@ -900,7 +804,7 @@
       },
       {
         "id": "wp41_LB5",
-        "type": "exit",
+        "type": "door",
         "floor": "LB5",
         "position": {
           "x": 0.8203,
