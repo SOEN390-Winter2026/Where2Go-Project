@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import { indoorMaps } from '../data/indoorData';
 import { extractFloorPlan } from './floorPlanUtils';
-// Indoor JSON for this campus only 
+
 function getBuildingIndoorData(campus, bCode) {
     if (!campus || !bCode) return null;
     return indoorMaps?.[campus]?.[bCode] ?? null;
@@ -12,12 +12,37 @@ function normalizeCode(code) {
     return String(code ?? "").trim().toUpperCase();
 }
 
+function parseBuildingOption(opt, fallbackCampus) {
+    const m = String(opt ?? '').match(/^(.+?)\s*\((.+?)\)$/);
+    if (m) return { code: normalizeCode(m[1]), campus: m[2].trim() };
+    return { code: normalizeCode(opt), campus: fallbackCampus };
+}
+
+/**
+ * Sort floor keys so pure-integer keys (1, 2, …, 9) come first in numeric
+ * order, followed by alphanumeric keys (S1, S2, H-2, …) in locale order.
+ * This is more reliable than relying on localeCompare({ numeric: true })
+ * which Hermes on Android may not fully support.
+ */
+function sortedFloorKeys(buildingData) {
+    return Object.keys(buildingData)
+        .filter(k => buildingData[k]?.image != null)
+        .sort((a, b) => {
+            const na = Number(a);
+            const nb = Number(b);
+            const aIsInt = Number.isFinite(na) && String(na) === String(a);
+            const bIsInt = Number.isFinite(nb) && String(nb) === String(b);
+            if (aIsInt && bIsInt) return na - nb;      // both integers: numeric order
+            if (aIsInt) return -1;                      // integer before string
+            if (bIsInt) return 1;                       // string after integer
+            return String(a).localeCompare(String(b), undefined, { numeric: true });
+        });
+}
+
 export default function useIndoorMaps(height, campus, buildingCode, _buildings = []) {
     const SHEET_COLLAPSED = height * 0.11;
     const SHEET_EXPANDED = height * 0.45;
-    /** Default height when opening the directions tab. */
     const SHEET_DIRECTIONS = height * 0.72;
-    /** Extra-tall snap when on directions so long step lists are reachable (drag handle up). */
     const SHEET_DIRECTIONS_MAX = height * 0.92;
 
     const [selectedFloor,  setSelectedFloor]  = useState(null);
@@ -26,48 +51,70 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
     const [directionsFrom, setDirectionsFrom] = useState({ building: null, floor: null, room: null });
     const [directionsTo,   setDirectionsTo]   = useState({ building: null, floor: null, room: null });
 
-    // Auto-select first available floor when building or campus changes
+    // Auto-select the LOWEST numbered floor (numerically sorted) when the
+    // building or campus changes. Previously used Object.keys()[0] which
+    // depends on insertion order in indoorData.js — unreliable and caused
+    // MB to default to "S2" instead of "MB1".
     useEffect(() => {
         if (!campus || !buildingCode) return;
         const buildingData = indoorMaps?.[campus]?.[buildingCode];
         if (!buildingData) return;
-        const firstFloor = Object.keys(buildingData)[0];
+        const floors = sortedFloorKeys(buildingData);
+        const firstFloor = floors[0] ?? Object.keys(buildingData)[0];
         setSelectedFloor(firstFloor);
     }, [campus, buildingCode]);
 
-    // Keep directions defaults anchored to the building/floor currently open in IndoorMaps.
     useEffect(() => {
         if (!buildingCode || !selectedFloor) return;
+        const label = `${String(buildingCode).toUpperCase()} (${campus})`;
         setDirectionsFrom((prev) => (
-            prev?.building ? prev : { building: String(buildingCode).toUpperCase(), floor: selectedFloor, room: null }
+            prev?.building ? prev : { building: label, floor: selectedFloor, room: null }
         ));
         setDirectionsTo((prev) => (
-            prev?.building ? prev : { building: String(buildingCode).toUpperCase(), floor: selectedFloor, room: null }
+            prev?.building ? prev : { building: label, floor: selectedFloor, room: null }
         ));
     }, [buildingCode, selectedFloor]);
 
-    // Show only buildings that have indoor floor plans on this campus; this guarantees selection is routable.
-    const indoorCodes = Object.keys(indoorMaps?.[campus] ?? {}).map(normalizeCode).filter(Boolean);
-    const currentCode = normalizeCode(buildingCode);
-    const mergedCodes = [...indoorCodes, currentCode].filter(Boolean);
-    const BUILDINGS_LIST = [...new Set(mergedCodes)].sort((a, b) =>
-        String(a).localeCompare(String(b), undefined, { numeric: true })
-    );
+    const seen = new Set();
+    const allBuildingEntries = [];
 
-    // Returns floors only when the building has JSON data in indoorData (numeric order, e.g. 2,4,…,12)
-    const getFloors = (bCode) => {
-        if (!bCode) return [];
-        const data = getBuildingIndoorData(campus, bCode);
+    for (const c of Object.keys(indoorMaps ?? {})) {
+        for (const rawCode of Object.keys(indoorMaps[c] ?? {})) {
+            const code = normalizeCode(rawCode);
+            if (!code) continue;
+            const key = `${c}-${code}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                allBuildingEntries.push({ code, campus: c });
+            }
+        }
+    }
+
+    const currentCode = normalizeCode(buildingCode);
+    const currentKey = `${campus}-${currentCode}`;
+    if (currentCode && !seen.has(currentKey)) {
+        allBuildingEntries.push({ code: currentCode, campus });
+    }
+
+    const BUILDINGS_LIST = allBuildingEntries
+        .slice()
+        .sort((a, b) => String(a.code).localeCompare(String(b.code), undefined, { numeric: true }))
+        .map(({ code, campus: c }) => `${code} (${c})`);
+
+    const getFloors = (bOpt) => {
+        if (!bOpt) return [];
+        const { code, campus: c } = parseBuildingOption(bOpt, campus);
+        const data = getBuildingIndoorData(c, code);
         if (!data) return [];
         return Object.keys(data)
             .filter((floor) => data[floor]?.image != null)
             .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
     };
 
-    // Extract classroom room IDs from the floor's JSON data
-    const getRooms = (bCode, floor) => {
-        if (!bCode || !floor) return [];
-        const bData = getBuildingIndoorData(campus, bCode);
+    const getRooms = (bOpt, floor) => {
+        if (!bOpt || !floor) return [];
+        const { code, campus: c } = parseBuildingOption(bOpt, campus);
+        const bData = getBuildingIndoorData(c, code);
         const floorEntry = bData?.[floor] ?? bData?.[Number(floor)];
         if (!floorEntry?.data) return [];
         const floorPlan = extractFloorPlan(floorEntry.data, floor);
@@ -93,7 +140,6 @@ export default function useIndoorMaps(height, campus, buildingCode, _buildings =
 
     const sheetHeight = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
     const lastHeight = useRef(SHEET_COLLAPSED);
-    /** Keeps pan callbacks in sync (PanResponder is created once). */
     const sheetMetricsRef = useRef({});
 
     const animateSheet = (toValue) => {

@@ -690,18 +690,36 @@ function connectTransferWaypoints({ adjacencyList, floorId, waypoint, pointType,
   let floorsReachable = waypoint.floorsReachable || [];
 
   if (floorsReachable.length === 0) {
-    const allFloorIds = Array.from(floorGraphs.keys())
-      .map(id => {
-        const digits = trailingAsciiDigitSuffix(String(id));
-        return digits ? { key: id, num: Number.parseInt(digits, 10) } : null;
-      })
-      .filter(Boolean)
-      .sort((a, b) => a.num - b.num);
-
-    const currentDigits = trailingAsciiDigitSuffix(String(floorId));
+    const currentFloorStr = String(floorId).toLowerCase();
+    const currentDigits = trailingAsciiDigitSuffix(currentFloorStr);
     const currentNum = currentDigits ? Number.parseInt(currentDigits, 10) : NaN;
 
+    // The non-digit prefix of the current floor key, e.g.:
+    //   "1"  → prefix ""    (pure numeric, main floors)
+    //   "9"  → prefix ""
+    //   "s1" → prefix "s"   (sub-basement)
+    //   "s2" → prefix "s"
+    //   "h9" → prefix "h"   (Hall-style keys)
+    // We only infer adjacency within the same prefix group so that sub-basement
+    // floors ("S1","S2") are never incorrectly linked to main floors ("1".."9")
+    // due to a trailing-digit collision (both "1" and "S1" have digit "1").
+    const currentPrefix = currentDigits
+      ? currentFloorStr.slice(0, currentFloorStr.length - currentDigits.length)
+      : currentFloorStr;
+
     if (!Number.isNaN(currentNum)) {
+      const allFloorIds = Array.from(floorGraphs.keys())
+        .map(id => {
+          const idStr = String(id).toLowerCase();
+          const digits = trailingAsciiDigitSuffix(idStr);
+          if (!digits) return null;
+          const prefix = idStr.slice(0, idStr.length - digits.length);
+          if (prefix !== currentPrefix) return null; // different stack — skip
+          return { key: id, num: Number.parseInt(digits, 10) };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.num - b.num);
+
       let prevEntry = null;
       for (const f of allFloorIds) { if (f.num < currentNum) prevEntry = f; }
       const nextEntry = allFloorIds.find(f => f.num > currentNum);
