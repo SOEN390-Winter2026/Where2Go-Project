@@ -456,73 +456,17 @@
           "w": 0.0983,
           "h": 0.0683
         }
-      },
-      {
-        "id": "MB-S1_Corridor1",
-        "label": "MB-S1_Corridor1",
-        "type": "hallway",
-        "floor": "MB-S1",
-        "bounds": {
-          "x": 0.5007,
-          "y": 0.1868,
-          "w": 0.0208,
-          "h": 0.5325
-        }
-      },
-      {
-        "id": "MB-S1_Corridor2",
-        "label": "MB-S1_Corridor2",
-        "type": "hallway",
-        "floor": "MB-S1",
-        "bounds": {
-          "x": 0.5492,
-          "y": 0.7354,
-          "w": 0.026,
-          "h": 0.1434
-        }
-      },
-      {
-        "id": "MB-S1_Corridor3",
-        "label": "MB-S1_Corridor3",
-        "type": "hallway",
-        "floor": "MB-S1",
-        "bounds": {
-          "x": 0.5857,
-          "y": 0.7946,
-          "w": 0.2376,
-          "h": 0.0161
-        }
-      },
-      {
-        "id": "MB-S1_Corridor4",
-        "label": "MB-S1_Corridor4",
-        "type": "hallway",
-        "floor": "MB-S1",
-        "bounds": {
-          "x": 0.8423,
-          "y": 0.8017,
-          "w": 0.0225,
-          "h": 0.0771
-        }
-      },
-      {
-        "id": "MB-S1_Corridor5",
-        "label": "MB-S1_Corridor5",
-        "type": "hallway",
-        "floor": "MB-S1",
-        "bounds": {
-          "x": 0.544,
-          "y": 0.2065,
-          "w": 0.1665,
-          "h": 0.0161
-        }
       }
     ],
     "waypoints": [
       {
         "id": "wp1_MB-S1_Exit294",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB-S1",
+        "floorsReachable": [
+          "MB-S2",
+          "MB-1"
+        ],
         "position": {
           "x": 0.5215,
           "y": 0.1832
@@ -533,8 +477,12 @@
       },
       {
         "id": "wp2_MB-S1_Exit394",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB-S1",
+        "floorsReachable": [
+          "MB-S2",
+          "MB-1"
+        ],
         "position": {
           "x": 0.7261,
           "y": 0.6081
@@ -545,8 +493,12 @@
       },
       {
         "id": "wp3_MB-S1_Exit494",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB-S1",
+        "floorsReachable": [
+          "MB-S2",
+          "MB-1"
+        ],
         "position": {
           "x": 0.7296,
           "y": 0.8717
@@ -557,8 +509,12 @@
       },
       {
         "id": "wp4_MB-S1_to_S2",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB-S1",
+        "floorsReachable": [
+          "MB-S2",
+          "MB-1"
+        ],
         "position": {
           "x": 0.3845,
           "y": 0.2944
@@ -1034,7 +990,8 @@
         "connections": [
           "wp42_MB-S1",
           "wp40_MB-S1",
-          "wp43_MB-S1"
+          "wp43_MB-S1",
+          "wp47_MB-S1"
         ]
       },
       {
@@ -1049,7 +1006,8 @@
           "wp21_MB-S1_320",
           "wp2_MB-S1_Exit394",
           "wp20_MB-S1_315",
-          "wp41_MB-S1"
+          "wp41_MB-S1",
+          "wp47_MB-S1"
         ]
       },
       {
@@ -1115,6 +1073,23 @@
           "wp25_MB-S1_447",
           "wp26_MB-S1_451",
           "wp27_MB-S1_455"
+        ]
+      },
+      {
+        "id": "wp47_MB-S1",
+        "type": "elevator",
+        "floor": "MB-S1",
+        "floorsReachable": [
+          "MB-S2",
+          "MB-1"
+        ],
+        "position": {
+          "x": 0.6313,
+          "y": 0.5628
+        },
+        "connections": [
+          "wp41_MB-S1",
+          "wp42_MB-S1"
         ]
       }
     ]

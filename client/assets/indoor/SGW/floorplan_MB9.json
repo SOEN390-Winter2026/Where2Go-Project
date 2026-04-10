@@ -6,7 +6,7 @@
         "id": "MB-9_9.285",
         "label": "MB-9_9.285",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp1_MB9_9.285",
         "bounds": {
           "x": 0.0904,
@@ -19,7 +19,7 @@
         "id": "MB-9_9.275",
         "label": "MB-9_9.275",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp2_MB9_9.275",
         "bounds": {
           "x": 0.0877,
@@ -32,7 +32,7 @@
         "id": "MB-9_9.265",
         "label": "MB-9_9.265",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp3_MB9_9.265",
         "bounds": {
           "x": 0.0877,
@@ -45,7 +45,7 @@
         "id": "MB-9_9.225",
         "label": "MB-9_9.225",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp4_MB9_9.225",
         "bounds": {
           "x": 0.0824,
@@ -58,7 +58,7 @@
         "id": "MB-9_9.201",
         "label": "MB-9_9.201",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp5_MB9_9.201",
         "bounds": {
           "x": 0.0904,
@@ -71,7 +71,7 @@
         "id": "MB-9_9.475",
         "label": "MB-9_9.475",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp6_MB9_9.475",
         "bounds": {
           "x": 0.0797,
@@ -84,7 +84,7 @@
         "id": "MB-9_9.476",
         "label": "MB-9_9.476",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp7_MB9_9.476",
         "bounds": {
           "x": 0.3191,
@@ -97,7 +97,7 @@
         "id": "MB-9_9.474",
         "label": "MB-9_9.474",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp8_MB9_9.474",
         "bounds": {
           "x": 0.3218,
@@ -110,7 +110,7 @@
         "id": "MB-9_9.465",
         "label": "MB-9_9.465",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp9_MB9_9.465",
         "bounds": {
           "x": 0.2074,
@@ -123,7 +123,7 @@
         "id": "MB-9_9.455",
         "label": "MB-9_9.455",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp10_MB9_9.455",
         "bounds": {
           "x": 0.4255,
@@ -136,7 +136,7 @@
         "id": "MB-9_9.445",
         "label": "MB-9_9.445",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp11_MB9_9.445",
         "bounds": {
           "x": 0.5346,
@@ -149,7 +149,7 @@
         "id": "MB-9_9.424",
         "label": "MB-9_9.424",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp12_MB9_9.424",
         "bounds": {
           "x": 0.4761,
@@ -162,7 +162,7 @@
         "id": "MB-9_9.240",
         "label": "MB-9_9.240",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp13_MB9_9.240",
         "bounds": {
           "x": 0.4415,
@@ -175,7 +175,7 @@
         "id": "MB-9_9.330",
         "label": "MB-9_9.330",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp14_MB9_9.330",
         "bounds": {
           "x": 0.5559,
@@ -188,7 +188,7 @@
         "id": "MB-9_9.255",
         "label": "MB-9_9.255",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp15_MB9_9.255",
         "bounds": {
           "x": 0.4787,
@@ -201,7 +201,7 @@
         "id": "MB-9_9.250",
         "label": "MB-9_9.250",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp16_MB9_9.250",
         "bounds": {
           "x": 0.4441,
@@ -214,7 +214,7 @@
         "id": "MB-9_9.270",
         "label": "MB-9_9.270",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp17_MB9_9.270",
         "bounds": {
           "x": 0.4521,
@@ -227,7 +227,7 @@
         "id": "MB-9_9.280",
         "label": "MB-9_9.280",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp18_MB9_9.280",
         "bounds": {
           "x": 0.4521,
@@ -240,7 +240,7 @@
         "id": "MB-9_9.260",
         "label": "MB-9_9.260",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp19_MB9_9.260",
         "bounds": {
           "x": 0.6064,
@@ -253,7 +253,7 @@
         "id": "MB-9_9.315",
         "label": "MB-9_9.315",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp20_MB9_9.315",
         "bounds": {
           "x": 0.6543,
@@ -266,7 +266,7 @@
         "id": "MB-9_9.335",
         "label": "MB-9_9.335",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp21_MB9_9.335",
         "bounds": {
           "x": 0.6942,
@@ -279,7 +279,7 @@
         "id": "MB-9_9.345",
         "label": "MB-9_9.345",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp22_MB9_9.345",
         "bounds": {
           "x": 0.7101,
@@ -292,7 +292,7 @@
         "id": "MB-9_9.405",
         "label": "MB-9_9.405",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp23_MB9_9.405",
         "bounds": {
           "x": 0.7128,
@@ -305,7 +305,7 @@
         "id": "MB-9_9.415",
         "label": "MB-9_9.415",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp24_MB9_9.415",
         "bounds": {
           "x": 0.7527,
@@ -318,7 +318,7 @@
         "id": "MB-9_9.425",
         "label": "MB-9_9.425",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp25_MB9_9.425",
         "bounds": {
           "x": 0.7101,
@@ -331,7 +331,7 @@
         "id": "MB-9_9.435",
         "label": "MB-9_9.435",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp26_MB9_9.435",
         "bounds": {
           "x": 0.7154,
@@ -344,7 +344,7 @@
         "id": "MB-9_Elevator",
         "label": "MB-9_Elevator",
         "type": "elevator",
-        "floor": "CC3",
+        "floor": "MB9",
         "bounds": {
           "x": 0.419,
           "y": 0.4903,
@@ -356,7 +356,7 @@
         "id": "MB-9_T1",
         "label": "MB-9_T1",
         "type": "other",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp29_MB9_T1",
         "bounds": {
           "x": 0.4286,
@@ -369,7 +369,7 @@
         "id": "MB-9_T2",
         "label": "MB-9_T2",
         "type": "other",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp30_MB9_T2",
         "bounds": {
           "x": 0.5468,
@@ -382,7 +382,7 @@
         "id": "MB-9_S1",
         "label": "MB-9_S1",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp28_MB9_Exit1",
         "bounds": {
           "x": 0.4286,
@@ -395,61 +395,13 @@
         "id": "MB-9_S2",
         "label": "MB-9_S2",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "MB9",
         "nearestWaypoint": "wp27_MB9_Exit2",
         "bounds": {
           "x": 0.6585,
           "y": 0.8852,
           "w": 0.2235,
           "h": 0.0782
-        }
-      },
-      {
-        "id": "MB-9_Corridor1",
-        "label": "MB-9_Corridor1",
-        "type": "hallway",
-        "floor": "MB9",
-        "bounds": {
-          "x": 0.3616,
-          "y": 0.0303,
-          "w": 0.0575,
-          "h": 0.7879
-        }
-      },
-      {
-        "id": "MB-9_Corridor2",
-        "label": "MB-9_Corridor2",
-        "type": "hallway",
-        "floor": "MB9",
-        "bounds": {
-          "x": 0.4286,
-          "y": 0.7958,
-          "w": 0.2459,
-          "h": 0.0242
-        }
-      },
-      {
-        "id": "MB-9_Corridor3",
-        "label": "MB-9_Corridor3",
-        "type": "hallway",
-        "floor": "MB9",
-        "bounds": {
-          "x": 0.6649,
-          "y": 0.509,
-          "w": 0.0415,
-          "h": 0.3614
-        }
-      },
-      {
-        "id": "MB-9_Corridor4",
-        "label": "MB-9_Corridor4",
-        "type": "hallway",
-        "floor": "MB9",
-        "bounds": {
-          "x": 0.4318,
-          "y": 0.3804,
-          "w": 0.2012,
-          "h": 0.0242
         }
       }
     ],
@@ -594,7 +546,9 @@
           "x": 0.6106,
           "y": 0.6803
         },
-        "connections": []
+        "connections": [
+          "wp30_MB9_T2"
+        ]
       },
       {
         "id": "wp13_MB9_9.240",
@@ -614,7 +568,9 @@
           "x": 0.649,
           "y": 0.4419
         },
-        "connections": []
+        "connections": [
+          "wp40_MB9"
+        ]
       },
       {
         "id": "wp15_MB9_9.255",
@@ -624,7 +580,9 @@
           "x": 0.5468,
           "y": 0.4065
         },
-        "connections": []
+        "connections": [
+          "wp32_MB9"
+        ]
       },
       {
         "id": "wp16_MB9_9.250",
@@ -634,7 +592,9 @@
           "x": 0.4797,
           "y": 0.3693
         },
-        "connections": []
+        "connections": [
+          "wp32_MB9"
+        ]
       },
       {
         "id": "wp17_MB9_9.270",
@@ -668,7 +628,9 @@
           "x": 0.6266,
           "y": 0.36
         },
-        "connections": []
+        "connections": [
+          "wp40_MB9"
+        ]
       },
       {
         "id": "wp20_MB9_9.315",
@@ -678,7 +640,9 @@
           "x": 0.6362,
           "y": 0.3972
         },
-        "connections": []
+        "connections": [
+          "wp40_MB9"
+        ]
       },
       {
         "id": "wp21_MB9_9.335",
@@ -713,7 +677,8 @@
           "y": 0.6841
         },
         "connections": [
-          "wp38_MB9"
+          "wp38_MB9",
+          "wp24_MB9_9.415"
         ]
       },
       {
@@ -724,7 +689,10 @@
           "x": 0.7511,
           "y": 0.7362
         },
-        "connections": []
+        "connections": [
+          "wp41_MB9",
+          "wp23_MB9_9.405"
+        ]
       },
       {
         "id": "wp25_MB9_9.425",
@@ -752,8 +720,11 @@
       },
       {
         "id": "wp27_MB9_Exit2",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB9",
+        "floorsReachable": [
+          "MB-8"
+        ],
         "position": {
           "x": 0.6841,
           "y": 0.8759
@@ -764,8 +735,11 @@
       },
       {
         "id": "wp28_MB9_Exit1",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB9",
+        "floorsReachable": [
+          "MB-8"
+        ],
         "position": {
           "x": 0.4222,
           "y": 0.075
@@ -795,7 +769,9 @@
           "y": 0.6859
         },
         "connections": [
-          "wp21_MB9_9.335"
+          "wp21_MB9_9.335",
+          "wp41_MB9",
+          "wp12_MB9_9.424"
         ]
       },
       {
@@ -830,7 +806,10 @@
           "y": 0.3939
         },
         "connections": [
-          "wp31_MB9"
+          "wp31_MB9",
+          "wp16_MB9_9.250",
+          "wp40_MB9",
+          "wp15_MB9_9.255"
         ]
       },
       {
@@ -890,22 +869,28 @@
         },
         "connections": [
           "wp35_MB9",
-          "wp38_MB9",
           "wp27_MB9_Exit2",
           "wp25_MB9_9.425",
-          "wp26_MB9_9.435"
+          "wp26_MB9_9.435",
+          "wp38_MB9",
+          "wp41_MB9"
         ]
       },
       {
         "id": "wp37_MB9",
         "type": "elevator",
         "floor": "MB9",
+        "floorsReachable": [
+          "MB-8"
+        ],
         "position": {
           "x": 0.4445,
           "y": 0.5629
         },
         "connections": [
-          "wp31_MB9"
+          "wp31_MB9",
+          "wp39_MB9",
+          "wp38_MB9"
         ]
       },
       {
@@ -918,9 +903,11 @@
         },
         "connections": [
           "wp39_MB9",
-          "wp36_MB9",
           "wp22_MB9_9.345",
-          "wp23_MB9_9.405"
+          "wp23_MB9_9.405",
+          "wp37_MB9",
+          "wp36_MB9",
+          "wp41_MB9"
         ]
       },
       {
@@ -934,7 +921,38 @@
         "connections": [
           "wp38_MB9",
           "wp31_MB9",
-          "wp33_MB9"
+          "wp33_MB9",
+          "wp37_MB9"
+        ]
+      },
+      {
+        "id": "wp40_MB9",
+        "type": "corridor",
+        "floor": "MB9",
+        "position": {
+          "x": 0.5848,
+          "y": 0.3947
+        },
+        "connections": [
+          "wp32_MB9",
+          "wp19_MB9_9.260",
+          "wp20_MB9_9.315",
+          "wp14_MB9_9.330"
+        ]
+      },
+      {
+        "id": "wp41_MB9",
+        "type": "corridor",
+        "floor": "MB9",
+        "position": {
+          "x": 0.6943,
+          "y": 0.7271
+        },
+        "connections": [
+          "wp36_MB9",
+          "wp38_MB9",
+          "wp30_MB9_T2",
+          "wp24_MB9_9.415"
         ]
       }
     ]
