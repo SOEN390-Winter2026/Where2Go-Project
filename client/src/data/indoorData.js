@@ -110,7 +110,7 @@ export const indoorMaps = {
     },
 
       JW: {
-        2: {
+        1: {
           image: require('../../assets/indoor/SGW/LB-1.png'),
           data: require('../../assets/indoor/SGW/floorplan_LB1.json'),
         },

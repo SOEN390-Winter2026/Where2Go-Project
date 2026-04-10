@@ -603,7 +603,16 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                 // Current-building polylines for the map overlay.
                 setIndoorRouteByFloor(buildIndoorRoutePolylinesByFloor(result.segments, building?.code, campus));
 
-                if (directionsFrom?.floor) setSelectedFloor(String(directionsFrom.floor));
+                // Only jump to the departure floor when we're viewing the departure
+                // building. For inter-building directions (e.g. Hall→MB generated
+                // while in MB's IndoorMaps), directionsFrom.floor belongs to a
+                // different building — applying it here would jump MB to Hall's
+                // floor number (e.g. floor 9 or floor 2).
+                const fromBCode = String(directionsFrom?.building ?? '').split(' (')[0].trim().toUpperCase();
+                const thisBCode = String(building?.code ?? '').toUpperCase();
+                if (fromBCode === thisBCode && directionsFrom?.floor) {
+                    setSelectedFloor(String(directionsFrom.floor));
+                }
                 onPersistCombinedRoute(result.segments || [], { from: directionsFrom, to: directionsTo });
             } else {
                 setIndoorRouteByFloor(null);

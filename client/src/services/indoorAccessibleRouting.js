@@ -131,11 +131,6 @@ function waypointTouchesHallHub(wp, allHubIds) {
   return false;
 }
 
-/**
- * FIX (Bug 4): Restrict the unconditional short-distance bypass to transfer-type
- * waypoints only. Regular waypoints (corridor, door, intersection) must have a
- * valid hallway path to avoid linking through walls.
- */
 function maybeLinkWaypointToHallHub(wp, maxDist, allHubIds, idToWp, hallwayWaysForSnap) {
   if (!wp?.id || !wp?.position) return;
   if (waypointTouchesHallHub(wp, allHubIds)) return;
@@ -300,7 +295,14 @@ function enrichFloorAliases(floorAliases) {
     const compactAlias = normalizeFloorAlias(alias);
     floorAliases.set(compactAlias, canonicalFloorId);
     const trailingNumber = getTrailingDigits(alias);
-    if (trailingNumber) floorAliases.set(trailingNumber, canonicalFloorId);
+    // Only add the trailing-digit shortcut when that key is not already mapped
+    // to a canonical floor. Without this guard, processing "S1" would set
+    // trailingNumber="1" and overwrite the genuine "1"→"1" mapping with "1"→"S1",
+    // causing resolveFloorId("1") to return "S1" and sending all routing
+    // requests for floor 1 to the sub-basement instead.
+    if (trailingNumber && !floorAliases.has(trailingNumber)) {
+      floorAliases.set(trailingNumber, canonicalFloorId);
+    }
   }
 }
 
@@ -504,15 +506,6 @@ function addBidirectionalConnection(a, b) {
   if (!hasConnection(b, a.id)) b.connections.push(String(a.id));
 }
 
-/**
- * FIX (Bug 1): Preserve the room's transfer type in the synthetic waypoint.
- * Previously every synthetic waypoint was typed "door", which meant escalator/elevator
- * room waypoints were never given floor-transfer edges by linkElevatorAndStairTransfersForAllFloors.
- *
- * FIX (Bug 4 partial): For non-transfer rooms, only connect to a waypoint that is
- * reachable without crossing a wall. This prevents room-center synthetic waypoints from
- * routing through walls to the nearest hallway hub.
- */
 function ensureRoomDoorwayWaypoint(room, floorPlan, floorId, idSet, syntheticState) {
   if (!room?.id) return;
   const center = roomCenter(room);
@@ -532,10 +525,8 @@ function ensureRoomDoorwayWaypoint(room, floorPlan, floorId, idSet, syntheticSta
     : [];
 
   if (isTransfer || hallwayRoomsHere.length === 0) {
-    // Transfer-type rooms live inside their own polygons — just use nearest waypoint.
     nearestExisting = nearestWaypointIdByPosition(floorPlan.waypoints, center);
   } else {
-    // Regular rooms: prefer a connection that doesn't cross a wall.
     let bestD = Infinity;
     for (const wp of floorPlan.waypoints) {
       if (!wp?.id || !wp?.position) continue;
@@ -546,7 +537,6 @@ function ensureRoomDoorwayWaypoint(room, floorPlan, floorId, idSet, syntheticSta
         bestD = d; nearestExisting = String(wp.id);
       }
     }
-    // If no wall-free connection found, fall back to nearest anyway.
     if (!nearestExisting) nearestExisting = nearestWaypointIdByPosition(floorPlan.waypoints, center);
   }
 
@@ -679,9 +669,6 @@ function buildFloorGraphsAndAliases(buildingData, floorAliases) {
   return floorGraphs;
 }
 
-// FIX: `continue` → `return` (continue is only valid inside a loop).
-// FIX: removed stray `}` that cut the function short before floorsReachable.forEach.
-// FIX: added escalator guard and processing.
 function connectTransferWaypoints({ adjacencyList, floorId, waypoint, pointType, floorGraphs, resolveFloorId, rules }) {
   if (pointType === "staircase" && rules.avoidStairs) return;
   if (pointType === "escalator" && rules.avoidStairs) return;
@@ -694,15 +681,6 @@ function connectTransferWaypoints({ adjacencyList, floorId, waypoint, pointType,
     const currentDigits = trailingAsciiDigitSuffix(currentFloorStr);
     const currentNum = currentDigits ? Number.parseInt(currentDigits, 10) : NaN;
 
-    // The non-digit prefix of the current floor key, e.g.:
-    //   "1"  → prefix ""    (pure numeric, main floors)
-    //   "9"  → prefix ""
-    //   "s1" → prefix "s"   (sub-basement)
-    //   "s2" → prefix "s"
-    //   "h9" → prefix "h"   (Hall-style keys)
-    // We only infer adjacency within the same prefix group so that sub-basement
-    // floors ("S1","S2") are never incorrectly linked to main floors ("1".."9")
-    // due to a trailing-digit collision (both "1" and "S1" have digit "1").
     const currentPrefix = currentDigits
       ? currentFloorStr.slice(0, currentFloorStr.length - currentDigits.length)
       : currentFloorStr;
@@ -714,7 +692,7 @@ function connectTransferWaypoints({ adjacencyList, floorId, waypoint, pointType,
           const digits = trailingAsciiDigitSuffix(idStr);
           if (!digits) return null;
           const prefix = idStr.slice(0, idStr.length - digits.length);
-          if (prefix !== currentPrefix) return null; // different stack — skip
+          if (prefix !== currentPrefix) return null;
           return { key: id, num: Number.parseInt(digits, 10) };
         })
         .filter(Boolean)
@@ -755,7 +733,6 @@ function bridgeDisconnectedComponentsForAllFloors(floorGraphs, adjacencyList, ru
   }
 }
 
-// FIX: added "escalator" so escalator waypoints get floor-transfer edges built.
 function linkElevatorAndStairTransfersForAllFloors(floorGraphs, adjacencyList, resolveFloorId, rules) {
   for (const [floorId, { floorPlan }] of floorGraphs.entries()) {
     for (const waypoint of floorPlan.waypoints) {
@@ -899,11 +876,6 @@ export function generateAccessibleIndoorPath({ campus, buildingCode, from, to, a
   return { success: true, path, cost: result.cost };
 }
 
-/**
- * FIX: rulesB.elevatorBonus was 0; corrected to 10 to match generateAccessibleIndoorPath
- * cost rules for non-accessible mode. The cache key only encodes avoidStairs so a wrong
- * elevatorBonus would silently persist and serve incorrect edge weights.
- */
 export function warmupIndoorGraph(campus, buildingCode) {
   if (!campus || !buildingCode) return;
   const rulesA = { avoidStairs: true,  stairsPenalty: 2, elevatorBonus: 0,  floorTransferCost: 1 };
