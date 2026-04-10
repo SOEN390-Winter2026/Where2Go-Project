@@ -1,9 +1,4 @@
 {
-  "CC3": {
-    "floor": "CC3",
-    "rooms": [],
-    "waypoints": []
-  },
   "MB7": {
     "floor": "MB7",
     "rooms": [
@@ -11,7 +6,7 @@
         "id": "elevator",
         "label": "elevator",
         "type": "elevator",
-        "floor": "CC3",
+        "floor": "MB7",
         "bounds": {
           "x": 0.4,
           "y": 0.5021,
@@ -23,7 +18,7 @@
         "id": "elevator",
         "label": "elevator",
         "type": "elevator",
-        "floor": "CC3",
+        "floor": "MB7",
         "bounds": {
           "x": 0.4025,
           "y": 0.5769,
@@ -35,7 +30,7 @@
         "id": "MB-7.394",
         "label": "MB-7.394",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "MB7",
         "bounds": {
           "x": 0.645,
           "y": 0.5769,
@@ -212,54 +207,6 @@
         }
       },
       {
-        "id": "MB-700",
-        "label": "MB-700",
-        "type": "hallway",
-        "floor": "MB7",
-        "bounds": {
-          "x": 0.335,
-          "y": 0.0739,
-          "w": 0.065,
-          "h": 0.7273
-        }
-      },
-      {
-        "id": "MB-700",
-        "label": "MB-700",
-        "type": "hallway",
-        "floor": "MB7",
-        "bounds": {
-          "x": 0.4,
-          "y": 0.774,
-          "w": 0.2625,
-          "h": 0.0272
-        }
-      },
-      {
-        "id": "MB-700",
-        "label": "MB-700",
-        "type": "hallway",
-        "floor": "MB7",
-        "bounds": {
-          "x": 0.6275,
-          "y": 0.8063,
-          "w": 0.0325,
-          "h": 0.0918
-        }
-      },
-      {
-        "id": "MB-700",
-        "label": "MB-700",
-        "type": "hallway",
-        "floor": "MB7",
-        "bounds": {
-          "x": 0.4025,
-          "y": 0.5463,
-          "w": 0.235,
-          "h": 0.0323
-        }
-      },
-      {
         "id": "MB-7.300",
         "label": "study lounge",
         "type": "other",
@@ -275,7 +222,7 @@
     "waypoints": [
       {
         "id": "wp1_MB7",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "MB7",
         "position": {
           "x": 0.3875,
@@ -288,13 +235,12 @@
           "wp9_MB7",
           "wp20_MB7",
           "wp10_MB7",
-          "wp22_MB7",
           "wp7_MB7"
         ]
       },
       {
         "id": "wp2_MB7",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "MB7",
         "position": {
           "x": 0.4125,
@@ -311,7 +257,7 @@
       },
       {
         "id": "wp3_MB7",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "MB7",
         "position": {
           "x": 0.3875,
@@ -326,7 +272,7 @@
       },
       {
         "id": "wp4_MB7",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "MB7",
         "position": {
           "x": 0.415,
@@ -340,7 +286,7 @@
       },
       {
         "id": "wp5_MB7",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "MB7",
         "position": {
           "x": 0.63,
@@ -354,7 +300,7 @@
       },
       {
         "id": "wp6_MB7",
-        "type": "intersection",
+        "type": "corridor",
         "floor": "MB7",
         "position": {
           "x": 0.6475,
@@ -369,8 +315,12 @@
       },
       {
         "id": "wp7_MB7",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB7",
+        "floorsReachable": [
+          "MB-6",
+          "MB-8"
+        ],
         "position": {
           "x": 0.4325,
           "y": 0.1164
@@ -441,8 +391,12 @@
       },
       {
         "id": "wp13_MB7",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB7",
+        "floorsReachable": [
+          "MB-6",
+          "MB-8"
+        ],
         "position": {
           "x": 0.655,
           "y": 0.6024
@@ -453,8 +407,12 @@
       },
       {
         "id": "wp14_MB7",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB7",
+        "floorsReachable": [
+          "MB-6",
+          "MB-8"
+        ],
         "position": {
           "x": 0.645,
           "y": 0.9133
@@ -536,21 +494,13 @@
         ]
       },
       {
-        "id": "wp22_MB7",
-        "type": "door",
-        "floor": "MB7",
-        "position": {
-          "x": 0.6213,
-          "y": 0.6283
-        },
-        "connections": [
-          "wp1_MB7"
-        ]
-      },
-      {
         "id": "wp23_MB7",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB7",
+        "floorsReachable": [
+          "MB-6",
+          "MB-8"
+        ],
         "position": {
           "x": 0.3183,
           "y": 0.7158
@@ -575,6 +525,10 @@
         "id": "wp25_MB7",
         "type": "elevator",
         "floor": "MB7",
+        "floorsReachable": [
+          "MB-6",
+          "MB-8"
+        ],
         "position": {
           "x": 0.5115,
           "y": 0.5309

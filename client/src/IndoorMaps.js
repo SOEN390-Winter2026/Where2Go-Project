@@ -61,7 +61,6 @@ const roomLabelKey = (room) => {
     return `${String(room?.id || 'room')}|${b.x}|${b.y}|${b.w}|${b.h}`;
 };
 
-// Compute rendered image rect inside a contain-mode container
 function getContainBounds(containerW, containerH, imageAspect) {
     if (!containerW || !containerH || !imageAspect) return null;
     const containerAspect = containerW / containerH;
@@ -74,7 +73,6 @@ function getContainBounds(containerW, containerH, imageAspect) {
 }
 
 function ZoomButton({ iconName, onPress, accessibilityLabel }) {
-    // Add testID for testability
     let testID;
     if (iconName === 'add') testID = 'zoom-in-btn';
     else if (iconName === 'remove') testID = 'zoom-out-btn';
@@ -99,11 +97,7 @@ ZoomButton.propTypes = {
 };
 
 function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, routePolylines }) {
-    if (
-        !containBounds
-        || !containerWidth
-        || !routePolylines?.length
-    ) {
+    if (!containBounds || !containerWidth || !routePolylines?.length) {
         return null;
     }
 
@@ -139,23 +133,9 @@ function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, ro
                         ) : null}
                         {pxPts.length > 0 ? (
                             <>
-                                <Circle
-                                    cx={pxPts[0].x}
-                                    cy={pxPts[0].y}
-                                    r={6}
-                                    fill={BURGUNDY_LIGHT}
-                                    stroke="#fff"
-                                    strokeWidth={2}
-                                />
+                                <Circle cx={pxPts[0].x} cy={pxPts[0].y} r={6} fill={BURGUNDY_LIGHT} stroke="#fff" strokeWidth={2} />
                                 {pxPts.length > 1 ? (
-                                    <Circle
-                                        cx={pxPts[pxPts.length - 1].x}
-                                        cy={pxPts[pxPts.length - 1].y}
-                                        r={6}
-                                        fill={BURGUNDY_LIGHT}
-                                        stroke="#fff"
-                                        strokeWidth={2}
-                                    />
+                                    <Circle cx={pxPts[pxPts.length - 1].x} cy={pxPts[pxPts.length - 1].y} r={6} fill={BURGUNDY_LIGHT} stroke="#fff" strokeWidth={2} />
                                 ) : null}
                             </>
                         ) : null}
@@ -167,25 +147,12 @@ function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, ro
 }
 
 IndoorRouteOverlay.propTypes = {
-    containBounds: PropTypes.shape({
-        left: PropTypes.number,
-        top: PropTypes.number,
-        width: PropTypes.number,
-        height: PropTypes.number,
-    }),
+    containBounds: PropTypes.shape({ left: PropTypes.number, top: PropTypes.number, width: PropTypes.number, height: PropTypes.number }),
     containerWidth: PropTypes.number,
     containerHeight: PropTypes.number,
-    routePolylines: PropTypes.arrayOf(
-        PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))
-    ),
+    routePolylines: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))),
 };
-
-IndoorRouteOverlay.defaultProps = {
-    containBounds: null,
-    containerWidth: 0,
-    containerHeight: 0,
-    routePolylines: [],
-};
+IndoorRouteOverlay.defaultProps = { containBounds: null, containerWidth: 0, containerHeight: 0, routePolylines: [] };
 
 function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, targetRoom, routePolylines }) {
     const scale = useRef(new Animated.Value(1)).current;
@@ -202,13 +169,10 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
     const [containerDims, setContainerDims] = useState({ width: 0, height: 0 });
     const [imageAspect, setImageAspect] = useState(null);
 
-    // resolve natural image aspect ratio for letterbox calculation
     useEffect(() => {
         try {
             const asset = Image.resolveAssetSource(source);
-            if (asset?.width && asset?.height) {
-                setImageAspect(asset.width / asset.height);
-            }
+            if (asset?.width && asset?.height) setImageAspect(asset.width / asset.height);
         } catch (e) {
             console.warn('IndoorMaps: could not resolve asset source for label overlay:', e?.message);
         }
@@ -218,82 +182,54 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
     const [highlightedRoomId, setHighlightedRoomId] = useState(null);
 
     useEffect(() => {
-    if (!targetRoom || !rooms || rooms.length === 0 || hasShownInitialHighlight.current) return;
-
-    const normalizedTarget = String(targetRoom).toLowerCase();
-    const matchedRoom = rooms.find(r => {
-        const rId = String(r.id).toLowerCase();
-        return rId === normalizedTarget || rId.endsWith(normalizedTarget);
-    });
-
-    if (matchedRoom) {
-        hasShownInitialHighlight.current = true; // Lock it immediately
-        setHighlightedRoomId(matchedRoom.id);
-
-        const timer = setTimeout(() => {
-            setHighlightedRoomId(null);
-        }, 6000);
-
-        return () => {
-            clearTimeout(timer);
-            setHighlightedRoomId(null); 
-        };
-    }
-}, [targetRoom, rooms.length]);
+        if (!targetRoom || !rooms || rooms.length === 0 || hasShownInitialHighlight.current) return;
+        const normalizedTarget = String(targetRoom).toLowerCase();
+        const matchedRoom = rooms.find(r => {
+            const rId = String(r.id).toLowerCase();
+            return rId === normalizedTarget || rId.endsWith(normalizedTarget);
+        });
+        if (matchedRoom) {
+            hasShownInitialHighlight.current = true;
+            setHighlightedRoomId(matchedRoom.id);
+            const timer = setTimeout(() => { setHighlightedRoomId(null); }, 6000);
+            return () => { clearTimeout(timer); setHighlightedRoomId(null); };
+        }
+    }, [targetRoom, rooms.length]);
 
     const commitTranslation = (tx, ty, s, animated = false) => {
         const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
-        lastTranslateX.current = x;
-        lastTranslateY.current = y;
+        lastTranslateX.current = x; lastTranslateY.current = y;
         if (animated) {
             Animated.spring(translateX, { toValue: x, useNativeDriver: true }).start();
             Animated.spring(translateY, { toValue: y, useNativeDriver: true }).start();
-        } else {
-            translateX.setValue(x);
-            translateY.setValue(y);
-        }
+        } else { translateX.setValue(x); translateY.setValue(y); }
     };
 
     const previewTranslation = (tx, ty, s) => {
         const { x, y } = clampTranslation(containerSize.current, tx, ty, s);
-        translateX.setValue(x);
-        translateY.setValue(y);
+        translateX.setValue(x); translateY.setValue(y);
     };
 
     const resetToOrigin = (animated = false) => {
-        lastTranslateX.current = 0;
-        lastTranslateY.current = 0;
+        lastTranslateX.current = 0; lastTranslateY.current = 0;
         if (animated) {
             Animated.spring(translateX, { toValue: 0, useNativeDriver: true }).start();
             Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
-        } else {
-            translateX.setValue(0);
-            translateY.setValue(0);
-        }
+        } else { translateX.setValue(0); translateY.setValue(0); }
     };
 
     const applyScale = (next, animated = false) => {
         lastScale.current = next;
-        if (animated) {
-            Animated.spring(scale, { toValue: next, useNativeDriver: true }).start();
-        } else {
-            scale.setValue(next);
-        }
-        if (next <= MIN_SCALE) {
-            resetToOrigin(animated);
-            setIsZoomed(false);
-        } else {
-            commitTranslation(lastTranslateX.current, lastTranslateY.current, next, animated);
-            setIsZoomed(true);
-        }
+        if (animated) { Animated.spring(scale, { toValue: next, useNativeDriver: true }).start(); }
+        else { scale.setValue(next); }
+        if (next <= MIN_SCALE) { resetToOrigin(animated); setIsZoomed(false); }
+        else { commitTranslation(lastTranslateX.current, lastTranslateY.current, next, animated); setIsZoomed(true); }
     };
 
     const handleZoomIn = () => applyScale(Math.min(lastScale.current + ZOOM_STEP, MAX_SCALE), true);
     const handleZoomOut = () => applyScale(Math.max(lastScale.current - ZOOM_STEP, MIN_SCALE), true);
     const handleRecenter = () => {
-        lastScale.current = MIN_SCALE;
-        lastTranslateX.current = 0;
-        lastTranslateY.current = 0;
+        lastScale.current = MIN_SCALE; lastTranslateX.current = 0; lastTranslateY.current = 0;
         Animated.parallel([
             Animated.spring(scale, { toValue: MIN_SCALE, useNativeDriver: true }),
             Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
@@ -304,33 +240,19 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
 
     const pinchGesture = Gesture.Pinch()
         .onStart(() => { isPinching.current = true; })
-        .onUpdate((e) => {
-            scale.setValue(Math.min(Math.max(lastScale.current * e.scale, MIN_SCALE), MAX_SCALE));
-        })
-        .onEnd((e) => {
-            const next = Math.min(Math.max(lastScale.current * e.scale, MIN_SCALE), MAX_SCALE);
-            applyScale(next);
-            isPinching.current = false;
-        })
+        .onUpdate((e) => { scale.setValue(Math.min(Math.max(lastScale.current * e.scale, MIN_SCALE), MAX_SCALE)); })
+        .onEnd((e) => { applyScale(Math.min(Math.max(lastScale.current * e.scale, MIN_SCALE), MAX_SCALE)); isPinching.current = false; })
         .runOnJS(true);
 
     const panGesture = Gesture.Pan()
         .enabled(isZoomed)
         .onUpdate((e) => {
             if (isPinching.current) return;
-            previewTranslation(
-                lastTranslateX.current + e.translationX,
-                lastTranslateY.current + e.translationY,
-                lastScale.current
-            );
+            previewTranslation(lastTranslateX.current + e.translationX, lastTranslateY.current + e.translationY, lastScale.current);
         })
         .onEnd((e) => {
             if (isPinching.current) return;
-            commitTranslation(
-                lastTranslateX.current + e.translationX,
-                lastTranslateY.current + e.translationY,
-                lastScale.current
-            );
+            commitTranslation(lastTranslateX.current + e.translationX, lastTranslateY.current + e.translationY, lastScale.current);
         })
         .runOnJS(true);
 
@@ -352,71 +274,43 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                 </View>
             )}
             <GestureDetector gesture={composed}>
-                <Animated.View style={[
-                    styles.zoomableAnimatedView,
-                    { transform: [{ translateX }, { translateY }, { scale }] },
-                ]}>
-                    {/* Base floor plan */}
-                    <Image
-                        source={source}
-                        style={styles.mapImage}
-                        resizeMode="contain"
-                        onLoadStart={() => setIsLoading(true)}
-                        onLoadEnd={() => setIsLoading(false)}
-                    />
+                <Animated.View style={[styles.zoomableAnimatedView, { transform: [{ translateX }, { translateY }, { scale }] }]}>
+                    <Image source={source} style={styles.mapImage} resizeMode="contain" onLoadStart={() => setIsLoading(true)} onLoadEnd={() => setIsLoading(false)} />
 
-                    {/* POI overlay */}
                     {poiOverlay && (
-                        <Image
-                            source={poiOverlay}
-                            style={[styles.poiOverlay, { opacity: isPOIEnabled ? 1 : 0 }]}
-                            resizeMode="contain"
-                            pointerEvents="none"
-                        />
+                        <Image source={poiOverlay} style={[styles.poiOverlay, { opacity: isPOIEnabled ? 1 : 0 }]} resizeMode="contain" pointerEvents="none" />
                     )}
 
-                    {/* maestro poi loaded */}
                     {isPOIEnabled && (
-                        <Text
-                            style={{ position: 'absolute', color: 'transparent', fontSize: 1 }}
-                        >
-                            Maestro visible - POI loaded
-                        </Text>
+                        <Text style={{ position: 'absolute', color: 'transparent', fontSize: 1 }}>Maestro visible - POI loaded</Text>
                     )}
 
-                    {/* Classroom label overlay */}
                     {containBounds && rooms?.length > 0 && (
                         <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
                             {rooms.map((room, index) => {
                                 const { x, y, w, h } = room.bounds;
                                 const cx = containBounds.left + (x + w / 2) * containBounds.width;
                                 const cy = containBounds.top + (y + h / 2) * containBounds.height;
-
-                                // Determine if this specific label should change color
                                 const isTarget = room.id === highlightedRoomId;
-
                                 return (
                                     <TouchableOpacity
                                         key={`${roomLabelKey(room)}-${index}`}
                                         testID={`room-label-${room.id}`}
                                         style={[
                                             styles.roomLabel,
-                                            { left: cx, top: cy },
-                                            // CHANGE: Conditional Background Color
-                                            isTarget && {
-                                                backgroundColor: '#FFD700', // Bright Gold/Yellow
-                                                borderColor: '#912338',
-                                                borderWidth: 2,
-                                                zIndex: 10 // Ensure it sits above other labels
-                                            }
+                                            { left: cx, top: cy, paddingHorizontal: 3, paddingVertical: 1, minWidth: 0 },
+                                            isTarget && { backgroundColor: '#FFD700', borderColor: '#912338', borderWidth: 2, zIndex: 10 }
                                         ]}
                                         onPress={() => onRoomPress?.(room.id)}
                                     >
-                                        <Text style={[
-                                            styles.roomLabelText,
-                                            // CHANGE: Conditional Text Style
-                                            isTarget && { color: '#912338', fontWeight: 'bold' }
-                                        ]}>
+                                        <Text
+                                            style={[
+                                                styles.roomLabelText,
+                                                { fontSize: 8 },
+                                                isTarget && { color: '#912338', fontWeight: 'bold', fontSize: 9 }
+                                            ]}
+                                            numberOfLines={1}
+                                        >
                                             {room.id}
                                         </Text>
                                     </TouchableOpacity>
@@ -451,19 +345,9 @@ ZoomableImage.propTypes = {
     poiOverlay: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     isPOIEnabled: PropTypes.bool,
     targetRoom: PropTypes.string,
-    routePolylines: PropTypes.arrayOf(
-        PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))
-    ),
+    routePolylines: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))),
 };
-
-ZoomableImage.defaultProps = {
-    rooms: [],
-    onRoomPress: null,
-    poiOverlay: null,
-    isPOIEnabled: false,
-    targetRoom: null,
-    routePolylines: [],
-};
+ZoomableImage.defaultProps = { rooms: [], onRoomPress: null, poiOverlay: null, isPOIEnabled: false, targetRoom: null, routePolylines: [] };
 
 function Placeholder({ width, text }) {
     return (
@@ -473,11 +357,7 @@ function Placeholder({ width, text }) {
         </View>
     );
 }
-
-Placeholder.propTypes = {
-    width: PropTypes.number.isRequired,
-    text: PropTypes.string.isRequired,
-};
+Placeholder.propTypes = { width: PropTypes.number.isRequired, text: PropTypes.string.isRequired };
 
 function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled, targetRoom, routeByFloor }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
@@ -488,7 +368,6 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
 
     return (
         <View style={styles.floorLayersContainer}>
-            {/* Floor label */}
             <View style={styles.badge} pointerEvents="none">
                 <Text style={styles.floorLabelText}>{`Floor ${selectedFloor}`}</Text>
             </View>
@@ -496,7 +375,11 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
             {Object.entries(buildingData).map(([floor, entry]) => {
                 const isActive = selectedFloor === floor || Number(selectedFloor) === Number(floor);
                 const floorPlan = isActive ? extractFloorPlan(entry?.data, floor) : null;
-                const allRooms = (floorPlan?.rooms ?? []).filter(r => r.bounds);
+                // Hide infrastructure room labels — only show rooms users navigate to.
+                const HIDDEN_LABEL_TYPES = new Set(['escalator', 'hallway', 'corridor', 'exit', 'staircase', 'elevator']);
+                const allRooms = (floorPlan?.rooms ?? []).filter(
+                    r => r.bounds && !HIDDEN_LABEL_TYPES.has(String(r?.type || '').toLowerCase())
+                );
                 const poiOverlay = isActive ? getPOIOverlay(campus, buildingCode, floor) : null;
 
                 return (
@@ -516,7 +399,6 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                                     targetRoom={targetRoom}
                                     routePolylines={isActive ? routePolylines : []}
                                 />
-
                                 {!entry.data && (
                                     <View style={styles.navUnavailableBadge}>
                                         <Text style={styles.navUnavailableText}>Navigation unavailable</Text>
@@ -543,13 +425,7 @@ FloorMapImage.propTypes = {
     targetRoom: PropTypes.string,
     routeByFloor: PropTypes.object,
 };
-
-FloorMapImage.defaultProps = {
-    onRoomPress: null,
-    routeByFloor: null,
-    isPOIEnabled: false,
-    targetRoom: null,
-};
+FloorMapImage.defaultProps = { onRoomPress: null, routeByFloor: null, isPOIEnabled: false, targetRoom: null };
 
 function RouteFloorSwitcher({ routeFloors, selectedFloor, setSelectedFloor }) {
     if (!routeFloors || routeFloors.length < 2) return null;
@@ -592,20 +468,11 @@ RouteFloorSwitcher.propTypes = {
     selectedFloor: PropTypes.string,
     setSelectedFloor: PropTypes.func.isRequired,
 };
-
-RouteFloorSwitcher.defaultProps = {
-    routeFloors: [],
-    selectedFloor: null,
-};
+RouteFloorSwitcher.defaultProps = { routeFloors: [], selectedFloor: null };
 
 function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
     return (
-        <Modal
-            visible={visible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}
-        >
+        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
             <Pressable style={styles.roomModalOverlay} onPress={onClose}>
                 <View style={styles.roomModalCard}>
                     <Text style={styles.roomModalTitle}>{roomId}</Text>
@@ -625,15 +492,7 @@ function RoomActionModal({ visible, roomId, onSetFrom, onSetTo, onClose }) {
         </Modal>
     );
 }
-
-RoomActionModal.propTypes = {
-    visible: PropTypes.bool.isRequired,
-    roomId: PropTypes.string,
-    onSetFrom: PropTypes.func.isRequired,
-    onSetTo: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-};
-
+RoomActionModal.propTypes = { visible: PropTypes.bool.isRequired, roomId: PropTypes.string, onSetFrom: PropTypes.func.isRequired, onSetTo: PropTypes.func.isRequired, onClose: PropTypes.func.isRequired };
 RoomActionModal.defaultProps = { roomId: '' };
 
 export default function IndoorMaps({ building, onPressBack, campus, buildings = [], isAccessibilityEnabled = false,
@@ -661,56 +520,35 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
     const FONT_MD = Math.round(width * 0.038);
 
     const [roomModal, setRoomModal] = useState({ visible: false, roomId: null });
-    //poi state is here so that the sidebar btn and the map can read it
     const [isPOIEnabled, setIsPOIEnabled] = useState(false);
     const [generatingDirections, setGeneratingDirections] = useState(false);
     const [indoorRouteByFloor, setIndoorRouteByFloor] = useState(null);
     const [routeError, setRouteError] = useState(null);
     const [routeSegments, setRouteSegments] = useState(null);
+    // All indoor route floors across every building (departure + destination).
+    // Used by RouteFloorSwitcher so both buildings' floors appear as buttons.
 
     const keyboardAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
         const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
-        const onShow = (e) => {
-            Animated.timing(keyboardAnim, {
-                toValue: e.endCoordinates.height,
-                duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 150,
-                useNativeDriver: false, 
-            }).start();
-        };
-
-        const onHide = (e) => {
-            Animated.timing(keyboardAnim, {
-                toValue: 0,
-                duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 150,
-                useNativeDriver: false,
-            }).start();
-        };
-
+        const onShow = (e) => Animated.timing(keyboardAnim, { toValue: e.endCoordinates.height, duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 150, useNativeDriver: false }).start();
+        const onHide = (e) => Animated.timing(keyboardAnim, { toValue: 0, duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 150, useNativeDriver: false }).start();
         const showSub = Keyboard.addListener(showEvent, onShow);
         const hideSub = Keyboard.addListener(hideEvent, onHide);
-
-        return () => {
-            showSub.remove();
-            hideSub.remove();
-        };
+        return () => { showSub.remove(); hideSub.remove(); };
     }, [keyboardAnim]);
 
     const allRoomsForBuilding = useMemo(() => {
         if (!building?.code || !campus) return [];
         const buildingData = indoorMaps?.[campus]?.[building.code];
         if (!buildingData) return [];
-
         const seen = new Set();
         return Object.entries(buildingData)
             .flatMap(([floor, entry]) => {
                 const floorPlan = extractFloorPlan(entry?.data, floor);
-                return (floorPlan?.rooms ?? [])
-                    .filter((r) => r.bounds && r.id)
-                    .map((r) => ({ room: r.id, floor }));
+                return (floorPlan?.rooms ?? []).filter((r) => r.bounds && r.id).map((r) => ({ room: r.id, floor }));
             })
             .filter(({ room, floor }) => {
                 const key = `${floor}-${room}`;
@@ -724,28 +562,32 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
         if (!Array.isArray(persistedCombinedSegments) || !persistedCombinedSegments.length) return;
         setRouteError(null);
         setRouteSegments(persistedCombinedSegments);
-        setIndoorRouteByFloor(
-            buildIndoorRoutePolylinesByFloor(persistedCombinedSegments, building?.code, campus)
-        );
+        const routeByFloor = buildIndoorRoutePolylinesByFloor(persistedCombinedSegments, building?.code, campus);
+        setIndoorRouteByFloor(routeByFloor);
         if (persistedDirectionsFrom?.building && persistedDirectionsTo?.building) {
-            setDirectionsFrom(persistedDirectionsFrom);
-            setDirectionsTo(persistedDirectionsTo);
+            // Only restore directionsFrom/To when this IndoorMaps is showing the
+            // DEPARTURE building. In the destination building (e.g. MB when the
+            // route was Hall→MB), restoring directionsTo causes IndoorMapsBottomSheet
+            // to call setSelectedFloor(directionsTo.floor) which jumps to the
+            // destination room's floor (e.g. 9) instead of the entrance floor (1).
+            const fromBCode = String(persistedDirectionsFrom.building).split(' (')[0].trim().toUpperCase();
+            const thisBCode = String(building?.code ?? '').toUpperCase();
+            if (fromBCode === thisBCode) {
+                setDirectionsFrom(persistedDirectionsFrom);
+                setDirectionsTo(persistedDirectionsTo);
+            }
+            // Destination building: leave directions at defaults.
+            // The route overlay already shows the full path from entrance to room.
         }
     }, [persistedCombinedSegments, building?.code, campus]);
 
-    const handleSelectRoom = (room, floor) => {
-        setSelectedFloor(floor);
-        setClassroomInput(room);
-        Keyboard.dismiss();
-    };
+    const handleSelectRoom = (room, floor) => { setSelectedFloor(floor); setClassroomInput(room); Keyboard.dismiss(); };
 
     const handleGenerateDirections = async () => {
         setIndoorRouteByFloor(null);
         setRouteError(null);
         setRouteSegments(null);
         setGeneratingDirections(true);
-        // Yield to the event loop so React can render the loading state before
-        // the synchronous graph-build blocks the JS thread.
         await new Promise(resolve => setTimeout(resolve, 0));
         try {
             const result = await buildInterBuildingDirections({
@@ -757,16 +599,21 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
             });
             if (result.ok) {
                 setRouteSegments(result.segments || null);
-                setIndoorRouteByFloor(
-                    buildIndoorRoutePolylinesByFloor(result.segments, building?.code, campus)
-                );
-                if (directionsFrom?.floor) {
+
+                // Current-building polylines for the map overlay.
+                setIndoorRouteByFloor(buildIndoorRoutePolylinesByFloor(result.segments, building?.code, campus));
+
+                // Only jump to the departure floor when we're viewing the departure
+                // building. For inter-building directions (e.g. Hall→MB generated
+                // while in MB's IndoorMaps), directionsFrom.floor belongs to a
+                // different building — applying it here would jump MB to Hall's
+                // floor number (e.g. floor 9 or floor 2).
+                const fromBCode = String(directionsFrom?.building ?? '').split(' (')[0].trim().toUpperCase();
+                const thisBCode = String(building?.code ?? '').toUpperCase();
+                if (fromBCode === thisBCode && directionsFrom?.floor) {
                     setSelectedFloor(String(directionsFrom.floor));
                 }
-                onPersistCombinedRoute(result.segments || [], {
-                    from: directionsFrom,
-                    to: directionsTo,
-                });
+                onPersistCombinedRoute(result.segments || [], { from: directionsFrom, to: directionsTo });
             } else {
                 setIndoorRouteByFloor(null);
                 setRouteError(result.message || "Could not build directions.");
@@ -789,34 +636,28 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
     const handleSetDirectionsFrom = (v) => { setDirectionsFrom(v); clearRoute(); };
     const handleSetDirectionsTo = (v) => { setDirectionsTo(v); clearRoute(); };
     const handleSwapAndClear = () => { handleSwapDirections(); clearRoute(); };
-
     const handleRoomPress = (roomId) => setRoomModal({ visible: true, roomId });
 
-    // Navigate to target floor and optionally focus on room when passed as props
     useEffect(() => {
         if (targetFloor) {
             setSelectedFloor(targetFloor);
-            // Open room modal after floor is set
             if (targetRoom) {
-                const timer = setTimeout(() => {
-                    handleRoomPress(targetRoom);
-                }, 100);
+                const timer = setTimeout(() => { handleRoomPress(targetRoom); }, 100);
                 return () => clearTimeout(timer);
             }
         } else if (targetRoom) {
-            // If only room is specified without floor, open it immediately
             handleRoomPress(targetRoom);
         }
     }, [targetFloor, targetRoom]);
 
     const handleSetFrom = () => {
-        handleSetDirectionsFrom({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
+        handleSetDirectionsFrom({ building: `${building?.code} (${campus})`, floor: selectedFloor, room: roomModal.roomId });
         setRoomModal({ visible: false, roomId: null });
         handleTabPress('directions');
     };
 
     const handleSetTo = () => {
-        handleSetDirectionsTo({ building: building?.code, floor: selectedFloor, room: roomModal.roomId });
+        handleSetDirectionsTo({ building: `${building?.code} (${campus})`, floor: selectedFloor, room: roomModal.roomId });
         setRoomModal({ visible: false, roomId: null });
         handleTabPress('directions');
     };
@@ -900,34 +741,18 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
 }
 
 IndoorMaps.propTypes = {
-    building: PropTypes.shape({
-        id: PropTypes.string,
-        name: PropTypes.string,
-        code: PropTypes.string,
-        address: PropTypes.string,
-    }),
+    building: PropTypes.shape({ id: PropTypes.string, name: PropTypes.string, code: PropTypes.string, address: PropTypes.string }),
     onPressBack: PropTypes.func.isRequired,
     campus: PropTypes.string,
-    buildings: PropTypes.arrayOf(PropTypes.shape({
-        code: PropTypes.string,
-        name: PropTypes.string,
-    })),
+    buildings: PropTypes.arrayOf(PropTypes.shape({ code: PropTypes.string, name: PropTypes.string })),
     isAccessibilityEnabled: PropTypes.bool,
     onToggleAccessibility: PropTypes.func,
     targetFloor: PropTypes.string,
     targetRoom: PropTypes.string,
     onPersistCombinedRoute: PropTypes.func,
     persistedCombinedSegments: PropTypes.array,
-    persistedDirectionsFrom: PropTypes.shape({
-        building: PropTypes.string,
-        floor: PropTypes.string,
-        room: PropTypes.string,
-    }),
-    persistedDirectionsTo: PropTypes.shape({
-        building: PropTypes.string,
-        floor: PropTypes.string,
-        room: PropTypes.string,
-    }),
+    persistedDirectionsFrom: PropTypes.shape({ building: PropTypes.string, floor: PropTypes.string, room: PropTypes.string }),
+    persistedDirectionsTo: PropTypes.shape({ building: PropTypes.string, floor: PropTypes.string, room: PropTypes.string }),
 };
 
 IndoorMaps.defaultProps = {

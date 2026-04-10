@@ -6,7 +6,7 @@
         "id": "CC4_430-9",
         "label": "CC4_430-9",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp1_CC4_430-9",
         "bounds": {
           "x": 0.0473,
@@ -19,7 +19,7 @@
         "id": "CC4_430-5",
         "label": "CC4_430-5",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp2_CC4_430-5",
         "bounds": {
           "x": 0.1171,
@@ -32,7 +32,7 @@
         "id": "CC4_430-3",
         "label": "CC4_430-3",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp3_CC4_430-3",
         "bounds": {
           "x": 0.1893,
@@ -45,7 +45,7 @@
         "id": "CC4_430-1",
         "label": "CC4_430-1",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp4_CC4_430-1",
         "bounds": {
           "x": 0.223,
@@ -58,7 +58,7 @@
         "id": "CC4_430-4",
         "label": "CC4_430-4",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp19_CC4_430-4",
         "bounds": {
           "x": 0.1742,
@@ -71,7 +71,7 @@
         "id": "CC4_430-11",
         "label": "CC4_430-11",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp5_CC4_430-11",
         "bounds": {
           "x": 0.045,
@@ -84,7 +84,7 @@
         "id": "CC4_431-13",
         "label": "CC4_431-13",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp6_CC4_431_13",
         "bounds": {
           "x": 0.0462,
@@ -97,7 +97,7 @@
         "id": "CC4_431-11",
         "label": "CC4_431-11",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp7_CC4_431-11",
         "bounds": {
           "x": 0.0485,
@@ -110,7 +110,7 @@
         "id": "CC4_431-9",
         "label": "CC4_431-9",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp8_CC4_431-9",
         "bounds": {
           "x": 0.1113,
@@ -123,7 +123,7 @@
         "id": "CC4_431",
         "label": "CC4_431",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp9_CC4_431",
         "bounds": {
           "x": 0.1614,
@@ -136,7 +136,7 @@
         "id": "CC4_431-1",
         "label": "CC4_431-1",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp10_CC4_431-1",
         "bounds": {
           "x": 0.2568,
@@ -149,7 +149,7 @@
         "id": "CC4_405",
         "label": "CC4_405",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp13_CC4_405",
         "bounds": {
           "x": 0.635,
@@ -162,7 +162,7 @@
         "id": "CC4_403",
         "label": "CC4_403",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp14_CC4_403",
         "bounds": {
           "x": 0.777,
@@ -175,7 +175,7 @@
         "id": "CC4_425",
         "label": "CC4_425",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp15_CC4_425",
         "bounds": {
           "x": 0.6757,
@@ -188,7 +188,7 @@
         "id": "CC4_426",
         "label": "CC4_426",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp16_CC4_426",
         "bounds": {
           "x": 0.7828,
@@ -201,7 +201,7 @@
         "id": "CC4_431-12",
         "label": "CC4_431-12",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp20_CC4_431-12",
         "bounds": {
           "x": 0.1393,
@@ -214,7 +214,7 @@
         "id": "CC4_S1",
         "label": "CC4_S1",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp11_CC4_S1",
         "bounds": {
           "x": 0.2626,
@@ -227,7 +227,7 @@
         "id": "CC4_S2",
         "label": "CC4_S2",
         "type": "staircase",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp12_CC4_S2",
         "bounds": {
           "x": 0.6292,
@@ -240,7 +240,7 @@
         "id": "CC4_T1",
         "label": "CC4_T1",
         "type": "other",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp17_CC4_T1",
         "bounds": {
           "x": 0.8293,
@@ -253,7 +253,7 @@
         "id": "CC4_431_6",
         "label": "CC4_431-6",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "CC4",
         "nearestWaypoint": "wp21_CC4_431_6",
         "bounds": {
           "x": 0.2002,
@@ -261,344 +261,437 @@
           "w": 0.021,
           "h": 0.0291
         }
-      },
-      {
-        "id": "CC4",
-        "label": "CC4",
-        "type": "hallway",
-        "floor": "CC3",
-        "nearestWaypoint": "wp18_CC4",
-        "bounds": {
-          "x": 0.2592,
-          "y": 0.4529,
-          "w": 0.6602,
-          "h": 0.0345
-        }
-      },
-      {
-        "id": "CC4_1",
-        "label": "CC4_1",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.1008,
-          "y": 0.4216,
-          "w": 0.1188,
-          "h": 0.0215
-        }
-      },
-      {
-        "id": "CC4_2",
-        "label": "CC4_2",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.1089,
-          "y": 0.4464,
-          "w": 0.0259,
-          "h": 0.0884
-        }
-      },
-      {
-        "id": "CC4_3",
-        "label": "CC4_3",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.1388,
-          "y": 0.496,
-          "w": 0.1091,
-          "h": 0.0388
-        }
-      },
-      {
-        "id": "CC4_4",
-        "label": "CC4_4",
-        "type": "hallway",
-        "floor": "CC3",
-        "bounds": {
-          "x": 0.2277,
-          "y": 0.4442,
-          "w": 0.0242,
-          "h": 0.0496
-        }
       }
     ],
     "waypoints": [
       {
         "id": "wp1_CC4_430-9",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.1016,
           "y": 0.4151
         },
         "connections": [
-          "wp_exit_CC4"
+          "wp28_CC4"
         ]
       },
       {
         "id": "wp2_CC4_430-5",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.1759,
           "y": 0.4141
         },
-        "connections": []
+        "connections": [
+          "wp27_CC4"
+        ]
       },
       {
         "id": "wp3_CC4_430-3",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.197,
           "y": 0.4119
         },
-        "connections": []
+        "connections": [
+          "wp27_CC4"
+        ]
       },
       {
         "id": "wp4_CC4_430-1",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.2196,
           "y": 0.4259
         },
-        "connections": []
+        "connections": [
+          "wp27_CC4"
+        ]
       },
       {
         "id": "wp5_CC4_430-11",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.0903,
           "y": 0.4248
         },
-        "connections": []
+        "connections": [
+          "wp28_CC4"
+        ]
       },
       {
         "id": "wp6_CC4_431_13",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.1048,
           "y": 0.4507
         },
-        "connections": []
+        "connections": [
+          "wp28_CC4",
+          "wp29_CC4"
+        ]
       },
       {
         "id": "wp7_CC4_431-11",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.1048,
           "y": 0.5013
         },
-        "connections": []
+        "connections": [
+          "wp30_CC4",
+          "wp29_CC4"
+        ]
       },
       {
         "id": "wp8_CC4_431-9",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.1574,
           "y": 0.5455
         },
-        "connections": []
+        "connections": [
+          "wp32_CC4"
+        ]
       },
       {
         "id": "wp9_CC4_431",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.2083,
           "y": 0.5347
         },
-        "connections": []
+        "connections": [
+          "wp32_CC4",
+          "wp31_CC4"
+        ]
       },
       {
         "id": "wp10_CC4_431-1",
         "type": "door",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
           "x": 0.2527,
           "y": 0.5197
         },
-        "connections": []
+        "connections": [
+          "wp31_CC4"
+        ]
       },
       {
         "id": "wp11_CC4_S1",
-        "type": "door",
-        "floor": "CC3",
+        "type": "staircase",
+        "floor": "CC4",
+        "floorsReachable": [
+          "CC-3"
+        ],
         "position": {
           "x": 0.2713,
           "y": 0.4496
         },
-        "connections": []
+        "connections": [
+          "wp24_CC4"
+        ]
       },
       {
         "id": "wp12_CC4_S2",
-        "type": "door",
-        "floor": "CC3",
+        "type": "staircase",
+        "floor": "CC4",
+        "floorsReachable": [
+          "CC-3"
+        ],
         "position": {
           "x": 0.6341,
           "y": 0.4485
-        },
-        "connections": []
-      },
-      {
-        "id": "wp13_CC4_405",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.7303,
-          "y": 0.4863
-        },
-        "connections": []
-      },
-      {
-        "id": "wp14_CC4_403",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.8079,
-          "y": 0.4895
-        },
-        "connections": []
-      },
-      {
-        "id": "wp15_CC4_425",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.7497,
-          "y": 0.4485
-        },
-        "connections": []
-      },
-      {
-        "id": "wp16_CC4_426",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.8103,
-          "y": 0.4496
-        },
-        "connections": []
-      },
-      {
-        "id": "wp17_CC4_T1",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.8362,
-          "y": 0.4916
-        },
-        "connections": []
-      },
-      {
-        "id": "wp18_CC4",
-        "type": "corridor",
-        "floor": "CC3",
-        "position": {
-          "x": 0.9315,
-          "y": 0.4679
-        },
-        "connections": []
-      },
-      {
-        "id": "wp19_CC4_430-4",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.1856,
-          "y": 0.4399
-        },
-        "connections": []
-      },
-      {
-        "id": "wp20_CC4_431-12",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.1355,
-          "y": 0.4798
-        },
-        "connections": []
-      },
-      {
-        "id": "wp21_CC4_431_6",
-        "type": "door",
-        "floor": "CC3",
-        "position": {
-          "x": 0.2139,
-          "y": 0.496
-        },
-        "connections": []
-      },
-      {
-        "id": "wp22_CC4",
-        "type": "corridor",
-        "floor": "CC3",
-        "position": {
-          "x": 0.1202,
-          "y": 0.4453
         },
         "connections": [
           "wp23_CC4"
         ]
       },
       {
-        "id": "wp23_CC4",
-        "type": "corridor",
-        "floor": "CC3",
+        "id": "wp13_CC4_405",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.7303,
+          "y": 0.4863
+        },
+        "connections": [
+          "wp22_CC4"
+        ]
+      },
+      {
+        "id": "wp14_CC4_403",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.8079,
+          "y": 0.4895
+        },
+        "connections": [
+          "wp18_CC4"
+        ]
+      },
+      {
+        "id": "wp15_CC4_425",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.7497,
+          "y": 0.4485
+        },
+        "connections": [
+          "wp22_CC4"
+        ]
+      },
+      {
+        "id": "wp16_CC4_426",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.8103,
+          "y": 0.4496
+        },
+        "connections": [
+          "wp18_CC4"
+        ]
+      },
+      {
+        "id": "wp17_CC4_T1",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.8362,
+          "y": 0.4916
+        },
+        "connections": [
+          "wp18_CC4"
+        ]
+      },
+      {
+        "id": "wp19_CC4_430-4",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.1856,
+          "y": 0.4399
+        },
+        "connections": [
+          "wp27_CC4"
+        ]
+      },
+      {
+        "id": "wp20_CC4_431-12",
+        "type": "door",
+        "floor": "CC4",
         "position": {
           "x": 0.1355,
-          "y": 0.5089
+          "y": 0.4798
+        },
+        "connections": [
+          "wp29_CC4"
+        ]
+      },
+      {
+        "id": "wp21_CC4_431_6",
+        "type": "door",
+        "floor": "CC4",
+        "position": {
+          "x": 0.2139,
+          "y": 0.496
+        },
+        "connections": [
+          "wp31_CC4",
+          "wp32_CC4"
+        ]
+      },
+      {
+        "id": "wp18_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.8197,
+          "y": 0.4726
+        },
+        "connections": [
+          "wp17_CC4_T1",
+          "wp14_CC4_403",
+          "wp16_CC4_426",
+          "wp22_CC4"
+        ]
+      },
+      {
+        "id": "wp22_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.7355,
+          "y": 0.4671
+        },
+        "connections": [
+          "wp18_CC4",
+          "wp15_CC4_425",
+          "wp13_CC4_405",
+          "wp23_CC4"
+        ]
+      },
+      {
+        "id": "wp23_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.634,
+          "y": 0.4693
         },
         "connections": [
           "wp22_CC4",
+          "wp12_CC4_S2",
           "wp24_CC4"
         ]
       },
       {
         "id": "wp24_CC4",
         "type": "corridor",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
-          "x": 0.2479,
-          "y": 0.4949
+          "x": 0.2707,
+          "y": 0.4671
         },
         "connections": [
           "wp23_CC4",
+          "wp11_CC4_S1",
           "wp25_CC4"
         ]
       },
       {
         "id": "wp25_CC4",
         "type": "corridor",
-        "floor": "CC3",
+        "floor": "CC4",
         "position": {
-          "x": 0.2553,
-          "y": 0.468
+          "x": 0.2344,
+          "y": 0.4572
         },
         "connections": [
           "wp24_CC4",
-          "wp_exit_CC4"
+          "wp31_CC4",
+          "wp26_CC4"
         ]
       },
       {
-        "id": "wp_exit_CC4",
-        "type": "exit",
+        "id": "wp26_CC4",
+        "type": "corridor",
         "floor": "CC4",
         "position": {
-          "x": 0.5,
-          "y": 0.93
+          "x": 0.208,
+          "y": 0.4517
+        },
+        "connections": [
+          "wp27_CC4",
+          "wp25_CC4"
+        ]
+      },
+      {
+        "id": "wp27_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.2022,
+          "y": 0.4308
+        },
+        "connections": [
+          "wp28_CC4",
+          "wp26_CC4",
+          "wp2_CC4_430-5",
+          "wp19_CC4_430-4",
+          "wp3_CC4_430-3",
+          "wp4_CC4_430-1"
+        ]
+      },
+      {
+        "id": "wp28_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.1188,
+          "y": 0.4297
+        },
+        "connections": [
+          "wp29_CC4",
+          "wp27_CC4",
+          "wp6_CC4_431_13",
+          "wp5_CC4_430-11",
+          "wp1_CC4_430-9"
+        ]
+      },
+      {
+        "id": "wp29_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.118,
+          "y": 0.4858
+        },
+        "connections": [
+          "wp30_CC4",
+          "wp28_CC4",
+          "wp7_CC4_431-11",
+          "wp20_CC4_431-12",
+          "wp6_CC4_431_13"
+        ]
+      },
+      {
+        "id": "wp30_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.1221,
+          "y": 0.5167
+        },
+        "connections": [
+          "wp32_CC4",
+          "wp29_CC4",
+          "wp7_CC4_431-11"
+        ]
+      },
+      {
+        "id": "wp31_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.2361,
+          "y": 0.5145
         },
         "connections": [
           "wp25_CC4",
-          "wp1_CC4_430-9"
+          "wp32_CC4",
+          "wp21_CC4_431_6",
+          "wp9_CC4_431",
+          "wp10_CC4_431-1"
+        ]
+      },
+      {
+        "id": "wp32_CC4",
+        "type": "corridor",
+        "floor": "CC4",
+        "position": {
+          "x": 0.1758,
+          "y": 0.5189
+        },
+        "connections": [
+          "wp31_CC4",
+          "wp8_CC4_431-9",
+          "wp30_CC4",
+          "wp21_CC4_431_6",
+          "wp9_CC4_431"
         ]
       }
     ]

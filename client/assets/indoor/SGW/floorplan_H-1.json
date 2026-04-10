@@ -197,19 +197,6 @@
         }
       },
       {
-        "id": "H-Tunnel",
-        "label": "H-Tunnel",
-        "type": "exit",
-        "floor": "H-1",
-        "nearestWaypoint": "wp14_H-1",
-        "bounds": {
-          "x": 0.6551,
-          "y": 0.8466,
-          "w": 0.0845,
-          "h": 0.0545
-        }
-      },
-      {
         "id": "H-198",
         "label": "H-198",
         "type": "staircase",
@@ -401,18 +388,6 @@
         ]
       },
       {
-        "id": "wp14_H-1",
-        "type": "exit",
-        "floor": "H-1",
-        "position": {
-          "x": 0.7417,
-          "y": 0.8756
-        },
-        "connections": [
-          "wp19_H-1"
-        ]
-      },
-      {
         "id": "wp15_H-1",
         "type": "exit",
         "floor": "H-1",
@@ -492,7 +467,6 @@
           "wp20_H-1",
           "wp18_H-1",
           "wp15_H-1",
-          "wp14_H-1",
           "wp22_H-1"
         ]
       },

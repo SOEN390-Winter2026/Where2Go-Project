@@ -63,6 +63,10 @@ export const indoorMaps = {
     },
 
     MB: {
+      1: {
+        image: require('../../assets/indoor/SGW/MB-1.png'),
+        data: require('../../assets/indoor/SGW/floorplan_MB1.json'),
+      },
       2: {
         image: require('../../assets/indoor/SGW/MB-2.png'),
         data: require('../../assets/indoor/SGW/floorplan_MB2.json'),
@@ -106,6 +110,10 @@ export const indoorMaps = {
     },
 
       JW: {
+        1: {
+          image: require('../../assets/indoor/SGW/LB-1.png'),
+          data: require('../../assets/indoor/SGW/floorplan_LB1.json'),
+        },
         2: {
           image: require('../../assets/indoor/SGW/LB-2.png'),
           data: require('../../assets/indoor/SGW/floorplan_LB2.json'),

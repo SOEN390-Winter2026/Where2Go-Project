@@ -1,9 +1,4 @@
 {
-  "CC3": {
-    "floor": "CC3",
-    "rooms": [],
-    "waypoints": []
-  },
   "MB5": {
     "floor": "MB5",
     "rooms": [
@@ -11,7 +6,7 @@
         "id": "MB-5.245",
         "label": "MB-5.245",
         "type": "classroom",
-        "floor": "CC3",
+        "floor": "MB5",
         "bounds": {
           "x": 0.2229,
           "y": 0.5446,
@@ -462,102 +457,6 @@
           "w": 0.117,
           "h": 0.0629
         }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.2065,
-          "y": 0.4359,
-          "w": 0.3141,
-          "h": 0.0374
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.3489,
-          "y": 0.8234,
-          "w": 0.1796,
-          "h": 0.025
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.5178,
-          "y": 0.2333,
-          "w": 0.0356,
-          "h": 0.7314
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.3524,
-          "y": 0.2038,
-          "w": 0.1831,
-          "h": 0.0221
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.2778,
-          "y": 0.1656,
-          "w": 0.0711,
-          "h": 0.1692
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.372,
-          "y": 0.1405,
-          "w": 0.1689,
-          "h": 0.0235
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.5196,
-          "y": 0.1597,
-          "w": 0.0213,
-          "h": 0.0471
-        }
-      },
-      {
-        "id": "MB-500",
-        "label": "MB-500",
-        "type": "hallway",
-        "floor": "MB5",
-        "bounds": {
-          "x": 0.5462,
-          "y": 0.3819,
-          "w": 0.1564,
-          "h": 0.0427
-        }
       }
     ],
     "waypoints": [
@@ -723,7 +622,6 @@
           "wp12_MB5",
           "wp47_MB5",
           "wp30_MB5",
-          "wp48_MB5",
           "wp38_MB5",
           "wp37_MB5",
           "wp36_MB5"
@@ -963,8 +861,12 @@
       },
       {
         "id": "wp30_MB5",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB5",
+        "floorsReachable": [
+          "MB-4",
+          "MB-6"
+        ],
         "position": {
           "x": 0.3192,
           "y": 0.4047
@@ -1108,18 +1010,6 @@
         ]
       },
       {
-        "id": "wp42_MB5",
-        "type": "exit",
-        "floor": "MB5",
-        "position": {
-          "x": 0.3735,
-          "y": 0.8979
-        },
-        "connections": [
-          "wp13_MB5"
-        ]
-      },
-      {
         "id": "wp43_MB5",
         "type": "door",
         "floor": "MB5",
@@ -1159,6 +1049,10 @@
         "id": "wp46_MB5",
         "type": "staircase",
         "floor": "MB5",
+        "floorsReachable": [
+          "MB-4",
+          "MB-6"
+        ],
         "position": {
           "x": 0.5816,
           "y": 0.311
@@ -1171,21 +1065,13 @@
         "id": "wp47_MB5",
         "type": "elevator",
         "floor": "MB5",
+        "floorsReachable": [
+          "MB-4",
+          "MB-6"
+        ],
         "position": {
           "x": 0.4312,
           "y": 0.421
-        },
-        "connections": [
-          "wp11_MB5"
-        ]
-      },
-      {
-        "id": "wp48_MB5",
-        "type": "elevator",
-        "floor": "MB5",
-        "position": {
-          "x": 0.436,
-          "y": 0.4898
         },
         "connections": [
           "wp11_MB5"
@@ -1205,14 +1091,34 @@
       },
       {
         "id": "wp50_MB5",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB5",
+        "floorsReachable": [
+          "MB-4",
+          "MB-6"
+        ],
         "position": {
           "x": 0.3382,
           "y": 0.1126
         },
         "connections": [
           "wp1_MB5"
+        ]
+      },
+      {
+        "id": "wp42_MB5",
+        "type": "staircase",
+        "floor": "MB5",
+        "floorsReachable": [
+          "MB-4",
+          "MB-6"
+        ],
+        "position": {
+          "x": 0.4886,
+          "y": 0.895
+        },
+        "connections": [
+          "wp13_MB5"
         ]
       }
     ]

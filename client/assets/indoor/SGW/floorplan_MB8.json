@@ -1,9 +1,4 @@
 {
-  "CC3": {
-    "floor": "CC3",
-    "rooms": [],
-    "waypoints": []
-  },
   "MB8": {
     "floor": "MB8",
     "rooms": [
@@ -538,54 +533,6 @@
           "w": 0.2037,
           "h": 0.0706
         }
-      },
-      {
-        "id": "Corridor1",
-        "label": "Corridor1",
-        "type": "hallway",
-        "floor": "MB8",
-        "bounds": {
-          "x": 0.3931,
-          "y": 0.0323,
-          "w": 0.0481,
-          "h": 0.7561
-        }
-      },
-      {
-        "id": "Corridor2",
-        "label": "Corridor2",
-        "type": "hallway",
-        "floor": "MB8",
-        "bounds": {
-          "x": 0.444,
-          "y": 0.7592,
-          "w": 0.2349,
-          "h": 0.031
-        }
-      },
-      {
-        "id": "Corridor3",
-        "label": "Corridor3",
-        "type": "hallway",
-        "floor": "MB8",
-        "bounds": {
-          "x": 0.4497,
-          "y": 0.1546,
-          "w": 0.2292,
-          "h": 0.0189
-        }
-      },
-      {
-        "id": "Corridor4",
-        "label": "Corridor4",
-        "type": "hallway",
-        "floor": "MB8",
-        "bounds": {
-          "x": 0.6846,
-          "y": 0.1581,
-          "w": 0.034,
-          "h": 0.7217
-        }
       }
     ],
     "waypoints": [
@@ -994,7 +941,8 @@
           "y": 0.4862
         },
         "connections": [
-          "wp44_MB8"
+          "wp44_MB8",
+          "wp49_MB8"
         ]
       },
       {
@@ -1035,8 +983,12 @@
       },
       {
         "id": "wp39_Exit2",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB8",
+        "floorsReachable": [
+          "MB-7",
+          "MB-9"
+        ],
         "position": {
           "x": 0.6987,
           "y": 0.8814
@@ -1047,8 +999,12 @@
       },
       {
         "id": "wp40_Exit1",
-        "type": "exit",
+        "type": "staircase",
         "floor": "MB8",
+        "floorsReachable": [
+          "MB-7",
+          "MB-9"
+        ],
         "position": {
           "x": 0.4695,
           "y": 0.1529
@@ -1192,6 +1148,22 @@
           "wp47_MB8",
           "wp45_MB8",
           "wp40_Exit1"
+        ]
+      },
+      {
+        "id": "wp49_MB8",
+        "type": "elevator",
+        "floor": "MB8",
+        "floorsReachable": [
+          "MB-7",
+          "MB-9"
+        ],
+        "position": {
+          "x": 0.6782,
+          "y": 0.5495
+        },
+        "connections": [
+          "wp35_MB-8_8.319"
         ]
       }
     ]

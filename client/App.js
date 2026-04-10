@@ -60,6 +60,9 @@ function findRoomFloor(buildingCode, room, campus) {
   return null;
 }
 
+// All campuses to fetch buildings from
+const ALL_CAMPUSES = ["SGW", "Loyola"];
+
 export default function App() {
   const [showOutdoorDirection, setShowOutdoorDirection] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -68,7 +71,11 @@ export default function App() {
   const [currentCampus, setCurrentCampus] = useState("SGW");
   const [campusCoords, setCampusCoords] = useState(CAMPUS_COORDS.SGW);
 
+  // buildings: current campus only — used for map polygon rendering.
   const [buildings, setBuildings] = useState([]);
+  // allBuildings: merged across all campuses — used for indoor routing exit lookup.
+  const [allBuildings, setAllBuildings] = useState([]);
+
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -108,6 +115,7 @@ export default function App() {
 
   const [targetRoom, setTargetRoom] = useState(null);
   const [targetFloor, setTargetFloor] = useState(null);
+
   const handlePersistCombinedRoute = (segments = [], selection = null) => {
     const outdoor = Array.isArray(segments)
       ? segments.find((s) => s?.kind === "outdoor")
@@ -125,7 +133,7 @@ export default function App() {
     setActiveRouteMeta({
       source: "indoorCombined",
       segments,
-      selection: selection && selection.from && selection.to ? selection : null,
+      selection: selection?.from && selection.to ? selection : null,
     });
     setIsRouteActive(true);
   };
@@ -148,12 +156,14 @@ export default function App() {
     if (building?.id === destinationBuilding?.id) return "destination";
     return null;
   };
+
   useEffect(() => {
     if (departureBuilding && destinationBuilding) {
       setModalVisible(false);
       setShowOutdoorDirection(true);
     }
   }, [departureBuilding, destinationBuilding]);
+
   function fitRoute(coords) {
     if (!mapRef.current || !coords?.length) return;
     mapRef.current.fitToCoordinates(coords, {
@@ -251,6 +261,7 @@ export default function App() {
     }
   };
 
+  // Current campus buildings — used for map polygon rendering only.
   useEffect(() => {
     const nextCoords = CAMPUS_COORDS[currentCampus];
     setCampusCoords(nextCoords);
@@ -279,6 +290,26 @@ export default function App() {
       });
   }, [currentCampus, showLogin]);
 
+  // both campus buildings are fetched once after login for indoor routing exit lookup
+  useEffect(() => {
+    if (showLogin) return;
+
+    Promise.all(
+      ALL_CAMPUSES.map((c) =>
+        fetch(`${API_BASE_URL}/campus/${c}/buildings`)
+          .then((r) => r.json())
+          .catch(() => [])
+      )
+    )
+      .then((results) => {
+        const merged = results.flatMap((r) => (Array.isArray(r) ? r : []));
+        setAllBuildings(merged);
+      })
+      .catch((err) => {
+        console.error("Error fetching all-campus buildings:", err);
+      });
+  }, [showLogin]);
+
   useEffect(() => {
     if (!liveLocationEnabled) {
       if (watchRef.current) {
@@ -296,7 +327,6 @@ export default function App() {
         { accuracy: Location.Accuracy.High, timeInterval: 1000, distanceInterval: 5 },
         (loc) => {
           setUserLocation({
-            //latitude: 45.49728, longitude: -73.57896 // hall building coordinates for testing
             latitude: loc.coords.latitude,
             longitude: loc.coords.longitude,
           });
@@ -350,7 +380,7 @@ export default function App() {
             setTargetFloor(null);
           }}
           campus={currentCampus}
-          buildings={buildings}
+          buildings={allBuildings}
           isAccessibilityEnabled={isAccessibilityEnabled}
           onToggleAccessibility={() => setIsAccessibilityEnabled((p) => !p)}
           targetFloor={targetFloor}
