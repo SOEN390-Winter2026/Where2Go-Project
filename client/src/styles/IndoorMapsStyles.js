@@ -646,7 +646,34 @@ const styles = StyleSheet.create({
         color: '#912338',
         fontWeight: '400',
     },
+    accessibilityBanner: {
+        position: 'absolute',
+        top: 70,
+        alignSelf: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: '#FFF4CC',
+        borderColor: '#F4C542',
+        borderWidth: 1,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 16,
+        zIndex: 20,
+        maxWidth: '60%',
+        shadowColor: '#000',
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 3,
+    },
 
+    accessibilityBannerText: {
+        color: '#6B4E00',
+        fontSize: 13,
+        fontWeight: '600',
+        flexShrink: 1,
+    },
 
 });
 

@@ -34,6 +34,7 @@ function makeBase(overrides = {}) {
     generatingDirections: false,
     routeError: null,
     routeSegments: null,
+    isAccessibilityEnabled: false,
     ...overrides,
   };
 }
@@ -47,9 +48,38 @@ describe("IndoorMapsBottomSheet", () => {
 
   it("info tab triggers handleTabPress", () => {
     const handleTabPress = jest.fn();
-    const { getByTestId } = render(<IndoorMapsBottomSheet {...makeBase({ handleTabPress })} />);
+    const { getByTestId } = render(
+      <IndoorMapsBottomSheet {...makeBase({ handleTabPress })} />
+    );
     fireEvent.press(getByTestId("tab-info"));
     expect(handleTabPress).toHaveBeenCalledWith("info");
+  });
+
+  it("shows Directions header on directions tab when accessibility is off", () => {
+    const { getByText } = render(
+      <IndoorMapsBottomSheet
+        {...makeBase({
+          activeTab: "directions",
+          isAccessibilityEnabled: false,
+        })}
+      />
+    );
+
+    expect(getByText("Directions")).toBeTruthy();
+  });
+
+  it("shows Accessible Directions header on directions tab when accessibility is on", () => {
+    const { getByText, queryByText } = render(
+      <IndoorMapsBottomSheet
+        {...makeBase({
+          activeTab: "directions",
+          isAccessibilityEnabled: true,
+        })}
+      />
+    );
+
+    expect(getByText("Accessible Directions")).toBeTruthy();
+    expect(queryByText("Directions")).toBeNull();
   });
 
   it("shows Directions Summary when directions tab has segments", () => {

@@ -953,6 +953,41 @@ describe('IndoorMaps', () => {
                 expect(getAllByText('network down').length).toBeGreaterThan(0);
             });
         });
+        it('shows accessibility banner after generating a route in accessibility mode', async () => {
+            const { buildInterBuildingDirections } = require('../../src/services/interBuildingDirections');
+
+            buildInterBuildingDirections.mockResolvedValue({
+                ok: true,
+                segments: [{
+                    kind: 'indoor',
+                    buildingCode: 'H',
+                    path: [
+                        { floor: '2', position: { x: 0.1, y: 0.1 } },
+                        { floor: '4', position: { x: 0.2, y: 0.2 } },
+                    ],
+                }],
+            });
+
+            const { getByText, getByTestId, getAllByText } = render(
+                <IndoorMaps {...defaultProps} isAccessibilityEnabled />
+            );
+
+            fireEvent.press(getByText('Get Room Directions'));
+            fireEvent.press(getByTestId('from-room'));
+            pressLastMatch(getAllByText, 'H-201');
+            fireEvent.press(getByTestId('to-room'));
+            pressLastMatch(getAllByText, 'H-202');
+
+            await act(async () => {
+                fireEvent.press(getByTestId('generate-directions-btn'));
+            });
+
+            await waitFor(() => {
+                expect(
+                    getByText('Accessible route active — avoiding stairs when possible')
+                ).toBeTruthy();
+            });
+        });
 const pressLastMatch = (getAllByText, text) => {
     const matches = getAllByText(text);
     fireEvent.press(matches[matches.length - 1]);

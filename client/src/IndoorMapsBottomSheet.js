@@ -270,6 +270,7 @@ function SheetContent({
     routeSegments,
     allRooms,
     onSelectRoom,
+    isAccessibilityEnabled,
 }) {
     if (activeTab === 'floors') {
         return (
@@ -351,7 +352,7 @@ function SheetContent({
             >
                 <View style={styles.sheetContent}>
                     <Text style={[styles.directionsSectionTitle, { fontSize: FONT_MD + 2 }]}>
-                        Directions
+                        {isAccessibilityEnabled ? "Accessible Directions" : "Directions"}
                     </Text>
 
                     <LocationSelector
@@ -497,6 +498,7 @@ const sharedSheetPropTypes = {
         floor: PropTypes.string.isRequired,
     })),
     onSelectRoom: PropTypes.func,
+    isAccessibilityEnabled: PropTypes.bool,
 };
 
 SheetContent.propTypes = {
@@ -555,6 +557,7 @@ export default function IndoorMapsBottomSheet({
     allRooms,
     onSelectRoom,
     keyboardOffset,
+    isAccessibilityEnabled,
 }) {
     return (
         <>
@@ -635,6 +638,7 @@ export default function IndoorMapsBottomSheet({
                         routeSegments={routeSegments}
                         allRooms={allRooms}
                         onSelectRoom={onSelectRoom}
+                        isAccessibilityEnabled={isAccessibilityEnabled}
                     />
                 </View>
             </Animated.View>

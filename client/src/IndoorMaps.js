@@ -36,6 +36,9 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const ZOOM_STEP = 0.75;
 const INDOOR_ROUTE_STROKE_DASH = [8, 6];
+const DEFAULT_ROUTE_COLOR = BURGUNDY_LIGHT;
+const ACCESSIBLE_ROUTE_COLOR = '#F4C542';
+const ACCESSIBLE_ROUTE_GLOW = '#FFE680';
 
 const clamp = (value, max) => Math.min(Math.max(value, -max), max);
 
@@ -98,7 +101,13 @@ ZoomButton.propTypes = {
     accessibilityLabel: PropTypes.string.isRequired,
 };
 
-function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, routePolylines }) {
+function IndoorRouteOverlay({
+  containBounds,
+  containerWidth,
+  containerHeight,
+  routePolylines,
+  isAccessibilityEnabled,
+})  {
     if (
         !containBounds
         || !containerWidth
@@ -127,15 +136,29 @@ function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, ro
                 return (
                     <React.Fragment key={routePolylineKey(pts)}>
                         {pxPts.length >= 2 ? (
+                        <>
+                            {isAccessibilityEnabled ? (
                             <Polyline
                                 points={pointsStr}
                                 fill="none"
-                                stroke={BURGUNDY_LIGHT}
-                                strokeWidth={4}
+                                stroke={ACCESSIBLE_ROUTE_GLOW}
+                                strokeWidth={10}
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                strokeDasharray={INDOOR_ROUTE_STROKE_DASH}
+                                opacity={0.9}
                             />
+                            ) : null}
+
+                            <Polyline
+                            points={pointsStr}
+                            fill="none"
+                            stroke={isAccessibilityEnabled ? ACCESSIBLE_ROUTE_COLOR : DEFAULT_ROUTE_COLOR}
+                            strokeWidth={isAccessibilityEnabled ? 6 : 4}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeDasharray={INDOOR_ROUTE_STROKE_DASH}
+                            />
+                        </>
                         ) : null}
                         {pxPts.length > 0 ? (
                             <>
@@ -143,7 +166,7 @@ function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, ro
                                     cx={pxPts[0].x}
                                     cy={pxPts[0].y}
                                     r={6}
-                                    fill={BURGUNDY_LIGHT}
+                                    fill={isAccessibilityEnabled ? ACCESSIBLE_ROUTE_COLOR : DEFAULT_ROUTE_COLOR}
                                     stroke="#fff"
                                     strokeWidth={2}
                                 />
@@ -152,7 +175,7 @@ function IndoorRouteOverlay({ containBounds, containerWidth, containerHeight, ro
                                         cx={pxPts[pxPts.length - 1].x}
                                         cy={pxPts[pxPts.length - 1].y}
                                         r={6}
-                                        fill={BURGUNDY_LIGHT}
+                                        fill={isAccessibilityEnabled ? ACCESSIBLE_ROUTE_COLOR : DEFAULT_ROUTE_COLOR}
                                         stroke="#fff"
                                         strokeWidth={2}
                                     />
@@ -178,6 +201,7 @@ IndoorRouteOverlay.propTypes = {
     routePolylines: PropTypes.arrayOf(
         PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))
     ),
+    isAccessibilityEnabled: PropTypes.bool,
 };
 
 IndoorRouteOverlay.defaultProps = {
@@ -185,9 +209,10 @@ IndoorRouteOverlay.defaultProps = {
     containerWidth: 0,
     containerHeight: 0,
     routePolylines: [],
+    isAccessibilityEnabled: false,
 };
 
-function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, targetRoom, routePolylines }) {
+function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, targetRoom, routePolylines, isAccessibilityEnabled }) {
     const scale = useRef(new Animated.Value(1)).current;
     const lastScale = useRef(1);
     const translateX = useRef(new Animated.Value(0)).current;
@@ -430,6 +455,7 @@ function ZoomableImage({ source, rooms, onRoomPress, poiOverlay, isPOIEnabled, t
                         containerWidth={containerDims.width}
                         containerHeight={containerDims.height}
                         routePolylines={routePolylines}
+                        isAccessibilityEnabled={isAccessibilityEnabled}
                     />
                 </Animated.View>
             </GestureDetector>
@@ -454,6 +480,7 @@ ZoomableImage.propTypes = {
     routePolylines: PropTypes.arrayOf(
         PropTypes.arrayOf(PropTypes.shape({ x: PropTypes.number, y: PropTypes.number }))
     ),
+    isAccessibilityEnabled: PropTypes.bool,
 };
 
 ZoomableImage.defaultProps = {
@@ -463,6 +490,7 @@ ZoomableImage.defaultProps = {
     isPOIEnabled: false,
     targetRoom: null,
     routePolylines: [],
+    isAccessibilityEnabled: false,
 };
 
 function Placeholder({ width, text }) {
@@ -479,7 +507,7 @@ Placeholder.propTypes = {
     text: PropTypes.string.isRequired,
 };
 
-function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled, targetRoom, routeByFloor }) {
+function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress, isPOIEnabled, targetRoom, routeByFloor, isAccessibilityEnabled }) {
     const buildingData = indoorMaps?.[campus]?.[buildingCode];
     const routePolylines = getPolylinesForFloor(routeByFloor, selectedFloor);
 
@@ -515,6 +543,7 @@ function FloorMapImage({ campus, buildingCode, selectedFloor, width, onRoomPress
                                     isPOIEnabled={isPOIEnabled}
                                     targetRoom={targetRoom}
                                     routePolylines={isActive ? routePolylines : []}
+                                    isAccessibilityEnabled={isAccessibilityEnabled}
                                 />
 
                                 {!entry.data && (
@@ -542,6 +571,7 @@ FloorMapImage.propTypes = {
     isPOIEnabled: PropTypes.bool,
     targetRoom: PropTypes.string,
     routeByFloor: PropTypes.object,
+    isAccessibilityEnabled: PropTypes.bool,
 };
 
 FloorMapImage.defaultProps = {
@@ -549,6 +579,7 @@ FloorMapImage.defaultProps = {
     routeByFloor: null,
     isPOIEnabled: false,
     targetRoom: null,
+    isAccessibilityEnabled: false,
 };
 
 function RouteFloorSwitcher({ routeFloors, selectedFloor, setSelectedFloor }) {
@@ -842,12 +873,21 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                     isPOIEnabled={isPOIEnabled}
                     targetRoom={targetRoom}
                     routeByFloor={indoorRouteByFloor}
+                    isAccessibilityEnabled={isAccessibilityEnabled}
                 />
                 <RouteFloorSwitcher
                     routeFloors={indoorRouteByFloor ? Object.keys(indoorRouteByFloor) : []}
                     selectedFloor={selectedFloor}
                     setSelectedFloor={setSelectedFloor}
                 />
+                {isAccessibilityEnabled && indoorRouteByFloor ? (
+                    <View style={styles.accessibilityBanner} pointerEvents="none">
+                        <Ionicons name="accessibility" size={16} color="#6B4E00" />
+                        <Text style={styles.accessibilityBannerText}>
+                            Accessible route active — avoiding stairs when possible
+                        </Text>
+                    </View>
+                ) : null}
                 {routeError ? (
                     <View style={styles.routeErrorBanner} pointerEvents="none">
                         <Text style={styles.routeErrorText}>{routeError}</Text>
@@ -886,6 +926,7 @@ export default function IndoorMaps({ building, onPressBack, campus, buildings = 
                 allRooms={allRoomsForBuilding}
                 onSelectRoom={handleSelectRoom}
                 keyboardOffset={keyboardAnim}
+                isAccessibilityEnabled={isAccessibilityEnabled}
             />
 
             <RoomActionModal
